@@ -127,10 +127,8 @@ class Cron extends MY_Controller {
 				case 'XIII': $region = 15; $r_code = 'XIII'; break;
 				default: $region = 0;
 			}
-			// if ($region > 10) $company = 1;
-			// else $company = (substr($row->branch, 0, 1) == 6) ? 2 : substr($row->branch, 0, 1);
-
-			$company = (substr($row->branch, 0, 1) == 6) ? 2 : substr($row->branch, 0, 1);
+			if ($region > 10) $company = 1;
+			else $company = (substr($row->branch, 0, 1) == 6) ? 2 : substr($row->branch, 0, 1);
 			
 			$branch = $global->query("select * from tbl_branches where b_code = '".$row->branch."'")->row();
 
@@ -231,6 +229,7 @@ class Cron extends MY_Controller {
 	public function rms_expense()
 	{
 		$start = date("Y-m-d H:i:s");
+		$current_date = date("Y-m-d");
 		$rows = 0;
 
 		$dev_ces2 = $this->load->database('dev_ces2', TRUE);
@@ -238,7 +237,8 @@ class Cron extends MY_Controller {
 		$date_yesterday = $this->input->post('date_yesterday');
 		$date_yesterday = (empty($date_yesterday))
 			? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
-		$date_from = date('Y-m-d', strtotime('-7 days'));
+		$date_from = date('Y-m-d', strtotime('-3 days'));
+
 		// update lto pending sales
 		//$result = $this->db->query('select sid, engine_no, cust_code, 
 		//		left(pending_date, 10) as pending_date, registration,
@@ -247,21 +247,56 @@ class Cron extends MY_Controller {
 		//	inner join tbl_customer c on customer = cid
 		//	inner join tbl_engine e on engine = eid
 		//	where left(pending_date,10) = "'.$date_yesterday.'"
-			//or left(registration_date,10) = "'.$date_yesterday.'"')->result_object();
+		//		or left(registration_date,10) = "'.$date_from.'"')->result_object();
 
-		$result = $this->db->query('select sid, engine_no, cust_code, 
-				left(pending_date, 10) as pending_date, registration,
-				left(cr_date, 10) as cr_date
-			from tbl_sales s
-			inner join tbl_customer c on customer = cid
-			inner join tbl_engine e on engine = eid
-			where (left(pending_date,10) BETWEEN "'.$date_from.'" and  "'.$date_yesterday.'")
-			or (left(registration_date,10) BETWEEN "'.$date_from.'" and "'.$date_yesterday.'")')->result_object();
+
+		$query  = "SELECT sid, engine_no, cust_code, ";
+		$query .= "LEFT(pending_date, 10) AS pending_date, registration, ";
+		$query .= "LEFT(cr_date, 10) AS cr_date ";
+		$query .= "FROM tbl_sales s ";
+		$query .= "INNER JOIN tbl_customer c ON customer=cid ";
+		$query	.= "INNER JOIN tbl_engine e ON engine=eid ";
+		$query .= 'WHERE (left(pending_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'") ';
+		$query .= 'OR (left(registration_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'")';
+
+		$result = $this->db->query($query)->result_object();
+		
+		// FOR DEBUGGING
+		//print_r(array($start, $current_date, $date_yesterday, $date_from, $query, $result));
+		//exit;
+
+		
+		//START: PRESERVE THIS BLOCK OF CODE FOR OPTIMIZATION BUT USE IN DEV ENVIRONMENT INSTEAD OF PRODUCTION - Jake
+		//foreach ($result as $row){
+		//	$engine_nums[] = $row->engine_no;
+		//	$cust_codes[]  = $row->cust_code;
+		//}
+
+		//$dev_ces2->select('rec_no');
+		//$dev_ces2->from('rms_expense');
+		//$dev_ces2->where_not_in('engine_num', $engine_nums);
+		//$dev_ces2->where_not_in('custcode', $cust_codes);
+		//$expense_not_exist = $dev_ces2->get()->result_array();
+		//print_r(array('NOT_EXIST', $expense_not_exist));
+		//exit;
+
+		//$dev_ces2->select('rec_no');
+		//$dev_ces2->from('rms_expense');
+		//$dev_ces2->where_in('engine_num', $engine_nums);
+		//$dev_ces2->where_in('custcode', $cust_codes);
+		//$expense_exist = $dev_ces2->get()->result_array();
+		
+		//END
+
+		//print_r(array('EXIST', $expense_exist));
+		//exit;
+
 		foreach ($result as $row)
-		{
+		{				
 			$expense = $dev_ces2->query("select rec_no from rms_expense
 				where engine_num = '".$row->engine_no."'
 				and custcode = '".$row->cust_code."'")->row();
+
 			if (empty($expense))
 			{
 				$expense = new Stdclass();
@@ -284,6 +319,7 @@ class Cron extends MY_Controller {
 			}
 			$rows++;
 		}
+
 		$end = date("Y-m-d H:i:s");
 
 		$log = new Stdclass();

@@ -29,7 +29,7 @@
         }
         
         // Get rid of the decimal place and capture separately
-        var decimalRegex = /(\d{0,})(\.(\d{1,})?)?/g
+        var decimalRegex = new RegExp(/(\d{0,})(\.(\d{1,})?)?/g);
         var decimalPartMatches = decimalRegex.exec(justNumbers);
         var decimalPart = "";
         if (decimalPartMatches[2]) {

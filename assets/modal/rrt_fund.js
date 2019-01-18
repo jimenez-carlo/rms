@@ -15,18 +15,21 @@ function modal(_fid, _cid, _type)
     case 1:
       $(".modal-title").text('Cash Withdrawal');
       $(".check_no").addClass('hide');
+      $(".check_date").addClass('hide');
       $("input[name=check_no]").val('N/A');
       $("#btnSubmit").text('Withdraw');
       break;
     case 2:
       $(".modal-title").text('Check Withdrawal');
       $(".check_no").removeClass('hide');
+      $(".check_date").removeClass('hide');
       $("input[name=check_no]").val('');
       $("#btnSubmit").text('Withdraw');
       break;
     case 3:
       $(".modal-title").text('Cash Deposit');
       $(".check_no").addClass('hide');
+      $(".check_date").addClass('hide');
       $("input[name=check_no]").val('N/A');
       $("#btnSubmit").text('Deposit');
       break;
@@ -35,6 +38,8 @@ function modal(_fid, _cid, _type)
 
 function submit()
 {
+  if (!confirm('Please make sure that all information are correct before proceeding. Continue?')) return;
+
   $("#form input.numeric").each(function(){
     var val = toFloat($(this).val());
     $(this).val(val);

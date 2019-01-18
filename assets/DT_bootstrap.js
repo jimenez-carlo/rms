@@ -5,7 +5,7 @@ $.extend( true, $.fn.dataTable.defaults, {
 	"oLanguage": {
 		"sLengthMenu": "_MENU_ records per page"
 	}
-} );
+});
 
 
 /* Default class modification */

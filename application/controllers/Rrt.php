@@ -37,7 +37,6 @@ class Rrt extends MY_Controller {
 				case 1: $row->company->name = 'MNC'; break;
 				case 2: $row->company->name = 'MTI'; break;
 				case 3: $row->company->name = 'HPTI'; break;
-				case 6: $row->company->name = 'MDI'; break;
 			}
 
 			$result[$key] = $row;

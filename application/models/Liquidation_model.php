@@ -28,7 +28,6 @@ class Liquidation_model extends CI_Model{
 				WHEN v.company = 1 THEN 'MNC'
 				WHEN v.company = 2 THEN 'MTI'
 				WHEN v.company = 3 THEN 'HPTI'
-				WHEN v.company = 6 THEN 'MDI'
 				END as companyname,
 				count(distinct s.sid) as sales_count,
 				ifnull(sum(case when s.status < 3 then 1200 else 0 end), 0) as rrt_pending,

@@ -20,7 +20,6 @@ class Return_fund_model extends CI_Model{
 				WHEN company = 1 THEN 'MNC'
 				WHEN company = 2 THEN 'MTI'
 				WHEN company = 3 THEN 'HPTI'
-				WHEN company = 6 THEN 'MDI'
 				END as companyname,
 			rf.amount from tbl_return_fund rf
 			inner join tbl_voucher v on v.vid = rf.fund

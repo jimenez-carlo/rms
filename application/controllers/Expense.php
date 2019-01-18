@@ -275,6 +275,11 @@ class Expense extends MY_Controller {
 			$this->template('expense/ca_ref_up', $data);
 		}
 		else {
+			// echo "select m.*, v.reference as ca_ref, t.trans_no as topsheet
+			//	from tbl_misc m
+			//	left join tbl_voucher v on ca_ref = vid
+			//	left join tbl_topsheet t on topsheet = tid
+			//	where m.region = ".$_SESSION['region'];
 			$data['type'] = $this->expense->type;
 			$data['status'] = $this->expense->status;
 			$data['table'] = $this->db->query("select m.*, v.reference as ca_ref, t.trans_no as topsheet

@@ -7,7 +7,7 @@ class Sales extends MY_Controller {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->helper('directory');
-    $this->load->model('Sales_model', 'sales');
+    		$this->load->model('Sales_model', 'sales');
 	}
 
 	public function index()

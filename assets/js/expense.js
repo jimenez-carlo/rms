@@ -1,5 +1,7 @@
 function upload()
 {
+	$(".messages").remove();
+	
   $.ajax({
     url : "upload",
     type: "POST",
@@ -21,9 +23,8 @@ function upload()
       }
       else 
       {
-        $(".alert-error").removeClass("hide");
         $("body").prepend(data.message);
-      }    
+      }	
     },
     error: function (jqXHR, textStatus, errorThrown)
     {
@@ -40,27 +41,6 @@ function unlink(filename)
     data: {"filename": filename},
     dataType: "JSON",
   });
-}
-
-function get_offline()
-{
-  if($('input[name=offline]').is(':checked')){
-    $('.control-group.date').removeClass('hide');
-    document.getElementById("or_date").disabled = false;
-  }
-  else {
-    $('.control-group.date').addClass('hide');
-    document.getElementById("or_date").disabled = true;
-
-    var today = new Date();
-    var dd = today.getDate();
-    var mm = today.getMonth()+1;
-    var yyyy = today.getFullYear();
-
-    if (dd < 10) dd = "0"+dd;
-    if (mm < 10) mm = "0"+mm;
-    $('input[name=date]').val(yyyy + '-' + mm + '-' + dd);
-  }
 }
 
 $(function(){

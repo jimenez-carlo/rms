@@ -5,7 +5,7 @@ class Lto_payment extends MY_Controller {
 
 	public function __construct() {
 		parent::__construct();
-    $this->load->model('Lto_payment_model', 'lto_payment');
+    		$this->load->model('Lto_payment_model', 'lto_payment');
 	}
 
 	public function index()
@@ -38,7 +38,7 @@ class Lto_payment extends MY_Controller {
 		$this->header_data('nav', 'lto_payment');
 		$this->header_data('dir', './../');
 
-		$data['company'] = array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI', 8 => 'MDI');
+		$data['company'] = array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI');
 		$this->template('lto_payment/extract_form', $data);
 	}
 
@@ -109,9 +109,7 @@ class Lto_payment extends MY_Controller {
 		}
 
 		$data['region'] = $this->region[$_SESSION['region']];
-		
-
-		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 3 => 'HPTI', 6 => 'MTI', 8 => 'MDI');
+		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 3 => 'HPTI', 6 => 'MTI');
 		$this->template('lto_payment/add', $data);
 	}
 
@@ -150,7 +148,7 @@ class Lto_payment extends MY_Controller {
 
 		$data['payment'] = $payment;
 		$data['region'] = $this->region[$_SESSION['region']];
-		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 2 => 'MTI', 3 => 'HPTI', 6 => 'MDI');
+		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 2 => 'MTI', 3 => 'HPTI');
 		$this->template('lto_payment/edit', $data);
 	}
 

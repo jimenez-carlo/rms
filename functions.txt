@@ -1,50 +1,120 @@
-ROLLOUT
+LTO Transmittal
+	- System to create sales from LTO Transmittal System via scheduled cron
+		- Select sales transmitted yesterday from LTO Transmittal System
+		- Create LTO Transmittal record
+		- Create sales record
 
-RRT SPVSR - set initial value (fund)
-RRT SPVSR - set initial value (old rms)
-RRT MGR - confirm (fund)
-RRT MGR - confirm (old rms)
+Cash Advance
+	- Accounting to create cash advance entry on SAP
+		- Select included transmittal
+		- Print included list of sales
+		- Input document # from SAP
+	- Treasury to process cash advance entry on SAP
+		- Input debit memo #
+		- If tagged as offline, input date
+	- Treasury to tag as deposited
+		- If tagged as offline, input date
+		- Add total amount to bank account
 
-~
+Registration
+	- RRT Staff to tag as LTO pending
+		- If rejected by LTO, select reason for rejection
+	- RRT Supervisor to withdraw fund
+		- Input amount to withdraw
+		- If check withdrawal, input check # and check date
+		- If cash withdrawal, add amount to cash fund
+		- If check withdrawal, add amount to check fund
+	- RRT Supervisor to hold/unhold check
+		- If holding, input reason for hold
+		- If holding,
+			- Deduct check amount from check fund
+			- Add check amount to check on hold fund
+		- If unholding,
+			- Deduct check amount from check on hold fund
+			- Add check amount to check fund
+	- RRT Staff to process payment to LTO via NRU
+		- Input registration amount
+		- Select method of payment
+			- If cash, deduct amount to cash fund
+			- If check, 
+				- Select check to use
+				- Deduct check amount from check fund
+				- If check has remaining balance, deposit balance to bank account
+				- Tag check as used
+	- RRT Staff to record received ORCR from LTO
+		- Input CR #, MV File #, and Plate #
+		- Input adjusted registration amount
+		- If registration amount changed,
+			- If registration amount reduced, add reduced amount to cash fund
+			- If registration amount increased, deduct increased amount from cash fund
+		- Generate RERFO report
+			- If RERFO does not exist, create RERFO
+			- If RERFO exists, add record to RERFO
+		- Generate TOPSHEET report
+			- If TOPSHEET does not exist, create TOPSHEET
+			- If TOPSHEET exists, add record to TOPSHEET
+	- RRT Staff to record miscellaneous expenses
+		- Input OR #, date and amount
+		- Upload scanned receipt
+		- If miscellaneous expense was rejected, edit details
+	- RRT Supervisor to approve miscellaneous expense
+		- If miscellaneous expense was rejected, select reason for rejection
+	- RRT Supervisor to print RERFO
+	- RRT Supervisor to print TOPSHEET
+		- Select miscellaneous expense to include to TOPSHEET
+		- Print TOPSHEET with total expense
+	- RRT Staff to upload scanned ORCR
 
-DEV - cron budget
-TRSRY - budget
+Liquidation
+	- Accounting to check sales details and upload to SAP
+		- Select sales record to include to SAP template for upload
+			- If sales has no attachment, exclude from SAP template
+		- Input document # range from SAP after upload
+	- Accounting to liquidate cash advance entry
+		- Generate report for cash advance entry and liquidated expenses
 
-~
+ORCR Transmittal
+	- RRT Supervisor to print transmittal slip based on TOPSHEET
+		- Breakdown sales under TOPSHEET by branch
+			- If record is CASH sales type, include OR and CR to slip for branch
+			- If record is INST sales type,
+				- include OR to slip for branch
+				- include CR to sli0p for bank (BMI)
+	- Branch to tag as received
+		- If not received, input remarks
+	- BMI to tag as received
+		- If not received, input remarks
 
-RRT - diy
-RRT - pending
-TRSRY - cash advance
+Report
+	- Accounting to monitor RRT account funds
+	- Treasury to monitor unliquidated cash advance entries
+	- RRT to monitor pending processes
+	- RRT to monitor current account funds
+	- Branch to monitor registration status
+		- If ORCR attachment is available, print ORCR attachment
+	- Audit to monitor cash flow
 
-~
+BOBJ Report
+	- System to update BOBJ data for report via scheduled cron
+		- Select sales tagged as LTO pending yesterday
+			- Update status and tagged date
+		- Select sales with registration amount inputted yesterday
+			- Update registration amount and inputted date
 
-RRT SPVSR - withdraw
-RRT - nru
-RRT SPVSR - old nru
 
-~
 
-RRT - registration
-RRT SPVSR - rerfo
-RRT SPVSR - topsheet
-RRT SPVSR - old topsheet
-RRT SPVSR - transmittal
+== FOR ENHANCEMENTS ==
 
-~
+Free Registration
+	- Marketing to create promo details
+		- Input promo code, date, brand, type, and amount
+		- Select included model code
+		- Select affected branches
+	- Branch to monitor ongoing promo
+	- RMS System to validate incoming sales for promo
+		- Generate discrepancy report between SAP entries and RMS validation for free registration
 
-BRANCH - receive
-ACCTG - checking
-ACCTG - sap upload
-
-~
-
-ACCTG AMGR - ca offset
-TRSRY - reimbursement
-
-~
-
-ACCTG - liquidation
-RRT - dashboard
-RRT SPVSR - old rms
-RRT MGR - fund audit
-TRSRY - transfer history
+AR Sub Ledger
+	- System to store payment for registration by AR
+	- System to monitor balance of AR
+		- If under promo, system to monitor supplier payment

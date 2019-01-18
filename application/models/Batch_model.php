@@ -37,7 +37,6 @@ class Batch_model extends CI_Model{
 			inner join tbl_topsheet on topsheet = tid
 			where bid = ".$bid)->row();
 		$batch->bcode = ($batch->company == 2) ? 6 : $batch->company;
-		$batch->bcode = ($batch->company == 6) ? 8 : $batch->company;
 		$batch->post_date = substr($batch->post_date, 0, 10);
 
 		$batch->account_key = $this->db->query("select acct_number from tbl_fund

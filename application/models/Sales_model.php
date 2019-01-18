@@ -399,8 +399,6 @@ class Sales_model extends CI_Model{
 					when 'REGION 6' then '8'
 					when 'REGION 7' then '9'
 					when 'REGION 8' then '10'
-					when 'REGION 9' then '11'
-					when 'REGION 10' then '12'
 					else 0
 					end as region,
 				ifnull(sum(case when not regn_status = 'Self Registration' then 1 else 0 end), 0) as pending,

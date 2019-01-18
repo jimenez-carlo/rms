@@ -7,13 +7,14 @@ function hold_c(_cid)
   $(".error").html("");
   $(".alert-error").addClass("hide");
   $('#form')[0].reset(); // reset form on modals
+  $('#form input[name=cid]').val(cid);
   $('#modal_form').modal('show'); // show bootstrap modal
 }
 
 function hold_check()
 {
   $.ajax({
-    url : "checks/hold_check/" + cid,
+    url : "checks/hold",
     type: "POST",
     data: $('#form').serialize(),
     dataType: "JSON",

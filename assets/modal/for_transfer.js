@@ -34,7 +34,7 @@ function save_transfer()
       if(data.status)
       {
         $('#modal_form').modal('hide');
-        location.href='for_transfer';
+        location.href='ca_list';
       }
       else 
       {

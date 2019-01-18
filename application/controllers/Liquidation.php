@@ -69,7 +69,6 @@ class Liquidation extends MY_Controller {
 		$data['company'][1] = 'MNC';
 		$data['company'][2] = 'MTI';
 		$data['company'][3] = 'HPTI';
-		$data['company'][6] = 'MDI';
 
 		$this->template('liquidation/rrt', $data);
 	}

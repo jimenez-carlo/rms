@@ -27,15 +27,18 @@ class Login extends CI_Controller {
 			}
 			else {
 				$this->load->model('Login_model','login');
-				
+				//var_dump(array('DATA', $username,$this->login->get_user_info('1822-BH-001')));
+				//die;
 				// special usernames
 				$user_info = $this->custom_login($username, $password);
-
+				
 				// global login
-				if (empty($user->info)) {
+				if (empty($user_info)) {
 					$raw['user_info'] = $this->login->get_user_info($username);
 					$raw['sys_access'] = $this->login->get_system_access(20);
 					$raw['page_access'] = $this->login->get_access();
+					
+
 
 					// validate 2 - username exists
 					if (empty($raw['user_info'])) {
@@ -89,7 +92,6 @@ class Login extends CI_Controller {
 						case 109:
 						case 108: // if rrt, set region
 							$name = explode('-', $user_info['username']);
-							echo "Haha";
 							switch ($name[1])
 							{
 								case 'NCR': $user_info['region'] = 1; break;
@@ -139,15 +141,15 @@ class Login extends CI_Controller {
 									break;
 								case 'ACCTG-PAYCL-004':
 									$user_info['task'] = 'For SAP Uploading';
-									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)';
+									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
 									break;
 								case 'ACCTG-PAYCL-005':
 									$user_info['task'] = 'For Voucher';
-									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)';
+									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
 									break;
 								case 'ACCTG-AMGR':
 									$user_info['task'] = 'For Manager Approval';
-									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)';
+									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
 									break;
 								case 'TRSRY-ASST-001':
 									$user_info['task'] = 'For Check Issuance';

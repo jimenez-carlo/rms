@@ -2,8 +2,10 @@ var filenames = new Array(), paths = new Array(), attachments = '';
 
 function upload()
 {
+	$(".messages").remove();
+	
   $.ajax({
-    url : "registration/upload",
+    url : "attachment/upload",
     type: "POST",
     data: new FormData($('#form')[0]),
     dataType: "JSON",
@@ -36,7 +38,6 @@ function upload()
       }
       else 
       {
-        $(".alert-error").removeClass("hide");
         $("body").prepend(data.message);
       }    
     },
@@ -50,7 +51,7 @@ function upload()
 function unlink(filename)
 {
   $.ajax({
-    url : "registration/unlink/",
+    url : "attachment/unlink/",
     type: "POST",
     data: {"filename": filename},
     dataType: "JSON",

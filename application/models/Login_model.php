@@ -49,16 +49,13 @@ class Login_model extends CI_Model{
 	}
 
 
-	public function get_user_info($username="") {
+	public function get_user_info($username) {
 	  $global = $this->load->database('global', TRUE);
-		$result = $global->query("SELECT
-																	a.username,
-																	a.password,
-																	b.*
-																FROM tbl_users a
-																	INNER JOIN tbl_users_info b ON a.uid=b.uid
-																WHERE
-																	username = '$username'");
+		$query  = "SELECT a.username, a.password, b.* ";
+		$query .= "FROM tbl_users a INNER JOIN tbl_users_info b ON a.uid=b.uid ";
+		$query .= 'WHERE username="'.$username.'"'; 
+				
+		$result = $global->query($query);
 		return $result->row();
 	}
 

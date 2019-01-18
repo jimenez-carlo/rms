@@ -212,3 +212,18 @@ body {
   font-size: 12px;
   padding-left: 2px;
 }
+
+.row-fluid [class*="span"] {
+  margin-left: 0;
+}
+
+.form-actions {
+  margin-top: 0;
+}
+
+
+/* Table Highlights */
+
+table.table tbody tr:hover td {
+  background: lightcyan;
+}

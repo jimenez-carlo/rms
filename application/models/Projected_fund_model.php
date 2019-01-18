@@ -59,7 +59,6 @@ class Projected_fund_model extends CI_Model{
 
 		$region = $this->reg_code[$fund->region];
 		$company = ($fund->company == 2) ? 6 : $fund->company;
-		$company = ($fund->company == 6) ? 8 : $fund->company;
 		$fund->reference = 'CA-'.$region.'-'.date('ymd');
 
 		$ref_code = $this->db->query("select count(*) as c from tbl_voucher

@@ -85,8 +85,7 @@ class MY_Controller extends CI_Controller {
 		}
 
 		// if access check fails
-		// print_r($_SESSION['page_access']);
-		// redirect('no_access');
+		redirect('no_access');
 	}
 
 	public function template($page, $data = array())
