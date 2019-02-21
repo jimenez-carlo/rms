@@ -12,8 +12,7 @@ class Projected_fund extends MY_Controller {
   /**
    * Accounting to Create Voucher
    */
-	public function index()
-	{
+	public function index() {
 		$this->access(1);
 		$this->header_data('title', 'Projected Funds');
 		$this->header_data('nav', 'projected_fund');
@@ -27,12 +26,15 @@ class Projected_fund extends MY_Controller {
 		$this->template('projected_fund/list_projected', $data);
 	}
 
-	public function create_voucher($fid, $cid)
-	{
-		$data['fund'] = $this->projected_fund->create_voucher($fid, $cid);
-		$data['company'] = $this->projected_fund->company;
-		$view = $this->load->view('projected_fund/create_voucher', $data, TRUE);
-		echo json_encode($view);
+	public function create_voucher() {
+          // $fid = $this->input->get('fid'); //FOR DEBUGGING
+          // $cid = $this->input->get('cid');
+          $fid = $this->input->post('fid');
+          $cid = $this->input->post('cid');
+          $data['fund'] = $this->projected_fund->create_voucher($fid, $cid);
+          $data['company'] = $this->projected_fund->company;
+          $view = $this->load->view('projected_fund/create_voucher', $data, TRUE);
+          print $view;
 	}
 
 	public function sprint()
@@ -52,13 +54,13 @@ class Projected_fund extends MY_Controller {
 
 		$this->form_validation->set_rules('voucher_no', 'Document #', 'required');
 
-    if ($this->form_validation->run() == FALSE) {
-    	$err_msg[] = validation_errors();
-    }
-    if (empty($ltid)) {
-    	$err_msg[] = 'Please select at least one transmittal to proceed.';
-    }
-    
+                if ($this->form_validation->run() == FALSE) {
+                  $err_msg[] = validation_errors();
+                }
+                if (empty($ltid)) {
+                  $err_msg[] = 'Please select at least one transmittal to proceed.';
+                }
+
 		if (!empty($err_msg)) echo json_encode(array("status" => FALSE, "message" => $err_msg));
 		else $this->true_save_voucher($fid);
 	}
@@ -74,7 +76,7 @@ class Projected_fund extends MY_Controller {
 		$voucher->voucher_no = $this->input->post('voucher_no');
 		$voucher->amount = $this->input->post('amount');
 		$voucher = $this->projected_fund->save_voucher($voucher, $ltid);
-		
+
 		$_SESSION['messages'][] = 'Created Document # '.$voucher->voucher_no.' for '.$voucher->region.'.';
 		echo json_encode(array("status" => TRUE));
 	}

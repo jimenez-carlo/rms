@@ -26,12 +26,12 @@ class Projected_fund_model extends CI_Model{
 	public function get_projected_funds()
 	{
 		$result = $this->db->query("select f.*,
-				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher = 0 then 1200 else 0 end), '0.00') as voucher_1,
-				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher > 0 then 1200 else 0 end), '0.00') as transfer_1,
-				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher = 0 then 1200 else 0 end), '0.00') as voucher_3,
-				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher > 0 then 1200 else 0 end), '0.00') as transfer_3,
-				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 1200 else 0 end), '0.00') as voucher_6,
-				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher > 0 then 1200 else 0 end), '0.00') as transfer_6
+				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_1,
+				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_1,
+				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_3,
+				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_3,
+				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_6,
+				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_6
 			from tbl_fund f
 			left join tbl_sales s
 				on s.region = f.region
@@ -53,37 +53,52 @@ class Projected_fund_model extends CI_Model{
   /**
    * Accounting to Create Voucher
    */
-	public function create_voucher($fid, $cid)
-	{
-		$fund = $this->db->query("select * from tbl_fund where fid = ".$fid)->row();
+        public function create_voucher($fid, $cid) {
+          $fund = $this->db->query("select * from tbl_fund where fid = ".$fid)->row();
 
-		$region = $this->reg_code[$fund->region];
-		$company = ($fund->company == 2) ? 6 : $fund->company;
-		$fund->reference = 'CA-'.$region.'-'.date('ymd');
+          $region = $this->reg_code[$fund->region];
+          $company = ($fund->company == 2) ? 6 : $fund->company;
+          $fund->reference = 'CA-'.$region.'-'.date('ymd');
 
-		$ref_code = $this->db->query("select count(*) as c from tbl_voucher
-			where reference like '".$fund->reference."%'")->row()->c;
-		$fund->reference .= ($ref_code == 0) ? '' : '-'.($ref_code++);
-		
-		$fund->transmittal = $this->db->query("select t.*,
-				left(t.date, 10) as date,
-				sum(1200) as amount,
-				count(*) as sales
-			from tbl_lto_transmittal t
-			inner join tbl_sales s on lto_transmittal = ltid
-			where t.region = ".$fund->region."
-			and left(s.bcode, 1) = '".$cid."'
-			and voucher = 0
-			and registration_type != 'Self Registration'
-			group by t.date, t.company")->result_object();
-		
-		return $fund;
-	}
+          $ref_code = $this->db->query("select count(*) as c from tbl_voucher
+            where reference like '".$fund->reference."%'")->row()->c;
+          $fund->reference .= ($ref_code == 0) ? '' : '-'.($ref_code++);
+
+          $fund->transmittal = $this->db->query(
+            "SELECT
+                t.ltid, t.code, t.region, t.company
+                 ,LEFT(t.date, 10) AS date
+                ,SUM(900) AS amount
+                ,COUNT(*) AS sales
+            FROM
+                tbl_lto_transmittal t
+                    INNER JOIN
+                tbl_sales s ON s.lto_transmittal = t.ltid
+            WHERE  t.region = ".$fund->region."
+                    AND LEFT(s.bcode, 1) = '".$cid."'
+                    AND voucher = 0
+                    AND registration_type != 'Self Registration'
+            GROUP BY t.date, t.company, t.ltid"
+          )->result_object();
+          // BACK UP
+          // select t.*,
+          //            left(t.date, 10) as date,
+          //            sum(900) as amount,
+          //            count(*) as sales
+          //            from tbl_lto_transmittal t
+          //            inner join tbl_sales s on lto_transmittal = ltid
+          //            where t.region = ".$fund->region."
+//            and left(s.bcode, 1) = '".$cid."'
+//            and voucher = 0
+//            and registration_type != 'Self Registration'
+//            group by t.date, t.company"
+          return $fund;
+        }
 
 	public function print_projected($fid, $ltid)
 	{
 		$fund = $this->db->query("select * from tbl_fund where fid = ".$fid)->row();
-		
+
 		$region = $this->reg_code[$fund->region];
 		$company = ($fund->company == 2) ? 6 : $fund->company;
 		$fund->reference = 'CA-'.$region.'-'.date('ymd');
@@ -123,7 +138,7 @@ class Projected_fund_model extends CI_Model{
 		$this->db->insert('tbl_voucher', $voucher);
 		$voucher->vid = $this->db->insert_id();
 
-		$this->db->query("update tbl_sales 
+		$this->db->query("update tbl_sales
 			set voucher = ".$voucher->vid."
 			where lto_transmittal in (".$ltid.")");
 
