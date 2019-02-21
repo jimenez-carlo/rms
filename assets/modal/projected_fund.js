@@ -1,17 +1,14 @@
-var fid;
-var cid;
-
-function create_voucher(_fid, _cid)
-{
-  fid = _fid;
-  cid = _cid;
+function create_voucher(_fid, _cid) {
+  console.log(_fid, _cid);
+  let fid = `fid=${_fid}`;
+  let cid = `cid=${_cid}`;
 
   $.ajax({
-    url : "projected_fund/create_voucher/" + fid + "/" + cid,
+    url : "projected_fund/create_voucher",
+    data: `${fid}&${cid}`,
     type: "POST",
-    dataType: "JSON",
-    success: function(data)
-    {
+    success: function(data) {
+      console.log(data);
       $(".error").html("");
       $(".alert-error").addClass("hide");
       $('.form-body').html(data); // reset form on modals
@@ -98,7 +95,7 @@ function print()
       $("form#print div.container").append('<input type="hidden" name="'+this.name+'" value="'+this.value+'">');
     });
 
-    $("form#print").submit(); // submit form 
+    $("form#print").submit(); // submit form
   }
   else
   {
