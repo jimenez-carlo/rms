@@ -47,8 +47,8 @@ class Projected_fund extends MY_Controller {
 		$this->load->view('projected_fund/print_projected', $data);
 	}
 
-	public function save_voucher($fid)
-	{
+	public function save_voucher() {
+                $fid  = $this->input->post('fid');
 		$ltid = $this->input->post('ltid');
 		$err_msg = array();
 

@@ -1,14 +1,15 @@
+var fid;
+var cid;
+
 function create_voucher(_fid, _cid) {
-  console.log(_fid, _cid);
-  let fid = `fid=${_fid}`;
-  let cid = `cid=${_cid}`;
+  fid = `fid=${_fid}`;
+  cid = `cid=${_cid}`;
 
   $.ajax({
     url : "projected_fund/create_voucher",
     data: `${fid}&${cid}`,
     type: "POST",
     success: function(data) {
-      console.log(data);
       $(".error").html("");
       $(".alert-error").addClass("hide");
       $('.form-body').html(data); // reset form on modals
@@ -21,17 +22,18 @@ function create_voucher(_fid, _cid) {
   });
 }
 
-function save_voucher()
-{
+function save_voucher() {
   if (confirm('Please make sure that all information are correct before proceeding. Continue?'))
   {
+    let data = $('#form').serialize() +'&'+ fid;
     $.ajax({
-      url : "projected_fund/save_voucher/" + fid,
+      url : `projected_fund/save_voucher`,
       type: "POST",
-      data: $('#form').serialize(),
-      dataType: "JSON",
+      data: data,
+      //dataType: "JSON",
       success: function(data)
       {
+        console.log(data);
         if(data.status)
         {
           $('#modal_form').modal('hide');
