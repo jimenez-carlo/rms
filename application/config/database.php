@@ -75,9 +75,12 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.55',
-	'username' => 'admin',
-	'password' => 'cmcadmin',
+	//'hostname' => '192.168.100.55',
+	//'username' => 'admin',
+	//'password' => 'cmcadmin',
+	'hostname' => '172.17.0.3',
+	'username' => 'root',
+	'password' => 'root',
 	'database' => 'rms_db',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
@@ -95,33 +98,33 @@ $db['default'] = array(
 	'save_queries' => TRUE
 );
 
-$db['promo_db'] = array(
-	'dsn'	=> '',
-	'hostname' => '192.168.100.55',
-	'username' => 'admin',
-	'password' => 'cmcadmin',
-	'database' => 'promo_db',
-	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
-	'pconnect' => FALSE,
-	'db_debug' => (ENVIRONMENT !== 'production'),
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'encrypt' => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
-);
+//$db['promo_db'] = array(
+//	'dsn'	=> '',
+//	'hostname' => '192.168.100.55',
+//	'username' => 'admin',
+//	'password' => 'cmcadmin',
+//	'database' => 'promo_db',
+//	'dbdriver' => 'mysqli',
+//	'dbprefix' => '',
+//	'pconnect' => FALSE,
+//	'db_debug' => (ENVIRONMENT !== 'production'),
+//	'cache_on' => FALSE,
+//	'cachedir' => '',
+//	'char_set' => 'utf8',
+//	'dbcollat' => 'utf8_general_ci',
+//	'swap_pre' => '',
+//	'encrypt' => FALSE,
+//	'compress' => FALSE,
+//	'stricton' => FALSE,
+//	'failover' => array(),
+//	'save_queries' => TRUE
+//);
 
 $db['global'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.55',
-	'username' => 'admin',
-	'password' => 'cmcadmin',
+	'hostname' => '172.17.0.3',
+	'username' => 'root',
+	'password' => 'root',
 	'database' => 'portal_global_db',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
@@ -139,9 +142,9 @@ $db['global'] = array(
 	'save_queries' => TRUE
 );
 
-$db['dev_ces2'] = array(
+$db['mdi_dev_ces2'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.20',
+	'hostname' => '192.168.100.40',
 	'username' => 'admin',
 	'password' => 'admin',
 	'database' => 'dev_ces2',
@@ -162,8 +165,30 @@ $db['dev_ces2'] = array(
 );
 
 $db['dev_rms'] = array(
+	'dsn'	   => '',
+	'hostname' => '172.17.0.2',
+	'username' => 'root',
+	'password' => 'root',
+	'database' => 'dev_rms',
+	'dbdriver' => 'mysqli',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8',
+	'dbcollat' => 'utf8_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
+
+$db['mdi_dev_rms'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.20',
+	'hostname' => '192.168.100.40',
 	'username' => 'admin',
 	'password' => 'admin',
 	'database' => 'dev_rms',
