@@ -87,29 +87,23 @@ define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 switch(ENVIRONMENT):
 
   case 'development':
-
     # RMS_DB
-    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.2');
+    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.3');
     defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'root');
     defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'root');
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
     # PORTAL GLOBAL PORTAL FROM 192.168.100.20
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.20');
+    #defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.17.0.3');
+    #defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'root');
+    #defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'root');
+    #defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
+
+    # PORTAL GLOBAL PORTAL FROM 192.168.100.50
+    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.55');
     defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'admin');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'admin');
+    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'cmcadmin');
     defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
-
-    #Production IAAS database for debuggin & testing only
-    //defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.16.30.156');
-    //defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'dev');
-    //defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'rootdev');
-    //defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'cps_portal_global_db');
-
-    //defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.16.30.156');
-    //defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'dev');
-    //defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'rootdev');
-    //defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'cps_portal_global_db');
   break;
 
   case 'testing':
@@ -118,34 +112,22 @@ switch(ENVIRONMENT):
     defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'root');
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
-    # PORTAL GLOBAL PORTAL FROM 192.168.100.20
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', 'localhost');
-    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'root');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'root');
+    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.55');
+    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'admin');
+    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'cmcadmin');
     defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
-
     break;
   case 'production':
-
     # RMS_DB
     defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '192.168.100.55');
     defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'admin');
     defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'cmcadmin');
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
-    # PORTAL GLOBAL
-    //defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '');
-    //defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'appserver');
-    //defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'opulently tadpole mulberry ether overfeed drizzly');
-    //defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.20');
-    //defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'admin');
-    //defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'admin');
-    //defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
-
-    # PORTAL GLOBAL PORTAL FROM 192.168.100.20
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.20');
+    # PORTAL GLOBAL PORTAL FROM 192.168.100.50
+    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.55');
     defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'admin');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'admin');
+    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'cmcadmin');
     defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
   break;
 
