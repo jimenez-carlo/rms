@@ -60,7 +60,7 @@ class Projected_fund_model extends CI_Model{
           }
 
           foreach ($result as $key => $fund) {
-            $fund->region = $this->region[$fund->region];
+            $fund->region = ($_SESSION['company'] != 8) ? $this->region[$fund->region] : $this->mdi_region[$fund->region];
             $fund->company = ($_SESSION['company'] != 8) ? $this->company[$fund->company] : $this->mdi[$fund->company];
             $result[$key] = $fund;
           }
