@@ -2,9 +2,9 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Login extends CI_Controller {
-	
-  public function __construct() { 
-     parent::__construct(); 
+
+  public function __construct() {
+     parent::__construct();
      $this->load->helper('url');
   }
 
@@ -23,7 +23,7 @@ class Login extends CI_Controller {
 				$data['error'] = "Please enter your username.";
 			}
 			else if (empty($password)) {
-				$data['error'] = "Please enter your password.";	
+				$data['error'] = "Please enter your password.";
 			}
 			else {
 				$this->load->model('Login_model','login');
@@ -31,14 +31,12 @@ class Login extends CI_Controller {
 				//die;
 				// special usernames
 				$user_info = $this->custom_login($username, $password);
-				
+
 				// global login
 				if (empty($user_info)) {
 					$raw['user_info'] = $this->login->get_user_info($username);
 					$raw['sys_access'] = $this->login->get_system_access(20);
 					$raw['page_access'] = $this->login->get_access();
-					
-
 
 					// validate 2 - username exists
 					if (empty($raw['user_info'])) {
@@ -57,21 +55,21 @@ class Login extends CI_Controller {
 							foreach ($raw['sys_access'] as $value) {
 								if ($raw['user_info']->position == $value['position'])
 								{
-									$log = $this->login->add_user_log($raw['user_info']->username);
-									$user_info = array(
-													'ulid'				=> $log->ulid,
-				                  'uid'         => $raw['user_info']->uid,
-				                  'username'    => $raw['user_info']->username,
-				                  'password'    => $raw['user_info']->password,
-				                  'lastname'    => $raw['user_info']->lastname,
-				                  'firstname'   => $raw['user_info']->firstname,
-				                  'middlename'  => $raw['user_info']->middlename,
-				                  'ext'         => $raw['user_info']->ext,
-				                  'branch'      => $raw['user_info']->branch,
-				                  'position'    => $raw['user_info']->position,
-				                  'department'  => $raw['user_info']->department,
-				                  'sys_access'  => $raw['sys_access'],
-				                  'page_access' => $raw['page_access']
+								  $log = $this->login->add_user_log($raw['user_info']->username);
+							          $user_info = array(
+								  'ulid'        => $log->ulid,
+				                                  'uid'         => $raw['user_info']->uid,
+				                                  'username'    => $raw['user_info']->username,
+				                                  'password'    => $raw['user_info']->password,
+				                                  'lastname'    => $raw['user_info']->lastname,
+				                                  'firstname'   => $raw['user_info']->firstname,
+				                                  'middlename'  => $raw['user_info']->middlename,
+				                                  'ext'         => $raw['user_info']->ext,
+				                                  'branch'      => $raw['user_info']->branch,
+				                                  'position'    => $raw['user_info']->position,
+				                                  'department'  => $raw['user_info']->department,
+				                                  'sys_access'  => $raw['sys_access'],
+				                                  'page_access' => $raw['page_access']
 				            			);
 									break;
 								}
@@ -130,35 +128,47 @@ class Login extends CI_Controller {
 								case 'ACCTG-PAYCL-001':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(1)';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-002':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(2,3,4,5,6)';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-003':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(7,8,9,10)';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-004':
 									$user_info['task'] = 'For SAP Uploading';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-005':
 									$user_info['task'] = 'For Voucher';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-AMGR':
 									$user_info['task'] = 'For Manager Approval';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'TRSRY-ASST-001':
 									$user_info['task'] = 'For Check Issuance';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'TRSRY-ASST-002':
 									$user_info['task'] = 'For Check Deposit';
+                                                                        $user_info['company'] = 1;
 									break;
 								case 'CMC-CCO':
 									$user_info['task'] = 'For Management Approval';
+
+                                                                //FOR MDI USERS
+                                                                case 'ACCTG-PAYCL-030':
+                                                                        $user_info['company'] = 8;
 									break;
 							}
 							break;
@@ -183,42 +193,42 @@ class Login extends CI_Controller {
 			// for marketing, orcr extract
 			$log = $this->login->add_user_log($username);
 			return array(
-									'ulid'				=> $log->ulid,
-                  'uid'         => 0,
-                  'username'    => $username,
-                  'password'    => 'dummy',
-                  'lastname'    => 'Manayan',
-                  'firstname'   => 'Alma',
-                  'middlename'  => '',
-                  'ext'         => '',
-                  'branch'      => '9000',
-                  'position'    => '-1',
-                  'department'  => '0',
-                  'sys_access'  => array(),
-                  'page_access' => array(),
-            			);
+			  'ulid'        => $log->ulid,
+                          'uid'         => 0,
+                          'username'    => $username,
+                          'password'    => 'dummy',
+                          'lastname'    => 'Manayan',
+                          'firstname'   => 'Alma',
+                          'middlename'  => '',
+                          'ext'         => '',
+                          'branch'      => '9000',
+                          'position'    => '-1',
+                          'department'  => '0',
+                          'sys_access'  => array(),
+                          'page_access' => array(),
+            		);
 		}
 
 		if ($username == 'siteadmin' && $password == 'siteadmin') {
 			// for marketing, orcr extract
 			$log = $this->login->add_user_log($username);
 			return array(
-									'ulid'				=> $log->ulid,
-                  'uid'         => 0,
-                  'username'    => $username,
-                  'password'    => 'dummy',
-                  'lastname'    => 'De Vera',
-                  'firstname'   => 'Mary Jane',
-                  'middlename'  => '',
-                  'ext'         => '',
-                  'branch'      => '9000',
-                  'position'    => '-2',
-                  'department'  => '0',
-                  'sys_access'  => array(),
-                  'page_access' => array(),
+			  'ulid'        => $log->ulid,
+                          'uid'         => 0,
+                          'username'    => $username,
+                          'password'    => 'dummy',
+                          'lastname'    => 'De Vera',
+                          'firstname'   => 'Mary Jane',
+                          'middlename'  => '',
+                          'ext'         => '',
+                          'branch'      => '9000',
+                          'position'    => '-2',
+                          'department'  => '0',
+                          'sys_access'  => array(),
+                          'page_access' => array(),
             			);
 		}
-		
+
 		return null;
 	}
 }
