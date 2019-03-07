@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Dashboard extends MY_Controller {
-	
-  public function __construct() { 
+
+  public function __construct() {
      parent::__construct();
      $this->load->helper('url');
      $this->load->model('Cmc_model', 'cmc');
@@ -24,13 +24,13 @@ class Dashboard extends MY_Controller {
 			case 21: // LO
 			case 27: // PROGRAMMER/ADMIN
 			*/
-			case 3: 
-			case 53: $this->acct(); break; // ACCTG-PAYCL
-			// case 34: 
+			case 3:
+			case 53: $this->acct($_SESSION['company']); break; // ACCTG-PAYCL
+			// case 34:
 			// case 98: $this->trsry(); break; // Treasury
 			case 108: $this->rrt_spvsr(); break; // RRT
-			case 107: 
-			case 109: 
+			case 107:
+			case 109:
 			case 156: $this->rrt(); break; // RRT
 			default: $this->template('home');
 		}
@@ -42,7 +42,7 @@ class Dashboard extends MY_Controller {
 		$this->header_data('title', 'Unprocessed');
 		$this->header_data('nav', 'report');
 		$this->header_data('dir', './../');
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="../vendors/morris/morris.css">
 	     <link href="../vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
@@ -55,7 +55,7 @@ class Dashboard extends MY_Controller {
 
 		if ($_SESSION['position'] != 108)
 		{
-			$branches = $global->query("select b_code from tbl_branches
+			$branches = $global->query("SELECT b_code from tbl_branches
 				where ph_region = ".$_SESSION['region'])->result_object();
 			foreach ($branches as $branch)
 			{
@@ -88,7 +88,7 @@ class Dashboard extends MY_Controller {
 			GROUP BY 2")->result_array();
 
 		$data['pnp_count'] = $data['ar_count'] = $data['si_count'] = $data['insurance_count'] = $data['pending_count'] = 0;
-		
+
 		foreach ($unprocessed as $row) {
 			switch ($row['status']) {
 				case 'PNP': $data['pnp_count'] = $row['count']; break;
@@ -142,7 +142,7 @@ class Dashboard extends MY_Controller {
 			$unprocessed_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="../vendors/raphael-min.js"></script>
 			<script src="../vendors/morris/morris.min.js"></script>
 	        <script src="../assets/scripts.js"></script>
@@ -163,20 +163,20 @@ class Dashboard extends MY_Controller {
 
 	private function ccn($data = array())
 	{
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
 		// Brand New Sales
-		$data['bnew_rejected'] = $this->db->query("select count(*) as c from tbl_sales
+		$data['bnew_rejected'] = $this->db->query("SELECT count(*) as c from tbl_sales
 			where bcode = ".$_SESSION['branch']."
 			and (sales_type = 0 or sales_type = 1)
 			and status = 0")->row()->c;
-		$data['bnew_pending'] = $this->db->query("select count(*) as c from tbl_sales
+		$data['bnew_pending'] = $this->db->query("SELECT count(*) as c from tbl_sales
 			where bcode = ".$_SESSION['branch']."
 			and (sales_type = 0 or sales_type = 1)
 			and status in (1, 2, 3)")->row()->c;
-		$data['bnew_registered'] = $this->db->query("select count(*) as c from tbl_sales
+		$data['bnew_registered'] = $this->db->query("SELECT count(*) as c from tbl_sales
 			where bcode = ".$_SESSION['branch']."
 			and (sales_type = 0 or sales_type = 1)
 			and status = 4")->row()->c;
@@ -254,7 +254,7 @@ class Dashboard extends MY_Controller {
 			$orcr_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
@@ -281,15 +281,15 @@ class Dashboard extends MY_Controller {
 
 	private function rrt($data = array())
 	{
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
 		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 's.region = '.$_SESSION['region'];
 
 		// rerfo
-		$result = $this->db->query("select count(*) as count,
-			case when t.transmittal_date is null then 'rrt_pending'
+		$result = $this->db->query("SELECT count(*) as count,
+			CASE when t.transmittal_date is null then 'rrt_pending'
 				when received_date is null then 'transmitted'
 				else 'received'
 			end as status
@@ -338,7 +338,7 @@ class Dashboard extends MY_Controller {
 			$rerfo_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
@@ -359,14 +359,14 @@ class Dashboard extends MY_Controller {
 
 	private function rrt_spvsr($data = array())
 	{
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
 		// sales
 		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
 		$result = $this->db->query("SELECT count(*) as count,
-			case status when 0 then 'new'
+			CASE status when 0 then 'new'
 				when 1 then 'rejected'
 				when 2 then 'pending'
 				when 3 then 'nru'
@@ -441,8 +441,8 @@ class Dashboard extends MY_Controller {
 
 		// topsheet
 		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
-		$result = $this->db->query("select count(*) as count,
-			case when status = 0 then 'unprocessed'
+		$result = $this->db->query("SELECT count(*) as count,
+			CASE when status = 0 then 'unprocessed'
 				when status = 1 then 'incomplete'
 				when status = 2 then 'sap_upload'
 				when status = 3 then 'done'
@@ -503,11 +503,11 @@ class Dashboard extends MY_Controller {
 		**    with & without transmittal (independent, no process)
 		*/
 		$branches = $this->cmc->get_region_branches($_SESSION['region']);
-		$data['sr_with'] = $this->db->query("select sid from tbl_sales
+		$data['sr_with'] = $this->db->query("SELECT sid from tbl_sales
 			where registration_type = 'Self Registration'and
 			transmittal_date IS NULL and
 			branch in (".$branches.")")->num_rows();
-		$data['sr_without'] = $this->db->query("select sid from tbl_sales
+		$data['sr_without'] = $this->db->query("SELECT sid from tbl_sales
 			where registration_type = 'Self Registration'and
 			transmittal_date IS NOT NULL and
 			branch in (".$branches.")")->num_rows();
@@ -538,7 +538,7 @@ class Dashboard extends MY_Controller {
 			$sr_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
@@ -569,44 +569,72 @@ class Dashboard extends MY_Controller {
 		$this->template('dashboard/rrt_spvsr', $data);
 	}
 
-	private function acct($data = array())
-	{
-		// sales
-		$result = $this->db->query("select 'For CA' as label, count(*) as total, 
-				sum(case when voucher = 0 then 1 else 0 end) as pending,
-				sum(case when voucher > 0 then 1 else 0 end) as done
-			from tbl_sales
-			where not (region = 1 and voucher = 0 and lto_payment = 0)
+        private function acct($company) {
+          // sales
+          if ($company != 8) {
+            $result = $this->db->query("
+                SELECT
+                  'For CA' AS label, count(*) AS total,
+                  SUM(CASE WHEN voucher = 0 THEN 1 else 0 END) AS pending,
+                  SUM(CASE WHEN voucher > 0 THEN 1 else 0 END) AS done
+                FROM tbl_sales
+                WHERE region <= 9 AND NOT (region = 1 and voucher = 0 and lto_payment = 0)
 
-			UNION
+                UNION
 
-			select 'For Checking' as label, count(*) as total, 
-				sum(case when batch = 0 then 1 else 0 end) as pending,
-				sum(case when batch > 0 then 1 else 0 end) as done
-			from tbl_sales
-			where topsheet > 0 and da_reason < 1
+                SELECT 'For Checking' as label, count(*) as total,
+                        sum(CASE when batch = 0 then 1 else 0 end) as pending,
+                        sum(CASE when batch > 0 then 1 else 0 end) as done
+                from tbl_sales
+                where topsheet > 0 and da_reason < 1 AND region <= 9
 
-			UNION
+                UNION
 
-			select 'For SAP Uploading' as label, count(*) as total, 
-				sum(case when status < 5 then 1 else 0 end) as pending,
-				sum(case when status = 5 then 1 else 0 end) as done
-			from tbl_sales
-			where batch > 0")->result_object();
+                SELECT 'For SAP Uploading' as label, count(*) as total,
+                        sum(CASE when status < 5 then 1 else 0 end) as pending,
+                        sum(CASE when status = 5 then 1 else 0 end) as done
+                from tbl_sales
+                where batch > 0 AND region <= 9")->result_object();
+            } else  {
+              $result = $this->db->query("
+                SELECT
+                  'For CA' AS label, count(*) AS total,
+                  SUM(CASE WHEN voucher = 0 THEN 1 else 0 END) AS pending,
+                  SUM(CASE WHEN voucher > 0 THEN 1 else 0 END) AS done
+                FROM tbl_sales
+                WHERE region > 10 AND NOT (voucher = 0 AND lto_payment = 0)
 
-		$data['table'] = $result;
-		$this->template('dashboard/acct', $data);
-	}
+                UNION
+
+                SELECT 'For Checking' as label, count(*) as total,
+                        sum(CASE when batch = 0 then 1 else 0 end) as pending,
+                        sum(CASE when batch > 0 then 1 else 0 end) as done
+                from tbl_sales
+                where topsheet > 0 and da_reason < 1 AND region > 10
+
+                UNION
+
+                SELECT 'For SAP Uploading' as label, count(*) as total,
+                        sum(CASE when status < 5 then 1 else 0 end) as pending,
+                        sum(CASE when status = 5 then 1 else 0 end) as done
+                from tbl_sales
+                where batch > 0 AND region > 10")->result_object();
+            }
+
+          //$data = array();
+          $data['table'] = $result;
+          $this->template('dashboard/acct', $data);
+        }
 
 	private function trsry($data = array())
 	{
 		// batch
-		$result = $this->db->query("select count(*) as count,
-			case when (select count(*) from tbl_batch_status
+		$result = $this->db->query("SELECT count(*) as count,
+			CASE when (SELECT count(*) from tbl_batch_status
 				where batch = bid and status = 'For Check Issuance') = 0 then 'issuance'
-				when (select count(*) from tbl_batch_status
+				when (SELECT count(*) from tbl_batch_status
 				where batch = bid and status = 'For Management Approval') = 0 then 'approval'
-				when (select count(*) from tbl_batch_status
+				when (SELECT count(*) from tbl_batch_status
 				where batch = bid and status = 'For Check Deposit') = 0 then 'deposit'
 				else 'done'
 			end as status
@@ -661,7 +689,7 @@ class Dashboard extends MY_Controller {
 			$b_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
