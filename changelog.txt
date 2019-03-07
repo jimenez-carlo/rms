@@ -1,0 +1,16 @@
+2018-01-08
+- deleted unused
+	tbl_batch_old
+	tbl_regions
+	tbl_reimbursement
+- remove brand and model from tbl_engine
+- remove repo objects
+	tbl_transfer
+	emission column
+- insurance column default to 300
+- optimize tables
+- optimize controllers
+
+2018-01-07
+- deleted unused tables
+- cron insert at day and update at night

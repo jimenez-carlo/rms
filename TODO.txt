@@ -1,0 +1,82 @@
+TODO
+	- Accounting
+		- SAP Upload
+			- Able to validate information and upload template in a single process
+		- Liquidation
+			- Able to monitor unliquidated fund
+	- RRT
+		- Return fund for clearing
+			- Able to deposit fund to close unliquidated fund
+		- Liquidation
+			- Able to monitor unliquidated fund
+		- Closed items fund
+			- Able to request fund for closed items
+		- RERFO
+			- Printing style
+		- Topsheet
+			- Able to view topsheet details
+			- Printing style
+		- Transmittal
+			- Able to create transmittal slip via TOPSHEET
+			- Able to monitor transmittal
+			- Able to add remarks
+		- Report
+			- Branch promo infraction report
+	- Branch
+		- Transmittal
+			- Able to receive transmittal
+			- Able to add remarks
+	- BMI
+		- Transmittal
+			- Able to receive transmittal
+			- Able to add remarks
+
+PROMO
+	- Marketing
+		- Able to keyin promo
+	- Cron
+		- Able to identify if MC sales under promo
+	- Branch
+		- Able to monitor ongoing promo
+
+ENHANCEMENTS
+	- AR Sub Ledger
+		- Able to monitor customer payment balance
+		- Able to monitor supplier payment balance
+
+REVISIONS
+	// NO EFFECT ON TIMELINE
+	- Customer Status
+		- Able to view customers regardless of region
+	- Registration
+		- Able to keyin tip, optional
+		- Able to keyin plate #, optional
+	- Miscellaneous
+		- Able to keyin reference # (si/or)
+		- Able to keyin remarks
+
+	// FOR REASSESSMENT
+	- Intercompany Cheque
+		- Able to create single cheque from multiple accounts
+	- NRU Payment
+		- Able to use single cheque regardless of company and date transmitted
+	- Registration
+		- Able to update record regardless of company and date transmitted
+		- Able to monitor fund under LTO
+	- Attachment
+		- Able to bulk upload attachments per rerfo (suggestion)
+	- RERFO
+		- Able to correct information within 24 hours
+		- Able to request for updating to manager (will affect topsheet computation)
+	- Topsheet
+		- Able to submit for liquidation
+	- BMI Transmittal
+		- Able to keyin destination
+
+	// TO FOLLOW FOR PHASE 2
+	- RRT Role Delegation
+	- BMI Transmittal
+		- Able to access RMS
+		- Able to tag transmittal as received
+		- Able to generate template for upload of CR transmittal from RRT
+		- Able to monitor CR transmittal of closed accounts
