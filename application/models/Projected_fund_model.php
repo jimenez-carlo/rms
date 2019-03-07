@@ -23,31 +23,50 @@ class Projected_fund_model extends CI_Model{
   /**
    * View RRT Funds with Projected Funds
    */
-	public function get_projected_funds()
-	{
-		$result = $this->db->query("select f.*,
-				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_1,
-				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_1,
-				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_3,
-				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_3,
-				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_6,
-				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_6
-			from tbl_fund f
-			left join tbl_sales s
-				on s.region = f.region
-				and s.fund = 0
-				and registration_type != 'Self Registration'
-			where fid < 11
-			group by fid")->result_object();
+	public function get_projected_funds() {
+          //
+                // FOR MNC fid < 11
+                // FOR MDI fid >= 11
+                // ifnull(sum(case when left(bcode, 1) = '8' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_8,
+                // ifnull(sum(case when left(bcode, 1) = '8' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_8
+          if ($_SESSION['company'] != 8) {
+            $result = $this->db->query("
+              select f.*,
+              ifnull(sum(case when left(bcode, 1) = '1' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_1,
+              ifnull(sum(case when left(bcode, 1) = '1' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_1,
+              ifnull(sum(case when left(bcode, 1) = '3' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_3,
+              ifnull(sum(case when left(bcode, 1) = '3' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_3,
+              ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_6,
+              ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 900 else 0 end), '0.00') as transfer_6
+              from tbl_fund f
+              left join tbl_sales s
+              on s.region = f.region
+              and s.fund = 0
+              and registration_type != 'Self Registration'
+              where fid < 11
+              group by fid")->result_object();
+          } else {
+            $result = $this->db->query("
+              select f.*,
+                ifnull(sum(case when left(bcode, 1) = '8' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_8,
+                ifnull(sum(case when left(bcode, 1) = '8' and s.voucher = 0 then 900 else 0 end), '0.00') as transfer_8
+              from tbl_fund f
+              left join tbl_sales s
+                on s.region = f.region
+                and s.fund = 0
+                and registration_type != 'Self Registration'
+              where fid >= 11
+              group by fid")->result_object();
+          }
 
-		foreach ($result as $key => $fund)
-		{
-			$fund->region = $this->region[$fund->region];
-			$fund->company = $this->company[$fund->company];
-			$result[$key] = $fund;
-		}
+          foreach ($result as $key => $fund) {
+            $fund->region = $this->region[$fund->region];
+            $fund->company = $this->company[$fund->company];
+            $result[$key] = $fund;
+          }
 
-		return $result;
+          //var_dump($this->db->last_query()); die();
+          return $result;
 	}
 
   /**
@@ -80,7 +99,7 @@ class Projected_fund_model extends CI_Model{
                     AND registration_type != 'Self Registration'
             GROUP BY t.date, t.company, t.ltid"
           )->result_object();
-          // BACK UP
+          // BACK UP OLD QUERY
           // select t.*,
           //            left(t.date, 10) as date,
           //            sum(900) as amount,
@@ -88,10 +107,10 @@ class Projected_fund_model extends CI_Model{
           //            from tbl_lto_transmittal t
           //            inner join tbl_sales s on lto_transmittal = ltid
           //            where t.region = ".$fund->region."
-//            and left(s.bcode, 1) = '".$cid."'
-//            and voucher = 0
-//            and registration_type != 'Self Registration'
-//            group by t.date, t.company"
+          //    and left(s.bcode, 1) = '".$cid."'
+          //    and voucher = 0
+          //    and registration_type != 'Self Registration'
+          //    group by t.date, t.company"
           return $fund;
         }
 
@@ -103,7 +122,7 @@ class Projected_fund_model extends CI_Model{
 		$company = ($fund->company == 2) ? 6 : $fund->company;
 		$fund->reference = 'CA-'.$region.'-'.date('ymd');
 
-		$ref_code = $this->db->query("select count(*) as c from tbl_voucher
+		$ref_code = $this->db->query("SELECT count(*) as c from tbl_voucher
 			where reference like '".$fund->reference."%'")->row()->c;
 		$fund->reference .= ($ref_code == 0) ? '' : '-'.($ref_code++);
 

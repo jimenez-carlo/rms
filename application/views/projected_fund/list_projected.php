@@ -29,7 +29,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           </thead>
           <tbody>
             <?php
-            $comps = array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI');
+            $comps = ($_SESSION['company'] != 8)
+              ? array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI')
+              : array(8 => 'MDI');
+
             foreach ($table as $row)
             {
               print '<tr>';
@@ -41,6 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   case 1: $voucher = $row->voucher_1; $transfer = $row->transfer_1; break;
                   case 3: $voucher = $row->voucher_3; $transfer = $row->transfer_3; break;
                   case 6: $voucher = $row->voucher_6; $transfer = $row->transfer_6; break;
+                  case 8: $voucher = $row->voucher_8; $transfer = $row->transfer_8; break;
                 }
 
                 if ($key > 1) {

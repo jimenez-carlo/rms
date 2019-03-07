@@ -18,11 +18,11 @@ class Projected_fund extends MY_Controller {
 		$this->header_data('nav', 'projected_fund');
 		$this->header_data('dir', './');
 		$this->footer_data('script', '
-      <script src="assets/modal/projected_fund.js"></script>');
-
+                  <script src="assets/modal/projected_fund.js"></script>');
 		$data['position'] = $_SESSION['position'];
 
 		$data['table'] = $this->projected_fund->get_projected_funds();
+
 		$this->template('projected_fund/list_projected', $data);
 	}
 
@@ -93,8 +93,7 @@ class Projected_fund extends MY_Controller {
 		$this->header_data('title', 'CA List');
 		$this->header_data('nav', $nav);
 		$this->header_data('dir', './../');
-			$this->footer_data('script', '
-	      <script src="./../assets/js/voucher_list.js"></script>');
+		$this->footer_data('script', '<script src="./../assets/js/voucher_list.js"></script>');
 
 		$param = new Stdclass;
 		$param->date_from = $this->input->post('date_from');
