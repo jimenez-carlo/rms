@@ -15,10 +15,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="control-label">Entry Date</div>
               <div class="controls">
                 <span style="display:inline-block;width:50px">From:</span>
-                <?php print form_input('date_from', set_value('date_from', date('Y-m-d')), array('class' => 'datepicker')); ?>
+                <?php print form_input('date_from', set_value('date_from', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
                 <br>
                 <span style="display:inline-block;width:50px">To:</span>
-                <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker')); ?>
+                <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
               </div>
             </div>
 
@@ -30,19 +30,36 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo form_dropdown('status', $status, set_value('status', $def_stat));
               echo '</div></div>';
 
-              $regions = array(
-                '_any' => '- Any -',
-                1 => 'NCR',
-                2 => 'Region 1',
-                3 => 'Region 2',
-                4 => 'Region 3',
-                5 => 'Region 4A',
-                6 => 'Region 4B',
-                7 => 'Region 5',
-                8 => 'Region 6',
-                9 => 'Region 7',
-                10 => 'Region 8',
-              );
+              $regions = array('_any' => '- Any -');
+
+              if ($_SESSION['company'] != 8) {
+                $regions = array_merge(
+                  $regions,
+                  array(
+                       1 => 'NCR',
+                       2 => 'Region 1',
+                       3 => 'Region 2',
+                       4 => 'Region 3',
+                       5 => 'Region 4A',
+                       6 => 'Region 4B',
+                       7 => 'Region 5',
+                       8 => 'Region 6',
+                       9 => 'Region 7',
+                       10 => 'Region 8'
+                     )
+                   );
+              } else {
+                $regions = array_merge(
+                  $regions,
+                  array(
+                      11 => 'IX',
+                      12 => 'X',
+                      13 => 'XI',
+                      14 => 'XII',
+                      15 => 'XIII'
+                    )
+                  );
+              }
               echo '<div class="control-group span5">';
               echo form_label('Region', 'region', array('class' => 'control-label'));
               echo '<div class="controls">';

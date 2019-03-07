@@ -32,7 +32,7 @@ class Projected_fund extends MY_Controller {
           $fid = $this->input->post('fid');
           $cid = $this->input->post('cid');
           $data['fund'] = $this->projected_fund->create_voucher($fid, $cid);
-          $data['company'] = $this->projected_fund->company;
+          $data['company'] = ($_SESSION['company'] != 8) ? $this->projected_fund->company : $this->projected_fund->mdi;
           $view = $this->load->view('projected_fund/create_voucher', $data, TRUE);
           print $view;
 	}

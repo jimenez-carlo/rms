@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
 
+
 	public $region = array(
 		1 => 'NCR',
 		2 => 'Region 1',
@@ -14,11 +15,14 @@ class MY_Controller extends CI_Controller {
 		8 => 'Region 6',
 		9 => 'Region 7',
 		10 => 'Region 8',
+	);
+
+	public $mdi_region = array(
 		11 => 'Region IX',
 		12 => 'Region X',
 		13 => 'Region XI',
 		14 => 'Region XII',
-		15 => 'Region XIII',
+		15 => 'Region XIII'
 	);
 
 	public $reg_code = array(
@@ -44,17 +48,20 @@ class MY_Controller extends CI_Controller {
 		2 => 'MTI',
 		3 => 'HPTI',
 		6 => 'MTI',
-		8 => 'MDI',
 	);
+
+        public $mdi = array(
+                8 => 'MDI'
+        );
 
 	private static $header = array();
 	private static $footer = array();
-	
-	public function __construct() { 
+
+	public function __construct() {
 	  parent::__construct();
 		$this->load->helper('url');
 		$this->load->helper('form');
-		
+
 	  $this->load->helper(array('form', 'url'));
 	  $this->load->library('form_validation');
 	}
@@ -100,7 +107,7 @@ class MY_Controller extends CI_Controller {
 				$this->load->view('tpl/nav_dev');
 				break;
 
-			case 109: 
+			case 109:
 			case 156: // RRT
 				$this->load->view('tpl/nav_rrt');
 				break;
@@ -146,7 +153,7 @@ class MY_Controller extends CI_Controller {
 			case 34: // Treasury
 				$this->load->view('tpl/nav_trsry', $data);
 				break;
-				
+
 			case 95: // Treasury-head
 				$this->load->view('tpl/nav_trsry_head');
 				break;
@@ -155,7 +162,7 @@ class MY_Controller extends CI_Controller {
 				$this->load->view('tpl/nav_lo');
 				break;
 
-			case 81: 
+			case 81:
 			case 73: // BRANCH CCN + BH
 				$data['orcr'] = $this->db->query("select *
 					from tbl_transmittal
@@ -184,7 +191,7 @@ class MY_Controller extends CI_Controller {
 			default:
 				$this->load->view('tpl/nav_def');
 		}
-		
+
 		// templated
 		$this->load->view('tpl/messages');
 		$this->load->view($page, $data);
