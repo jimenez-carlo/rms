@@ -26,12 +26,12 @@ class Projected_fund_model extends CI_Model{
 	public function get_projected_funds()
 	{
 		$result = $this->db->query("select f.*,
-				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher = 0 then 1200 else 0 end), '0.00') as voucher_1,
-				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher > 0 then 1200 else 0 end), '0.00') as transfer_1,
-				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher = 0 then 1200 else 0 end), '0.00') as voucher_3,
-				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher > 0 then 1200 else 0 end), '0.00') as transfer_3,
-				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 1200 else 0 end), '0.00') as voucher_6,
-				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher > 0 then 1200 else 0 end), '0.00') as transfer_6
+				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_1,
+				ifnull(sum(case when left(bcode, 1) = '1' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_1,
+				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_3,
+				ifnull(sum(case when left(bcode, 1) = '3' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_3,
+				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher = 0 then 900 else 0 end), '0.00') as voucher_6,
+				ifnull(sum(case when left(bcode, 1) = '6' and s.voucher > 0 then 900 else 0 end), '0.00') as transfer_6
 			from tbl_fund f
 			left join tbl_sales s
 				on s.region = f.region
@@ -67,7 +67,7 @@ class Projected_fund_model extends CI_Model{
 		
 		$fund->transmittal = $this->db->query("select t.*,
 				left(t.date, 10) as date,
-				sum(1200) as amount,
+				sum(900) as amount,
 				count(*) as sales
 			from tbl_lto_transmittal t
 			inner join tbl_sales s on lto_transmittal = ltid
