@@ -39,7 +39,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 ? round(($row->done / $row->total) * 100, 2)
                 : 0;
 
-
               print '<tr>';
               print '<td>'.$row->label.'</td>';
               print '<td>'.$row->total.'</td>';

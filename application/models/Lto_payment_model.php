@@ -23,12 +23,6 @@ class Lto_payment_model extends CI_Model{
 
 		if (empty($param->region)) $region = "";
 		else $region = " and region = ".$param->region;
-		
-		//if ($_SESSION['username'] != 'RRT-NCR-SPVSR'){
-		//	$region = " and region = ".$_SESSION['region'];
-		//}
-
-		
 
 		if (empty($param->status)) $status = "";
 		else $status = " and status = ".$param->status;
@@ -42,19 +36,18 @@ class Lto_payment_model extends CI_Model{
 			order by created desc limit 1000")->result_object();
 	}
 
-	public function load_payment($lpid)
-	{
-		$payment = $this->db->query("select * from tbl_lto_payment where lpid = ".$lpid)->row();
-		$payment->status = $this->status[$payment->status];
+        public function load_payment($lpid) {
+          $payment = $this->db->query("select * from tbl_lto_payment where lpid = ".$lpid)->row();
+          $payment->status = $this->status[$payment->status];
 
-		$payment->sales = $this->db->query("select * from tbl_sales
-			inner join tbl_engine on engine = eid
-			inner join tbl_customer on customer = cid
-			where lto_payment = ".$lpid."
-			order by bcode")->result_object();
+          $payment->sales = $this->db->query("select * from tbl_sales
+            inner join tbl_engine on engine = eid
+            inner join tbl_customer on customer = cid
+            where lto_payment = ".$lpid."
+            order by bcode")->result_object();
 
-		return $payment;
-	}
+          return $payment;
+        }
 
 	public function upload_screenshot()
 	{
@@ -169,11 +162,11 @@ class Lto_payment_model extends CI_Model{
 		redirect('/lto_payment/view/'.$payment->lpid);
 	}
 
-	public function get_list_by_status($status)
-	{
-		return $this->db->query("select * from tbl_lto_payment
-			where status = ".$status." order by created desc")->result_object();
-	}
+        public function get_list_by_status($status) {
+          $company = ($_SESSION['company'] != 8) ? ' AND company != 8' : ' AND company = 8';
+          return $this->db->query("select * from tbl_lto_payment
+            where status = ".$status.$company." order by created desc")->result_object();
+        }
 
 	public function update_payment_status($payment, $status)
 	{

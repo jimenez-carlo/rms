@@ -85,7 +85,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               '.number_format($row->misc_for_liq,2,'.',',').'<br>
               '.number_format($row->return_for_liq,2,'.',',').'
             </td>';
-            
+
             print '<td style="text-align:right">'.number_format($row->lto_pending,2,'.',',').'</td>';
             print '<td style="text-align:right">'.number_format($balance,2,'.',',').'</td>';
             print '</tr>';
@@ -118,7 +118,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   </div>
 </div>
 
-<form id="form_liq" method="post" action="/liquidation/sales" target="_blank">
+<form id="form_liq" method="post" action="<?= base_url() ?>liquidation/sales" target="_blank">
   <input type="hidden" name="vid" value="0" class="vid">
 </form>
 

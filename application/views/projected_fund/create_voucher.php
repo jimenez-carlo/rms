@@ -24,8 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <tbody>
       <?php
       $total = 0;
-      foreach ($fund->transmittal as $row)
-      {
+      foreach ($fund->transmittal as $row) {
         $total += $row->amount;
         print '<tr>';
         print '<td><input type="checkbox" name="ltid['.$row->ltid.']" value="'.$row->amount.'" onchange="total()" class="amount" checked></td>';

@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
-<div class="container-fluid">	
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">
@@ -14,7 +14,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							<input type="submit" class="btn btn-success" value="Save" name="save" onclick="return confirm('Please make sure all information are correct before proceeding. Continue?')">
 						</div>
 					</fieldset>
-					
+
 					<table class="table">
 						<thead>
 							<tr>

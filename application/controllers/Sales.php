@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Sales extends MY_Controller {
-	
-	public function __construct() { 
+
+	public function __construct() {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->helper('directory');
@@ -26,12 +26,12 @@ class Sales extends MY_Controller {
 		if (empty($param->branch) && !is_numeric($param->branch) && ($_SESSION['position'] == 73 || $_SESSION['position'] == 81)) {
 			$param->branch = $_SESSION['branch'];
 		}
-		
+
 		$data['branch_def'] = ($_SESSION['position'] == 73 || $_SESSION['position'] == 81) ? $_SESSION['branch'] : 0;
-		$data['branches'] = $this->sales->dd_branches();
-		$data['status'] = $this->sales->status;
-		$data['table'] = $this->sales->customer_status_report($param);
-		$this->template('sales/list', $data); 
+		$data['branches']   = $this->sales->dd_branches();
+		$data['status']     = $this->sales->status;
+		$data['table']      = $this->sales->customer_status_report($param);
+		$this->template('sales/list', $data);
 	}
 
 	public function view($sid = null)
@@ -133,7 +133,7 @@ class Sales extends MY_Controller {
 		if (!empty($engine_no))
 		{
 			$sales = $this->sales->get_orcr_by_engine($engine_no);
-			
+
 			if (!empty($sales)) {
 				$data['sales'] = $sales;
 			}

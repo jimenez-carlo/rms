@@ -21,12 +21,14 @@ class Orcr_checking_model extends CI_Model{
 
 	public function get_list_for_checking($date)
 	{
+                $company = ($_SESSION['company'] != 8) ? ' AND t.company != 8' : ' AND t.company = 8';
 		if($date != "") $date = " and left(post_date,10) = '".date('Y-m-d')."' ";
 		$result = $this->db->query("select t.* from tbl_topsheet t
 				inner join tbl_sales s on topsheet = tid and batch = 0
 				where t.status < 3
 				and da_reason <= 0
 				".$date."
+                                ".$company."
 				group by tid
 				order by date desc
 				limit 1000")->result_object();
@@ -134,7 +136,7 @@ class Orcr_checking_model extends CI_Model{
 
 		$this->load->helper('directory');
 		$folder = './rms_dir/misc/'.$misc->mid.'/';
-		
+
 		if (is_dir($folder)) {
 			$misc->files = directory_map($folder, 1);
 		}

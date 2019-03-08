@@ -2,13 +2,13 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Orcr_checking extends MY_Controller {
-	
-	public function __construct() { 
-		parent::__construct();
-		$this->load->helper('url');
-    $this->load->model('Orcr_checking_model', 'orcr_checking');
-	}
- 
+
+        public function __construct() {
+                parent::__construct();
+                $this->load->helper('url');
+                $this->load->model('Orcr_checking_model', 'orcr_checking');
+        }
+
 	public function index()
 	{
 		$this->access(1);
@@ -32,23 +32,23 @@ class Orcr_checking extends MY_Controller {
 			$data['mid'] = null;
 		}
 
-		if (!empty($data['tid'])) {
-			$topsheet = $this->orcr_checking->load_topsheet($data);
-	    $data['topsheet'] = $topsheet;
+                if (!empty($data['tid'])) {
+                  $topsheet = $this->orcr_checking->load_topsheet($data);
+                  $data['topsheet'] = $topsheet;
 
-	    $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/topsheet';
-	    $data['view'] = $this->load->view($view, $data, TRUE);
-	  }
-		
+                  $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/topsheet';
+                  $data['view'] = $this->load->view($view, $data, TRUE);
+                }
+
 		$data['table'] = $this->orcr_checking->get_list_for_checking("");
 		$this->template('orcr_checking/list', $data);
 	}
- 
+
 	public function attachment()
 	{
 		$id = $this->input->post('id');
 		$type = $this->input->post('type');
-		
+
 		switch ($type)
 		{
 			case 1:

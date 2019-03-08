@@ -90,7 +90,7 @@
     $total = 0;
     foreach ($fund->sales as $sales)
     {
-      $amount = 1200 * $sales->units;
+      $amount = 900 * $sales->units;
       print '<tr>';
       print '<td>'.$sales->bcode.'</td>';
       print '<td>'.$sales->bname.'</td>';

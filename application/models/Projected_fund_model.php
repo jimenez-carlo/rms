@@ -126,7 +126,8 @@ class Projected_fund_model extends CI_Model{
 			where reference like '".$fund->reference."%'")->row()->c;
 		$fund->reference .= ($ref_code == 0) ? '' : '-'.($ref_code++);
 
-		$fund->sales = $this->db->query("select bcode, bname, count(*) as units
+                $fund->sales = $this->db->query("
+                  select bcode, bname, count(*) as units
 			from tbl_sales
 			inner join tbl_engine on eid = engine
 			inner join tbl_customer on cid = customer
@@ -134,6 +135,7 @@ class Projected_fund_model extends CI_Model{
 			and voucher = 0
 			and registration_type != 'Self Registration'
 			group by bcode")->result_object();
+
 		// foreach ($fund->sales as $key => $sales)
 		// {
 		// 	$sales->date_sold = substr($sales->date_sold, 0, 10);
@@ -162,8 +164,8 @@ class Projected_fund_model extends CI_Model{
 			where lto_transmittal in (".$ltid.")");
 
 		$fund = $this->db->query("select * from tbl_fund where fid = ".$voucher->fund)->row();
-		$voucher->region = $this->region[$fund->region];
-		$voucher->company = $this->company[$fund->company];
+		$voucher->region  = ($_SESSION['company'] != 8) ? $this->region[$fund->region]   : $this->mdi_region[$fund->region];
+		$voucher->company = ($_SESSION['company'] != 8) ? $this->company[$fund->company] : $this->mdi[$fund->company];
 		return $voucher;
 	}
 
@@ -188,8 +190,8 @@ class Projected_fund_model extends CI_Model{
           {
             $row->date = substr($row->date, 0, 10);
             $row->transfer_date = substr($row->transfer_date, 0, 10);
-            $row->region = $this->region[$row->region];
-            $row->company = $this->company[$row->company];
+            $row->region  = ($_SESSION['company'] != 8) ? $this->region[$row->region]   : $this->mdi_region[$row->region];
+            $row->company = ($_SESSION['company'] != 8) ? $this->company[$row->company] : $this->mdi[$row->company];
             $row->status = $this->status[$row->status];
             $result[$key] = $row;
           }

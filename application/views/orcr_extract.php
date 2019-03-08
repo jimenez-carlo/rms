@@ -9,7 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="pull-left">ORCR Extract</div>
       </div>
       <div class="block-content collapse in">
-      	<form method="post" action="/orcr_extract/csv" target="_blank" class="form-horizontal">
+        <form method="post" action="<?= base_url().'orcr_extract/csv'?>" target="_blank" class="form-horizontal">
           <div class="control-group">
             <div class="control-label">For Extraction</div>
             <div class="controls"><?php print $count.' Units'; ?></div>
@@ -58,16 +58,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </div>
 
 <script type="text/javascript">
-	$(document).ready(function(){
-		$('form input[type=submit]').click(function(){
-			if (!confirm('Confirm to proceed.')) return false;
+$(document).ready(function(){
+  $('form input[type=submit]').click(function(){
+    if (!confirm('Confirm to proceed.')) return false;
 
-			var data_batch = $(this).attr('data-batch');
-			$('form input[name=batch_no]').val(data_batch);
-
-			setTimeout(function(){
-				location.reload();
-			}, 1000);
-		});
-	});
+    var data_batch = $(this).attr('data-batch');
+    $('form input[name=batch_no]').val(data_batch);
+    setTimeout(function(){
+      location.reload();
+    }, 1000);
+  });
+});
 </script>
