@@ -32,9 +32,8 @@ function save_voucher() {
       data: data,
       //dataType: "JSON",
       success: function(data) {
-        var foo = JSON.parse(data);
-        console.log(foo);
-        if(data.status) {
+        var res = JSON.parse(data);
+        if(res.status) {
           $('#modal_form').modal('hide');
           location.href = location.href;
         } else {
