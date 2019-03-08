@@ -6,6 +6,10 @@ class Nru_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] = 8) {
+                  $this->region  = $this->mdi_region;
+                  $this->company = $this->mdi;
+                }
 	}
 
 	public function load_list($data)

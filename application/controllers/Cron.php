@@ -105,12 +105,11 @@ class Cron extends MY_Controller {
 		  WHERE left(date_sold, 10) >= '2018-08-01'
 		  AND (left(date_created, 10) BETWEEN '$date_from' AND  '$date_yesterday')
 QRY;
-		      $dev_rms_result = $this->dev_rms->query($query)->result_object();
-
-                var_dump($dev_rms_result); die();
+                $dev_rms_result     = $this->dev_rms->query($query)->result_object();
                 $mdi_dev_rms_result = $this->mdi_dev_rms->query($query)->result_object();
 
 
+                var_dump(array($dev_rms_result, $mdi_dev_rms_result)); die();
 		foreach ($result as $row)
 		{
 			// branch dtls
@@ -133,7 +132,6 @@ QRY;
 				case 'XIII': $region = 15; $r_code = 'XIII'; break;
 				default: $region = 0;
 			}
-                        var_dump($row->branch); die();
                         if ($region > 10) {
                           $company = 8; // MDI
                         } else {
