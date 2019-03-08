@@ -107,9 +107,8 @@ class Cron extends MY_Controller {
 QRY;
                 $dev_rms_result     = $this->dev_rms->query($query)->result_object();
                 $mdi_dev_rms_result = $this->mdi_dev_rms->query($query)->result_object();
+                $result = array_merge($dev_rms_result, $mdi_dev_rms_result);
 
-
-                var_dump(array($dev_rms_result, $mdi_dev_rms_result)); die();
 		foreach ($result as $row)
 		{
 			// branch dtls
