@@ -16,9 +16,9 @@ class Liquidation_model extends CI_Model{
 	{
 		parent::__construct();
                 if ($_SESSION['company'] != 8) {
-                  $this->companyQry = ' AND company != 8';
+                  $this->companyQry = ' AND v.company != 8';
                 } else {
-                  $this->companyQry = ' AND company = 8';
+                  $this->companyQry = ' AND v.company = 8';
                 }
 	}
 
@@ -48,7 +48,7 @@ class Liquidation_model extends CI_Model{
 			inner join tbl_fund f on fid = v.fund
 			inner join tbl_sales s on s.fund = vid
 			where left(transfer_date, 10) between '".$date_from."' and '".$date_to."'
-			".$region." ".$companyQry."
+			".$region." ".$this->companyQry."
 			group by vid
 			order by transfer_date desc")->result_object();
 	}

@@ -23,18 +23,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </thead>
     <tbody>
       <?php
-      $total = 0;
-      foreach ($fund->transmittal as $row) {
-        $total += $row->amount;
-        print '<tr>';
-        print '<td><input type="checkbox" name="ltid['.$row->ltid.']" value="'.$row->amount.'" onchange="total()" class="amount" checked></td>';
-        print '<td>'.$company[$row->company].'</td>';
-        print '<td>'.$row->code.'</td>';
-        print '<td>'.$row->date.'</td>';
-        print '<td style="text-align:right; padding-right:10px;">'.number_format($row->amount,2,'.',',').'</td>';
-        print '<td style="text-align:right; padding-right:10px;">'.number_format($row->sales,0,'.',',').'</td>';
-        print '</tr>';
-      }
+        $total = 0;
+        foreach ($fund->transmittal as $row) {
+          $total += $row->amount;
+          print '<tr>';
+          print '<td><input type="checkbox" name="ltid['.$row->ltid.']" value="'.$row->amount.'" onchange="total()" class="amount" checked></td>';
+          print '<td>'.$company[$row->company].'</td>';
+          print '<td>'.$row->code.'</td>';
+          print '<td>'.$row->date.'</td>';
+          print '<td style="text-align:right; padding-right:10px;">'.number_format($row->amount,2,'.',',').'</td>';
+          print '<td style="text-align:right; padding-right:10px;">'.number_format($row->sales,0,'.',',').'</td>';
+          print '</tr>';
+        }
       ?>
     </tbody>
   </table>
