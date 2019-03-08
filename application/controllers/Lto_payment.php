@@ -6,6 +6,11 @@ class Lto_payment extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
     		$this->load->model('Lto_payment_model', 'lto_payment');
+                // Check in application/core/MY_Controller the value of $this->region and $this->company
+                if ($_SESSION['company'] == 8) {
+                   $this->region  = $this->mdi_region;
+                   $this->company = $this->mdi;
+                }
 	}
 
 	public function index() {
@@ -21,11 +26,10 @@ class Lto_payment extends MY_Controller {
 		$param->status = $this->input->post('status');
 		$param->reference = $this->input->post('reference');
 
-		$data['table'] = $this->lto_payment->get_list($param);
-
-		$data['status'] = $this->lto_payment->status;
-		$data['region'] = ($_SESSION['company'] != 8) ? $this->region  : $this->mdi_region;
-		$data['company'] =($_SESSION['company'] != 8) ? $this->company : $this->mdi;
+		$data['table']   = $this->lto_payment->get_list($param);
+		$data['status']  = $this->lto_payment->status;
+		$data['region']  = $this->region;
+		$data['company'] = $this->company;
 
 		$this->template('lto_payment/list', $data);
 	}
@@ -69,8 +73,8 @@ class Lto_payment extends MY_Controller {
           $this->header_data('nav', 'lto_payment');
           $this->header_data('dir', './../../');
 
-          $payment->region  = ($_SESSION['company'] != 8) ? $this->region[$payment->region]   : $this->mdi_region[$payment->region];
-          $payment->company = ($_SESSION['company'] != 8) ? $this->company[$payment->company] : $this->mdi;
+          $payment->region  = $this->region[$payment->region];
+          $payment->company = $this->company[$payment->company];
 
           $data['payment'] = $payment;
           $this->template('lto_payment/view', $data);
@@ -175,8 +179,8 @@ class Lto_payment extends MY_Controller {
 		}
 
 		$data['table']   = $this->lto_payment->get_list_by_status(1);
-		$data['region']  = ($_SESSION['company'] != 8) ? $this->region  : $this->mdi_region;
-		$data['company'] = ($_SESSION['company'] != 8) ? $this->company : $this->mdi;
+		$data['region']  = $this->region;
+		$data['company'] = $this->company;
 		$this->template('lto_payment/pending', $data);
 	}
 
@@ -246,8 +250,8 @@ class Lto_payment extends MY_Controller {
 		}
 
 		$data['table'] = $this->lto_payment->get_list_by_status(3);
-		$data['region']  = ($_SESSION['company'] != 8) ? $this->region  : $this->mdi_region;
-		$data['company'] = ($_SESSION['company'] != 8) ? $this->company : $this->mdi;
+		$data['region']  = $this->region;
+		$data['company'] = $this->company;
 		$this->template('lto_payment/for_deposit', $data);
 	}
 
@@ -276,8 +280,8 @@ class Lto_payment extends MY_Controller {
 		}
 
 		$data['table'] = $this->lto_payment->get_liquidation_list();
-		$data['region']  = ($_SESSION['company'] != 8) ? $this->region  : $this->mdi_region;
-		$data['company'] = ($_SESSION['company'] != 8) ? $this->company : $this->mdi;
+		$data['region']  = $this->region;
+		$data['company'] = $this->company;
 		$this->template('lto_payment/liquidation', $data);
 	}
 

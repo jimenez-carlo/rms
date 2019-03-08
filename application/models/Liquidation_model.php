@@ -1,5 +1,5 @@
 <?php
-defined ('BASEPATH') OR exit('No direct script access allowed'); 
+defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Liquidation_model extends CI_Model{
 
@@ -15,8 +15,13 @@ class Liquidation_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] != 8) {
+                  $this->companyQry = ' AND company != 8';
+                } else {
+                  $this->companyQry = ' AND company = 8';
+                }
 	}
-	
+
 	public function load_list($param)
 	{
 		$date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-15 days')) : $param->date_from;
@@ -28,6 +33,7 @@ class Liquidation_model extends CI_Model{
 				WHEN v.company = 1 THEN 'MNC'
 				WHEN v.company = 2 THEN 'MTI'
 				WHEN v.company = 3 THEN 'HPTI'
+				WHEN v.company = 8 THEN 'MDI'
 				END as companyname,
 				count(distinct s.sid) as sales_count,
 				ifnull(sum(case when s.status < 3 then 1200 else 0 end), 0) as rrt_pending,
@@ -42,11 +48,11 @@ class Liquidation_model extends CI_Model{
 			inner join tbl_fund f on fid = v.fund
 			inner join tbl_sales s on s.fund = vid
 			where left(transfer_date, 10) between '".$date_from."' and '".$date_to."'
-			".$region."
+			".$region." ".$companyQry."
 			group by vid
 			order by transfer_date desc")->result_object();
 	}
-	
+
 	public function load_sales($vid)
 	{
 		$result = $this->db->query("select * from tbl_sales

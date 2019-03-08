@@ -6,6 +6,11 @@ class Return_fund_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] != 8) {
+                  $this->companyQry = ' AND company != 8';
+                } else {
+                  $this->companyQry = ' AND company = 8';
+                }
 	}
 
 	public function load_list($param)
@@ -15,16 +20,19 @@ class Return_fund_model extends CI_Model{
 
 		if (empty($param->reference)) $reference = "";
 		else $reference = " and v.reference like '%".$param->reference."%'";
-	
-		return $this->db->query("select *, CASE
+
+                return $this->db->query("
+                      SELECT *, CASE
 				WHEN company = 1 THEN 'MNC'
 				WHEN company = 2 THEN 'MTI'
 				WHEN company = 3 THEN 'HPTI'
-				END as companyname,
-			rf.amount from tbl_return_fund rf
-			inner join tbl_voucher v on v.vid = rf.fund
-			where 1=1 ".$region." ".$reference."
-			order by created desc limit 1000")->result_object();
+                                WHEN company = 8 THEN 'MDI'
+                                END as companyname, rf.amount
+                      FROM tbl_return_fund rf
+		      INNER join tbl_voucher v on v.vid = rf.fund
+		      WHERE 1=1 ".$this->companyQry." ".$region." ".$reference."
+                      ORDER BY created DESC LIMIT 1000
+                ")->result_object();
 	}
 
 	public function load_fund($vid)

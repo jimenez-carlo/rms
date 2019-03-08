@@ -31,16 +31,13 @@ function save_voucher() {
       type: "POST",
       data: data,
       //dataType: "JSON",
-      success: function(data)
-      {
-        console.log(data);
-        if(data.status)
-        {
+      success: function(data) {
+        var foo = JSON.parse(data);
+        console.log(foo);
+        if(data.status) {
           $('#modal_form').modal('hide');
           location.href = location.href;
-        }
-        else
-        {
+        } else {
           $(".alert-error").removeClass("hide");
           $(".error").html("");
           $(".error").append(data.message);

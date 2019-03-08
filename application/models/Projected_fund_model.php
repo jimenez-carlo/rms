@@ -18,6 +18,10 @@ class Projected_fund_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] == 8) {
+                  $this->region  = $this->mdi_region;
+                  $this->company = $this->mdi;
+                }
 	}
 
   /**
@@ -60,8 +64,8 @@ class Projected_fund_model extends CI_Model{
           }
 
           foreach ($result as $key => $fund) {
-            $fund->region = ($_SESSION['company'] != 8) ? $this->region[$fund->region] : $this->mdi_region[$fund->region];
-            $fund->company = ($_SESSION['company'] != 8) ? $this->company[$fund->company] : $this->mdi[$fund->company];
+            $fund->region  = $this->region[$fund->region];
+            $fund->company = $this->company[$fund->company];
             $result[$key] = $fund;
           }
 
@@ -164,8 +168,8 @@ class Projected_fund_model extends CI_Model{
 			where lto_transmittal in (".$ltid.")");
 
 		$fund = $this->db->query("select * from tbl_fund where fid = ".$voucher->fund)->row();
-		$voucher->region  = ($_SESSION['company'] != 8) ? $this->region[$fund->region]   : $this->mdi_region[$fund->region];
-		$voucher->company = ($_SESSION['company'] != 8) ? $this->company[$fund->company] : $this->mdi[$fund->company];
+		$voucher->region  = $this->region[$fund->region];
+		$voucher->company = $this->company[$fund->company];
 		return $voucher;
 	}
 
@@ -190,9 +194,9 @@ class Projected_fund_model extends CI_Model{
           {
             $row->date = substr($row->date, 0, 10);
             $row->transfer_date = substr($row->transfer_date, 0, 10);
-            $row->region  = ($_SESSION['company'] != 8) ? $this->region[$row->region]   : $this->mdi_region[$row->region];
-            $row->company = ($_SESSION['company'] != 8) ? $this->company[$row->company] : $this->mdi[$row->company];
-            $row->status = $this->status[$row->status];
+            $row->region  = $this->region[$row->region];
+            $row->company = $this->company[$row->company];
+            $row->status  = $this->status[$row->status];
             $result[$key] = $row;
           }
           return $result;

@@ -18,6 +18,13 @@ class Fund_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] != 8) {
+                  $this->companyQry = ' company != 8';
+                } else {
+                  $this->companyQry = ' company = 8';
+                  $this->region  = $this->mdi_region;
+                  $this->company = $this->mdi;
+                }
 	}
 
 	public function load($fid)
@@ -30,10 +37,10 @@ class Fund_model extends CI_Model{
 
 	public function load_all()
 	{
-		$result = $this->db->query("select * from tbl_fund")->result_object();
+		$result = $this->db->query("SELECT * FROM tbl_fund WHERE $this->company")->result_object();
 		foreach ($result as $fund)
 		{
-			$fund->region_name = $this->region[$fund->region];
+			$fund->region_name  = $this->region[$fund->region];
 			$fund->company_name = $this->company[$fund->company];
 		}
 		return $result;

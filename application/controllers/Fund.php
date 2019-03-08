@@ -17,10 +17,10 @@ class Fund extends MY_Controller {
 		$this->header_data('nav', 'fund');
 		$this->header_data('dir', './');
 		$this->footer_data('script', '
-      <script src="./assets/modal/rrt_fund.js"></script>');
+                <script src="./assets/modal/rrt_fund.js"></script>');
 
 		$data['table'] = $this->fund->load_rrt_fund($_SESSION['region']);
-		$this->template('fund/view', $data); 
+		$this->template('fund/view', $data);
 	}
 
 	public function transaction($fid, $company, $type)
@@ -108,7 +108,7 @@ class Fund extends MY_Controller {
 			order by date desc
 			limit 1000")->result_object();
 
-		$this->template('fund/passbook', $data); 
+		$this->template('fund/passbook', $data);
 	}
 
 	public function bank()

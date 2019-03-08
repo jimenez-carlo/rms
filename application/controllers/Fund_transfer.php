@@ -42,7 +42,7 @@ class Fund_transfer extends MY_Controller {
     if ($this->form_validation->run() == FALSE) {
     	$err_msg[] = validation_errors();
     }
-    
+
 		// if (!empty($err_msg)) $_SESSION['warning'] = $err_msg;
 		// echo json_encode(array("status" => FALSE, "message" => $err_msg));
 		else $this->true_save_process($vid);
@@ -69,8 +69,7 @@ class Fund_transfer extends MY_Controller {
   /**
    * Treasury to Transfer Fund
    */
-	public function for_deposit()
-	{
+	public function for_deposit() {
 		$this->access(1);
 		$this->header_data('title', 'Fund Transfer');
 		$this->header_data('nav', 'fund_transfer');
@@ -100,7 +99,7 @@ class Fund_transfer extends MY_Controller {
     if ($this->form_validation->run() == FALSE) {
     	$err_msg[] = validation_errors();
     }
-    
+
 		// if (!empty($err_msg)) $_SESSION['warning'] = $err_msg;
 		// echo json_encode(array("status" => FALSE, "message" => $err_msg));
 		if (empty($err_msg)) $this->true_save_transfer($vid);
