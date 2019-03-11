@@ -139,7 +139,7 @@ QRY;
                               : substr($row->branch, 0, 1);
                         }
 
-			$branch = $global->query("select * from tbl_branches where b_code = '".$row->branch."'")->row();
+			$branch = $this->global->query("select * from tbl_branches where b_code = '".$row->branch."'")->row();
 
 			// lto_transmittal
 			$code = 'LT-'.$r_code.'-'
