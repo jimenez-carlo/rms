@@ -46,11 +46,10 @@ class Sales_model extends CI_Model{
 		$this->load->model('Fund_model', 'fund');
 
 		$this->topsheet_region = $this->reg_code;
-                $this->query = ($_SESSION['company'] != 8) ? ' company != 8 ' : ' company = 8 ';
+                $this->query = ($_SESSION['company'] != 8) ? ' company = 8 ' : ' company != 8 ';
 	}
 
 	public function dd_branches() {
-          $global = $this->load->database('global', TRUE);
           $result = $this->db->query(
             'SELECT DISTINCT bcode, bname
               FROM tbl_sales
