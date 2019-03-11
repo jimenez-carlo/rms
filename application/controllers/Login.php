@@ -208,6 +208,9 @@ class Login extends CI_Controller {
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
                                                                         $user_info['company'] = 1;
 									break;
+								case 'ACCTG-PAYCL-013':
+                                                                        $user_info['company'] = 1;
+									break;
 								case 'ACCTG-AMGR':
 									$user_info['task'] = 'For Manager Approval';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
