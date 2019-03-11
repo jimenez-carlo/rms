@@ -15,6 +15,7 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 /vendor/
 rms_dir/scan_docs/*
 rms_dir/temp/*
+rms_dir/*
 
 # IDE Files
 #-------------------------
