@@ -242,6 +242,8 @@ class Login extends CI_Controller {
 									break;
 							}
 							break;
+                                                default:
+                                                        $user_info['company'] = 1;
 					}
 
 					// session set
