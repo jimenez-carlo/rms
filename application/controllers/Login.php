@@ -165,7 +165,9 @@ class Login extends CI_Controller {
                                                           $user_info['region'] = 15;
                                                           $user_info['company'] = 8;
                                                           break;
-								default: $user_info['region'] = 0;
+                                                        default:
+                                                          $user_info['region'] = 0;
+                                                          $user_info['company'] = 1;
 							}
 
 							$this->load->model('Cmc_model', 'cmc');
@@ -239,7 +241,9 @@ class Login extends CI_Controller {
 								case 'TRSRY-ASST-010':
 									$user_info['task'] = 'For Check Issuance';
                                                                         $user_info['company'] = 8;
-									break;
+                                                                        break;
+                                                                default:
+                                                                        $user_info['company'] = 1;
 							}
 							break;
                                                 default:
