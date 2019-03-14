@@ -40,7 +40,7 @@ class Lto_payment extends MY_Controller {
 		$this->header_data('nav', 'lto_payment');
 		$this->header_data('dir', './../');
 
-		$data['company'] = array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI', 8 => 'MDI');
+		$data['company'] = $this->company;
 		$this->template('lto_payment/extract_form', $data);
 	}
 

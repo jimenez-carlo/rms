@@ -21,18 +21,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               </div>
             </div>
 
-						<?php $region = array_merge(array(0 => '- Any -'), $region); ?>
 						<div class="control-group span5">
 							<div class="control-label">Region</div>
 							<div class="controls">
 								<?php
 								if(substr($_SESSION['username'],0,5) == 'ACCTG' || substr($_SESSION['username'],0,5) == 'TRSRY'){
+                                                                $region = array_merge(array(0 => '- Any -'), $region);
 								print form_dropdown('region', $region, set_value('region'));
 								}else{
-								print form_dropdown('region', $region, set_value('region',$_SESSION['region']), array('readonly'=>'true'));
+								print form_dropdown('region', $region, set_value('region', $_SESSION['region']), array('readonly'=>'true'));
 								}
-								//print form_dropdown('region', $region, set_value('region'));
-
 								?>
 							</div>
 						</div>
