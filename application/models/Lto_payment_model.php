@@ -18,22 +18,21 @@ class Lto_payment_model extends CI_Model{
 
 	public function get_list($param)
 	{
+                $compQuery = ($_SESSION['company'] == 8) ? " AND company = ".$_SESSION['company'] : " ";
+
 		if (empty($param->date_from)) $param->date_from = date('Y-m-d', strtotime('-5 days'));
 		if (empty($param->date_to)) $param->date_to = date('Y-m-d');
 
-		if (empty($param->region)) $region = "";
-		else $region = " and region = ".$param->region;
+		$region = (empty($param->region)) ? "" : " AND region = ".$param->region;
 
-		if (empty($param->status)) $status = "";
-		else $status = " and status = ".$param->status;
+		$status = (empty($param->status)) ? "" : " AND status = ".$param->status;
 
-		if (empty($param->reference)) $reference = "";
-		else $reference = " and reference like '%".$param->reference."%'";
+		$reference = (empty($param->reference)) ? "" : " AND reference LIKE '%".$param->reference."%'";
 
-		return $this->db->query("select * from tbl_lto_payment
-			where ref_date between '".$param->date_from."' and '".$param->date_to."'
-			".$region." ".$status." ".$reference."
-			order by created desc limit 1000")->result_object();
+		return $this->db->query("SELECT * FROM tbl_lto_payment
+                        WHERE ref_date BETWEEN '".$param->date_from."' AND '".$param->date_to."'
+			".$region." ".$status." ".$reference." ".$compQuery."
+			ORDER BY created DESC limit 1000")->result_object();
 	}
 
         public function load_payment($lpid) {
