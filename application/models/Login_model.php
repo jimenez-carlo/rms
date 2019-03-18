@@ -8,7 +8,7 @@ class Login_model extends CI_Model{
 		parent::__construct();
 	}
 
-	public function add_user_log($username="") { 
+	public function add_user_log($username="") {
 		$this->db->query("INSERT INTO tbl_user_logs (
 												user,
 												ip_address,
@@ -51,12 +51,21 @@ class Login_model extends CI_Model{
 
 	public function get_user_info($username) {
 	  $global = $this->load->database('global', TRUE);
-		$query  = "SELECT a.username, a.password, b.* ";
-		$query .= "FROM tbl_users a INNER JOIN tbl_users_info b ON a.uid=b.uid ";
-		$query .= 'WHERE username="'.$username.'"'; 
-				
-		$result = $global->query($query);
-		return $result->row();
+
+          $query  = <<<SQL
+            SELECT
+              a.username, a.password, b.*, c.company
+            FROM
+              tbl_users a
+            INNER JOIN
+              tbl_users_info b ON a.uid=b.uid
+            LEFT JOIN
+              tbl_branches c ON b.branch = c.bid
+            WHERE username="$username"
+SQL;
+
+          $result = $global->query($query);
+          return $result->row();
 	}
 
 	public function get_system_access($system="") {

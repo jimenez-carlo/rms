@@ -41,15 +41,13 @@ class Login extends CI_Controller {
 					// validate 2 - username exists
 					if (empty($raw['user_info'])) {
 						$data['error'] = "Invalid username.";
-					}
-					else {
+					} else {
 
 						// validate 3 - password match
 						$user_password = $this->login->decrypt($raw['user_info']->password);
 						if ($password != $user_password) {
 							$data['error'] = "You have entered an incorrect password.";
-						}
-						else {
+						} else {
 
 							// validate 4 - access to system
 							foreach ($raw['sys_access'] as $value) {
@@ -68,10 +66,10 @@ class Login extends CI_Controller {
 				                                  'branch'      => $raw['user_info']->branch,
 				                                  'position'    => $raw['user_info']->position,
 				                                  'department'  => $raw['user_info']->department,
+                                                                  'company'     => $raw['user_info']->company,
 				                                  'sys_access'  => $raw['sys_access'],
 				                                  'page_access' => $raw['page_access']
-				            			);
-									break;
+				            			  );
 								}
 							}
 						}
@@ -81,11 +79,9 @@ class Login extends CI_Controller {
 				// still? invalid or empty login credential
 				if (empty($user_info)) {
 					if (!isset($data['error'])) $data['error'] = "Your account does not have access to this system.";
-				}
-				else {
+				} else {
 					// set variables based on position
-					switch ($user_info['position'])
-					{
+					switch ($user_info['position']) {
 						case 156:
 						case 109:
 						case 108: // if rrt, set region
@@ -93,77 +89,62 @@ class Login extends CI_Controller {
 							switch ($name[1]) {
                                                         case 'NCR':
                                                           $user_info['region'] = 1;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R1' :
                                                           $user_info['region'] = 2;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R2' :
                                                           $user_info['region'] = 3;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R3' :
                                                           $user_info['region'] = 4;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R4A':
                                                           $user_info['region'] = 5;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R4B': $user_info
                                                           ['region'] = 6;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R5' :
                                                           $user_info['region'] = 7;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R6' :
                                                           $user_info['region'] = 8;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R7' :
                                                           $user_info['region'] = 9;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R8' :
                                                           $user_info['region'] = 10;
-                                                          $user_info['company'] = 1;
                                                           break;
 
                                                         case 'R9' :
                                                           $user_info['region'] = 11;
-                                                          $user_info['company'] = 8;
                                                           break;
 
                                                         case 'R10':
                                                           $user_info['region'] = 12;
-                                                          $user_info['company'] = 8;
                                                           break;
 
                                                         case 'R11':
                                                           $user_info['region'] = 13;
-                                                          $user_info['company'] = 8;
                                                           break;
 
                                                         case 'R12':
                                                           $user_info['region'] = 14;
-                                                          $user_info['company'] = 8;
                                                           break;
 
                                                         case 'R13':
                                                           $user_info['region'] = 15;
-                                                          $user_info['company'] = 8;
                                                           break;
                                                         default:
                                                           $user_info['region'] = 0;
@@ -188,66 +169,50 @@ class Login extends CI_Controller {
 								case 'ACCTG-PAYCL-001':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(1)';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-002':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(2,3,4,5,6)';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-003':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(7,8,9,10)';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-004':
 									$user_info['task'] = 'For SAP Uploading';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-005':
 									$user_info['task'] = 'For Voucher';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-PAYCL-013':
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'ACCTG-AMGR':
 									$user_info['task'] = 'For Manager Approval';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'TRSRY-ASST-001':
 									$user_info['task'] = 'For Check Issuance';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'TRSRY-ASST-002':
 									$user_info['task'] = 'For Check Deposit';
-                                                                        $user_info['company'] = 1;
 									break;
 								case 'CMC-CCO':
 									$user_info['task'] = 'For Management Approval';
 
                                                                 //FOR MDI USERS
                                                                 case 'ACCTG-PAYCL-030':
-                                                                        $user_info['company'] = 8;
 									break;
 								case 'ACCTG-PAYCL-031':
 									$user_info['task'] = 'For ORCR Checking';
 									$user_info['task_regions'] = '(2,3,4,5,6)';
-                                                                        $user_info['company'] = 8;
 									break;
 								case 'TRSRY-ASST-010':
 									$user_info['task'] = 'For Check Issuance';
-                                                                        $user_info['company'] = 8;
                                                                         break;
-                                                                default:
-                                                                        $user_info['company'] = 1;
 							}
 							break;
-                                                default:
-                                                        $user_info['company'] = 1;
 					}
 
 					// session set
