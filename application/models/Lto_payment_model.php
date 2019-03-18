@@ -34,7 +34,7 @@ class Lto_payment_model extends CI_Model{
             WHERE
               lp.ref_date BETWEEN '$param->date_from' AND '$param->date_to'
               $region $status $reference $this->compQuery
-            ORDER BY created DESC limit 1000"
+            ORDER BY created DESC limit 1000
 SQL;
 
           return $this->db->query($sql)->result_object();
