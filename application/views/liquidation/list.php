@@ -15,10 +15,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="control-label">Date Deposited</div>
               <div class="controls">
                 <span style="display:inline-block;width:50px">From:</span>
-                <?php print form_input('date_from', set_value('date_from', date('Y-m-d', strtotime('-15 days'))), array('class' => 'datepicker')); ?>
+                <?php print form_input('date_from', set_value('date_from', date('Y-m-d', strtotime('-15 days'))), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
                 <br>
                 <span style="display:inline-block;width:50px">To:</span>
-                <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker')); ?>
+                <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
               </div>
             </div>
 
