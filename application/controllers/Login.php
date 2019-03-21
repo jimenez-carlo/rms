@@ -155,6 +155,7 @@ class Login extends CI_Controller {
 							$user_info['branches'] = $this->cmc->get_region_branches($user_info['region']);
 							break;
 
+						case 72:
 						case 73:
 						case 81: // if ccn, set branch
 							$user_info['branch'] = substr($user_info['username'], 0, 4);

@@ -162,6 +162,7 @@ class MY_Controller extends CI_Controller {
 				$this->load->view('tpl/nav_lo');
 				break;
 
+			case 72:
 			case 81:
 			case 73: // BRANCH CCN + BH
 				$data['orcr'] = $this->db->query("select *

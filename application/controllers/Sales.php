@@ -23,7 +23,7 @@ class Sales extends MY_Controller {
 		$param->engine_no = $this->input->post('engine_no');
 		$param->branch = $this->input->post('branch');
 
-		if (empty($param->branch) && !is_numeric($param->branch) && ($_SESSION['position'] == 73 || $_SESSION['position'] == 81)) {
+		if (empty($param->branch) && !is_numeric($param->branch) && ($_SESSION['position'] == 72 || $_SESSION['position'] == 73 || $_SESSION['position'] == 81)) {
 			$param->branch = $_SESSION['branch'];
 		}
 
