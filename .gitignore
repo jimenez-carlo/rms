@@ -16,6 +16,11 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 rms_dir/scan_docs/*
 rms_dir/temp/*
 rms_dir/*
+TODO.txt
+assets.tar
+assets/js/voucher_list.js
+cleanrms.sql
+rms-clone.tgz
 
 # IDE Files
 #-------------------------
