@@ -36,7 +36,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							{
 								print '<tr>';
 								print '<td>'.$row->ref_date.'</td>';
-								print '<td><a href="lto_payment/view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
+								print '<td><a href="view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
 
 								print '<td>'.$region[$row->region].' '.$company[$row->company].'</td>';
 								print '<td>'.$row->amount.'</td>';
