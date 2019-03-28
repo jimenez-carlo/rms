@@ -14,7 +14,7 @@ class Lto_payment_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
-                $this->compQuery = ($_SESSION['company'] == 8) ? " AND lp.company = ".$_SESSION['company'] : " AND lp.company != ".$_SESSION['company'] ;
+                $this->compQuery = ($_SESSION['company'] == 8) ? " AND lp.company = ".$_SESSION['company'] : " AND lp.company != 8";
 	}
 
 	public function get_list($param) {
@@ -37,6 +37,7 @@ class Lto_payment_model extends CI_Model{
             ORDER BY created DESC limit 1000
 SQL;
 
+          var_dump($sql); die();
           return $this->db->query($sql)->result_object();
 	}
 
