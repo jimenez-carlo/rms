@@ -37,7 +37,6 @@ class Lto_payment_model extends CI_Model{
             ORDER BY created DESC limit 1000
 SQL;
 
-          var_dump($sql); die();
           return $this->db->query($sql)->result_object();
 	}
 
