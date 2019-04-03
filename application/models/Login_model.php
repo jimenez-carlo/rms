@@ -8,25 +8,25 @@ class Login_model extends CI_Model{
 		parent::__construct();
 	}
 
-	public function add_user_log($username="") {
-		$this->db->query("INSERT INTO tbl_user_logs (
-												user,
-												ip_address,
-												user_name,
-												datetime_in
-											)
-											VALUES (
-												'$username',
-												'".$_SESSION['firstname']." ".$_SESSION['middlename']." ".$_SESSION['lastname']."',
-												'".$_SERVER['REMOTE_ADDR']."',
-												'".date('Y-m-d H:i:s', time())."'
-											)");
-		$result = $this->db->query("SELECT
-																	ulid
-																FROM tbl_user_logs
-																ORDER BY ulid DESC LIMIT 1");
-		return $result->row();
-	}
+        public function add_user_log($username="") {
+          $this->db->query("INSERT INTO tbl_user_logs (
+            user,
+            ip_address,
+            user_name,
+            datetime_in
+          )
+          VALUES (
+            '$username',
+            '".$_SESSION['firstname']." ".$_SESSION['middlename']." ".$_SESSION['lastname']."',
+            '".$_SERVER['REMOTE_ADDR']."',
+            '".date('Y-m-d H:i:s', time())."'
+          )");
+          $result = $this->db->query("SELECT
+            ulid
+            FROM tbl_user_logs
+            ORDER BY ulid DESC LIMIT 1");
+          return $result->row();
+        }
 
 	public function end_user_log($ulid="") {
 		$this->db->query("UPDATE tbl_user_logs

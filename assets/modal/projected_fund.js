@@ -3,7 +3,6 @@ var cid;
 
 function create_voucher(_fid, _cid) {
   var dataObj = { fid: _fid, cid: _cid }
-  fid = _fid; // This variable is reference in save_voucher line 29
 
   $.ajax({
     url : 'projected_fund/create_voucher',
@@ -26,7 +25,6 @@ function save_voucher() {
   if (confirm('Please make sure that all information are correct before proceeding. Continue?'))
   {
     var data = $('#form').serializeArray();
-    data.push({name: 'fid', value: fid});
 
     $.ajax({
       url : 'projected_fund/save_voucher',

@@ -23,6 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </thead>
     <tbody>
       <?php
+        print '<td><input type="hidden" name="fid" value="'.$fid.'"></td>';
         $total = 0;
         foreach ($fund->transmittal as $row) {
           $total += $row->amount;

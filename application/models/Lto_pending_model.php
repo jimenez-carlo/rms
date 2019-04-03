@@ -21,17 +21,22 @@ class Lto_pending_model extends CI_Model{
 
 	public function load_list($region)
 	{
-		$result = $this->db->query("select t.*,
-				left(t.date, 10) as date,
-				count(*) as sales
-			from tbl_lto_transmittal t
-			inner join tbl_sales on lto_transmittal = ltid
-			where t.region = ".$region."
-			and registration_type != 'Self Registration'
-			and status < 2
-			group by ltid
-			order by t.date desc")->result_object();
-		return $result;
+          $result = $this->db->query("
+	    SELECT
+	        t.*, LEFT(t.date, 10) AS date, COUNT(*) AS sales
+	    FROM
+	        tbl_lto_transmittal t
+	            INNER JOIN
+	        tbl_sales ON lto_transmittal = ltid
+	    WHERE
+	        t.region = '.$region.'
+	            AND registration_type != 'Self Registration'
+	            AND status < 2
+	    GROUP BY ltid
+	    ORDER BY t.date DESC
+          ")->result_object();
+
+	  return $result;
 	}
 
 	public function load_transmittal($ltid)

@@ -107,8 +107,8 @@ class Login extends CI_Controller {
                                                           $user_info['region'] = 5;
                                                           break;
 
-                                                        case 'R4B': $user_info
-                                                          ['region'] = 6;
+                                                        case 'R4B':
+                                                          $user_info['region'] = 6;
                                                           break;
 
                                                         case 'R5' :
