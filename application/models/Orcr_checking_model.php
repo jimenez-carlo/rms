@@ -17,6 +17,13 @@ class Orcr_checking_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] != 8) {
+                  $this->companyQry = ' AND t.company != 8';
+                } else {
+                  $this->region  = $this->mdi_region;
+                  $this->company = $this->mdi;
+                  $this->companyQry = ' AND t.company = 8';
+                }
 	}
 
 	public function get_list_for_checking($date)
@@ -27,6 +34,7 @@ class Orcr_checking_model extends CI_Model{
 				where t.status < 3
 				and da_reason <= 0
 				".$date."
+                                ".$this->companyQry."
 				group by tid
 				order by date desc
 				limit 1000")->result_object();
@@ -53,7 +61,7 @@ class Orcr_checking_model extends CI_Model{
 
 		$topsheet = $this->db->query("select * from tbl_topsheet
 			where tid = ".$data['tid'])->row();
-		$topsheet->region = $this->region[$topsheet->region];
+		$topsheet->region  = $this->region[$topsheet->region];
 		$topsheet->company = $this->company[$topsheet->company];
 		$topsheet->date = substr($topsheet->date, 0, 10);
 
@@ -61,7 +69,8 @@ class Orcr_checking_model extends CI_Model{
 		$topsheet->total_credit = 0;
 		$topsheet->check = 0;
 
-		$topsheet->sales = $this->db->query("select *,
+                $topsheet->sales = $this->db->query("
+                        select *,
 			case when registration_type = 'Free Registration' then si_no
 				when registration_type = 'With Regn. Subsidy' then concat(si_no, '<br>', ar_no)
 				else ar_no end as ar_no
@@ -134,7 +143,7 @@ class Orcr_checking_model extends CI_Model{
 
 		$this->load->helper('directory');
 		$folder = './rms_dir/misc/'.$misc->mid.'/';
-		
+
 		if (is_dir($folder)) {
 			$misc->files = directory_map($folder, 1);
 		}

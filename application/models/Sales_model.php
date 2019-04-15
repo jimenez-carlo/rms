@@ -2,12 +2,12 @@
 defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Sales_model extends CI_Model{
-	
+
 	public $sales_type = array(
 		0 => 'Brand New (Cash)',
 		1 => 'Brand New (Installment)'
 	);
-	
+
 	public $status = array(
 		0 => 'Ongoing Transmittal',
 		1 => 'LTO Rejected',
@@ -46,19 +46,21 @@ class Sales_model extends CI_Model{
 		$this->load->model('Fund_model', 'fund');
 
 		$this->topsheet_region = $this->reg_code;
+                $this->query = ($_SESSION['company'] != 8) ? ' company != 8 ' : ' company = 8 ';
 	}
 
-	public function dd_branches()
-	{
-		$global = $this->load->database('global', TRUE);
-		$result = $this->db->query('select distinct bcode, bname from tbl_sales
-			order by bcode')->result_object();
+	public function dd_branches() {
+          $result = $this->db->query(
+            'SELECT DISTINCT bcode, bname
+              FROM tbl_sales
+             WHERE '.$this->query.'ORDER BY bcode'
+          )->result_object();
 
-		$branches = array();
-		foreach ($result as $branch) {
-			$branches[$branch->bcode] = $branch->bcode.' '.$branch->bname;
-		}
-		return $branches;
+          $branches = array();
+          foreach ($result as $branch) {
+            $branches[$branch->bcode] = $branch->bcode.' '.$branch->bname;
+          }
+          return $branches;
 	}
 
 	public function dd_status()
@@ -116,12 +118,12 @@ class Sales_model extends CI_Model{
 		$sales = $this->db->query("select * from tbl_sales
 			left join tbl_engine on engine = eid
 			left join tbl_customer on customer = cid
-			where registration_type = 'Self Registration' and 
-			transmittal_date IS NULL and 
+			where registration_type = 'Self Registration' and
+			transmittal_date IS NULL and
 			branch in (".$branches.") and
 			LEFT(date_sold,10) like '$date_sold%'
 			limit 1000")->result_object();
-		
+
 		if (!empty($sales))
 		{
 			foreach ($sales as $key => $sale) {
@@ -139,12 +141,12 @@ class Sales_model extends CI_Model{
 		$sales = $this->db->query("select * from tbl_sales
 			left join tbl_engine on engine = eid
 			left join tbl_customer on customer = cid
-			where registration_type = 'Self Registration' and 
+			where registration_type = 'Self Registration' and
 			transmittal_date IS NOT NULL and
 			branch in (".$branches.") and
 			LEFT(date_sold,10) like '$date_sold%'
 			limit 1000")->result_object();
-		
+
 		if (!empty($sales))
 		{
 			foreach ($sales as $key => $sale) {
@@ -193,17 +195,17 @@ class Sales_model extends CI_Model{
 			inner join tbl_engine on engine = eid
 			inner join tbl_customer on customer = cid
 			where 1=1".$branch.$status.$name.$engine_no."
-			order by sid desc
+			AND ".$this->query."order by sid desc
 			limit 1000")->result_object();
-		
+
 		foreach ($result as $key => $sales)
 		{
 			$sales->date_sold = substr($sales->date_sold, 0, 10);
 			$sales->status = $this->status[$sales->status];
 			$sales->lto_reason = $this->lto_reason[$sales->lto_reason];
 
-			$sales->edit = ($_SESSION['position'] == 108 
-				&& $sales->status == 3 
+			$sales->edit = ($_SESSION['position'] == 108
+				&& $sales->status == 3
 				&& substr($sales->registration_date, 0, 10) == date('Y-m-d'));
 			$result[$key] = $sales;
 		}
@@ -218,11 +220,11 @@ class Sales_model extends CI_Model{
 			inner join tbl_customer on customer = cid
 			where engine_no = '".$engine_no."'
 			limit 1000")->row();
-		
+
 		if (!empty($sales))
 		{
-			$sales->edit = ($_SESSION['position'] == 108 
-				&& $sales->status == 3 
+			$sales->edit = ($_SESSION['position'] == 108
+				&& $sales->status == 3
 				&& substr($sales->registration_date, 0, 10) == date('Y-m-d'));
 			$sales->status = $this->status[$sales->status];
 		}

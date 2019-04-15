@@ -3,54 +3,65 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Fund_transfer_model extends CI_Model{
 
-	public function __construct()
-	{
-		parent::__construct();
-	}
+  public function __construct() {
+    parent::__construct();
 
-	public function get_voucher($vid)
-	{
-		$voucher = $this->db->query("select * from tbl_voucher v
-			inner join tbl_fund on fid = v.fund
-			where vid = ".$vid)->row();
-		return $voucher;
-	}
+    if ($_SESSION['company'] != 8) {
+      $this->region   = $this->region;
+      $this->company  = $this->company;
+      $this->andQuery = ' AND v.company != 8';
+    } else {
+      $this->region   = $this->mdi_region;
+      $this->company  = $this->mdi;
+      $this->andQuery = ' AND v.company = 8';
+    }
+  }
+
+  public function get_voucher($vid) {
+    $voucher = $this->db->query("select * from tbl_voucher v
+      inner join tbl_fund on fid = v.fund
+      where vid = ".$vid)->row();
+    return $voucher;
+  }
 
   /**
    * Treasury to Process Transfer
    */
-	public function get_for_process()
-	{
-		$result = $this->db->query("select * from tbl_voucher v
-			inner join tbl_fund on fid = v.fund
-			where status = 0")->result_object();
-		foreach ($result as $key => $row)
-		{
-			$row->date = substr($row->date, 0, 10);
-			$row->region = $this->region[$row->region];
-			$row->company = $this->company[$row->company];
-			$result[$key] = $row;
-		}
-		return $result;
-	}
+  public function get_for_process() {
+
+    $result = $this->db->query("
+            SELECT * from tbl_voucher v
+            INNER JOIN tbl_fund ON fid = v.fund
+            WHERE status = 0 $this->andQuery
+          ")->result_object();
+
+           foreach ($result as $key => $row)
+           {
+                   $row->date    = substr($row->date, 0, 10);
+                   $row->region  = $this->region[$row->region];
+                   $row->company = $this->company[$row->company];
+                   $result[$key] = $row;
+           }
+           return $result;
+  }
 
   /**
    * Treasury to Transfer Fund
    */
-	public function get_for_transfer()
-	{
-		$result = $this->db->query("select * from tbl_voucher v
-			inner join tbl_fund on fid = v.fund
-			where status = 1")->result_object();
-		foreach ($result as $key => $row)
-		{
-			$row->date = substr($row->date, 0, 10);
-			$row->region = $this->region[$row->region];
-			$row->company = $this->company[$row->company];
-			$result[$key] = $row;
-		}
-		return $result;
-	}
+  public function get_for_transfer() {
+    $result = $this->db->query("select * from tbl_voucher v
+      inner join tbl_fund on fid = v.fund
+      where status = 1 $this->andQuery")->result_object();
+
+    foreach ($result as $key => $row)
+    {
+      $row->date = substr($row->date, 0, 10);
+      $row->region = $this->region[$row->region];
+      $row->company = $this->company[$row->company];
+      $result[$key] = $row;
+    }
+    return $result;
+  }
 
 	public function save_transfer($voucher)
 	{

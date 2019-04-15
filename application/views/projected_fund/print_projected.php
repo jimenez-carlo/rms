@@ -88,23 +88,20 @@
   <tbody>
     <?php
     $total = 0;
+    $budget = ((int) ($_SESSION['company']) == 8) ? 1200 : 900;
+
     foreach ($fund->sales as $sales)
     {
+<<<<<<< HEAD
       $amount = 900 * $sales->units;
+=======
+      $amount = $budget * $sales->units;
+>>>>>>> production.50
       print '<tr>';
       print '<td>'.$sales->bcode.'</td>';
       print '<td>'.$sales->bname.'</td>';
       print '<td>'.$sales->units.'</td>';
       print '<td>'.number_format($amount, 2, '.', ',').'</td>';
-      // print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
-      // print '<td>'.$sales->date_sold.'</td>';
-      // print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
-      // print '<td>'.$sales->engine_no.'</td>';
-      // print '<td>'.$sales->sales_type.'</td>';
-      // print '<td>'.$sales->si_no.'</td>';
-      // print '<td>'.$sales->ar_no.'</td>';
-      // print '<td>'.$sales->registration_type.'</td>';
-      // print '<td>'.number_format($amount, 2, '.', ',').'</td>';
       print '</tr>';
       $total += $amount;
     }

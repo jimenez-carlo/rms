@@ -37,7 +37,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td style="text-align:right;padding-right:10px;">'.number_format($row->amount,2,'.',',').'</td>';
                 print '<td>'.$row->region.'</td>';
                 print '<td>'.form_input('dm_no['.$row->vid.']', set_value('dm_no['.$row->vid.']'), array('disabled' => '')).'</td>';
-                print '<td>'.form_input('process_date['.$row->vid.']', set_value('process_date['.$row->vid.']'), array('class' => 'datepicker', 'disabled' => '')).'</td>';
+                print '<td>'.form_input('process_date['.$row->vid.']', set_value('process_date['.$row->vid.']'), array('class' => 'datepicker', 'disabled' => '', 'autocomplete' => 'off')).'</td>';
                 // print '<td>'.$row->company.'</td>';
                 // print '<td style="text-align:center"><button class="btn btn-success" onclick="process_transfer('.$row->vid.')">Process Transfer</button></td>';
                 print '</tr>';
@@ -133,7 +133,7 @@ function save_process()
           $('#modal_form').modal('hide');
           location.href='fund_transfer';
         }
-        else 
+        else
         {
           $(".alert-error").removeClass("hide");
           $(".error").html("");

@@ -18,6 +18,13 @@ class Fund_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] != 8) {
+                  $this->companyQry = ' company != 8';
+                } else {
+                  $this->companyQry = ' company = 8';
+                  $this->region  = $this->mdi_region;
+                  $this->company = $this->mdi;
+                }
 	}
 
 	public function load($fid)
@@ -30,10 +37,10 @@ class Fund_model extends CI_Model{
 
 	public function load_all()
 	{
-		$result = $this->db->query("select * from tbl_fund")->result_object();
+		$result = $this->db->query("SELECT * FROM tbl_fund WHERE $this->company")->result_object();
 		foreach ($result as $fund)
 		{
-			$fund->region_name = $this->region[$fund->region];
+			$fund->region_name  = $this->region[$fund->region];
 			$fund->company_name = $this->company[$fund->company];
 		}
 		return $result;
@@ -100,10 +107,10 @@ class Fund_model extends CI_Model{
 			$fund->lto_pending = $row->lto_pending;
 			$fund->for_liquidation = $row->for_liquidation;
 
-			$fund->region = $this->region[$fund->region];
+			$fund->region = ($_SESSION['company'] != 8) ? $this->region[$fund->region] : $this->mdi_region[$fund->region];
 			$fund->company_cid = $fund->company;
-			$fund->company = $this->company[$fund->company];
-			$result[$key] = $fund;
+                        $fund->company = ($_SESSION['company'] != 8) ? $this->company : $this->mdi;
+                        $result[$key] = $fund;
 		}
 		return $result;
 	}
@@ -154,7 +161,7 @@ class Fund_model extends CI_Model{
 				$new_fund->fund = $fund->fund + $transaction->amount;
 				$new_fund->cash_on_hand = $fund->cash_on_hand - $transaction->amount;
 				$this->db->update('tbl_fund', $new_fund, array('fid' => $fund->fid));
-				
+
 				$history = new Stdclass();
 				$history->fund = $fund->fid;
 				$history->in_amount = $transaction->amount;

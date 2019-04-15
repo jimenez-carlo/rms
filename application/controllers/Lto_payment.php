@@ -6,10 +6,14 @@ class Lto_payment extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
     		$this->load->model('Lto_payment_model', 'lto_payment');
+                // Check in application/core/MY_Controller the value of $this->region and $this->company
+                if ($_SESSION['company'] == 8) {
+                   $this->region  = $this->mdi_region;
+                   $this->company = $this->mdi;
+                }
 	}
 
-	public function index()
-	{
+	public function index() {
 		$this->access(1);
 		$this->header_data('title', 'LTO Payment');
 		$this->header_data('nav', 'lto_payment');
@@ -22,28 +26,25 @@ class Lto_payment extends MY_Controller {
 		$param->status = $this->input->post('status');
 		$param->reference = $this->input->post('reference');
 
-		$data['table'] = $this->lto_payment->get_list($param);
-
-		$data['status'] = $this->lto_payment->status;
-		$data['region'] = $this->region;
+		$data['table']   = $this->lto_payment->get_list($param);
+		$data['status']  = $this->lto_payment->status;
+		$data['region']  = $this->region;
 		$data['company'] = $this->company;
 
 		$this->template('lto_payment/list', $data);
 	}
 
-	public function extract()
-	{
+	public function extract() {
 		$this->access(1);
 		$this->header_data('title', 'LTO Payment');
 		$this->header_data('nav', 'lto_payment');
 		$this->header_data('dir', './../');
 
-		$data['company'] = array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI');
+		$data['company'] = $this->company;
 		$this->template('lto_payment/extract_form', $data);
 	}
 
-	public function csv()
-	{
+	public function csv() {
 		$param = new Stdclass();
 		$param->region = $_SESSION['region'];
 		$param->company = $this->input->post('company');
@@ -64,21 +65,20 @@ class Lto_payment extends MY_Controller {
 		$this->load->view('lto_payment/extract_csv', $data);
 	}
 
-	public function view($lpid)
-	{
-		$payment = $this->lto_payment->load_payment($lpid);
+        public function view($lpid) {
+          $payment = $this->lto_payment->load_payment($lpid);
 
-		$this->access(1);
-		$this->header_data('title', $payment->reference);
-		$this->header_data('nav', 'lto_payment');
-		$this->header_data('dir', './../../');
+          $this->access(1);
+          $this->header_data('title', $payment->reference);
+          $this->header_data('nav', 'lto_payment');
+          $this->header_data('dir', './../../');
 
-		$payment->region = $this->region[$payment->region];
-		$payment->company = $this->company[$payment->company];
+          $payment->region  = $this->region[$payment->region];
+          $payment->company = $this->company[$payment->company];
 
-		$data['payment'] = $payment;
-		$this->template('lto_payment/view', $data);
-	}
+          $data['payment'] = $payment;
+          $this->template('lto_payment/view', $data);
+        }
 
 	public function add()
 	{
@@ -113,8 +113,7 @@ class Lto_payment extends MY_Controller {
 		$this->template('lto_payment/add', $data);
 	}
 
-	public function edit($lpid)
-	{
+	public function edit($lpid) {
 		$save = $this->input->post('save');
 		if (!empty($save)) {
 			$this->form_validation->set_rules('company', 'Company', 'required');
@@ -179,8 +178,8 @@ class Lto_payment extends MY_Controller {
 			}
 		}
 
-		$data['table'] = $this->lto_payment->get_list_by_status(1);
-		$data['region'] = $this->region;
+		$data['table']   = $this->lto_payment->get_list_by_status(1);
+		$data['region']  = $this->region;
 		$data['company'] = $this->company;
 		$this->template('lto_payment/pending', $data);
 	}
@@ -251,7 +250,7 @@ class Lto_payment extends MY_Controller {
 		}
 
 		$data['table'] = $this->lto_payment->get_list_by_status(3);
-		$data['region'] = $this->region;
+		$data['region']  = $this->region;
 		$data['company'] = $this->company;
 		$this->template('lto_payment/for_deposit', $data);
 	}
@@ -281,7 +280,7 @@ class Lto_payment extends MY_Controller {
 		}
 
 		$data['table'] = $this->lto_payment->get_liquidation_list();
-		$data['region'] = $this->region;
+		$data['region']  = $this->region;
 		$data['company'] = $this->company;
 		$this->template('lto_payment/liquidation', $data);
 	}

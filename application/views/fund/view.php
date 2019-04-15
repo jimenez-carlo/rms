@@ -45,7 +45,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
           <hr>
           <div class="form-actions">
-            <?php 
+            <?php
               print '<button class="btn btn-success" onclick="modal('.$fid.', '.$cid.', 1)">Cash Withdrawal</button> ';
               // print '<button class="btn btn-success" onclick="modal('.$fid.', '.$cid.', 2)">Check Withdrawal</button> ';
               print '<button class="btn btn-success" onclick="modal('.$fid.', '.$cid.', 3)">Deposit Cash</button> ';
@@ -55,7 +55,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			</div>
 		</div>
   </div>
-</div> 
+</div>
 
 <!-- Bootstrap modal -->
 <div class="modal fade" id="modal_form" role="dialog">

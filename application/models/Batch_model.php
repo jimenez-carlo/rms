@@ -6,27 +6,36 @@ class Batch_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+
+                // Check the value of $this->region and $this->company in application/core/MY_Controller
+                if ($_SESSION['company'] == 8) {
+                  $this->region     = $this->mdi_region;
+                  $this->company    = $this->mdi;
+                  $this->companyQry = ' AND company = 8';
+                } else {
+                  $this->companyQry = ' AND company != 8';
+                }
 	}
 
-	public function list_for_upload()
-	{
-		$result = $this->db->query("select bid, b.trans_no, b.post_date,
-				region, company, download_date
-			from tbl_batch b
-			inner join tbl_topsheet on topsheet = tid
-			where b.status = 0
-			order by b.post_date desc
-			limit 1000")->result_object();
+	public function list_for_upload() {
+          $result = $this->db->query("
+            select bid, b.trans_no, b.post_date,
+                   region, company, download_date
+            from tbl_batch b
+            inner join tbl_topsheet on topsheet = tid
+            where b.status = 0 $this->companyQry
+            order by b.post_date desc
+            limit 1000
+          ")->result_object();
 
-		foreach ($result as $key => $batch)
-		{
-			$batch->region = $this->region[$batch->region];
-			$batch->company = $this->company[$batch->company];
-			$batch->post_date = substr($batch->post_date, 0, 10);
-			$result[$key] = $batch;
-		}
+          foreach ($result as $key => $batch) {
+                  $batch->region = $this->region[$batch->region];
+                  $batch->company = $this->company[$batch->company];
+                  $batch->post_date = substr($batch->post_date, 0, 10);
+                  $result[$key] = $batch;
+          }
 
-		return $result;
+          return $result;
 	}
 
 	public function sap_upload($bid)
@@ -43,8 +52,8 @@ class Batch_model extends CI_Model{
 			where region = ".$batch->region)->row()->acct_number;
 		$batch->region = $this->region[$batch->region];
 		$batch->company = $this->company[$batch->company];
-		
-		
+
+
 		if($batch->region == 'NCR'){
 		$batch->sales = $this->db->query("select *, s.amount as amount
 			from tbl_sales s
@@ -52,14 +61,14 @@ class Batch_model extends CI_Model{
 			inner join tbl_lto_payment on lto_payment = lpid
 			where batch = ".$bid)->result_object();
 
-	
+
 		}else{
 		$batch->sales = $this->db->query("select *, s.amount as amount
 			from tbl_sales s
 			inner join tbl_customer on customer = cid
 			inner join tbl_voucher on voucher = vid
 			where batch = ".$bid)->result_object();
-		
+
 		}
 
 

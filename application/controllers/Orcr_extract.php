@@ -8,18 +8,32 @@ class Orcr_extract extends MY_Controller {
      $this->load->helper('url');
   }
 
+<<<<<<< HEAD
   public function index()
   {
+=======
+  public function index() {
+>>>>>>> production.50
     $this->access(1);
     $this->header_data('title', 'ORCR Extract');
     $this->header_data('nav', 'orcr_extract');
     $this->header_data('dir', './');
 
+<<<<<<< HEAD
     $data['count'] = $this->db->query("select count(sid) as count from tbl_sales
       left join tbl_orcr_extract on sales = sid
       where status > 3 and oeid is null")->row()->count;
 
     //$data['count'] = $this->db->query("select count(sid) as count from tbl_sales where status > 3")->row()->count;
+=======
+    $data['count'] = $this->db->query(
+      "SELECT COUNT(sid) AS count
+      FROM tbl_sales
+      LEFT JOIN tbl_orcr_extract ON sales = sid
+      WHERE status > 3 AND oeid IS NULL"
+    )->row()->count;
+    // $data['count'] = $this->db->query("select count(sid) as count from tbl_sales where status > 3")->row()->count;
+>>>>>>> production.50
 
     $data['table'] = $this->db->query("select batch_no,
       max(extract_date) as extract_date, count(sales) as count
@@ -49,6 +63,7 @@ class Orcr_extract extends MY_Controller {
           order by sid limit 5000");
     }
 
+<<<<<<< HEAD
     $data['result'] = $this->db->query("
       select
         bcode,
@@ -67,6 +82,14 @@ class Orcr_extract extends MY_Controller {
         batch_no = ".$batch_no."
       order by bcode
       ")->result_array();
+=======
+    $data['result'] = $this->db->query("select bcode, trim(concat(ifnull(first_name, ''), ' ', ifnull(last_name, ''))) as name, engine_no, cr_date, cr_no, tbl_sales.plate_no from tbl_sales
+      inner join tbl_customer on cid = customer
+      inner join tbl_engine on eid = engine
+      inner join tbl_orcr_extract on sales = sid
+      where batch_no = ".$batch_no."
+      order by bcode")->result_array();
+>>>>>>> production.50
 
     $this->load->view('orcr_extract_csv', $data);
   }

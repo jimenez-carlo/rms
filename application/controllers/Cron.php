@@ -8,6 +8,9 @@ class Cron extends MY_Controller {
     $this->load->helper('url');
 		$this->load->helper('directory');
 		$this->load->model('Login_model', 'login');
+		$this->global  = $this->load->database('global', TRUE);
+		$this->dev_rms = $this->load->database('dev_rms', TRUE);
+		$this->mdi_dev_rms = $this->load->database('mdi_dev_rms', TRUE);
   }
 
 	public function index()
@@ -86,14 +89,11 @@ class Cron extends MY_Controller {
 		$start = date("Y-m-d H:i:s");
 		$rows = 0;
 
-		$global = $this->load->database('global', TRUE);
-		$dev_rms = $this->load->database('dev_rms', TRUE);
-		
 		$date_yesterday = $this->input->post('date_yesterday');
-		$date_yesterday = (empty($date_yesterday))
-			? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
+		$date_yesterday = (empty($date_yesterday)) ? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
 		$date_from = date('Y-m-d', strtotime('-7 days'));
 
+<<<<<<< HEAD
 		$result = $dev_rms->query("select c.*, r.*, si_mat_no, regn_status, date_created
 			from customer_tbl c
 			inner join rrt_reg_tbl r on branch_code = branch
@@ -103,6 +103,24 @@ class Cron extends MY_Controller {
 			where left(date_sold, 10) >= '2018-08-01'
 			and (left(date_created, 10) BETWEEN '$date_from' and  '$date_yesterday')")->result_object();
 		
+=======
+                $query = <<<QRY
+                  SELECT
+                    c.*, r.*, si_mat_no, regn_status, date_created
+                  FROM
+                    customer_tbl c
+		  INNER JOIN rrt_reg_tbl r ON branch_code = branch
+		  INNER JOIN si_tbl_print ON si_engin_no = engine_no AND si_custcode = customer_id
+		  INNER JOIN regn_status ON engine_nr = engine_no
+		  INNER JOIN transmittal_tbl ON transmittal_code = transmittal_no
+		  WHERE left(date_sold, 10) >= '2018-08-01'
+		  AND (left(date_created, 10) BETWEEN '$date_from' AND  '$date_yesterday')
+QRY;
+                $dev_rms_result     = $this->dev_rms->query($query)->result_object();
+                $mdi_dev_rms_result = $this->mdi_dev_rms->query($query)->result_object();
+                $result = array_merge($dev_rms_result, $mdi_dev_rms_result);
+
+>>>>>>> production.50
 		foreach ($result as $row)
 		{
 			// branch dtls
@@ -125,10 +143,15 @@ class Cron extends MY_Controller {
 				case 'XIII': $region = 15; $r_code = 'XIII'; break;
 				default: $region = 0;
 			}
-			if ($region > 10) $company = 1;
-			else $company = (substr($row->branch, 0, 1) == 6) ? 2 : substr($row->branch, 0, 1);
-			
-			$branch = $global->query("select * from tbl_branches where b_code = '".$row->branch."'")->row();
+                        if ($region > 10) {
+                          $company = 8; // MDI
+                        } else {
+                          $company = (substr($row->branch, 0, 1) == 6)
+                              ? 2
+                              : substr($row->branch, 0, 1);
+                        }
+
+			$branch = $this->global->query("select * from tbl_branches where b_code = '".$row->branch."'")->row();
 
 			// lto_transmittal
 			$code = 'LT-'.$r_code.'-'
@@ -146,7 +169,7 @@ class Cron extends MY_Controller {
 				$transmittal->region = $region;
 				$transmittal->company = $company;
 				$this->db->insert('tbl_lto_transmittal', $transmittal);
-				$transmittal->ltid = $this->db->insert_id();	
+				$transmittal->ltid = $this->db->insert_id();
 			}
 
 			// engine
@@ -234,11 +257,11 @@ class Cron extends MY_Controller {
 
 		$date_yesterday = $this->input->post('date_yesterday');
 		$date_yesterday = (empty($date_yesterday))
-			? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
+			        ? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
 		$date_from = date('Y-m-d', strtotime('-3 days'));
 
 		// update lto pending sales
-		//$result = $this->db->query('select sid, engine_no, cust_code, 
+		//$result = $this->db->query('select sid, engine_no, cust_code,
 		//		left(pending_date, 10) as pending_date, registration,
 		//		left(cr_date, 10) as cr_date
 		//	from tbl_sales s
@@ -262,15 +285,20 @@ class Cron extends MY_Controller {
 		//$query .= 'OR (left(registration_date,10)="2019-02-17")';
 
 		$result = $this->db->query($query)->result_object();
+<<<<<<< HEAD
 		
 		//var_dump($result);	
 		//exit;	
 		
 		// FOR DEBUGGING	
+=======
+
+		// FOR DEBUGGING
+>>>>>>> production.50
 		//print_r(array($start, $current_date, $date_yesterday, $date_from, $query, $result));
 		//exit;
 
-		
+
 		//START: PRESERVE THIS BLOCK OF CODE FOR OPTIMIZATION BUT USE IN DEV ENVIRONMENT INSTEAD OF PRODUCTION - Jake
 		//foreach ($result as $row){
 		//	$engine_nums[] = $row->engine_no;
@@ -290,14 +318,14 @@ class Cron extends MY_Controller {
 		//$dev_ces2->where_in('engine_num', $engine_nums);
 		//$dev_ces2->where_in('custcode', $cust_codes);
 		//$expense_exist = $dev_ces2->get()->result_array();
-		
+
 		//END
 
 		//print_r(array('EXIST', $expense_exist));
 		//exit;
 
 		foreach ($result as $row)
-		{				
+		{
 			$expense = $dev_ces2->query("select rec_no from rms_expense
 				where engine_num = '".$row->engine_no."'
 				and custcode = '".$row->cust_code."'")->row();
@@ -338,10 +366,14 @@ class Cron extends MY_Controller {
 		$this->login->saveLog('Run Cron: Update rms_expense table for BOBJ Report [rms_expense] Duration: '.$start.' - '.$end);
 
 		$submit = $this->input->post('submit');
+<<<<<<< HEAD
 
 		print 'SUCCESS!!!!';
 		if (empty($submit)) redirect('cron');
 
+=======
+		if (!empty($submit)) redirect('cron');
+>>>>>>> production.50
 	}
 
 	public function ar_amount()
@@ -383,7 +415,7 @@ class Cron extends MY_Controller {
 		$this->login->saveLog('Run Cron: Update Sales AR Amount from BOBJ [ar_amount] Duration: '.$start.' - '.$end);
 
 		$submit = $this->input->post('submit');
-		if (empty($submit)) redirect('cron');
+		if (!empty($submit)) redirect('cron');
 	}
 
 	public function empty_temp()

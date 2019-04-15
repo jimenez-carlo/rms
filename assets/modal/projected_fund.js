@@ -1,6 +1,7 @@
 var fid;
 var cid;
 
+<<<<<<< HEAD
 function create_voucher(_fid, _cid)
 {
   fid = _fid;
@@ -8,6 +9,14 @@ function create_voucher(_fid, _cid)
 
   $.ajax({
     url : "projected_fund/create_voucher/" + fid + "/" + cid,
+=======
+function create_voucher(_fid, _cid) {
+  var dataObj = { fid: _fid, cid: _cid }
+
+  $.ajax({
+    url : 'projected_fund/create_voucher',
+    data: dataObj,
+>>>>>>> production.50
     type: "POST",
     dataType: "JSON",
     success: function(data)
@@ -15,7 +24,7 @@ function create_voucher(_fid, _cid)
       $(".error").html("");
       $(".alert-error").addClass("hide");
       $('.form-body').html(data); // reset form on modals
-      $('#modal_form').modal('show'); // show bootstrap modal
+      $("#modal_form").modal('show'); // show bootstrap modal
     },
     error: function (jqXHR, textStatus, errorThrown)
     {
@@ -28,6 +37,7 @@ function save_voucher()
 {
   if (confirm('Please make sure that all information are correct before proceeding. Continue?'))
   {
+<<<<<<< HEAD
     $.ajax({
       url : "projected_fund/save_voucher/" + fid,
       type: "POST",
@@ -37,11 +47,20 @@ function save_voucher()
       {
         if(data.status)
         {
+=======
+    var data = $('#form').serializeArray();
+
+    $.ajax({
+      url : 'projected_fund/save_voucher',
+      type: "POST",
+      data: data,
+      success: function(data) {
+        var res = JSON.parse(data);
+        if(res.status) {
+>>>>>>> production.50
           $('#modal_form').modal('hide');
           location.href = location.href;
-        }
-        else
-        {
+        } else {
           $(".alert-error").removeClass("hide");
           $(".error").html("");
           $(".error").append(data.message);

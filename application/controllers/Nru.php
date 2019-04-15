@@ -34,8 +34,7 @@ class Nru extends MY_Controller {
 		if (empty($data['ltid'])) {
 	 		$data['table'] = $this->nru->load_list($data);
 			$this->template('nru/list', $data);
-	 	}
-	 	else {
+	 	} else {
 	 		$data['ltid'] = (is_array($data['ltid'])) ? current(array_keys($data['ltid'])) : $data['ltid'];
 
 		 	if (empty($data['registration']) || $back_key == 1) {
@@ -66,21 +65,21 @@ class Nru extends MY_Controller {
 	{
 		$this->load->model('Login_model', 'login');
 
-		foreach ($data['registration'] as $sid => $registration)
-		{
-			if ($registration == 0) continue;
+                foreach ($data['registration'] as $sid => $registration)
+                {
+                  if ($registration == 0) continue;
 
-			$sales = new Stdclass();
-		  $sales->sid = $sid;
-		  $sales->registration = $registration;
-		  $sales->status = 3;
-			$this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
+                  $sales = new Stdclass();
+                  $sales->sid = $sid;
+                  $sales->registration = $registration;
+                  $sales->status = 3;
+                  $this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
 
-			$engine_no = $this->db->query("select engine_no from tbl_engine
-				inner join tbl_sales on eid = engine
-				where sid = ".$sales->sid)->row()->engine_no;
-			$this->login->saveLog('Saved Registration Expense [Php '.$registration.'] for Engine # '.$engine_no.' ['.$sid.']');
-		}
+                  $engine_no = $this->db->query("select engine_no from tbl_engine
+                    inner join tbl_sales on eid = engine
+                    where sid = ".$sales->sid)->row()->engine_no;
+                  $this->login->saveLog('Saved Registration Expense [Php '.$registration.'] for Engine # '.$engine_no.' ['.$sid.']');
+                }
 
 		$transmittal = $this->db->query("select * from tbl_lto_transmittal
 			where ltid = ".$data['ltid'])->row();

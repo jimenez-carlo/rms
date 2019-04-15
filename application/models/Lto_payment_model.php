@@ -14,34 +14,33 @@ class Lto_payment_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                $this->compQuery = ($_SESSION['company'] == 8) ? " AND lp.company = ".$_SESSION['company'] : " AND lp.company != 8";
 	}
 
-	public function get_list($param)
-	{
-		if (empty($param->date_from)) $param->date_from = date('Y-m-d', strtotime('-5 days'));
-		if (empty($param->date_to)) $param->date_to = date('Y-m-d');
+	public function get_list($param) {
 
-		if (empty($param->region)) $region = "";
-		else $region = " and region = ".$param->region;
-		
-		//if ($_SESSION['username'] != 'RRT-NCR-SPVSR'){
-		//	$region = " and region = ".$_SESSION['region'];
-		//}
+          if (empty($param->date_from)) $param->date_from = date('Y-m-d', strtotime('-5 days'));
+          if (empty($param->date_to)) $param->date_to = date('Y-m-d');
 
-		
+          $region = (empty($param->region)) ? "" : " AND lp.region = ".$param->region;
+          $status = (empty($param->status)) ? "" : " AND lp.status = ".$param->status;
+          $reference = (empty($param->reference)) ? "" : " AND lp.reference LIKE '%".$param->reference."%'";
 
-		if (empty($param->status)) $status = "";
-		else $status = " and status = ".$param->status;
+          $sql = <<<SQL
+            SELECT
+              lp.*
+            FROM
+              tbl_lto_payment lp
+            WHERE
+              lp.ref_date BETWEEN '$param->date_from' AND '$param->date_to'
+              $region $status $reference $this->compQuery
+            ORDER BY created DESC limit 1000
+SQL;
 
-		if (empty($param->reference)) $reference = "";
-		else $reference = " and reference like '%".$param->reference."%'";
-
-		return $this->db->query("select * from tbl_lto_payment
-			where ref_date between '".$param->date_from."' and '".$param->date_to."'
-			".$region." ".$status." ".$reference."
-			order by created desc limit 1000")->result_object();
+          return $this->db->query($sql)->result_object();
 	}
 
+<<<<<<< HEAD
 	public function load_payment($lpid)
 	{
 		$payment = $this->db->query("select * from tbl_lto_payment where lpid = ".$lpid)->row();
@@ -61,6 +60,20 @@ class Lto_payment_model extends CI_Model{
 			order by bcode")->result_object();
 		return $payment;
 	}
+=======
+        public function load_payment($lpid) {
+          $payment = $this->db->query("select * from tbl_lto_payment where lpid = ".$lpid)->row();
+          $payment->status = $this->status[$payment->status];
+
+          $payment->sales = $this->db->query("select * from tbl_sales
+            inner join tbl_engine on engine = eid
+            inner join tbl_customer on customer = cid
+            where lto_payment = ".$lpid."
+            order by bcode")->result_object();
+
+          return $payment;
+        }
+>>>>>>> production.50
 
 	public function upload_screenshot()
 	{
@@ -175,11 +188,11 @@ class Lto_payment_model extends CI_Model{
 		redirect('/lto_payment/view/'.$payment->lpid);
 	}
 
-	public function get_list_by_status($status)
-	{
-		return $this->db->query("select * from tbl_lto_payment
-			where status = ".$status." order by created desc")->result_object();
-	}
+        public function get_list_by_status($status) {
+          $company = ($_SESSION['company'] != 8) ? ' AND company != 8' : ' AND company = 8';
+          return $this->db->query("select * from tbl_lto_payment
+            where status = ".$status.$company." order by created desc")->result_object();
+        }
 
 	public function update_payment_status($payment, $status)
 	{
@@ -222,14 +235,19 @@ class Lto_payment_model extends CI_Model{
 		}
 	}
 
-	public function get_liquidation_list()
-	{
-		return $this->db->query("select lp.*, sum(registration) as sales
-			from tbl_lto_payment lp
-			left join tbl_sales s on lto_payment = lpid
-			where lp.status = 4
-			group by lpid
-			order by lp.created desc")->result_object();
+	public function get_liquidation_list() {
+          $sql = <<<SQL
+            SELECT
+              lp.*, SUM(registration) AS sales
+            FROM
+              tbl_lto_payment lp
+            LEFT JOIN
+              tbl_sales s ON lto_payment = lpid
+	    WHERE lp.status = 4 $this->compQuery
+	    GROUP BY lpid
+	    ORDER BY lp.created DESC
+SQL;
+          return $this->db->query($sql)->result_object();
 	}
 
 	public function load_batch_sales($lpid)

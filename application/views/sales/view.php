@@ -125,7 +125,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             {
               foreach ($sales->files as $file)
               {
-    					  $path = '/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
+                $path = '/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
                 print '<div class="attachment" style="position:relative">';
                 print '<img src="'.$path.'" style="margin:1em; border:solid">';
                 print '</div>';

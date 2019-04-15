@@ -27,12 +27,25 @@ class Projected_fund extends MY_Controller {
 		$this->template('projected_fund/list_projected', $data);
 	}
 
+<<<<<<< HEAD
 	public function create_voucher($fid, $cid)
 	{
 		$data['fund'] = $this->projected_fund->create_voucher($fid, $cid);
 		$data['company'] = $this->projected_fund->company;
 		$view = $this->load->view('projected_fund/create_voucher', $data, TRUE);
 		echo json_encode($view);
+=======
+	public function create_voucher() {
+          // $fid = $this->input->get('fid'); //FOR DEBUGGING
+          // $cid = $this->input->get('cid');
+          $fid = $this->input->post('fid');
+          $cid = $this->input->post('cid');
+          $data['fid'] = $fid;
+          $data['fund'] = $this->projected_fund->create_voucher($fid, $cid);
+          $data['company'] = ($_SESSION['company'] != 8) ? $this->projected_fund->company : $this->projected_fund->mdi;
+          $view = $this->load->view('projected_fund/create_voucher', $data, TRUE);
+          print $view;
+>>>>>>> production.50
 	}
 
 	public function sprint()
@@ -45,6 +58,7 @@ class Projected_fund extends MY_Controller {
 		$this->load->view('projected_fund/print_projected', $data);
 	}
 
+<<<<<<< HEAD
 	public function save_voucher($fid)
 	{
 		$ltid = $this->input->post('ltid');
@@ -78,6 +92,43 @@ class Projected_fund extends MY_Controller {
 		$_SESSION['messages'][] = 'Created Document # '.$voucher->voucher_no.' for '.$voucher->region.'.';
 		echo json_encode(array("status" => TRUE));
 	}
+=======
+        public function save_voucher() {
+          $fid  = $this->input->post('fid');
+          $ltid = $this->input->post('ltid');
+          $err_msg = array();
+
+          $this->form_validation->set_rules('voucher_no', 'Document #', 'required');
+
+          if ($this->form_validation->run() == FALSE) {
+            $err_msg[] = validation_errors();
+          }
+          if (empty($ltid)) {
+            $err_msg[] = 'Please select at least one transmittal to proceed.';
+          }
+
+          if (!empty($err_msg)) {
+            echo json_encode(array("status" => FALSE, "message" => $err_msg));
+          } else {
+            $this->true_save_voucher($fid);
+          }
+        }
+
+        public function true_save_voucher($fid) {
+          $ltid = $this->input->post('ltid');
+          $ltid = implode(',', array_keys($ltid));
+
+          $voucher = new Stdclass();
+          $voucher->fund = $fid;
+          $voucher->reference = $this->input->post('reference');
+          $voucher->voucher_no = $this->input->post('voucher_no');
+          $voucher->amount = $this->input->post('amount');
+          $voucher = $this->projected_fund->save_voucher($voucher, $ltid);
+
+          $_SESSION['messages'][] = 'Created Document # '.$voucher->voucher_no.' for '.$voucher->region.'.';
+          echo json_encode(array("status" => TRUE));
+        }
+>>>>>>> production.50
 
   /**
    * Accounting to view list of Voucher

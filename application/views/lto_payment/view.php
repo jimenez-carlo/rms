@@ -9,16 +9,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       </div>
       <div class="block-content collapse in">
         <div class="row-fluid">
-
           <div class="span5">
-
             <?php if ($payment->status == 'Pending') { ?>
             <div class="control-group">
               <div class="control-label"></div>
               <div class="controls text"><a href=<?php print "/lto_payment/edit/".$payment->lpid; ?> class="btn btn-success">Update details</a></div>
             </div>
             <?php } ?>
-
             <div class="control-group">
               <div class="control-label">Region</div>
               <div class="controls text"><?php print $payment->region.' '.$payment->company; ?></div>
@@ -39,9 +36,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="control-label">Payment Status</div>
               <div class="controls text"><?php print $payment->status; ?></div>
             </div>
-
             <hr>
-
             <div class="control-group">
               <div class="control-label">Document #</div>
               <div class="controls text"><?php print (empty($payment->doc_no)) ? '-' : $payment->doc_no.'<br><i>on '.$payment->doc_date.'</i>'; ?></div>

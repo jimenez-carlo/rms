@@ -2,9 +2,9 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Login extends CI_Controller {
-	
-  public function __construct() { 
-     parent::__construct(); 
+
+  public function __construct() {
+     parent::__construct();
      $this->load->helper('url');
   }
 
@@ -23,7 +23,7 @@ class Login extends CI_Controller {
 				$data['error'] = "Please enter your username.";
 			}
 			else if (empty($password)) {
-				$data['error'] = "Please enter your password.";	
+				$data['error'] = "Please enter your password.";
 			}
 			else {
 				$this->load->model('Login_model','login');
@@ -31,49 +31,47 @@ class Login extends CI_Controller {
 				//die;
 				// special usernames
 				$user_info = $this->custom_login($username, $password);
-				
+
 				// global login
 				if (empty($user_info)) {
 					$raw['user_info'] = $this->login->get_user_info($username);
 					$raw['sys_access'] = $this->login->get_system_access(20);
 					$raw['page_access'] = $this->login->get_access();
-					
+
 
 
 					// validate 2 - username exists
 					if (empty($raw['user_info'])) {
 						$data['error'] = "Invalid username.";
-					}
-					else {
+					} else {
 
 						// validate 3 - password match
 						$user_password = $this->login->decrypt($raw['user_info']->password);
 						if ($password != $user_password) {
 							$data['error'] = "You have entered an incorrect password.";
-						}
-						else {
+						} else {
 
 							// validate 4 - access to system
 							foreach ($raw['sys_access'] as $value) {
 								if ($raw['user_info']->position == $value['position'])
 								{
-									$log = $this->login->add_user_log($raw['user_info']->username);
-									$user_info = array(
-													'ulid'				=> $log->ulid,
-				                  'uid'         => $raw['user_info']->uid,
-				                  'username'    => $raw['user_info']->username,
-				                  'password'    => $raw['user_info']->password,
-				                  'lastname'    => $raw['user_info']->lastname,
-				                  'firstname'   => $raw['user_info']->firstname,
-				                  'middlename'  => $raw['user_info']->middlename,
-				                  'ext'         => $raw['user_info']->ext,
-				                  'branch'      => $raw['user_info']->branch,
-				                  'position'    => $raw['user_info']->position,
-				                  'department'  => $raw['user_info']->department,
-				                  'sys_access'  => $raw['sys_access'],
-				                  'page_access' => $raw['page_access']
-				            			);
-									break;
+								  $log = $this->login->add_user_log($raw['user_info']->username);
+							          $user_info = array(
+								  'ulid'        => $log->ulid,
+				                                  'uid'         => $raw['user_info']->uid,
+				                                  'username'    => $raw['user_info']->username,
+				                                  'password'    => $raw['user_info']->password,
+				                                  'lastname'    => $raw['user_info']->lastname,
+				                                  'firstname'   => $raw['user_info']->firstname,
+				                                  'middlename'  => $raw['user_info']->middlename,
+				                                  'ext'         => $raw['user_info']->ext,
+				                                  'branch'      => $raw['user_info']->branch,
+				                                  'position'    => $raw['user_info']->position,
+				                                  'department'  => $raw['user_info']->department,
+                                                                  'company'     => $raw['user_info']->company,
+				                                  'sys_access'  => $raw['sys_access'],
+				                                  'page_access' => $raw['page_access']
+				            			  );
 								}
 							}
 						}
@@ -83,39 +81,83 @@ class Login extends CI_Controller {
 				// still? invalid or empty login credential
 				if (empty($user_info)) {
 					if (!isset($data['error'])) $data['error'] = "Your account does not have access to this system.";
-				}
-				else {
+				} else {
 					// set variables based on position
-					switch ($user_info['position'])
-					{
+					switch ($user_info['position']) {
 						case 156:
 						case 109:
 						case 108: // if rrt, set region
 							$name = explode('-', $user_info['username']);
-							switch ($name[1])
-							{
-								case 'NCR': $user_info['region'] = 1; break;
-								case 'R1': $user_info['region'] = 2; break;
-								case 'R2': $user_info['region'] = 3; break;
-								case 'R3': $user_info['region'] = 4; break;
-								case 'R4A': $user_info['region'] = 5; break;
-								case 'R4B': $user_info['region'] = 6; break;
-								case 'R5': $user_info['region'] = 7; break;
-								case 'R6': $user_info['region'] = 8; break;
-								case 'R7': $user_info['region'] = 9; break;
-								case 'R8': $user_info['region'] = 10; break;
-								case 'R9': $user_info['region'] = 11; break;
-								case 'R10': $user_info['region'] = 12; break;
-								case 'R11': $user_info['region'] = 13; break;
-								case 'R12': $user_info['region'] = 14; break;
-								case 'R13': $user_info['region'] = 15; break;
-								default: $user_info['region'] = 0;
+							switch ($name[1]) {
+                                                        case 'NCR':
+                                                          $user_info['region'] = 1;
+                                                          break;
+
+                                                        case 'R1' :
+                                                          $user_info['region'] = 2;
+                                                          break;
+
+                                                        case 'R2' :
+                                                          $user_info['region'] = 3;
+                                                          break;
+
+                                                        case 'R3' :
+                                                          $user_info['region'] = 4;
+                                                          break;
+
+                                                        case 'R4A':
+                                                          $user_info['region'] = 5;
+                                                          break;
+
+                                                        case 'R4B':
+                                                          $user_info['region'] = 6;
+                                                          break;
+
+                                                        case 'R5' :
+                                                          $user_info['region'] = 7;
+                                                          break;
+
+                                                        case 'R6' :
+                                                          $user_info['region'] = 8;
+                                                          break;
+
+                                                        case 'R7' :
+                                                          $user_info['region'] = 9;
+                                                          break;
+
+                                                        case 'R8' :
+                                                          $user_info['region'] = 10;
+                                                          break;
+
+                                                        case 'R9' :
+                                                          $user_info['region'] = 11;
+                                                          break;
+
+                                                        case 'R10':
+                                                          $user_info['region'] = 12;
+                                                          break;
+
+                                                        case 'R11':
+                                                          $user_info['region'] = 13;
+                                                          break;
+
+                                                        case 'R12':
+                                                          $user_info['region'] = 14;
+                                                          break;
+
+                                                        case 'R13':
+                                                          $user_info['region'] = 15;
+                                                          break;
+                                                        default:
+                                                          $user_info['region'] = 0;
+                                                          $user_info['company'] = 1;
 							}
 
 							$this->load->model('Cmc_model', 'cmc');
 							$user_info['branches'] = $this->cmc->get_region_branches($user_info['region']);
 							break;
 
+						case 72:
 						case 73:
 						case 81: // if ccn, set branch
 							$user_info['branch'] = substr($user_info['username'], 0, 4);
@@ -147,6 +189,8 @@ class Login extends CI_Controller {
 									$user_info['task'] = 'For Voucher';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
 									break;
+								case 'ACCTG-PAYCL-013':
+									break;
 								case 'ACCTG-AMGR':
 									$user_info['task'] = 'For Manager Approval';
 									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
@@ -159,7 +203,17 @@ class Login extends CI_Controller {
 									break;
 								case 'CMC-CCO':
 									$user_info['task'] = 'For Management Approval';
+
+                                                                //FOR MDI USERS
+                                                                case 'ACCTG-PAYCL-030':
 									break;
+								case 'ACCTG-PAYCL-031':
+									$user_info['task'] = 'For ORCR Checking';
+									$user_info['task_regions'] = '(2,3,4,5,6)';
+									break;
+								case 'TRSRY-ASST-010':
+									$user_info['task'] = 'For Check Issuance';
+                                                                        break;
 							}
 							break;
 					}
@@ -218,7 +272,7 @@ class Login extends CI_Controller {
                   'page_access' => array(),
             			);
 		}
-		
+
 		return null;
 	}
 }

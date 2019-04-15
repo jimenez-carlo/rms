@@ -13,7 +13,18 @@ user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
 user_guide_src/cilexer/pycilexer.egg-info/*
 /vendor/
+<<<<<<< HEAD
 rms_dir/*
+=======
+rms_dir/scan_docs/*
+rms_dir/temp/*
+rms_dir/*
+TODO.txt
+assets.tar
+assets/js/voucher_list.js
+cleanrms.sql
+rms-clone.tgz
+>>>>>>> production.50
 
 # IDE Files
 #-------------------------

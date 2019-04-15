@@ -155,7 +155,12 @@ class MY_Controller extends CI_Controller {
 				$this->load->view('tpl/nav_lo');
 				break;
 
+<<<<<<< HEAD
 			case 81: 
+=======
+			case 72:
+			case 81:
+>>>>>>> production.50
 			case 73: // BRANCH CCN + BH
 				$data['orcr'] = $this->db->query("select *
 					from tbl_transmittal

@@ -1,5 +1,5 @@
 <?php
-defined ('BASEPATH') OR exit('No direct script access allowed'); 
+defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Liquidation_model extends CI_Model{
 
@@ -15,19 +15,26 @@ class Liquidation_model extends CI_Model{
 	public function __construct()
 	{
 		parent::__construct();
+                if ($_SESSION['company'] != 8) {
+                  $this->companyQry = ' AND v.company != 8';
+                } else {
+                  $this->region = $this->mdi_region;
+                  $this->companyQry = ' AND v.company = 8';
+                }
 	}
-	
+
 	public function load_list($param)
 	{
 		$date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-15 days')) : $param->date_from;
 		$date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
-		$region = (is_numeric($param->region)) ? ' and f.region = '.$param->region : '';
+		$region = (is_numeric($param->region)) ? ' AND f.region = '.$param->region : '';
 
-		return $this->db->query("select v.*, f.region,
+		return $this->db->query("SELECT v.*, f.region,
 				CASE
 				WHEN v.company = 1 THEN 'MNC'
 				WHEN v.company = 2 THEN 'MTI'
 				WHEN v.company = 3 THEN 'HPTI'
+<<<<<<< HEAD
 				END as companyname,
 				count(distinct s.sid) as sales_count,
 				ifnull(sum(case when s.status < 3 then 1200 else 0 end), 0) as rrt_pending,
@@ -45,8 +52,28 @@ class Liquidation_model extends CI_Model{
 			".$region."
 			group by vid
 			order by transfer_date desc")->result_object();
+=======
+				WHEN v.company = 8 THEN 'MDI'
+				END AS companyname,
+				COUNT(DISTINCT s.sid) AS sales_count,
+				IFNULL(SUM(CASE WHEN s.status < 3 THEN 1200 else 0 END), 0) AS rrt_pending,
+				IFNULL(SUM(CASE WHEN s.status = 3 THEN registration ELSE 0 END), 0) AS lto_pending,
+				IFNULL(SUM(CASE WHEN s.status = 4 THEN registration+tip ELSE 0 END), 0) AS for_liquidation,
+				ifnull(SUM(CASE WHEN s.status = 5 THEN registration+tip ELSE 0 END), 0) AS liquidated,
+				(SELECT SUM(amount) FROM tbl_misc WHERE ca_ref = vid AND status > 1 AND status < 4) AS misc_for_liq,
+				(SELECT SUM(amount) FROM tbl_misc WHERE ca_ref = vid AND status = 4) AS misc_liquidated,
+				(SELECT SUM(amount) FROM tbl_return_fund WHERE fund = vid AND liq_date IS NULL) AS return_for_liq,
+				(SELECT SUM(amount) FROM tbl_return_fund WHERE fund = vid AND liq_date IS NOT NULL) AS return_liquidated
+			FROM tbl_voucher v
+			INNER JOIN tbl_fund f ON fid = v.fund
+			INNER JOIN tbl_sales s ON s.fund = vid
+			WHERE LEFT(transfer_date, 10) BETWEEN '".$date_from."' AND '".$date_to."'
+			".$region." ".$this->companyQry."
+			GROUP BY vid
+			ORDER BY transfer_date DESC")->result_object();
+>>>>>>> production.50
 	}
-	
+
 	public function load_sales($vid)
 	{
 		$result = $this->db->query("select * from tbl_sales
