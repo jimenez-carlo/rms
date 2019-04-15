@@ -16,7 +16,7 @@ ob_end_clean();
 $output = fopen('php://output', 'w');
 
 // output headers
-fputcsv($output, array('branch_code', 'customer_name', 'engine_no', 'registration_date', 'cr_no', 'plate_no'));
+fputcsv($output, array('branch_code', 'branch_name', 'customer_name', 'engine_no', 'registration_date', 'cr_no', 'plate_no'));
 
 foreach ($result as $row) {
   fputcsv($output, $row);

@@ -22,36 +22,36 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
           <hr>
 
-					<table class="table">
-						<thead>
-							<tr>
-								<th>Batch #</th>
-								<th>Timestamp</th>
-								<th># of Units</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php
-							foreach ($table as $row) {
-								print '<tr>';
-								print '<td>Batch-'.$row->batch_no.'</td>';
-								print '<td>'.$row->extract_date.'</td>';
-								print '<td>'.$row->count.'</td>';
-								print '<td><input type="submit" name="extract" value="Extract" class="btn btn-success" data-batch="'.$row->batch_no.'"></td>';
-								print '</tr>';
-							}
+	  <table class="table">
+	  	<thead>
+	  		<tr>
+	  			<th>Batch #</th>
+	  			<th>Timestamp</th>
+	  			<th># of Units</th>
+	  		</tr>
+	  	</thead>
+	  	<tbody>
+	  		<?php
+	  		foreach ($table as $row) {
+	  			print '<tr>';
+	  			print '<td>Batch-'.$row->batch_no.'</td>';
+	  			print '<td>'.$row->extract_date.'</td>';
+	  			print '<td>'.$row->count.'</td>';
+	  			print '<td><input type="submit" name="extract" value="Extract" class="btn btn-success" data-batch="'.$row->batch_no.'"></td>';
+	  			print '</tr>';
+	  		}
 
-							if (empty($table)) {
-								print '<tr>';
-								print '<td>No batch result.</td>';
-								print '<td></td>';
-								print '<td></td>';
-								print '</tr>';
-							}
-							?>
-						</tbody>
-					</table>
-				</form>
+	  		if (empty($table)) {
+	  			print '<tr>';
+	  			print '<td>No batch result.</td>';
+	  			print '<td></td>';
+	  			print '<td></td>';
+	  			print '</tr>';
+	  		}
+	  		?>
+	  	</tbody>
+	  </table>
+	</form>
       </div>
     </div>
   </div>

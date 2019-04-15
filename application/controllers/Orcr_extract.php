@@ -50,12 +50,23 @@ class Orcr_extract extends MY_Controller {
           order by sid limit 5000");
     }
 
-    $data['result'] = $this->db->query("select bcode, trim(concat(ifnull(first_name, ''), ' ', ifnull(last_name, ''))) as name, engine_no, cr_date, cr_no, tbl_sales.plate_no from tbl_sales
-      inner join tbl_customer on cid = customer
-      inner join tbl_engine on eid = engine
-      inner join tbl_orcr_extract on sales = sid
-      where batch_no = ".$batch_no."
-      order by bcode")->result_array();
+    $data['result'] = $this->db->query("
+      select
+        bcode, bname,
+        trim(concat(ifnull(first_name, ''), ' ', ifnull(last_name, ''))) as name,
+        engine_no, cr_date, cr_no, tbl_sales.plate_no
+      from
+        tbl_sales
+      inner join
+        tbl_customer on cid = customer
+      inner join
+        tbl_engine on eid = engine
+      inner join
+        tbl_orcr_extract on sales = sid
+      where
+        batch_no = ".$batch_no."
+      order by bcode
+    ")->result_array();
 
     $this->load->view('orcr_extract_csv', $data);
   }
