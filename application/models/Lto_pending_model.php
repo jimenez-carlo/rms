@@ -29,7 +29,7 @@ class Lto_pending_model extends CI_Model{
 	            INNER JOIN
 	        tbl_sales ON lto_transmittal = ltid
 	    WHERE
-	        t.region = '.$region.'
+	        t.region = ".$region."
 	            AND registration_type != 'Self Registration'
 	            AND status < 2
 	    GROUP BY ltid
