@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       </div>
       <div class="block-content collapse in">
 
-        <form class="form-horizontal" method="post" enctype="multipart/form-data">
+        <form class="form-horizontal" method="post" enctype="multipart/form-data" id='batchForm'>
           <fieldset class="span5">
             <div class="control-group">
               <div class="control-label">Region</div>
@@ -48,7 +48,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
 
             <div class="form-actions">
-              <input type="submit" name="save" value="Save" class="btn btn-success" onclick="return validation()">
+              <input type="submit" name="save" id="save" value="Save" class="btn btn-success"  onclick="return validation(this);">
+              <label id="LabelSave" style="visibility:hidden;">Please wait...</label>
+              <!-- <img src="img/loader.gif"> -->
+              <!-- <button onclick="move()">Click Me</button>  -->
+              <!-- <div id="myProgress" style="visibility:hidden;">
+  <div id="myBar"></div>
+</div> -->
+
             </div>
           </fieldset>
 
@@ -80,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </div>
 <script>
 
-function validation(){
+function validation(a){
 	var messages = "";
 	job = confirm('Please make sure all information are correct before proceeding. Continue?');
 	if(job != true){
@@ -98,7 +105,36 @@ function validation(){
 	alert(messages);
 	return false;
 	}
+  a.style['display']='none';
+  document.getElementById("LabelSave").style['visibility'] = 'visible';
+  // document.getElementById("myProgress").style['visibility'] = 'visible';
+  // move();
 
 }
+function move() {
+  var elem = document.getElementById("myBar");   
+  var width = 1;
+  var id = setInterval(frame, 10);
+  function frame() {
+    if (width >= 100) {
+      clearInterval(id);
+    } else {
+      width++; 
+      elem.style.width = width + '%'; 
+    }
+  }
+}
 
-</script>
+</script> 
+<style>
+#myProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#myBar {
+  width: 1%;
+  height: 30px;
+  background-color: #4CAF50;
+}
+</style>
