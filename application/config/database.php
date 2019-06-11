@@ -97,10 +97,10 @@ $db['default'] = array(
 
 $db['global'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.55',
-	'username' => 'admin',
-	'password' => 'cmcadmin',
-	'database' => 'promo_db',
+	'hostname' => PORTAL_GLOBAL_DB_HOST,
+	'username' => PORTAL_GLOBAL_DB_USER,
+	'password' => PORTAL_GLOBAL_DB_PASSWORD,
+	'database' => PORTAL_GLOBAL_DB_NAME,
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
