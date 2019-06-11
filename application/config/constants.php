@@ -88,6 +88,9 @@ switch(ENVIRONMENT):
 
   case 'development':
 
+    # BASE URL
+    defined('BASE_URL')      ? null : define('BASE_URL', 'localhost:8000/rms_dev');
+
     # RMS_DB
     defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.4');
     defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'root');
@@ -139,6 +142,9 @@ switch(ENVIRONMENT):
     break;
 
   case 'production':
+
+    # BASE URL
+    defined('BASE_URL')      ? null : define('BASE_URL', '192.168.200.2/rms');
 
     # RMS_DB
     defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '192.168.100.55');
