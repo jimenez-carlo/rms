@@ -1,11 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Logout extends CI_Controller{
-	
+
 	function __construct(){
 		parent::__construct();
      $this->load->helper('url');
 	}
-	
+
 	public function index(){
           $this->load->model('Login_model','login');
           $this->login->end_user_log($_SESSION['ulid']);
@@ -23,10 +23,8 @@ class Logout extends CI_Controller{
                     'branch',
                     'position',
                     'department',
-
                     'region',
                     'branches',
-
                     'task',
                     'task_regions',
                );
