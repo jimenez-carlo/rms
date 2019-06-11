@@ -49,12 +49,12 @@ class MY_Controller extends CI_Controller {
 
 	private static $header = array();
 	private static $footer = array();
-	
-	public function __construct() { 
+
+	public function __construct() {
 	  parent::__construct();
 		$this->load->helper('url');
 		$this->load->helper('form');
-		
+
 	  $this->load->helper(array('form', 'url'));
 	  $this->load->library('form_validation');
 	}
@@ -100,7 +100,7 @@ class MY_Controller extends CI_Controller {
 				$this->load->view('tpl/nav_dev');
 				break;
 
-			case 109: 
+			case 109:
 			case 156: // RRT
 				$this->load->view('tpl/nav_rrt');
 				break;
@@ -108,19 +108,7 @@ class MY_Controller extends CI_Controller {
 			case 108: // RRT SPVSR
 				$data['not_received'] = 0;
 				$data['remarks_count'] = 0;
-				/*
-				$data['not_received'] = $this->db->query("SELECT DISTINCT sales FROM tbl_orcr_remarks orcr WHERE (SELECT COUNT(*) FROM tbl_sales_status WHERE sales=orcr.sales AND status='ORCR Received' ) = 0")->num_rows();
-				$data['remarks_count'] = $this->db->query("select * from tbl_topsheet_sales
-					inner join tbl_topsheet on tid = topsheet
-					where region = ".$_SESSION['region']."
-					and hold = 1")->num_rows();
-				$data['remarks_count'] += $this->db->query("select * from tbl_topsheet
-					where region = ".$_SESSION['region']."
-					and (select count(*) from tbl_batch
-					where misc = 1 and topsheet = tid) = 0
-					and (select count(*) from tbl_topsheet_misc_remarks
-					where tid = topsheet) > 0")->num_rows();
-				*/
+
 				$this->load->view('tpl/nav_rrt_spvsr', $data);
 				break;
 
@@ -146,7 +134,7 @@ class MY_Controller extends CI_Controller {
 			case 34: // Treasury
 				$this->load->view('tpl/nav_trsry', $data);
 				break;
-				
+
 			case 95: // Treasury-head
 				$this->load->view('tpl/nav_trsry_head');
 				break;
@@ -155,12 +143,8 @@ class MY_Controller extends CI_Controller {
 				$this->load->view('tpl/nav_lo');
 				break;
 
-<<<<<<< HEAD
-			case 81: 
-=======
 			case 72:
 			case 81:
->>>>>>> production.50
 			case 73: // BRANCH CCN + BH
 				$data['orcr'] = $this->db->query("select *
 					from tbl_transmittal
@@ -189,7 +173,7 @@ class MY_Controller extends CI_Controller {
 			default:
 				$this->load->view('tpl/nav_def');
 		}
-		
+
 		// templated
 		$this->load->view('tpl/messages');
 		$this->load->view($page, $data);
