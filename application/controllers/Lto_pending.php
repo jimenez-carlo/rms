@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Lto_pending extends MY_Controller { 
+class Lto_pending extends MY_Controller {
 
   public function __construct() {
 		parent::__construct();
