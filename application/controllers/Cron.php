@@ -93,18 +93,7 @@ class Cron extends MY_Controller {
 		$date_yesterday = (empty($date_yesterday)) ? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
 		$date_from = date('Y-m-d', strtotime('-7 days'));
 
-<<<<<<< HEAD
-		$result = $dev_rms->query("select c.*, r.*, si_mat_no, regn_status, date_created
-			from customer_tbl c
-			inner join rrt_reg_tbl r on branch_code = branch
-			inner join si_tbl_print on si_engin_no = engine_no and si_custcode = customer_id
-			inner join regn_status on engine_nr = engine_no
-			inner join transmittal_tbl on transmittal_code = transmittal_no
-			where left(date_sold, 10) >= '2018-08-01'
-			and (left(date_created, 10) BETWEEN '$date_from' and  '$date_yesterday')")->result_object();
-		
-=======
-                $query = <<<QRY
+                $query = <<<SQL
                   SELECT
                     c.*, r.*, si_mat_no, regn_status, date_created
                   FROM
@@ -115,12 +104,12 @@ class Cron extends MY_Controller {
 		  INNER JOIN transmittal_tbl ON transmittal_code = transmittal_no
 		  WHERE left(date_sold, 10) >= '2018-08-01'
 		  AND (left(date_created, 10) BETWEEN '$date_from' AND  '$date_yesterday')
-QRY;
+SQL;
+		// WHERE engine_no = ''
                 $dev_rms_result     = $this->dev_rms->query($query)->result_object();
                 $mdi_dev_rms_result = $this->mdi_dev_rms->query($query)->result_object();
                 $result = array_merge($dev_rms_result, $mdi_dev_rms_result);
 
->>>>>>> production.50
 		foreach ($result as $row)
 		{
 			// branch dtls
@@ -260,16 +249,18 @@ QRY;
 			        ? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
 		$date_from = date('Y-m-d', strtotime('-3 days'));
 
-		// update lto pending sales
-		//$result = $this->db->query('select sid, engine_no, cust_code,
-		//		left(pending_date, 10) as pending_date, registration,
-		//		left(cr_date, 10) as cr_date
-		//	from tbl_sales s
-		//	inner join tbl_customer c on customer = cid
-		//	inner join tbl_engine e on engine = eid
-		//	where left(pending_date,10) = "'.$date_yesterday.'"
-		//		or left(registration_date,10) = "'.$date_from.'"')->result_object();
-
+		// Manual update lto pending sales
+		// Just change the date
+		//$result = $this->db->query('
+		//  select sid, engine_no, cust_code,
+		//    left(pending_date, 10) as pending_date, registration,
+		//    left(cr_date, 10) as cr_date
+		//  from tbl_sales s
+		//    inner join tbl_customer c on customer = cid
+		//    inner join tbl_engine e on engine = eid
+		//  where left(pending_date,10) = "2019-03-25"
+		//   or left(registration_date,10) = "2019-03-25"
+		//')->result_object();
 
 		$query  = "SELECT sid, engine_no, cust_code, ";
 		$query .= "LEFT(pending_date, 10) AS pending_date, registration, ";
@@ -279,49 +270,10 @@ QRY;
 		$query .= "INNER JOIN tbl_engine e ON engine=eid ";
 		$query .= 'WHERE (left(pending_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'") ';
 		$query .= 'OR (left(registration_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'")';
-		
-
-		//$query .= 'WHERE (left(pending_date,10)="2019-02-17") ';
-		//$query .= 'OR (left(registration_date,10)="2019-02-17")';
-
 		$result = $this->db->query($query)->result_object();
-<<<<<<< HEAD
-		
-		//var_dump($result);	
-		//exit;	
-		
-		// FOR DEBUGGING	
-=======
 
 		// FOR DEBUGGING
->>>>>>> production.50
 		//print_r(array($start, $current_date, $date_yesterday, $date_from, $query, $result));
-		//exit;
-
-
-		//START: PRESERVE THIS BLOCK OF CODE FOR OPTIMIZATION BUT USE IN DEV ENVIRONMENT INSTEAD OF PRODUCTION - Jake
-		//foreach ($result as $row){
-		//	$engine_nums[] = $row->engine_no;
-		//	$cust_codes[]  = $row->cust_code;
-		//}
-
-		//$dev_ces2->select('rec_no');
-		//$dev_ces2->from('rms_expense');
-		//$dev_ces2->where_not_in('engine_num', $engine_nums);
-		//$dev_ces2->where_not_in('custcode', $cust_codes);
-		//$expense_not_exist = $dev_ces2->get()->result_array();
-		//print_r(array('NOT_EXIST', $expense_not_exist));
-		//exit;
-
-		//$dev_ces2->select('rec_no');
-		//$dev_ces2->from('rms_expense');
-		//$dev_ces2->where_in('engine_num', $engine_nums);
-		//$dev_ces2->where_in('custcode', $cust_codes);
-		//$expense_exist = $dev_ces2->get()->result_array();
-
-		//END
-
-		//print_r(array('EXIST', $expense_exist));
 		//exit;
 
 		foreach ($result as $row)
@@ -353,7 +305,7 @@ QRY;
 			$rows++;
 		}
 
-		$end = date("Y-m-d H:i:s"); 
+		$end = date("Y-m-d H:i:s");
 
 		$log = new Stdclass();
 		$log->ckey = 2;
@@ -366,14 +318,7 @@ QRY;
 		$this->login->saveLog('Run Cron: Update rms_expense table for BOBJ Report [rms_expense] Duration: '.$start.' - '.$end);
 
 		$submit = $this->input->post('submit');
-<<<<<<< HEAD
-
-		print 'SUCCESS!!!!';
-		if (empty($submit)) redirect('cron');
-
-=======
 		if (!empty($submit)) redirect('cron');
->>>>>>> production.50
 	}
 
 	public function ar_amount()
@@ -384,11 +329,14 @@ QRY;
 		$dev_ces2 = $this->load->database('dev_ces2', TRUE);
 
 		// select sales with AR and zero amount
-		$result = $this->db->query("select sid, bcode, ar_no, cust_code
-			from tbl_sales s
-			inner join tbl_customer c on customer = cid
-			where amount = 0 and not ar_no = 'N/A'
-			limit 1000")->result_object();
+		$result = $this->db->query("
+		  select
+		  sid, bcode, ar_no, cust_code
+		  from tbl_sales s
+		  inner join tbl_customer c on customer = cid
+		  where amount = 0 and not ar_no = 'N/A'
+		  limit 10000
+		")->result_object();
 		foreach ($result as $row)
 		{
 			$ar = $dev_ces2->query("select amount from ar_amount_tbl
