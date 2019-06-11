@@ -1,8 +1,12 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+//foreach ($table as $misc) {
+//  var_dump($misc);
+//}
+//exit();
 ?>
 
-<div class="container-fluid">	
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">

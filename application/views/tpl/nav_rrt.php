@@ -12,8 +12,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     <div class="nav-collapse collapse">
                         <ul class="nav pull-right">
                             <li class="dropdown <?php if(isset($nav) && $nav=="profile") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown"> <i class="icon-user" style="background-image: url(bootstrap/img/glyphicons-halflings-white.png);"></i> <?php echo substr($_SESSION['firstname'],0,1) .'. '.$_SESSION['lastname']. ' ('.$_SESSION['username'].')'; ?> <i class="caret"></i>
-
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">
+                                  <i class="icon-user" style="background-image: url(bootstrap/img/glyphicons-halflings-white.png);"></i>
+                                    <?php echo substr($_SESSION['firstname'],0,1) .'. '.$_SESSION['lastname']. ' ('.$_SESSION['username'].')'; ?>
+                                  <i class="caret"></i>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>

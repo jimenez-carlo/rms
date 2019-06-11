@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Sap_upload extends MY_Controller {
-	
-	public function __construct() { 
+
+	public function __construct() {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->model('Batch_model', 'batch');
@@ -15,8 +15,7 @@ class Sap_upload extends MY_Controller {
 		$this->header_data('title', 'For SAP Uploading');
 		$this->header_data('nav', 'sap_upload');
 		$this->header_data('dir', './');
-		$this->footer_data('script', '
-      <script src="./assets/modal/sap_upload.js"></script>');
+		$this->footer_data('script', '<script src="./assets/modal/sap_upload.js"></script>');
 
 		$save = $this->input->post('save');
 		if(!empty($save))
@@ -26,7 +25,7 @@ class Sap_upload extends MY_Controller {
 		}
 
 		$data['table'] = $this->batch->list_for_upload();
-		$this->template('sap_upload/list', $data); 
+		$this->template('sap_upload/list', $data);
 	}
 
 	public function sap($bid)

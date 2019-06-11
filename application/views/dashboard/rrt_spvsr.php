@@ -12,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <div class="block-content collapse in">
         <div id="sales" style="height: 250px;"></div>
         <table class="table" style="margin-top:10px;margin-bottom:0px;">
-          <tbody> 
+          <tbody>
             <?php
             $total = $new + $rejected + $pending + $nru + $registered + $closed;
             print '

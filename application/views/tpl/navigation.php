@@ -34,7 +34,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <!-- FLOOR PLANS -->
                             <li class="dropdown <?php if(isset($nav) && $nav=="plans") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Floor Plans <i class="caret"></i>
-
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
