@@ -141,9 +141,9 @@ switch(ENVIRONMENT):
   case 'production':
 
     # RMS_DB
-    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '192.168.100.55');
-    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'admin');
-    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'cmcadmin');
+    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '192.168.200.3');
+    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'appserver');
+    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'opulently tadpole mulberry ether overfeed drizzly');
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
     # PORTAL GLOBAL DB
