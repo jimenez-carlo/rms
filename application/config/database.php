@@ -47,9 +47,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |				'ssl_key'    - Path to the private key file
 |				'ssl_cert'   - Path to the public key certificate file
 |				'ssl_ca'     - Path to the certificate authority file
-|				'ssl_capath' - Path to a directory containing trusted CA certificats in PEM format
+|				'ssl_capath' - Path to a directory containing trusted CA certificates in PEM format
 |				'ssl_cipher' - List of *allowed* ciphers to be used for the encryption, separated by colons (':')
-|				'ssl_verify' - TRUE/FALSE; Whether verify the server certificate or not ('mysqli' only)
+|				'ssl_verify' - TRUE/FALSE; Whether verify the server certificate or not
 |
 |	['compress'] Whether or not to use client compression (MySQL only)
 |	['stricton'] TRUE/FALSE - forces 'Strict Mode' connections
@@ -75,9 +75,6 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	//'hostname' => '192.168.100.55',
-	//'username' => 'admin',
-	//'password' => 'cmcadmin',
 	'hostname' => RMS_DB_HOST,
 	'username' => RMS_DB_USER,
 	'password' => RMS_DB_PASSWORD,
@@ -97,28 +94,6 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
-
-//$db['promo_db'] = array(
-//	'dsn'	=> '',
-//	'hostname' => '192.168.100.55',
-//	'username' => 'admin',
-//	'password' => 'cmcadmin',
-//	'database' => 'promo_db',
-//	'dbdriver' => 'mysqli',
-//	'dbprefix' => '',
-//	'pconnect' => FALSE,
-//	'db_debug' => (ENVIRONMENT !== 'production'),
-//	'cache_on' => FALSE,
-//	'cachedir' => '',
-//	'char_set' => 'utf8',
-//	'dbcollat' => 'utf8_general_ci',
-//	'swap_pre' => '',
-//	'encrypt' => FALSE,
-//	'compress' => FALSE,
-//	'stricton' => FALSE,
-//	'failover' => array(),
-//	'save_queries' => TRUE
-//);
 
 $db['global'] = array(
 	'dsn'	=> '',
@@ -142,12 +117,34 @@ $db['global'] = array(
 	'save_queries' => TRUE
 );
 
+$db['dev_ces2'] = array(
+	'dsn'	=> '',
+	'hostname' => DEV_CES_DB_HOST,
+	'username' => DEV_CES_DB_USER,
+	'password' => DEV_CES_DB_PASSWORD,
+	'database' => DEV_CES_DB_NAME,
+	'dbdriver' => 'mysqli',
+	'dbprefix' => '',
+	'pconnect' => FALSE,
+	'db_debug' => (ENVIRONMENT !== 'production'),
+	'cache_on' => FALSE,
+	'cachedir' => '',
+	'char_set' => 'utf8',
+	'dbcollat' => 'utf8_general_ci',
+	'swap_pre' => '',
+	'encrypt' => FALSE,
+	'compress' => FALSE,
+	'stricton' => FALSE,
+	'failover' => array(),
+	'save_queries' => TRUE
+);
+
 $db['mdi_dev_ces2'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.40',
-	'username' => 'admin',
-	'password' => 'admin',
-	'database' => 'dev_ces2',
+	'hostname' => MDI_DEV_CES_DB_HOST,
+	'username' => MDI_DEV_CES_DB_USER,
+	'password' => MDI_DEV_CES_DB_PASSWORD,
+	'database' => MDI_DEV_CES_DB_NAME,
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -166,10 +163,10 @@ $db['mdi_dev_ces2'] = array(
 
 $db['dev_rms'] = array(
 	'dsn'	   => '',
-	'hostname' => '172.17.0.2',
-	'username' => 'root',
-	'password' => 'root',
-	'database' => 'dev_rms',
+	'hostname' => DEV_RMS_DB_HOST,
+	'username' => DEV_RMS_DB_USER,
+	'password' => DEV_RMS_DB_PASSWORD,
+	'database' => DEV_RMS_DB_NAME,
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -188,10 +185,10 @@ $db['dev_rms'] = array(
 
 $db['mdi_dev_rms'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.100.40',
-	'username' => 'admin',
-	'password' => 'admin',
-	'database' => 'dev_rms',
+	'hostname' => MDI_DEV_RMS_DB_HOST,
+	'username' => MDI_DEV_RMS_DB_USER,
+	'password' => MDI_DEV_RMS_DB_PASSWORD,
+	'database' => MDI_DEV_RMS_DB_NAME,
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
