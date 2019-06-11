@@ -88,14 +88,13 @@ class MY_Controller extends CI_Controller {
 		redirect('no_access');
 	}
 
-	public function template($page, $data = array())
-	{
+	public function template($page, $data = array()) {
+
 		// set header
 		$this->load->view('tpl/header', self::$header);
 
 		// NAVIGATION BAR
-		switch ($_SESSION['position'])
-		{
+		switch ($_SESSION['position']) {
 			case 27: // PROGRAMMER/ADMIN
 				$this->load->view('tpl/nav_dev');
 				break;

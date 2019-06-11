@@ -18,7 +18,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <div class="pull-left">Registration</div>
       </div>
       <div class="block-content collapse in">
-        <form method="post" class="form-horizontal" action="/registration" target="_blank">
+        <form method="post" class="form-horizontal" action="<?php echo base_url(); ?>registration" target="_blank">
           <?php print form_hidden('sid', 0); ?>
 
           <table class="table">

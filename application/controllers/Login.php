@@ -8,80 +8,73 @@ class Login extends CI_Controller {
      $this->load->helper('url');
   }
 
-	public function index()
-	{
+	public function index() {
 		// prevent login when logged in
 		if ($this->session->has_userdata('username')) redirect('home');
 
-		if (isset($_POST['login']))
-		{
+		if (isset($_POST['login'])) {
 			$username = $this->input->post('username');
 			$password = $this->input->post('password');
 
 			// validate 1
 			if (empty($username)) {
 				$data['error'] = "Please enter your username.";
-			}
-			else if (empty($password)) {
+			} else if (empty($password)) {
 				$data['error'] = "Please enter your password.";
-			}
-			else {
+			} else {
 				$this->load->model('Login_model','login');
-				//var_dump(array('DATA', $username,$this->login->get_user_info('1822-BH-001')));
-				//die;
+
 				// special usernames
 				$user_info = $this->custom_login($username, $password);
 
 				// global login
-				if (empty($user_info)) {
-					$raw['user_info'] = $this->login->get_user_info($username);
-					$raw['sys_access'] = $this->login->get_system_access(20);
-					$raw['page_access'] = $this->login->get_access();
+                                if (empty($user_info)) {
+                                  $raw['user_info'] = $this->login->get_user_info($username);
+                                  $raw['sys_access'] = $this->login->get_system_access(20);
+                                  $raw['page_access'] = $this->login->get_access();
 
+                                  // validate 2 - username exists
+                                  if (empty($raw['user_info'])) {
+                                    $data['error'] = "Invalid username.";
+                                  } else {
 
+                                    // validate 3 - password match
+                                    $user_password = $this->login->decrypt($raw['user_info']->password);
+                                    if ($password != $user_password) {
+                                      $data['error'] = "You have entered an incorrect password.";
+                                    } else {
 
-					// validate 2 - username exists
-					if (empty($raw['user_info'])) {
-						$data['error'] = "Invalid username.";
-					} else {
-
-						// validate 3 - password match
-						$user_password = $this->login->decrypt($raw['user_info']->password);
-						if ($password != $user_password) {
-							$data['error'] = "You have entered an incorrect password.";
-						} else {
-
-							// validate 4 - access to system
-							foreach ($raw['sys_access'] as $value) {
-								if ($raw['user_info']->position == $value['position'])
-								{
-								  $log = $this->login->add_user_log($raw['user_info']->username);
-							          $user_info = array(
-								  'ulid'        => $log->ulid,
-				                                  'uid'         => $raw['user_info']->uid,
-				                                  'username'    => $raw['user_info']->username,
-				                                  'password'    => $raw['user_info']->password,
-				                                  'lastname'    => $raw['user_info']->lastname,
-				                                  'firstname'   => $raw['user_info']->firstname,
-				                                  'middlename'  => $raw['user_info']->middlename,
-				                                  'ext'         => $raw['user_info']->ext,
-				                                  'branch'      => $raw['user_info']->branch,
-				                                  'position'    => $raw['user_info']->position,
-				                                  'department'  => $raw['user_info']->department,
-                                                                  'company'     => $raw['user_info']->company,
-				                                  'sys_access'  => $raw['sys_access'],
-				                                  'page_access' => $raw['page_access']
-				            			  );
-								}
-							}
-						}
-					}
-				}
+                                      // validate 4 - access to system
+                                      foreach ($raw['sys_access'] as $value) {
+                                        if ($raw['user_info']->position == $value['position']) {
+                                          $log = $this->login->add_user_log($raw['user_info']->username, $raw['user_info']->firstname, $raw['user_info']->lastname);
+                                          $user_info = array(
+                                            'ulid'        => $log->ulid,
+                                            'uid'         => $raw['user_info']->uid,
+                                            'username'    => $raw['user_info']->username,
+                                            'password'    => $raw['user_info']->password,
+                                            'lastname'    => $raw['user_info']->lastname,
+                                            'firstname'   => $raw['user_info']->firstname,
+                                            'middlename'  => $raw['user_info']->middlename,
+                                            'ext'         => $raw['user_info']->ext,
+                                            'branch'      => $raw['user_info']->branch,
+                                            'position'    => $raw['user_info']->position,
+                                            'department'  => $raw['user_info']->department,
+                                            'company'     => $raw['user_info']->company,
+                                            'sys_access'  => $raw['sys_access'],
+                                            'page_access' => $raw['page_access']
+                                          );
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
 
 				// still? invalid or empty login credential
 				if (empty($user_info)) {
 					if (!isset($data['error'])) $data['error'] = "Your account does not have access to this system.";
 				} else {
+
 					// set variables based on position
 					switch ($user_info['position']) {
 						case 156:
@@ -221,6 +214,7 @@ class Login extends CI_Controller {
 					// session set
 					$this->session->set_userdata($user_info);
 					$this->login->saveLog("User [" . $_SESSION['uid'] . "] " . $_SESSION['username'] . " logged in.");
+
 					redirect('home');
 				}
 			}
@@ -234,44 +228,45 @@ class Login extends CI_Controller {
 	private function custom_login($username, $password)
 	{
 		if ($username == 'marketing' && $password == 'marketing') {
-			// for marketing, orcr extract
-			$log = $this->login->add_user_log($username);
-			return array(
-									'ulid'				=> $log->ulid,
-                  'uid'         => 0,
-                  'username'    => $username,
-                  'password'    => 'dummy',
-                  'lastname'    => 'Manayan',
-                  'firstname'   => 'Alma',
-                  'middlename'  => '',
-                  'ext'         => '',
-                  'branch'      => '9000',
-                  'position'    => '-1',
-                  'department'  => '0',
-                  'sys_access'  => array(),
-                  'page_access' => array(),
-            			);
+                  // for marketing, orcr extract
+                  $log = $this->login->add_user_custom_log($username);
+
+                  return array(
+                    'ulid'        => $log->ulid,
+                    'uid'         => 0,
+                    'username'    => $username,
+                    'password'    => 'dummy',
+                    'lastname'    => 'Manayan',
+                    'firstname'   => 'Alma',
+                    'middlename'  => '',
+                    'ext'         => '',
+                    'branch'      => '9000',
+                    'position'    => '-1',
+                    'department'  => '0',
+                    'sys_access'  => array(),
+                    'page_access' => array(),
+                  );
 		}
 
-		if ($username == 'siteadmin' && $password == 'siteadmin') {
-			// for marketing, orcr extract
-			$log = $this->login->add_user_log($username);
-			return array(
-									'ulid'				=> $log->ulid,
-                  'uid'         => 0,
-                  'username'    => $username,
-                  'password'    => 'dummy',
-                  'lastname'    => 'De Vera',
-                  'firstname'   => 'Mary Jane',
-                  'middlename'  => '',
-                  'ext'         => '',
-                  'branch'      => '9000',
-                  'position'    => '-2',
-                  'department'  => '0',
-                  'sys_access'  => array(),
-                  'page_access' => array(),
-            			);
-		}
+                if ($username == 'siteadmin' && $password == 'siteadmin') {
+                  // for marketing, orcr extract
+                  $log = $this->login->add_user_custom_log($username);
+                  return array(
+                    'ulid'				=> $log->ulid,
+                    'uid'         => 0,
+                    'username'    => $username,
+                    'password'    => 'dummy',
+                    'lastname'    => 'De Vera',
+                    'firstname'   => 'Mary Jane',
+                    'middlename'  => '',
+                    'ext'         => '',
+                    'branch'      => '9000',
+                    'position'    => '-2',
+                    'department'  => '0',
+                    'sys_access'  => array(),
+                    'page_access' => array(),
+                  );
+                }
 
 		return null;
 	}

@@ -79,7 +79,7 @@ class Registration extends MY_Controller {
 			foreach ($_FILES['scanFiles']['name'] as $key => $val) {
 				$total_size += $_FILES['scanFiles']['size'][$key];
 			}
-	
+
 			if($total_size > 1000000) {
 				$_SESSION['warning'][] = "The file you are attempting to upload is larger than the permitted size.";
 			}
@@ -266,7 +266,7 @@ if (!isset($form_valid)) $form_valid = $this->form_validation->run();
 			$this->registration->register_sales($data);
 			redirect('registration');
 		}
-		 
+
 		if (empty($data['ltid'])) {
 			$data['table'] = $this->registration->load_list($data);
 			$this->template('registration/list', $data);

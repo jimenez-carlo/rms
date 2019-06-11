@@ -3,49 +3,82 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Login_model extends CI_Model{
 
-	public function __construct()
-	{
+	public function __construct() {
 		parent::__construct();
 	}
 
-        public function add_user_log($username="") {
-          $this->db->query("INSERT INTO tbl_user_logs (
-            user,
-            ip_address,
-            user_name,
-            datetime_in
-          )
-          VALUES (
-            '$username',
-            '".$_SESSION['firstname']." ".$_SESSION['middlename']." ".$_SESSION['lastname']."',
-            '".$_SERVER['REMOTE_ADDR']."',
-            '".date('Y-m-d H:i:s', time())."'
-          )");
+        public function add_user_log($username, $firstname, $lastname) {
+
+          $ip_address = $_SERVER['REMOTE_ADDR'];
+          $time_stamp = date('Y-m-d H:i:s', time());
+
+          $sql = <<<SQL
+             INSERT INTO tbl_user_logs (
+               user,
+               user_name,
+               ip_address,
+               datetime_in
+             ) VALUES (
+               "$firstname $lastname",
+               "$username",
+               "$ip_address",
+               "$time_stamp"
+             )
+SQL;
+          $this->db->query($sql);
+
           $result = $this->db->query("SELECT
             ulid
             FROM tbl_user_logs
             ORDER BY ulid DESC LIMIT 1");
+
           return $result->row();
+
         }
 
+	public function add_user_custom_log($username="") {
+	  $this->db->query("INSERT INTO tbl_user_logs (
+	    user,
+	    ip_address,
+	    user_name,
+	    datetime_in
+	  )
+	  VALUES (
+	    '$username',
+	    '".$_SESSION['firstname']." ".$_SESSION['middlename']." ".$_SESSION['lastname']."',
+	    '".$_SERVER['REMOTE_ADDR']."',
+	    '".date('Y-m-d H:i:s', time())."'
+	  )");
+
+          $result = $this->db->query("SELECT
+            ulid
+            FROM tbl_user_logs
+            ORDER BY ulid DESC LIMIT 1")->row();
+
+          return $result;
+
+	}
+
+
 	public function end_user_log($ulid="") {
-		$this->db->query("UPDATE tbl_user_logs
-											SET
-												datetime_out='".date('Y-m-d H:i:s', time())."'
-											WHERE ulid=$ulid");
+          $this->db->query("UPDATE
+                              tbl_user_logs
+                            SET
+                              datetime_out='".date('Y-m-d H:i:s', time())."'
+			    WHERE ulid=$ulid");
 	}
 
 	public function saveLog($action="") {
 		$ulid = (isset($_SESSION['ulid'])) ? $_SESSION['ulid'] : 0;
 		$this->db->query("INSERT INTO tbl_user_action_logs (
-													userlid,
-													action_taken,
-													datetime_log
-												)
-												VALUES (
-												".$ulid.",
-												'" . str_replace("'", "\'", $action) . "',
-												'" . date('Y-m-d H:i:s', time()) . "')");
+					userlid,
+					action_taken,
+					datetime_log
+				)
+				VALUES (
+				".$ulid.",
+				'" . str_replace("'", "\'", $action) . "',
+				'" . date('Y-m-d H:i:s', time()) . "')");
 	}
 
 
@@ -79,9 +112,7 @@ SQL;
 	}
 
 	public function get_access() {
-		$result = $this->db->query("SELECT
-																	*
-																FROM tbl_page_access");
+		$result = $this->db->query("SELECT * FROM tbl_page_access");
 		return $result->result_array();
 	}
 
