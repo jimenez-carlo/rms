@@ -145,7 +145,7 @@ class Topsheet_model extends CI_Model{
 			+ $topsheet->photocopy
 			+ $topsheet->transportation
 			+ $topsheet->others);
-		$topsheet->total_balance = $topsheet->total_credit - 
+		$topsheet->total_balance = $topsheet->total_credit -
 			($topsheet->total_expense + $topsheet->total_misc);
 
 		// users info
@@ -200,7 +200,7 @@ class Topsheet_model extends CI_Model{
 					sum(case type when 4 then amount else 0 end) as others,
 					sum(amount) as total
 				from tbl_misc
-				where mid in (".$mids.")")->row();	
+				where mid in (".$mids.")")->row();
 		}
 		else {
 			$topsheet->misc = new Stdclass();
@@ -211,7 +211,7 @@ class Topsheet_model extends CI_Model{
 			$topsheet->misc->total = 0;
 		}
 
-		$topsheet->total_balance = $topsheet->total_credit - 
+		$topsheet->total_balance = $topsheet->total_credit -
 			($topsheet->total_expense + $topsheet->misc->total);
 
 		// users info
@@ -230,7 +230,7 @@ class Topsheet_model extends CI_Model{
 			from tbl_sales
 			inner join tbl_customer on customer = cid
 			where topsheet = ".$tid."
-			group by bcode, sales_type")->result_object();
+			group by bcode, bname, sales_type")->result_object();
 		foreach ($topsheet->branch as $key => $branch)
 		{
 			$branch->sales = $this->db->query("select * from tbl_sales
@@ -483,7 +483,7 @@ class Topsheet_model extends CI_Model{
 	public function get_transmittal_row($trans_no)
 	{
 		return $this->db->query("select *
-				from tbl_transmittal 
+				from tbl_transmittal
 				where trans_no = '".$trans_no."'")->row();
 	}
 
@@ -491,8 +491,8 @@ class Topsheet_model extends CI_Model{
 	{
 		$this->db->query("update tbl_transmittal
 						set status = 2,
-						receive_date = '".date('Y-m-d H:i:s')."'						
-						where tid = ".$tid);	
+						receive_date = '".date('Y-m-d H:i:s')."'
+						where tid = ".$tid);
 	}
 
 	public function get_topsheet_transmittal_row($ttid)

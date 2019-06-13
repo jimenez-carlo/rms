@@ -63,10 +63,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <thead>
               <tr>
                 <th><p>Transaction #</p></th>
-                <!-- <th><p>Company</p></th> -->
                 <th><p>Topsheet Date</p></th>
-                <!-- <th><p>Status</p></th> -->
-                <!-- <th><p>Log</p></th> -->
                 <th><p></p></th>
               </tr>
             </thead>
@@ -95,16 +92,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
                 print '<tr>';
                 print '<td>'.$topsheet->trans_no.'</td>';
-                // print '<td>'.$topsheet->company.'</td>';
                 print '<td>'.$topsheet->date.'</td>';
-                // print '<td>'.$topsheet->status.'</td>';
-                // print '<td>'.$log.'</td>';
-                // print '<td>'.$review.' '.$transmit.'</td>';
-
                 print '<td>';
                 if ($_SESSION['position'] == 108) {
                   print form_submit('view', 'View', array('class' => 'btn btn-success', 'data-value' => $topsheet->tid)).' ';
-                  print form_submit('print', 'Print', array('class' => 'btn btn-success', 'data-value' => $topsheet->tid)).' '; 
+                  print form_submit('print', 'Print', array('class' => 'btn btn-success', 'data-value' => $topsheet->tid)).' ';
                 }
                 print form_submit('transmit', 'Transmittal', array('class' => 'btn btn-success', 'data-value' => $topsheet->tid)).' ';
                 print '</td>';
