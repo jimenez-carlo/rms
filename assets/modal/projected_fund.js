@@ -8,7 +8,6 @@ function create_voucher(_fid, _cid) {
     url : 'projected_fund/create_voucher',
     data: dataObj,
     type: "POST",
-    dataType: "JSON",
     success: function(data)
     {
       $(".error").html("");
