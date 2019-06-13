@@ -40,11 +40,9 @@ SQL;
           return $this->db->query($sql)->result_object();
 	}
 
-<<<<<<< HEAD
-	public function load_payment($lpid)
-	{
+	public function load_payment($lpid) {
 		$payment = $this->db->query("select * from tbl_lto_payment where lpid = ".$lpid)->row();
-		
+
 		// SHOW 404 THIS CODE IS FOR MANUAL DELETION OF tbl_lto_payment REF
 		if($payment->status == 0){
 			show_404();
@@ -60,20 +58,6 @@ SQL;
 			order by bcode")->result_object();
 		return $payment;
 	}
-=======
-        public function load_payment($lpid) {
-          $payment = $this->db->query("select * from tbl_lto_payment where lpid = ".$lpid)->row();
-          $payment->status = $this->status[$payment->status];
-
-          $payment->sales = $this->db->query("select * from tbl_sales
-            inner join tbl_engine on engine = eid
-            inner join tbl_customer on customer = cid
-            where lto_payment = ".$lpid."
-            order by bcode")->result_object();
-
-          return $payment;
-        }
->>>>>>> production.50
 
 	public function upload_screenshot()
 	{
