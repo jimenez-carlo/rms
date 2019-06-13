@@ -62,7 +62,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div> -->
             <div class="control-group">
               <div class="control-label">Receipt</div>
-              <div class="controls text"><?php print (empty($payment->receipt)) ? '-' : '<a href="/rms_dir/lto_receipt/'.$payment->lpid.'/'.$payment->receipt.'" target="_blank">'.$payment->receipt.'</a>'; ?></div>
+              <div class="controls text"><?php print (empty($payment->receipt)) ? '-' : '<a href="'.base_url().'rms_dir/lto_receipt/'.$payment->lpid.'/'.$payment->receipt.'" target="_blank">'.$payment->receipt.'</a>'; ?></div>
             </div>
 
             <hr>
