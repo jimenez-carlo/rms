@@ -107,7 +107,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   print '<div class="attachment temp" style="position:relative">';
                   print form_hidden('temp[]', $file);
 
-                  $path = '/rms_dir/temp/'.$file;
+                  $path = base_url().'rms_dir/temp/'.$file;
                   print '<img src="'.$path.'" style="margin:1em; border:solid">';
 
                   print '<a href="#" style="background:#BDBDBD; color:black; padding:0.5em; position:absolute; top: 1em; right: 0">X</a>';
