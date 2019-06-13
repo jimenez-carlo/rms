@@ -34,25 +34,6 @@ class Liquidation_model extends CI_Model{
 				WHEN v.company = 1 THEN 'MNC'
 				WHEN v.company = 2 THEN 'MTI'
 				WHEN v.company = 3 THEN 'HPTI'
-<<<<<<< HEAD
-				END as companyname,
-				count(distinct s.sid) as sales_count,
-				ifnull(sum(case when s.status < 3 then 1200 else 0 end), 0) as rrt_pending,
-				ifnull(sum(case when s.status = 3 then registration else 0 end), 0) as lto_pending,
-				ifnull(sum(case when s.status = 4 then registration+tip else 0 end), 0) as for_liquidation,
-				ifnull(sum(case when s.status = 5 then registration+tip else 0 end), 0) as liquidated,
-				(select sum(amount) from tbl_misc where ca_ref = vid and status > 1 and status < 4) as misc_for_liq,
-				(select sum(amount) from tbl_misc where ca_ref = vid and status = 4) as misc_liquidated,
-				(select sum(amount) from tbl_return_fund where fund = vid and liq_date is null) as return_for_liq,
-				(select sum(amount) from tbl_return_fund where fund = vid and liq_date is not null) as return_liquidated
-			from tbl_voucher v
-			INNER join tbl_fund f on fid = v.fund
-			INNER join tbl_sales s on s.fund = vid
-			where left(transfer_date, 10) between '".$date_from."' and '".$date_to."'
-			".$region."
-			group by vid
-			order by transfer_date desc")->result_object();
-=======
 				WHEN v.company = 8 THEN 'MDI'
 				END AS companyname,
 				COUNT(DISTINCT s.sid) AS sales_count,
@@ -71,7 +52,6 @@ class Liquidation_model extends CI_Model{
 			".$region." ".$this->companyQry."
 			GROUP BY vid
 			ORDER BY transfer_date DESC")->result_object();
->>>>>>> production.50
 	}
 
 	public function load_sales($vid)
