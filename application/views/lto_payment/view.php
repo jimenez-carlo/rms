@@ -69,7 +69,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             <div class="control-group">
               <div class="control-label"></div>
-              <div class="controls text"><a href="/lto_payment/print_batch/<?php print $payment->lpid?>" target="_blank" class="btn btn-success">Print</a></div>
+              <div class="controls text"><a href="<?php print base_url().'lto_payment/print_batch/'.$payment->lpid?>" target="_blank" class="btn btn-success">Print</a></div>
             </div>
 
             <table class="table">
@@ -93,7 +93,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                   print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                   print '<td>'.$sales->cust_code.'</td>';
-                  print '<td><a href="/sales/view/'.$sales->sid.'" target="_blank">'.$sales->engine_no.'</a></td>';
+                  print '<td><a href="'.base_url().'sales/view/'.$sales->sid.'" target="_blank">'.$sales->engine_no.'</a></td>';
                   print '<td>'.$sales->chassis_no.'</td>';
                   print '</tr>';
                 }
