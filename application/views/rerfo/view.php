@@ -148,7 +148,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script type="text/javascript">
 function view(sid) {
   $('input[name=sid]').val(sid);
-  $('form').attr('action', '/registration');
+  $('form').attr('action', '<?php echo base_url(); ?>registration');
   $('form').attr('target', '_blank');
   $('form').submit();
 }

@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="pull-left">Attachment</div>
       </div>
       <div class="block-content collapse in">
-        <form method="post" enctype="multipart/form-data" class="form-horizontal" 
+        <form method="post" enctype="multipart/form-data" class="form-horizontal"
           <?php if (isset($sales)) print '"'; ?> >
 
           <!-- Sales Form -->
@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<div class="control-label">Branch</div>';
               print '<div class="controls">'.$sales->bcode.' '.$sales->bname.'</div>';
               print '</div>';
-              
+
               print '<div class="control-group">';
               print '<div class="control-label">Customer</div>';
               print '<div class="controls">'.$sales->first_name.' '.$sales->last_name.'</div>';
@@ -90,7 +90,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               {
                 foreach ($sales->files as $file)
                 {
-                  $path = '/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
+                  $path = base_url().'rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
                   print form_hidden('files[]', $file);
                   print '<div class="attachment" style="position:relative">';
                   print '<img src="'.$path.'" style="margin:1em; border:solid">';
@@ -146,7 +146,7 @@ var filenames = new Array(), paths = new Array(), attachments = '';
 function upload()
 {
   $(".messages").remove();
-  
+
   $.ajax({
     url : "../registration/upload",
     type: "POST",
@@ -164,10 +164,10 @@ function upload()
         $(".attachment-block").addClass("span9");
         $(".sales-block").removeClass("hide");
       }
-      else 
+      else
       {
         $("body").prepend(data.message);
-      }    
+      }
     },
     error: function (jqXHR, textStatus, errorThrown)
     {
@@ -195,7 +195,7 @@ $(function(){
     $(".attachment-block").addClass("span9");
     $(".sales-block").removeClass("hide");
   }
-  
+
   $("#save").on("click", function() {
      return confirm('Are you sure you want to save?');
   });
