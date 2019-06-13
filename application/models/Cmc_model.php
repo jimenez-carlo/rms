@@ -69,7 +69,7 @@ class Cmc_model extends CI_Model{
 															  ORDER BY c.username");
 			array_push($results, $result->result_object());
 	  }
-	  
+
 	  return $results;
 	}
 
@@ -216,10 +216,9 @@ class Cmc_model extends CI_Model{
 
 	// -- START HERE -- //
 
-	public function get_branch($bid)
-	{
+	public function get_branch($bid) {
 		$branch = $this->global->query("select * from tbl_branches where bid = ".$bid)->row();
-		if($branch->company == 4) $branch->company = 1;
+		if($branch->company == 4) { $branch->company = 1; }
 		return $branch;
 	}
 

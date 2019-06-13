@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php if ($payment->status == 'Pending') { ?>
             <div class="control-group">
               <div class="control-label"></div>
-              <div class="controls text"><a href=<?php print "/lto_payment/edit/".$payment->lpid; ?> class="btn btn-success">Update details</a></div>
+              <div class="controls text"><a href=<?php print base_url()."lto_payment/edit/".$payment->lpid; ?> class="btn btn-success">Update details</a></div>
             </div>
             <?php } ?>
             <div class="control-group">
