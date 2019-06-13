@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
-<div class="container-fluid">	
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">
@@ -53,7 +53,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								print '<td>'.$row->companyname.'</td>';
 								print '<td>'.$region[$row->fund].'</td>';
 								print '<td>'.number_format($row->amount, 2, '.', ',').'</td>';
-								print '<td><a href="/rms_dir/deposit_slip/'.$row->rfid.'/'.$row->slip.'" target="_blank">'.$row->slip.'</a></td>';
+								print '<td><a href="'.base_url().'rms_dir/deposit_slip/'.$row->rfid.'/'.$row->slip.'" target="_blank">'.$row->slip.'</a></td>';
 
 								if (empty($row->liq_date)) print '<td>-</td>';
 								else print '<td>'.$row->liq_date.'</td>';
