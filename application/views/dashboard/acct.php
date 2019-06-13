@@ -34,14 +34,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <tbody>
             <?php
             foreach ($table as $row) {
-<<<<<<< HEAD
-              $rate = round(($row->done / $row->total) * 100, 2);
-=======
+              //OLD CODE
               //$rate = round(($row->done / $row->total) * 100, 2);
+
               $rate = ($row->done != 0 || $row->total != 0 )
                 ? round(($row->done / $row->total) * 100, 2)
                 : 0;
->>>>>>> production.50
 
               print '<tr>';
               print '<td>'.$row->label.'</td>';

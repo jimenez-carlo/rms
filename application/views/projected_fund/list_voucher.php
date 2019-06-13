@@ -30,21 +30,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo form_dropdown('status', $status, set_value('status', $def_stat));
               echo '</div></div>';
 
-<<<<<<< HEAD
-              $regions = array(
-                '_any' => '- Any -',
-                1 => 'NCR',
-                2 => 'Region 1',
-                3 => 'Region 2',
-                4 => 'Region 3',
-                5 => 'Region 4A',
-                6 => 'Region 4B',
-                7 => 'Region 5',
-                8 => 'Region 6',
-                9 => 'Region 7',
-                10 => 'Region 8',
-              );
-=======
               $luzon_visayas = array(
                 '_any' => '- Any -',
                    1   => 'NCR',
@@ -70,7 +55,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
               $regions = ($_SESSION['company'] != 8) ? $luzon_visayas : $mindanao;
 
->>>>>>> production.50
               echo '<div class="control-group span5">';
               echo form_label('Region', 'region', array('class' => 'control-label'));
               echo '<div class="controls">';
