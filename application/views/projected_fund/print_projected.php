@@ -92,11 +92,7 @@
 
     foreach ($fund->sales as $sales)
     {
-<<<<<<< HEAD
-      $amount = 900 * $sales->units;
-=======
       $amount = $budget * $sales->units;
->>>>>>> production.50
       print '<tr>';
       print '<td>'.$sales->bcode.'</td>';
       print '<td>'.$sales->bname.'</td>';

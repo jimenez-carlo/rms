@@ -1,22 +1,12 @@
 var fid;
 var cid;
 
-<<<<<<< HEAD
-function create_voucher(_fid, _cid)
-{
-  fid = _fid;
-  cid = _cid;
-
-  $.ajax({
-    url : "projected_fund/create_voucher/" + fid + "/" + cid,
-=======
 function create_voucher(_fid, _cid) {
   var dataObj = { fid: _fid, cid: _cid }
 
   $.ajax({
     url : 'projected_fund/create_voucher',
     data: dataObj,
->>>>>>> production.50
     type: "POST",
     dataType: "JSON",
     success: function(data)
@@ -37,17 +27,6 @@ function save_voucher()
 {
   if (confirm('Please make sure that all information are correct before proceeding. Continue?'))
   {
-<<<<<<< HEAD
-    $.ajax({
-      url : "projected_fund/save_voucher/" + fid,
-      type: "POST",
-      data: $('#form').serialize(),
-      dataType: "JSON",
-      success: function(data)
-      {
-        if(data.status)
-        {
-=======
     var data = $('#form').serializeArray();
 
     $.ajax({
@@ -57,7 +36,6 @@ function save_voucher()
       success: function(data) {
         var res = JSON.parse(data);
         if(res.status) {
->>>>>>> production.50
           $('#modal_form').modal('hide');
           location.href = location.href;
         } else {
@@ -117,7 +95,7 @@ function print()
       $("form#print div.container").append('<input type="hidden" name="'+this.name+'" value="'+this.value+'">');
     });
 
-    $("form#print").submit(); // submit form 
+    $("form#print").submit(); // submit form
   }
   else
   {
