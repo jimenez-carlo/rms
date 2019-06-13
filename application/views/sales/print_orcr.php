@@ -19,7 +19,7 @@ if (!empty($sales->files))
     {
         $exp = explode('.', $file);
         $ext = array_pop($exp);
-        $path = '/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
+        $path = base_url().'rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
 
         print '<img src="'.$path.'" style="margin:1em; border:solid; float:left;">';
     }
