@@ -45,17 +45,27 @@ class Transmittal_model extends CI_Model{
 		return $result;
 	}
 
-	public function get_rrt_transmittal($region)
-	{
-		$result = $this->db->query("select bcode, bname,
-				sum(case when t.transmittal_date is null then 1 else 0 end) as pending,
-				sum(case when t.transmittal_date is not null and received_date is null then 1 else 0 end) as intransit,
-				sum(case when received_date is not null then 1 else 0 end) as received
-			from tbl_sales
-			inner join tbl_topsheet t on topsheet = tid
-			where t.region = '".$region."'
-			group by 1")->result_object();
-		return $result;
+	public function get_rrt_transmittal($region) {
+
+          $result = $this->db->query("
+            SELECT
+                bcode,
+                bname,
+                SUM(CASE WHEN t.transmittal_date IS NULL THEN 1 ELSE 0 END) AS pending,
+                SUM(CASE WHEN t.transmittal_date IS NOT NULL AND received_date IS NULL THEN 1 ELSE 0 END) AS intransit,
+                SUM(CASE WHEN received_date IS NOT NULL THEN 1 ELSE 0 END) AS received
+            FROM
+                tbl_sales
+                    INNER JOIN
+                tbl_topsheet t ON topsheet = tid
+            WHERE
+                t.region = '".$region."'
+            GROUP BY
+                bcode, bname, 1
+          ")->result_object();
+
+          return $result;
+
 	}
 
 	public function get_rrt_intransit($bcode)
