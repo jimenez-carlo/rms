@@ -159,10 +159,10 @@ switch(ENVIRONMENT):
     defined('DEV_CES_DB_NAME')      ? null : define('DEV_CES_DB_NAME', 'dev_ces2');
 
     # MDI_DEV_CES2
-    defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '192.168.100.40');
-    defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'root');
-    defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'RestricteD');
-    defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'dev_ces2');
+    # defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '192.168.100.40');
+    # defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'root');
+    # defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'RestricteD');
+    # defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'dev_ces2');
 
     # DEV_RMS
     defined('DEV_RMS_DB_HOST')      ? null : define('DEV_RMS_DB_HOST', '192.168.100.20');
@@ -172,8 +172,8 @@ switch(ENVIRONMENT):
 
     # MDI_DEV_RMS
     defined('MDI_DEV_RMS_DB_HOST')      ? null : define('MDI_DEV_RMS_DB_HOST', '192.168.100.40');
-    defined('MDI_DEV_RMS_DB_USER')      ? null : define('MDI_DEV_RMS_DB_USER', 'root');
-    defined('MDI_DEV_RMS_DB_PASSWORD')  ? null : define('MDI_DEV_RMS_DB_PASSWORD', 'RestricteD');
+    defined('MDI_DEV_RMS_DB_USER')      ? null : define('MDI_DEV_RMS_DB_USER', 'admin');
+    defined('MDI_DEV_RMS_DB_PASSWORD')  ? null : define('MDI_DEV_RMS_DB_PASSWORD', 'admin');
     defined('MDI_DEV_RMS_DB_NAME')      ? null : define('MDI_DEV_RMS_DB_NAME', 'dev_rms');
 
   break;
