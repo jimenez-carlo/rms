@@ -108,16 +108,17 @@ class Topsheet extends MY_Controller {
 		$this->load->view('topsheet/print', $data);
 	}
 
-	public function transmittal()
-	{
+	public function transmittal() {
 		// $transmit = $this->input->post('transmit');
 		// if (empty($transmit)) redirect('topsheet');
 		// $tid = current(array_keys($transmit));
 
 		$tid = $this->input->post('tid');
-		if (empty($tid)) redirect('topsheet');
-    $data['topsheet'] = $this->topsheet->transmit_topsheet($tid);
-    $this->load->view('topsheet/transmittal_print', $data);
+                if (empty($tid)) {
+                  redirect('topsheet');
+                }
+                $data['topsheet'] = $this->topsheet->transmit_topsheet($tid);
+                $this->load->view('topsheet/transmittal_print', $data);
 	}
 
 	public function request($tid)
