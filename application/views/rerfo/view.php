@@ -85,7 +85,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   }
                   else {
                     // print '<td><input type="submit" name="update['.$sales->sid.']" value="View" class="btn btn-success view"></td>';
-                    print '<p><a class="btn btn-success" href="/sales/view/'.$sales->sid.'" target="_blank">View</a></p>';
+                    print '<p><a class="btn btn-success" href="'.base_url().'sales/view/'.$sales->sid.'" target="_blank">View</a></p>';
                   }
                 }
                 print '<td>';
