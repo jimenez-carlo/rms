@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       		<div class="form-actions">
 	      		<input type="hidden" name="vid" value="<?php print $vid; ?>">
 	      		<input type="submit" name="submit" value="Download as CSV" class="btn btn-success">
-	      		<a href="/return_fund/ca/<?php print $vid; ?>" class="btn btn-success">Return Fund</a>
+                        <a href="<?php echo base_url(); ?>return_fund/ca/<?php print $vid; ?>" class="btn btn-success">Return Fund</a>
       		</div>
       	</form>
 
