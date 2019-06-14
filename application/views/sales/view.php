@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <div class="block-content collapse in">
         <?php if ($_SESSION['position'] == -2) { /**special site admin**/ ?>
         <div class="row-fluid">
-          <form class='form-horizontal' method='post' action="/sales/edit">
+          <form class='form-horizontal' method='post' action="<?php echo base_url(); ?>sales/edit">
             <div class="form-actions">
               <input type="submit" class="btn btn-success" name="edit[<?php print $sales->sid; ?>]" value="Edit">
             </div>
