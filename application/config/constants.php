@@ -147,9 +147,9 @@ switch(ENVIRONMENT):
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
     # PORTAL GLOBAL DB
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.100.55');
-    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'admin');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'cmcadmin');
+    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.200.3');
+    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'appserver');
+    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'opulently tadpole mulberry ether overfeed drizzly');
     defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
 
     # MNC, MTI, HPTI DEV_CES2
