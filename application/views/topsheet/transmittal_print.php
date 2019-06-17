@@ -72,7 +72,7 @@
   <style type="text/css">
   body {
     font-family: Tahoma;
-    font-size: 14px;
+    font-size: 10px;
     padding: 0 30px;
     padding-top: 30px !important;
   }
