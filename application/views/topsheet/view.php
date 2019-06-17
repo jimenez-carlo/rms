@@ -59,7 +59,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$row->bcode.'</td>';
                 print '<td>'.$row->bname.'</td>';
                 print '<td>'.$row->date.'</td>';
-                print '<td><a href="/rerfo/view/'.$row->rid.'" target="_blank">'.$row->trans_no.'</a></td>';
+                print '<td><a href="'.base_url().'rerfo/view/'.$row->rid.'" target="_blank">'.$row->trans_no.'</a></td>';
                 print '<td style="text-align: right">'.number_format($row->registration, 2, '.', '').'</td>';
                 print '</tr>';
 
@@ -90,7 +90,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td></td> 
+                  <td></td>
                   <td></td>
                   </tr>';
               }
