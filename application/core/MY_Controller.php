@@ -14,12 +14,17 @@ class MY_Controller extends CI_Controller {
 		8 => 'Region 6',
 		9 => 'Region 7',
 		10 => 'Region 8',
-		11 => 'Region IX',
-		12 => 'Region X',
-		13 => 'Region XI',
-		14 => 'Region XII',
-		15 => 'Region XIII',
-	);
+        );
+
+        public $mdi_region = array(
+                11 => 'Region IX',
+                12 => 'Region X',
+                13 => 'Region XI',
+                14 => 'Region XII',
+                15 => 'Region XIII'
+        );
+
+
 
 	public $reg_code = array(
 		1 => 'NCR',
@@ -44,8 +49,11 @@ class MY_Controller extends CI_Controller {
 		2 => 'MTI',
 		3 => 'HPTI',
 		6 => 'MTI',
-		8 => 'MDI',
 	);
+
+        public $mdi = array(
+                8 => 'MDI'
+        );
 
 	private static $header = array();
 	private static $footer = array();
