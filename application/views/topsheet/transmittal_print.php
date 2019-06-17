@@ -14,7 +14,7 @@
   <style type="text/css" media="print">
   body {
     font-family: Tahoma;
-    font-size: 14px;
+    font-size: 10px;
     padding-top: 30px !important;
   }
   .container {
@@ -130,7 +130,7 @@
 </head>
 <body onload="window.print();">
 
-<?php foreach ($topsheet->branch as $row) { ?>
+<?php foreach ($topsheet->branch as $row) : ?>
 
 <div class="container">
     <div class="dotted"></div>
@@ -166,7 +166,7 @@
             <?php
             $track_no = $row->bcode.$row->sales_type.'0'.date('ymd', strtotime($topsheet->date));
 
-            
+
 
             print $track_no;
             ?>
@@ -200,4 +200,4 @@
     </div>
 </div>
 
-<?php } ?>
+<?php endforeach; ?>
