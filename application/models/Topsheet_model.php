@@ -16,14 +16,16 @@ class Topsheet_model extends CI_Model{
 		1 => 'Brand New (Installment)',
 	);
 
-	public function __construct()
-	{
-		parent::__construct();
-		$this->load->model('Cmc_model', 'cmc');
-		$this->load->model('Rerfo_model', 'rerfo');
-		$this->load->model('Sales_model', 'sale');
-		$this->load->model('Fund_model', 'fund');
-	}
+        public function __construct() {
+          parent::__construct();
+          $this->load->model('Cmc_model', 'cmc');
+          $this->load->model('Rerfo_model', 'rerfo');
+          $this->load->model('Sales_model', 'sale');
+          $this->load->model('Fund_model', 'fund');
+          if ($_SESSION['company'] == 8) {
+            $this->company = $this->mdi;
+          }
+        }
 
 	public function list_topsheet($param)
 	{
@@ -51,6 +53,7 @@ class Topsheet_model extends CI_Model{
 			and date between '".$date_from."' and '".$date_to."'
 			".$company.$status."
 			limit 1000")->result_object();
+
 		foreach ($result as $key => $topsheet)
 		{
 			$topsheet->company = $this->company[$topsheet->company];
@@ -651,7 +654,7 @@ class Topsheet_model extends CI_Model{
 		{
 			$topsheet = new Stdclass();
 			$topsheet->region = $_SESSION['region'];
-			$topsheet->company = 1;
+			$topsheet->company = ($_SESSION['company'] != 8) ? 1 : 8;
 			$topsheet->date = date('Y-m-d');
 			$topsheet->trans_no = $trans_no;
 			$this->db->insert('tbl_topsheet', $topsheet);

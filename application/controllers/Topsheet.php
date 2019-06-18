@@ -3,13 +3,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Topsheet extends MY_Controller {
 
-	public function __construct() {
-		parent::__construct();
-		$this->load->helper('url');
-		$this->load->model('Topsheet_model', 'topsheet');
-    $this->load->model('File_model', 'file');
-    $this->load->model('Orcr_checking_model', 'orcr_checking');
-	}
+        public function __construct() {
+          parent::__construct();
+          $this->load->helper('url');
+          $this->load->model('Topsheet_model', 'topsheet');
+          $this->load->model('File_model', 'file');
+          $this->load->model('Orcr_checking_model', 'orcr_checking');
+          if ($_SESSION['company'] == 8) {
+            $this->topsheet->region = $this->topsheet->mdi_region;
+          }
+        }
 
 	public function index()
 	{
@@ -121,16 +124,15 @@ class Topsheet extends MY_Controller {
                 $this->load->view('topsheet/transmittal_print', $data);
 	}
 
-	public function request($tid)
-	{
-    if ($this->topsheet->request_reprint($tid)) {
-    	$_SESSION['messages'][] = 'Request for reprint sent.';
-    }
-    else {
-    	$_SESSION['warning'][] = 'Request for reprint already sent.';
-    }
-    redirect('topsheet');
-	}
+        public function request($tid) {
+          if ($this->topsheet->request_reprint($tid)) {
+            $_SESSION['messages'][] = 'Request for reprint sent.';
+          }
+          else {
+            $_SESSION['warning'][] = 'Request for reprint already sent.';
+          }
+          redirect('topsheet');
+        }
 
         public function create() {
           $this->access(1);
