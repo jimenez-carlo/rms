@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+$dir = base_url();
 ?>
         <div class="navbar navbar-fixed-top navbar-cmc">
             <div class="navbar-inner">

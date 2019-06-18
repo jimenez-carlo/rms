@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Dashboard extends MY_Controller {
-	
-  public function __construct() { 
+
+  public function __construct() {
      parent::__construct();
      $this->load->helper('url');
      $this->load->model('Cmc_model', 'cmc');
@@ -24,13 +24,13 @@ class Dashboard extends MY_Controller {
 			case 21: // LO
 			case 27: // PROGRAMMER/ADMIN
 			*/
-			case 3: 
+			case 3:
 			case 53: $this->acct(); break; // ACCTG-PAYCL
-			// case 34: 
+			// case 34:
 			// case 98: $this->trsry(); break; // Treasury
 			case 108: $this->rrt_spvsr(); break; // RRT
-			case 107: 
-			case 109: 
+			case 107:
+			case 109:
 			case 156: $this->rrt(); break; // RRT
 			default: $this->template('home');
 		}
@@ -42,7 +42,7 @@ class Dashboard extends MY_Controller {
 		$this->header_data('title', 'Unprocessed');
 		$this->header_data('nav', 'report');
 		$this->header_data('dir', './../');
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="../vendors/morris/morris.css">
 	     <link href="../vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
@@ -88,7 +88,7 @@ class Dashboard extends MY_Controller {
 			GROUP BY 2")->result_array();
 
 		$data['pnp_count'] = $data['ar_count'] = $data['si_count'] = $data['insurance_count'] = $data['pending_count'] = 0;
-		
+
 		foreach ($unprocessed as $row) {
 			switch ($row['status']) {
 				case 'PNP': $data['pnp_count'] = $row['count']; break;
@@ -142,7 +142,7 @@ class Dashboard extends MY_Controller {
 			$unprocessed_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="../vendors/raphael-min.js"></script>
 			<script src="../vendors/morris/morris.min.js"></script>
 	        <script src="../assets/scripts.js"></script>
@@ -163,7 +163,7 @@ class Dashboard extends MY_Controller {
 
 	private function ccn($data = array())
 	{
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
@@ -254,7 +254,7 @@ class Dashboard extends MY_Controller {
 			$orcr_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
@@ -281,7 +281,7 @@ class Dashboard extends MY_Controller {
 
 	private function rrt($data = array())
 	{
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
@@ -338,7 +338,7 @@ class Dashboard extends MY_Controller {
 			$rerfo_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
@@ -359,7 +359,7 @@ class Dashboard extends MY_Controller {
 
 	private function rrt_spvsr($data = array())
 	{
-		$this->header_data('link', 
+		$this->header_data('link',
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
@@ -538,7 +538,7 @@ class Dashboard extends MY_Controller {
 			$sr_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
@@ -569,30 +569,34 @@ class Dashboard extends MY_Controller {
 		$this->template('dashboard/rrt_spvsr', $data);
 	}
 
-	private function acct($data = array())
-	{
+	private function acct($data = array()) {
+          if ($_SESSION['company'] != 8) {
+            $company = 'AND company != 8';
+          } else {
+            $company = 'AND company = 8';
+          }
 		// sales
-		$result = $this->db->query("select 'For CA' as label, count(*) as total, 
+		$result = $this->db->query("select 'For CA' as label, count(*) as total,
 				sum(case when voucher = 0 then 1 else 0 end) as pending,
 				sum(case when voucher > 0 then 1 else 0 end) as done
 			from tbl_sales
-			where not (region = 1 and voucher = 0 and lto_payment = 0)
+			where not (region = 1 and voucher = 0 and lto_payment = 0) {$company}
 
 			UNION
 
-			select 'For Checking' as label, count(*) as total, 
+			select 'For Checking' as label, count(*) as total,
 				sum(case when batch = 0 then 1 else 0 end) as pending,
 				sum(case when batch > 0 then 1 else 0 end) as done
 			from tbl_sales
-			where topsheet > 0 and da_reason < 1
+			where topsheet > 0 and da_reason < 1 {$company}
 
 			UNION
 
-			select 'For SAP Uploading' as label, count(*) as total, 
+			select 'For SAP Uploading' as label, count(*) as total,
 				sum(case when status < 5 then 1 else 0 end) as pending,
 				sum(case when status = 5 then 1 else 0 end) as done
 			from tbl_sales
-			where batch > 0")->result_object();
+			where batch > 0 {$company}")->result_object();
 
 		$data['table'] = $result;
 		$this->template('dashboard/acct', $data);
@@ -661,7 +665,7 @@ class Dashboard extends MY_Controller {
 			$b_data = '{label: "No Data", value: 0 },';
 		}
 
-		$this->footer_data('script', 
+		$this->footer_data('script',
 			'<script src="vendors/raphael-min.js"></script>
 			<script src="vendors/morris/morris.min.js"></script>
 	        <script src="assets/scripts.js"></script>
