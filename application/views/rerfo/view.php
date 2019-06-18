@@ -161,7 +161,7 @@ $(function(){
       return confirm('Please make sure all information are correct before proceeding. Continue?');
     });
     $('.print').click(function(){
-      $('form').attr('action', 'sprint');
+      $('form').attr('action', '<?php echo base_url(); ?>rerfo/sprint');
       $('form').attr('target', '_blank');
     });
     $('.request').click(function(){

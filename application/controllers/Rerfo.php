@@ -31,7 +31,7 @@ class Rerfo extends MY_Controller {
 
 	public function view($rid = null)
 	{
-		$dir = (empty($rid)) ? './../' : './../../';
+		$dir = base_url();
 		$this->access(1);
 		$this->header_data('title', 'Rerfo');
 		$this->header_data('nav', 'rerfo');
@@ -53,7 +53,7 @@ class Rerfo extends MY_Controller {
 		$this->template('rerfo/view', $data);
 	}
 
-	public function sprint() 
+	public function sprint()
 	{
 		$print = $this->input->post('print');
 		if (empty($print)) redirect('rerfo');
