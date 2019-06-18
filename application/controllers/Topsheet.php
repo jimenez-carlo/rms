@@ -132,43 +132,40 @@ class Topsheet extends MY_Controller {
     redirect('topsheet');
 	}
 
-	public function create()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Create Topsheet');
-		$this->header_data('nav', 'topsheet');
-		$this->header_data('dir', './../');
+        public function create() {
+          $this->access(1);
+          $this->header_data('title', 'Create Topsheet');
+          $this->header_data('nav', 'topsheet');
+          $this->header_data('dir', './../');
 
-		$data['region'] = $_SESSION['region'];
-		$data['rid'] = $this->input->post('rid');
-		$data['tot_amt'] = $this->input->post('tot_amt');
-		$data['tot_exp'] = $this->input->post('tot_exp');
-		$data['mid'] = $this->input->post('mid');
-		$data['summary'] = $this->input->post('summary');
-		$data['submit_all'] = $this->input->post('submit_all');
-		$data['back'] = $this->input->post('back');
- 		$back_key = (!empty($data['back'])) ? current(array_keys($data['back'])) : 0;
+          $data['region'] = $_SESSION['region'];
+          $data['rid'] = $this->input->post('rid');
+          $data['tot_amt'] = $this->input->post('tot_amt');
+          $data['tot_exp'] = $this->input->post('tot_exp');
+          $data['mid'] = $this->input->post('mid');
+          $data['summary'] = $this->input->post('summary');
+          $data['submit_all'] = $this->input->post('submit_all');
+          $data['back'] = $this->input->post('back');
+          $back_key = (!empty($data['back'])) ? current(array_keys($data['back'])) : 0;
 
-		if (!empty($data['submit_all'])) {
-			$this->topsheet->hyper_create($data);
-			redirect('topsheet');
-		}
+          if (!empty($data['submit_all'])) {
+            $this->topsheet->hyper_create($data);
+            redirect('topsheet');
+          }
 
-		if (empty($data['rid']) || $back_key == 1) {
-			$data['table'] = $this->topsheet->list_rerfo_for_topsheet();
-			$data['regions'] = $this->topsheet->region;
-			$data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region']].'-'.date('ymd');
-			$this->template('topsheet/create', $data);
-		}
-		else if (empty($data['summary']) || $back_key == 2) {
-			$data['miscs'] = $this->topsheet->list_misc_for_topsheet($data);
-	    $this->template('topsheet/create_misc', $data);
-		}
-		else {
-	    $data['topsheet'] = $this->topsheet->list_summary_for_topsheet($data);
-			$data['regions'] = $this->topsheet->region;
-			$data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region']].'-'.date('ymd');
-	    $this->template('topsheet/create_summary', $data);
-		}
-	}
+          if (empty($data['rid']) || $back_key == 1) {
+            $data['table'] = $this->topsheet->list_rerfo_for_topsheet();
+            $data['regions'] = $this->topsheet->region;
+            $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region']].'-'.date('ymd');
+            $this->template('topsheet/create', $data);
+          } else if (empty($data['summary']) || $back_key == 2) {
+            $data['miscs'] = $this->topsheet->list_misc_for_topsheet($data);
+            $this->template('topsheet/create_misc', $data);
+          } else {
+            $data['topsheet'] = $this->topsheet->list_summary_for_topsheet($data);
+            $data['regions'] = $this->topsheet->region;
+            $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region']].'-'.date('ymd');
+            $this->template('topsheet/create_summary', $data);
+          }
+        }
 }
