@@ -88,6 +88,8 @@ switch(ENVIRONMENT):
 
   case 'development':
 
+    defined('BASE_URL')      ? null : define('BASE_URL', 'http://172.18.0.85:8000/rms_dev');
+
     # RMS_DB
     defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.4');
     defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'root');
@@ -127,6 +129,9 @@ switch(ENVIRONMENT):
   break;
 
   case 'testing':
+
+    defined('BASE_URL')      ? null : define('BASE_URL', 'http://172.18.0.222:8080/rms_test');
+
     defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.3');
     defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'test');
     defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'm012rm1!ar');
@@ -146,6 +151,8 @@ switch(ENVIRONMENT):
     break;
 
   case 'production':
+
+    defined('BASE_URL')      ? null : define('BASE_URL', 'http://192.168.200.2/rms');
 
     # RMS_DB
     defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '192.168.200.3');
