@@ -14,7 +14,7 @@ class Dashboard extends MY_Controller {
 		$this->access(1);
 		$this->header_data('title', 'Dashboard');
 		$this->header_data('nav', 'report');
-		$this->header_data('dir', './');
+		$this->header_data('dir', base_url());
 
 		switch ($_SESSION['position'])
 		{
@@ -569,38 +569,38 @@ class Dashboard extends MY_Controller {
 		$this->template('dashboard/rrt_spvsr', $data);
 	}
 
-	private function acct($data = array()) {
+        private function acct($data = array()) {
           if ($_SESSION['company'] != 8) {
             $company = 'AND company != 8';
           } else {
             $company = 'AND company = 8';
           }
-		// sales
-		$result = $this->db->query("select 'For CA' as label, count(*) as total,
-				sum(case when voucher = 0 then 1 else 0 end) as pending,
-				sum(case when voucher > 0 then 1 else 0 end) as done
-			from tbl_sales
-			where not (region = 1 and voucher = 0 and lto_payment = 0) {$company}
+          // sales
+          $result = $this->db->query("select 'For CA' as label, count(*) as total,
+            sum(case when voucher = 0 then 1 else 0 end) as pending,
+            sum(case when voucher > 0 then 1 else 0 end) as done
+            from tbl_sales
+            where region != 1 and lto_payment = 0 {$company}
 
-			UNION
+            UNION
 
-			select 'For Checking' as label, count(*) as total,
-				sum(case when batch = 0 then 1 else 0 end) as pending,
-				sum(case when batch > 0 then 1 else 0 end) as done
-			from tbl_sales
-			where topsheet > 0 and da_reason < 1 {$company}
+            select 'For Checking' as label, count(*) as total,
+            sum(case when batch = 0 then 1 else 0 end) as pending,
+            sum(case when batch > 0 then 1 else 0 end) as done
+            from tbl_sales
+            where topsheet > 0 and da_reason < 1 {$company}
 
-			UNION
+            UNION
 
-			select 'For SAP Uploading' as label, count(*) as total,
-				sum(case when status < 5 then 1 else 0 end) as pending,
-				sum(case when status = 5 then 1 else 0 end) as done
-			from tbl_sales
-			where batch > 0 {$company}")->result_object();
+            select 'For SAP Uploading' as label, count(*) as total,
+            sum(case when status < 5 then 1 else 0 end) as pending,
+            sum(case when status = 5 then 1 else 0 end) as done
+            from tbl_sales
+            where batch > 0 {$company}")->result_object();
 
-		$data['table'] = $result;
-		$this->template('dashboard/acct', $data);
-	}
+          $data['table'] = $result;
+          $this->template('dashboard/acct', $data);
+        }
 
 	private function trsry($data = array())
 	{
