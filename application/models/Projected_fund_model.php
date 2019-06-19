@@ -40,7 +40,7 @@ class Projected_fund_model extends CI_Model{
                 IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
                 IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_3,
                 IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_6,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6
+                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6
               FROM
                 tbl_fund f
               LEFT JOIN
@@ -54,7 +54,7 @@ class Projected_fund_model extends CI_Model{
             $result = $this->db->query("
               SELECT f.*,
                 IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8
+                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8
               FROM
                 tbl_fund f
               LEFT JOIN
