@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
-<div class="container-fluid">	
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">
@@ -37,7 +37,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							{
 								print '<tr>';
 								print '<td>'.$row->ref_date.'</td>';
-								print '<td><a href="lto_payment/view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
+								print '<td><a href="'.base_url().'lto_payment/view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
 
 								print '<td>'.$region[$row->region].' '.$company[$row->company].'</td>';
 								print '<td>'.$row->amount.'</td>';

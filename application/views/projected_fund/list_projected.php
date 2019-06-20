@@ -45,17 +45,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   case 8: $voucher = $row->voucher_8; $transfer = $row->transfer_8; break;
                 }
 
-                if ($key > 1) {
+                if ($key !=8 && $key > 1) {
                   print '<td></td><td>'.$comp.'</td>';
                   print '<td style="text-align:right;padding-right:10px;">-</td>';
                   print '<td style="text-align:right;padding-right:10px;">-</td>';
-                  // print '<td style="text-align:right;padding-right:10px;">-</td>';
-                }
-                else {
+                } else {
                   print '<td>'.$comp.'</td>';
                   print '<td style="text-align:right;padding-right:10px;">'.number_format($row->fund,2,'.',',').'</td>';
                   print '<td style="text-align:right;padding-right:10px;">'.number_format($row->cash_on_hand,2,'.',',').'</td>';
-                  // print '<td style="text-align:right;padding-right:10px;">'.number_format($row->cash_on_check,2,'.',',').'</td>';
                 }
 
                 print '<td style="text-align:right;padding-right:10px;">'.number_format($voucher,2,'.',',').'</td>';
