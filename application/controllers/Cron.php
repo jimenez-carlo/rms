@@ -276,34 +276,30 @@ SQL;
 		//print_r(array($start, $current_date, $date_yesterday, $date_from, $query, $result));
 		//exit;
 
-		foreach ($result as $row)
-		{
-			$expense = $dev_ces2->query("select rec_no from rms_expense
-				where engine_num = '".$row->engine_no."'
-				and custcode = '".$row->cust_code."'")->row();
+                foreach ($result as $row) {
 
-			if (empty($expense))
-			{
-				$expense = new Stdclass();
-				$expense->nid = 0;
-				$expense->custcode = $row->cust_code;
-				$expense->engine_num = $row->engine_no;
-				$expense->tip_conf = 0;
-				$expense->tip_conf_d = $row->pending_date;
-				if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
-				if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
-				$dev_ces2->insert('rms_expense', $expense);
-			}
-			else
-			{
-				$expense->tip_conf = 0;
-				$expense->tip_conf_d = $row->pending_date;
-				if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
-				if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
-				$dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
-			}
-			$rows++;
-		}
+                  $expense = $dev_ces2->query("SELECT rec_no, custcode FROM rms_expense WHERE engine_num = '{$row->engine_no}'")->row();
+
+                  if (empty($expense)) {
+                    $expense = new Stdclass();
+                    $expense->nid = 0;
+                    $expense->custcode = $row->cust_code;
+                    $expense->engine_num = $row->engine_no;
+                    $expense->tip_conf = 0;
+                    $expense->tip_conf_d = $row->pending_date;
+                    if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
+                    if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
+                    $dev_ces2->insert('rms_expense', $expense);
+                  } else {
+                    $expense->tip_conf = 0;
+                    $expense->tip_conf_d = $row->pending_date;
+                    if ($expense->custcode !== $row->cust_code) $expense->custcode = $row->cust_code; // Update dev_ces2.rms_expense custcode if data is not equal in RMS cust_code.
+                    if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
+                    if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
+                    $dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
+                  }
+                  $rows++;
+                }
 
 		$end = date("Y-m-d H:i:s");
 
