@@ -1,18 +1,19 @@
 <?php
-defined ('BASEPATH') OR exit('No direct script access allowed'); 
+defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Disapprove_model extends CI_Model{
 
 	public $da_reason = array(
-		1 => 'Wrong Amount',
-		2 => 'No (AR/SI) reference',
-		3 => 'Invalid (AR/SI) reference',
-		4 => 'Unreadable attachment',
-		5 => 'Missing OR attachment',
-		6 => 'Mismatch Customer Name',
-		7 => 'Mismatch Engine #',
-		8 => 'Mismatch CR #',
-		9 => 'Wrong Tagging',
+		1  => 'Wrong Amount',
+		2  => 'No (AR/SI) reference',
+		3  => 'Invalid (AR/SI) reference',
+		4  => 'Unreadable attachment',
+		5  => 'Missing OR attachment',
+		6  => 'Mismatch Customer Name',
+		7  => 'Mismatch Engine #',
+		8  => 'Mismatch CR #',
+		9  => 'Wrong Tagging',
+                10 => 'Wrong Regn Type'
 	);
 
 	public function __construct()
@@ -34,7 +35,7 @@ class Disapprove_model extends CI_Model{
 
 		return $branches;
 	}
-	
+
 	public function load_list($param)
 	{
 		if (empty($param->branch)) $branch = "";
@@ -50,7 +51,7 @@ class Disapprove_model extends CI_Model{
 			and s.da_reason > 0
 			order by s.bcode")->result_object();
 	}
-	
+
 	public function load_sales($sid)
 	{
 		$sales = $this->db->query("select * from tbl_sales
