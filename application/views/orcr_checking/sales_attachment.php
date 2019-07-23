@@ -57,15 +57,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   print '</div>';
 
   // disapprove
+  // You can check this array in Disapprove_model
   $da_reason = array(
-    1 => 'Wrong Amount',
-    2 => 'No (AR/SI) reference',
-    3 => 'Invalid (AR/SI) reference',
-    4 => 'Unreadable attachment',
-    5 => 'Missing OR attachment',
-    6 => 'Mismatch Customer Name',
-    7 => 'Mismatch Engine #',
-    8 => 'Mismatch CR #',
+    1  => 'Wrong Amount',
+    2  => 'No (AR/SI) reference',
+    3  => 'Invalid (AR/SI) reference',
+    4  => 'Unreadable attachment',
+    5  => 'Missing OR attachment',
+    6  => 'Mismatch Customer Name',
+    7  => 'Mismatch Engine #',
+    8  => 'Mismatch CR #',
+    //9  => 'Wrong Tagging',
+    10 => 'Wrong Regn Type'
   );
   if ($sales->da_reason > 0) {
     print '<div class="control-group">';
