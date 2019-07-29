@@ -68,7 +68,7 @@ class Registration_model extends CI_Model{
 			$sales->sales_type = $sales_type[$sales->sales_type];
 			$transmittal->sales[$key] = $sales;
 		}
-		
+
 		return $transmittal;
 	}
 
@@ -115,4 +115,5 @@ class Registration_model extends CI_Model{
 
 		$_SESSION['messages'][] = "Transmittal # ".$transmittal->code." updated successfully.";
 	}
+
 }

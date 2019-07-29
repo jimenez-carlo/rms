@@ -9,31 +9,31 @@ class Disapprove extends MY_Controller {
     $this->load->model('Disapprove_model', 'disapprove');
   }
 
-	public function index()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Disapprove List');
-		$this->header_data('nav', 'disapprove');
-		$this->header_data('dir', './');
+  public function index()
+  {
+    $this->access(1);
+    $this->header_data('title', 'Disapprove List');
+    $this->header_data('nav', 'disapprove');
+    $this->header_data('dir', './');
 
-		$param = new Stdclass();
-		$param->region = $_SESSION['region'];
-		$param->branch = $this->input->post('branch');
+    $param = new Stdclass();
+    $param->region = $_SESSION['region'];
+    $param->branch = $this->input->post('branch');
 
-		$data['branch'] = $this->disapprove->branch_list($param);
-		$data['table'] = $this->disapprove->load_list($param);
-		$data['da_reason'] = $this->disapprove->da_reason;
-		$this->template('disapprove/list', $data);
-	}
+    $data['branch'] = $this->disapprove->branch_list($param);
+    $data['table'] = $this->disapprove->load_list($param);
+    $data['da_reason'] = $this->disapprove->da_reason;
+    $this->template('disapprove/list', $data);
+  }
 
-	public function sales()
-	{
-		$sales = new Stdclass();
-		$sales->sid = $this->input->post('sid');
-		$sales->da_reason = $this->input->post('da_reason');
-		$this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
+  public function sales()
+  {
+    $sales = new Stdclass();
+    $sales->sid = $this->input->post('sid');
+    $sales->da_reason = $this->input->post('da_reason');
+    $this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
 
-		$sales->da_reason = $this->disapprove->da_reason[$sales->da_reason];
-		echo json_encode($sales->da_reason);
-	}
+    $sales->da_reason = $this->disapprove->da_reason[$sales->da_reason];
+    echo json_encode($sales->da_reason);
+  }
 }
