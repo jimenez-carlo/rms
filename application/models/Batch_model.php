@@ -19,13 +19,16 @@ class Batch_model extends CI_Model{
 
 	public function list_for_upload() {
           $result = $this->db->query("
-            select bid, b.trans_no, b.post_date,
-                   region, company, download_date
-            from tbl_batch b
-            inner join tbl_topsheet on topsheet = tid
-            where b.status = 0 $this->companyQry
-            order by b.post_date desc
-            limit 1000
+            SELECT
+              b.bid, b.trans_no, b.post_date,
+              ts.region, ts.company, b.download_date
+            FROM
+              tbl_batch b
+            INNER JOIN
+              tbl_topsheet ts ON b.topsheet = ts.tid
+            WHERE b.status = 0 $this->companyQry
+            ORDER BY b.post_date DESC
+            LIMIT 1000
           ")->result_object();
 
           foreach ($result as $key => $batch) {

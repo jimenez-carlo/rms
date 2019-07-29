@@ -16,8 +16,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <!-- Sales Form -->
           <div class="span5 sales-form">
             <?php
-            if (isset($sales))
-            {
+            if (isset($sales)) {
               print form_hidden('sid', $sales->sid);
 
               print '<div class="control-group">';
@@ -68,9 +67,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<div class="form-actions">';
               print form_submit('submit', 'Save', array('class' => 'btn btn-success', 'onclick' => "return confirm('Please make sure all information are correct before proceeding. Continue?')"));
               print '</div>';
-            }
-            else
-            {
+            } else {
               print '<div class="control-group">';
               print '<div class="control-label">Engine #</div>';
               print '<div class="controls">';

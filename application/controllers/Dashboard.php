@@ -570,33 +570,42 @@ class Dashboard extends MY_Controller {
 	}
 
         private function acct($data = array()) {
-          if ($_SESSION['company'] != 8) {
-            $company = 'AND company != 8';
-          } else {
-            $company = 'AND company = 8';
-          }
-          // sales
-          $result = $this->db->query("select 'For CA' as label, count(*) as total,
-            sum(case when voucher = 0 then 1 else 0 end) as pending,
-            sum(case when voucher > 0 then 1 else 0 end) as done
-            from tbl_sales
-            where region != 1 and lto_payment = 0 {$company}
+          $company = ($_SESSION['company'] != 8) ? 'AND company != 8' : 'AND company = 8';
+
+          $result = $this->db->query("
+            SELECT
+              'For CA' AS label,
+              COUNT(*) AS total,
+              SUM(CASE WHEN voucher = 0 THEN 1 ELSE 0 END) AS pending,
+              SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END) AS done
+            FROM
+              tbl_sales
+            WHERE region != 1 AND lto_payment = 0 {$company}
 
             UNION
 
-            select 'For Checking' as label, count(*) as total,
-            sum(case when batch = 0 then 1 else 0 end) as pending,
-            sum(case when batch > 0 then 1 else 0 end) as done
-            from tbl_sales
-            where topsheet > 0 and da_reason < 1 {$company}
+            SELECT
+              'For Checking' AS label,
+              COUNT(*) AS total,
+              SUM(CASE WHEN batch = 0 THEN 1 ELSE 0 END) AS pending,
+              SUM(CASE WHEN batch > 0 THEN 1 ELSE 0 END) AS done
+            FROM
+              tbl_sales
+            WHERE topsheet > 0 AND da_reason < 1 {$company}
 
             UNION
 
-            select 'For SAP Uploading' as label, count(*) as total,
-            sum(case when status < 5 then 1 else 0 end) as pending,
-            sum(case when status = 5 then 1 else 0 end) as done
-            from tbl_sales
-            where batch > 0 {$company}")->result_object();
+            SELECT
+              'For SAP Uploading' as label,
+              COUNT(*) AS total,
+              SUM(CASE WHEN s.status = 4 THEN 1 END) AS pending,
+              SUM(CASE WHEN s.status = 5 THEN 1 END) AS done
+            FROM
+              tbl_sales s
+            INNER JOIN
+              tbl_batch b ON b.bid = s.batch
+            WHERE s.status >= 4 {$company}
+          ")->result_object();
 
           $data['table'] = $result;
           $this->template('dashboard/acct', $data);
