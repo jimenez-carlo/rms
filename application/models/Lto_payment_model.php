@@ -161,10 +161,16 @@ SQL;
 
 		if (!empty($engine_no)) {
 			foreach ($engine_no as $row) {
-				$this->db->query("update tbl_sales
-					inner join tbl_engine on engine = eid
-					set lto_payment = ".$payment->lpid."
-					where engine_no = '".$row."'");
+                            $this->db->query("
+                              UPDATE
+                                tbl_sales
+                              INNER JOIN
+                                tbl_engine on engine = eid
+                              SET
+                                lto_payment = ".$payment->lpid.",
+                                status      = 3
+                              WHERE engine_no = '".$row."'
+                            ");
 			}
 		}
 
