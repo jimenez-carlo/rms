@@ -40,7 +40,7 @@ function save_voucher()
         } else {
           $(".alert-error").removeClass("hide");
           $(".error").html("");
-          $(".error").append(data.message);
+          $(".error").append(res.message);
         }
       },
       error: function (jqXHR, textStatus, errorThrown)
@@ -103,3 +103,4 @@ function print()
     $(".error").append("Please select at least one Projected Cost.");
   }
 }
+
