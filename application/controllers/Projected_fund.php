@@ -59,6 +59,7 @@ class Projected_fund extends MY_Controller {
     if ($this->form_validation->run() == FALSE) {
       $err_msg[] = validation_errors();
     }
+
     if (empty($ltid)) {
       $err_msg[] = 'Please select at least one transmittal to proceed.';
     }
@@ -90,24 +91,35 @@ class Projected_fund extends MY_Controller {
    */
   public function ca_list()
   {
-    $nav = ($_SESSION['position'] == 34) ? 'deposited_fund' : 'projected_fund';
-    $data['def_stat'] = ($_SESSION['position'] == 34) ? 2 : '';
+    switch ($_SESSION['position']) {
+      case 34: // TRSRY-ASST
+        $nav = 'deposited_fund';
+        $data['def_stat'] = 2;
+        break;
 
-    $this->access(1);
+      case 3:   // ACCTG-PAYCL
+        $nav = 'projected_fund';
+        $data['def_stat'] = '';
+        break;
+
+      case 107: // RRT-MGR
+      case 108: // RRT-SPVSR
+        $nav ='ca_list';
+        $data['def_stat'] = '';
+        break;
+    }
+
+    $this->access(16);
     $this->header_data('title', 'CA List');
     $this->header_data('nav', $nav);
     $this->header_data('dir', './../');
     $this->footer_data('script', '<script src="./../assets/js/voucher_list.js"></script>');
 
     $param = new Stdclass;
-    $param->date_from = $this->input->post('date_from');
-    $param->date_to   = $this->input->post('date_to');
-    $param->status    = $this->input->post('status');
-    $param->region    = $this->input->post('region');
-
-    $param->date_from = (isset($param->date_from)) ? $param->date_from : date('Y-m-d');
-    $param->date_to   = (isset($param->date_to))   ? $param->date_to   : date('Y-m-d');
-    $param->status    = (isset($param->status))    ? $param->status    : $data['def_stat'];
+    $param->date_from = $this->input->post('date_from') ?? date('Y-m-d');
+    $param->date_to   = $this->input->post('date_to')   ?? date('Y-m-d');
+    $param->status    = $this->input->post('status')    ?? $data['def_stat'];
+    $param->region    = ($this->session->has_userdata('region')) ? $this->session->region : $this->input->post('region');
 
     $data['status'] = $this->projected_fund->status;
     $data['table']  = $this->projected_fund->list_voucher($param);

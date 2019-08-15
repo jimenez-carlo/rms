@@ -46,11 +46,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
               $mindanao = array(
                 '_any' => '- Any -',
-                 11    => 'IX',
-                 12    => 'X',
-                 13    => 'XI',
-                 14    => 'XII',
-                 15    => 'XIII'
+                   11  => 'IX',
+                   12  => 'X',
+                   13  => 'XI',
+                   14  => 'XII',
+                   15  => 'XIII'
               );
 
               $regions = ($_SESSION['company'] != 8) ? $luzon_visayas : $mindanao;
@@ -58,7 +58,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo '<div class="control-group span5">';
               echo form_label('Region', 'region', array('class' => 'control-label'));
               echo '<div class="controls">';
-              echo form_dropdown('region', $regions, set_value('region'));
+              switch ($_SESSION['position']) {
+                case 108: // RRT-SPVSR
+                  $set_region = $_SESSION['region'];
+                  $bool = array('disabled' => 'false');
+                  break;
+
+                default: // TRSRY-SPVSR, ACCT-PAYCL, RRT-MGR
+                  $set_region = set_value('region');
+                  $bool = false;
+                  break;
+              }
+              echo form_dropdown('region', $regions, $set_region, $bool);
               echo '</div></div>';
             ?>
             <div class="form-actions span4">
