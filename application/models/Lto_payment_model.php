@@ -204,25 +204,9 @@ SQL;
 		return false;
 	}
 
-	public function deposit_payment($payment)
-	{
+	public function deposit_payment($payment) {
 		$payment->status = 4;
 		$this->db->update('tbl_lto_payment', $payment, array('lpid' => $payment->lpid));
-
-		if (!empty($payment->receipt)) {
-			// create folder
-			$folder = './rms_dir/lto_receipt/'.$payment->lpid.'/';
-			if (!is_dir($folder)) mkdir($folder, 0777, true);
-
-			// delete dir files
-			$this->load->helper('directory');
-			$dir_files = directory_map($folder, 1);
-			foreach ($dir_files as $file) {
-				if (!empty($file)) unlink($folder.$file);
-			}
-
-			rename('./rms_dir/temp/'.$payment->receipt, $folder.$payment->receipt);
-		}
 	}
 
 	public function get_liquidation_list() {

@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <table class="table projected" style="margin:0px!important;">
     <thead>
       <tr>
-        <th width="20"></th>
+        <th width="20"><input id="checkall" type="checkbox" onchange="total()" checked></th>
         <th width="125">Company</th>
         <th width="125">Transmittal #</th>
         <th width="100">Transmittal Date</th>
@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </thead>
     <tbody>
       <?php
-        print '<td><input type="hidden" name="fid" value="'.$fid.'"></td>';
+        print '<td style="display: none"><input type="text" name="fid" value="'.$fid.'"></td>';
         $total = 0;
         foreach ($fund->transmittal as $row) {
           $total += $row->amount;
@@ -65,3 +65,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </div>
   </div>
 </form>
+
+<?php if(isset($javascript)): ?>
+<script>
+  <?php print $javascript; ?>
+</script>
+<?php endif; ?>

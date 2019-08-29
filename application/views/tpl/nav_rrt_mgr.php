@@ -45,6 +45,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="sales") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>sales">Customer Status</a>
                             </li>
+                            <li <?php if(isset($nav) && $nav=="ca_list") echo 'class="active"'; ?>>
+                                <a href="<?php if(isset($dir)) echo $dir; ?>projected_fund/ca_list">CA Status</a>
+                            </li>
                             <li <?php if(isset($nav) && $nav=="projected_fund") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>projected_fund">Projected Fund</a>
                             </li>

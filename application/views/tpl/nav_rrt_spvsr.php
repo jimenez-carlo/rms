@@ -27,12 +27,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </li>
                         </ul>
                         <ul class="nav">
-                            <li class="dropdown <?php if(isset($nav) && $nav=="fund") echo 'active'; ?>">
+                            <li class="dropdown <?php if(isset($nav) && ($nav=="fund" || $nav=="ca_list")) echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Fund <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund">Withdraw/Deposit</a>
                                         <!-- <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>checks">Checks</a> -->
+					<?php if($this->session->region !== 1): ?>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>projected_fund/ca_list">View CA Status</a>
+					<?php endif; ?>
                                         <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund/audit">Audit</a>
                                     </li>
                                 </ul>
@@ -44,7 +47,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a href="<?php if(isset($dir)) echo $dir; ?>sales">Customer Status</a>
                             </li>
 
-                           
+
                             <li class="dropdown <?php if(isset($nav) && $nav=="lto_payment") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">LTO Payment <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
@@ -54,7 +57,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                 </ul>
                             </li>
-                           
+
 
                             <li class="dropdown <?php if(isset($nav) && $nav=="expense") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Miscellaneous <i class="caret"></i></a>
