@@ -18,17 +18,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 					<table class="table">
 						<thead>
 							<tr>
+                                                        <th><input type="checkbox" id="<?php echo $id_select_all; ?>"></th>
 								<th><p>Date</p></th>
 								<th><p>Payment Reference #</p></th>
 								<th><p>Region</p></th>
 								<th><p>Amount</p></th>
 								<th><p>Document #</p></th>
 								<th><p>Debit Memo #</p></th>
-								<th><p>Payment Confirmation #</p></th>
-								<th><p>Receipt
-									<br><i>Required file format: PDF</i>
-	                <br><i>File must not exceed 1MB</i>
-	               </p></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -36,6 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							foreach ($table as $row)
 							{
 								print '<tr>';
+                                                                print '<td><input type="checkbox" class="'.$class_checkbox.'" name="lpid[]" value="'.$row->lpid.'"></td>';
 								print '<td>'.$row->ref_date.'</td>';
 								print '<td><a href="'.base_url().'lto_payment/view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
 
@@ -44,8 +41,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 								print '<td>'.$row->doc_no.'</td>';
 								print '<td>'.$row->dm_no.'</td>';
-								print '<td>'.form_input('confirmation['.$row->lpid.']', set_value('confirmation['.$row->lpid.']')).'</td>';
-								print '<td><input type="file" name="receipt_'.$row->lpid.'" class="input-file uniform_on"></td>';
 								print '</tr>';
 							}
 
@@ -53,8 +48,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							{
 								print '<tr>';
 								print '<td>No result.</td>';
-								print '<td></td>';
-								print '<td></td>';
 								print '<td></td>';
 								print '<td></td>';
 								print '<td></td>';
@@ -70,3 +63,5 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 		</div>
 	</div>
 </div>
+
+<?php echo (isset($javascript)) ? "<script>$javascript</script>" : ''; ?>

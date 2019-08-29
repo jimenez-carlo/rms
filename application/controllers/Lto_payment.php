@@ -6,6 +6,8 @@ class Lto_payment extends MY_Controller {
 	public function __construct() {
 		parent::__construct();
     		$this->load->model('Lto_payment_model', 'lto_payment');
+    		$this->load->model('Js_model', 'js');
+
                 // Check in application/core/MY_Controller the value of $this->region and $this->company
                 if ($_SESSION['company'] == 8) {
                    $this->region  = $this->mdi_region;
@@ -217,43 +219,40 @@ class Lto_payment extends MY_Controller {
 		$this->template('lto_payment/processing', $data);
 	}
 
-	public function for_deposit()
-	{
-		$this->access(1);
-		$this->header_data('title', 'For Deposit LTO Payment');
-		$this->header_data('nav', 'lto_payment');
-		$this->header_data('dir', './../');
+        public function for_deposit() {
+          $this->access(1);
+          $this->header_data('title', 'For Deposit LTO Payment');
+          $this->header_data('nav', 'lto_payment');
+          $this->header_data('dir', './../');
+          $checkboxid    = 'check-all-for-deposit';
+          $checkboxclass = 'input-checkbox';
 
-		$save = $this->input->post('save');
-		if (!empty($save)) {
-			$confirmation = $this->input->post('confirmation');
-			if (!empty($confirmation)) {
-				$ctr = 0;
-				foreach ($confirmation as $lpid => $val) {
-					if (!empty($val)) {
-						if ($receipt = $this->lto_payment->upload_receipt($lpid)) {
-							$payment = new Stdclass();
-							$payment->lpid = $lpid;
-							$payment->confirmation = $val;
-							$payment->deposit_date = date('Y-m-d H:i:s');
-							$payment->receipt = $receipt;
-							$this->lto_payment->deposit_payment($payment);
-							$ctr++;
-						}
-					}
-				}
-				if ($ctr) $_SESSION['messages'][] = 'Records updated successfully.';
-			}
-			else {
-				$_SESSION['warning'][] = 'Nothing to save.';
-			}
-		}
+          $save = $this->input->post('save');
+          if (!empty($save)) {
+            $lpids = $this->input->post('lpid');
+            if (!empty($lpids)) {
+              $ctr = 0;
+              foreach ($lpids as $lpid) {
+                $payment = new Stdclass();
+                $payment->lpid = $lpid;
+                $payment->deposit_date = date('Y-m-d H:i:s');
+                $this->lto_payment->deposit_payment($payment);
+                $ctr++;
+              }
+              if ($ctr) $_SESSION['messages'][] = 'Records updated successfully.';
+            } else {
+              $_SESSION['warning'][] = 'Nothing to save.';
+            }
+          }
 
-		$data['table'] = $this->lto_payment->get_list_by_status(3);
-		$data['region']  = $this->region;
-		$data['company'] = $this->company;
-		$this->template('lto_payment/for_deposit', $data);
-	}
+          $data['table'] = $this->lto_payment->get_list_by_status(3);
+          $data['region']  = $this->region;
+          $data['company'] = $this->company;
+          $data['id_select_all']  = $checkboxid;
+          $data['class_checkbox'] = $checkboxclass;
+          $data['javascript']  = $this->js->jquery_checkall($checkboxid, $checkboxclass);
+          $this->template('lto_payment/for_deposit', $data);
+        }
 
 	public function liquidation()
 	{
