@@ -264,14 +264,14 @@ SQL;
 
 		$query  = "SELECT sid, engine_no, cust_code, ";
 		$query .= "LEFT(pending_date, 10) AS pending_date, registration, ";
-		$query .= "LEFT(cr_date, 10) AS cr_date ";
+		$query .= "LEFT(cr_date, 10) AS cr_date, ";
+		$query .= "LEFT(registration_date, 10) AS regn_upload_d ";
 		$query .= "FROM tbl_sales s ";
 		$query .= "INNER JOIN tbl_customer c ON customer=cid ";
 		$query .= "INNER JOIN tbl_engine e ON engine=eid ";
 		$query .= 'WHERE (left(pending_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'") ';
 		$query .= 'OR (left(registration_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'")';
 		$result = $this->db->query($query)->result_object();
-
 		// FOR DEBUGGING
 		//print_r(array($start, $current_date, $date_yesterday, $date_from, $query, $result));
 		//exit;
@@ -287,16 +287,20 @@ SQL;
                     $expense->engine_num = $row->engine_no;
                     $expense->tip_conf = 0;
                     $expense->tip_conf_d = $row->pending_date;
+                    $expense->regn_upload_d = $row->regn_upload_d;
                     if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
                     if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
                     $dev_ces2->insert('rms_expense', $expense);
+
                   } else {
                     $expense->tip_conf = 0;
                     $expense->tip_conf_d = $row->pending_date;
+                    $expense->regn_upload_d = $row->regn_upload_d;
                     if ($expense->custcode !== $row->cust_code) $expense->custcode = $row->cust_code; // Update dev_ces2.rms_expense custcode if data is not equal in RMS cust_code.
                     if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
                     if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
                     $dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
+
                   }
                   $rows++;
                 }
