@@ -37,7 +37,7 @@ class Fund_model extends CI_Model{
 
 	public function load_all()
 	{
-		$result = $this->db->query("SELECT * FROM tbl_fund WHERE $this->company")->result_object();
+		$result = $this->db->query("SELECT * FROM tbl_fund WHERE $this->companyQry")->result_object();
 		foreach ($result as $fund)
 		{
 			$fund->region_name  = $this->region[$fund->region];
