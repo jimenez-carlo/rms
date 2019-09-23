@@ -23,7 +23,10 @@ class Topsheet_model extends CI_Model{
           $this->load->model('Sales_model', 'sale');
           $this->load->model('Fund_model', 'fund');
           if ($_SESSION['company'] == 8) {
+            $this->andCompany = ' AND company = 8';
             $this->company = $this->mdi;
+          } else {
+            $this->andCompany = ' AND company != 8';
           }
         }
 
@@ -357,7 +360,7 @@ class Topsheet_model extends CI_Model{
 
 	public function get_topsheet_request()
 	{
-		return $this->db->query("select * from tbl_topsheet where print = 2")->result_object();
+		return $this->db->query("select * from tbl_topsheet where print = 2 {$this->andCompany}")->result_object();
 	}
 
 	public function search_topsheet($region, $company)
