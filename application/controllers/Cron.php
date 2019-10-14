@@ -89,9 +89,8 @@ class Cron extends MY_Controller {
 		$start = date("Y-m-d H:i:s");
 		$rows = 0;
 
-		$date_yesterday = $this->input->post('date_yesterday');
-		$date_yesterday = (empty($date_yesterday)) ? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
-		$date_from = date('Y-m-d', strtotime('-7 days'));
+		$date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-7 days'));
+		$date_yesterday = $this->input->post('date_yesterday') ?? date('Y-m-d', strtotime('-1 days'));
 
                 $query = <<<SQL
                   SELECT
@@ -244,10 +243,8 @@ SQL;
 
 		$dev_ces2 = $this->load->database('dev_ces2', TRUE);
 
-		$date_yesterday = $this->input->post('date_yesterday');
-		$date_yesterday = (empty($date_yesterday))
-			        ? date('Y-m-d', strtotime('-1 days')) : $date_yesterday;
-		$date_from = date('Y-m-d', strtotime('-3 days'));
+		$date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-3 days'));
+		$date_yesterday = $this->input->post('date_yesterday') ?? date('Y-m-d', strtotime('-1 days'));
 
 		// Manual update lto pending sales
 		// Just change the date

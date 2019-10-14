@@ -14,7 +14,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
           <fieldset>
             <div class="control-group">
-              <div class="control-label">Date</div>
+              <div class="control-label">Date From</div>
+              <div class="controls">
+                <?php
+                print form_input('date_from', set_value('date_from', date('Y-m-d', strtotime('-7 days'))), array('class' => 'datepicker')) ?>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="control-label">Date To</div>
               <div class="controls">
                 <?php
                 print form_input('date_yesterday', set_value('date_yesterday', date('Y-m-d', strtotime('-1 days'))), array('class' => 'datepicker')) ?>
