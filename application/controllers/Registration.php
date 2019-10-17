@@ -169,7 +169,7 @@ class Registration extends MY_Controller {
           {
           case 1: // wrong amount
             $new_sales->registration = $this->input->post('registration');
-            $new_sales->da_reason = -1;
+            $new_sales->da_reason = 11;
             $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
             break;
 
@@ -177,7 +177,7 @@ class Registration extends MY_Controller {
           case 3: // invalid si/ar
             $new_sales->si_no = $this->input->post('si_no');
             $new_sales->ar_no = $this->input->post('ar_no');
-            $new_sales->da_reason = -1;
+            $new_sales->da_reason = 11;
             $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
             break;
 
@@ -186,13 +186,13 @@ class Registration extends MY_Controller {
           case 6:  // mismatch cust name
           case 7:  // mismatch engine
           case 10: // wrong regn type
-            $new_sales->da_reason = -1;
+            $new_sales->da_reason = 11;
             $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
             break;
 
           case 8: // mismatch cr
             $new_sales->cr_no = $this->input->post('cr_no');
-            $new_sales->da_reason = -1;
+            $new_sales->da_reason = 11;
             $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
             break;
 

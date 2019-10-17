@@ -24,12 +24,12 @@ class Orcr_checking extends MY_Controller {
 		$data['back'] = $this->input->post('back');
 
 		if (!empty($data['submit_all'])) {
-			$this->save($data);
-		}
+                  $this->save($data);
+                }
 
 		if (!empty($data['back'])) {
-			$data['sid'] = null;
-			$data['mid'] = null;
+                  $data['sid'] = null;
+                  $data['mid'] = null;
 		}
 
                 if (!empty($data['tid'])) {
@@ -74,11 +74,11 @@ class Orcr_checking extends MY_Controller {
 			$this->orcr_checking->check_misc($mid, $data['tid']);
 		}
 
-  	// update topsheet status
-  	$this->load->model('Topsheet_model', 'topsheet');
-  	$topsheet = $this->topsheet->check_sales($data['tid']);
+  	        // update topsheet status
+  	        $this->load->model('Topsheet_model', 'topsheet');
+  	        $topsheet = $this->topsheet->check_sales($data['tid']);
 
-  	$_SESSION['messages'][] = 'Transaction # '.$topsheet->trans_no.' updated successfully.';
-  	redirect('orcr_checking');
+  	        $_SESSION['messages'][] = 'Transaction # '.$topsheet->trans_no.' updated successfully.';
+  	        redirect('orcr_checking');
 	}
 }

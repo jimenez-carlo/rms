@@ -3,30 +3,41 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Disapprove_model extends CI_Model{
 
-	public $da_reason = array(
-		1  => 'Wrong Amount',
-		2  => 'No (AR/SI) reference',
-		3  => 'Invalid (AR/SI) reference',
-		4  => 'Unreadable attachment',
-		5  => 'Missing OR attachment',
-		6  => 'Mismatch Customer Name',
-		7  => 'Mismatch Engine #',
-		8  => 'Mismatch CR #',
-		9  => 'Wrong Tagging',
-                10 => 'Wrong Regn Type'
-	);
-
 	public function __construct()
 	{
 		parent::__construct();
+                $this->load->model('Caching_model', 'caching');
 	}
+
+        public function da_reason()
+        {
+                $delete = $this->caching->delete('DA_REASON');
+                if ($delete) {
+                  $this->db->cache_delete('disapprove','resolve');
+                }
+
+                $this->db->cache_on();
+                $sql = "SELECT * FROM tbl_da_status WHERE id != 11";
+                $da_status = $this->db->query($sql)->result_array();
+                $status = [];
+                foreach ($da_status as $da) {
+                  $status[$da['id']] = $da['da_status'];
+                }
+                return $status;
+        }
 
 	public function branch_list($param)
 	{
-		$result = $this->db->query("select distinct bcode, bname from tbl_sales
-			where region = ".$param->region."
-			and da_reason > 0
-			order by bcode")->result_object();
+                $region = ($this->session->position === '3') ? '> 0' : "= '$param->region'";
+                $result = $this->db->query("
+                  SELECT
+                    DISTINCT bcode, bname
+                  FROM
+                    tbl_sales
+                  WHERE
+                    region $region AND da_reason > 0
+                  ORDER BY bcode
+                ")->result_object();
 
 		$branches = array();
 		foreach($result as $row) {
@@ -38,19 +49,55 @@ class Disapprove_model extends CI_Model{
 
 	public function load_list($param)
 	{
-		if (empty($param->branch)) $branch = "";
-		else $branch = " and s.bcode = '".$param->branch."'";
+                /* ---
+                  Position 3 = Accounting | Position 108 = RRT
+                */
+                if($this->session->position === '3' && $this->session->company !== '8') {
+                  $region = "s.region <= 10";
+                } elseif($this->session->position === '3' && $this->session->company === '8') {
+                  $region = "s.region >= 11";
+                } else {
+                  $region = "s.region = '$param->region'";
+                }
 
-		return $this->db->query("select s.*, e.*, c.*, t.trans_no
-			from tbl_sales s
-			inner join tbl_engine e on engine = eid
-			inner join tbl_customer c on customer = cid
-			inner join tbl_topsheet t on topsheet = tid
-			where s.region = ".$param->region."
-			".$branch."
-			and s.da_reason > 0
-			order by s.bcode")->result_object();
+		$branch = (empty($param->branch))  ? "" : " AND s.bcode = '$param->branch'";
+
+                return $this->db->query("
+                  SELECT
+                    s.*, e.*, c.*, t.trans_no
+                  FROM
+                    tbl_sales s
+                  INNER JOIN
+                    tbl_engine e ON engine = eid
+                  INNER JOIN
+                    tbl_customer c ON customer = cid
+                  INNER JOIN
+                    tbl_topsheet t ON topsheet = tid
+                  WHERE
+                    {$region} {$branch}
+                    AND s.da_reason > 0 AND s.da_reason != 11
+		  ORDER BY s.bcode")->result_object();
 	}
+
+        public function get_da_resolve()
+        {
+                return $this->db->query("
+                  SELECT
+                    s.*, e.*, c.*, t.trans_no, ds.id, ds.da_status
+                  FROM
+                    tbl_sales s
+                  INNER JOIN
+                    tbl_engine e ON engine = eid
+                  INNER JOIN
+                    tbl_customer c ON customer = cid
+                  INNER JOIN
+                    tbl_topsheet t ON topsheet = tid
+                  INNER JOIN
+                    tbl_da_status ds ON s.da_reason = ds.id
+                  WHERE
+                    s.da_reason = 11
+		  ORDER BY s.bcode")->result_object();
+        }
 
 	public function load_sales($sid)
 	{
@@ -61,4 +108,13 @@ class Disapprove_model extends CI_Model{
 		$sales->da_reason = $da_reason[$sales->da_reason];
 		return $sales;
 	}
+
+        public function da_status_history($sale_id)
+        {
+          return [
+            'sales_id' => $sale_id,
+            'da_status_id' => '0',
+            'uid' => $this->session->uid
+          ];
+        }
 }

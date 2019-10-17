@@ -41,7 +41,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	              <th><p>CR #</p></th>
 	              <th><p>Topsheet</p></th>
 	              <th><p>Reason for Disapprove</p></th>
-	              <th><p></p></th>
+                      <?php if (in_array($this->session->position, [108])): ?>
+	              <th></th>
+                      <?php endif; ?>
 	            </tr>
 	          </thead>
 	          <tbody>
@@ -62,7 +64,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	            print '<td>'.$row->cr_no.'</td>';
 	            print '<td>'.$row->trans_no.'</td>';
 	            print '<td>'.$da_reason[$row->da_reason].'</td>';
+                    if (in_array($this->session->position, [108])) {
 	            print '<td><a class="btn btn-success" onclick="resolve('.$row->sid.')">Resolve</a></td>';
+                    }
 	            print '</tr>';
 	          }
 
