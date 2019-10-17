@@ -69,6 +69,13 @@ $dir = base_url();
                                     </li>
                                 </ul>
                             </li>
+                            <li class="dropdown">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Disapprove<i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                  <li><a href="<?php echo base_url(); ?>disapprove/resolve">View Resolve</a></li>
+                                  <li><a href="<?php echo base_url(); ?>disapprove">View Disapprove</a></li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

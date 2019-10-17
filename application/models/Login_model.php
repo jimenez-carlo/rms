@@ -103,18 +103,22 @@ SQL;
 
 	public function get_system_access($system="") {
 	  $global = $this->load->database('global', TRUE);
-		$result = $global->query("SELECT
-																	*
-																FROM tbl_system_access
-																WHERE
-																	system = '$system'");
-		return $result->result_array();
+          $result = $global->query("
+            SELECT
+	      *
+            FROM
+              tbl_system_access
+	    WHERE
+              system = '$system'
+          ");
+
+          return $result->result_array();
 	}
 
-	public function get_access() {
-		$result = $this->db->query("SELECT * FROM tbl_page_access");
-		return $result->result_array();
-	}
+        public function get_access() {
+          $result = $this->db->query("SELECT * FROM tbl_page_access");
+          return $result->result_array();
+        }
 
 	public function decrypt($password="") {
 	  $key = 'passwordforportal';
