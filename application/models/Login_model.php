@@ -103,12 +103,14 @@ SQL;
 
 	public function get_system_access($system="") {
 	  $global = $this->load->database('global', TRUE);
-		$result = $global->query("SELECT
-																	*
-																FROM tbl_system_access
-																WHERE
-																	system = '$system'");
-		return $result->result_array();
+          $result = $global->query("
+            SELECT
+              *
+            FROM
+              tbl_system_access
+            WHERE system = '$system'
+          ");
+          return $result->result_array();
 	}
 
 	public function get_access() {
