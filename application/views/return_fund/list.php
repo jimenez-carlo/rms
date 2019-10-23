@@ -9,25 +9,40 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			</div>
 			<div class="block-content collapse in">
 				<form class="form-horizontal" method="post">
-					<fieldset>
+					<div class="row">
 						<div class="control-group span5">
-							<div class="control-label">Region</div>
+							<div class="control-label">Date From</div>
 							<div class="controls">
-								<?php print form_dropdown('region', array_merge(array(0 => '- Any -'), $region), set_value('region')); ?>
+                                                          <input class="datepicker" type="text" name="date_from" value="<?php echo $date_from; ?>" autocomplete="off">
 							</div>
 						</div>
-
 						<div class="control-group span5">
 							<div class="control-label">Reference #</div>
 							<div class="controls">
 								<?php print form_input('reference', set_value('reference')); ?>
 							</div>
 						</div>
+					</div>
+					<div class="row">
+						<div class="control-group span5">
+							<div class="control-label">Date To</div>
+							<div class="controls">
+                                                          <input class="datepicker" type="text" name="date_to" value="<?php echo $date_to; ?>" autocomplete="off">
+							</div>
+						</div>
 
+						<div class="control-group span5">
+							<div class="control-label">Region</div>
+							<div class="controls">
+								<?php print form_dropdown('region', array_merge(array(0 => '- Any -'), $region), set_value('region'), [ 'class' => 'form_dropdown']); ?>
+							</div>
+						</div>
+					</div>
+                                        <div class="row">
 						<div class="form-actions span5">
 							<input type="submit" class="btn btn-success" value="Search" name="search">
 						</div>
-					</fieldset>
+                                        </div>
 
 					<hr>
 
@@ -66,6 +81,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								print '<tr>';
 								print '<td></td>';
 								print '<td>No result.</td>';
+								print '<td></td>';
 								print '<td></td>';
 								print '<td></td>';
 								print '<td></td>';
