@@ -18,13 +18,19 @@ class Return_fund extends MY_Controller {
 		$this->header_data('title', 'Return Fund');
 		$this->header_data('nav', 'return_fund');
 		$this->header_data('dir', './');
+                $this->footer_data('script', '<script src="'.base_url().'vendors/datatables/js/dataTables.select.min.js"></script>');
+                $this->footer_data('return_fund_js', '<script src="'.base_url().'assets/js/return_fund.js"></script>');
 
 		$param = new Stdclass();
-		$param->region = $this->input->post('region');
+		$param->region    = $this->input->post('region');
 		$param->reference = $this->input->post('reference');
+		$param->date_from = $this->input->post('date_from') ?: date('Y-m-d', strtotime('-7 days'));
+                $param->date_to   = $this->input->post('date_to')   ?: date('Y-m-d');
 
-		$data['table'] = $this->return_fund->load_list($param);
-		$data['region'] = $this->region;
+                $data['date_from'] = $param->date_from;
+                $data['date_to']   = $param->date_to;
+		$data['table']     = $this->return_fund->load_list($param);
+		$data['region']    = $this->region;
 		$this->template('return_fund/list', $data);
 	}
 

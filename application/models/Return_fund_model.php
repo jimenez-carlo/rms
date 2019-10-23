@@ -7,9 +7,9 @@ class Return_fund_model extends CI_Model{
 	{
 		parent::__construct();
                 if ($_SESSION['company'] != 8) {
-                  $this->companyQry = ' AND company != 8';
+                  $this->companyQry = 'company != 8';
                 } else {
-                  $this->companyQry = ' AND company = 8';
+                  $this->companyQry = 'company = 8';
                 }
 	}
 
@@ -28,9 +28,13 @@ class Return_fund_model extends CI_Model{
 				WHEN company = 3 THEN 'HPTI'
                                 WHEN company = 8 THEN 'MDI'
                                 END as companyname, rf.amount
-                      FROM tbl_return_fund rf
-		      INNER join tbl_voucher v on v.vid = rf.fund
-		      WHERE 1=1 ".$this->companyQry." ".$region." ".$reference."
+                      FROM
+                        tbl_return_fund rf
+                      INNER
+                        join tbl_voucher v on v.vid = rf.fund
+                      WHERE
+                        ".$this->companyQry." ".$region." ".$reference."
+                        AND created BETWEEN '".$param->date_from." 00:00:00' AND '".$param->date_to." 23:59:59'
                       ORDER BY created DESC LIMIT 1000
                 ")->result_object();
 	}
@@ -92,6 +96,6 @@ class Return_fund_model extends CI_Model{
 		$this->db->update('tbl_return_fund', $return, array('rfid' => $rfid));
 
 		$_SESSION['messages'][] = 'Transaction updated successfully.';
-		redirect('liquidation');
+		redirect('return_fund/view/'.$rfid);
 	}
 }

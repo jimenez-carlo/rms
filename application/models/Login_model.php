@@ -105,12 +105,13 @@ SQL;
 	  $global = $this->load->database('global', TRUE);
           $result = $global->query("
             SELECT
-	      *
+              *
             FROM
               tbl_system_access
-	    WHERE
-              system = '$system'
+            WHERE system = '$system'
           ");
+          return $result->result_array();
+	}
 
           return $result->result_array();
 	}

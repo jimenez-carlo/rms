@@ -15,6 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
         <!--/.fluid-container-->
         <script type="text/javascript">
+        BASE_URL = "<?php echo base_url(); ?>";
         function commafy(val, prefix) {
             prefix = prefix || "\u20b1";
 
@@ -64,6 +65,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         });
         </script>
         <?php if(isset($script)) echo $script; ?>
+        <?php if(isset($return_fund_js)) echo $return_fund_js; ?>
     </body>
 
 </html>
