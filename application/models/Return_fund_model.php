@@ -96,6 +96,6 @@ class Return_fund_model extends CI_Model{
 		$this->db->update('tbl_return_fund', $return, array('rfid' => $rfid));
 
 		$_SESSION['messages'][] = 'Transaction updated successfully.';
-		redirect('liquidation');
+		redirect('return_fund/view/'.$rfid);
 	}
 }
