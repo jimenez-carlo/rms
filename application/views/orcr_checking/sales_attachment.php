@@ -1,6 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
+<style>
+.form-horizontal .controls {
+    padding-top: 5px;
+}
+</style>
 
 <div class="span4 details">
   <?php
@@ -68,9 +73,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     7  => 'Mismatch Engine #',
     8  => 'Mismatch CR #',
     //9  => 'Wrong Tagging',
-    10 => 'Wrong Regn Type'
+    10 => 'Wrong Regn Type',
   );
-  if ($sales->da_reason > 0) {
+  if ($sales->da_reason > 0 && $sales->da_reason != 11) {
     print '<div class="control-group">';
     print '<div class="control-label">Disapproved</div>';
     print '<div class="controls">Reason: '.$da_reason[$sales->da_reason].'</div>';
@@ -109,12 +114,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script type="text/javascript">
 $(function(){
   $(document).ready(function(){
-        $(".details").attr("style", "position:fixed; top:20%; left:10%");
+        $(".details").attr("style", "position:fixed; top:20%;");
         $(".attachments").attr("style", "margin-left:30%");
 
     $('.modal-body').on("scroll", function(){
       if ($(this).scrollTop() > 50) {
-        $(".details").attr("style", "position:fixed; top:20%; left:10%");
+        $(".details").attr("style", "position:fixed; top:20%;");
         $(".attachments").attr("style", "margin-left:30%");
       }
       else {
@@ -146,7 +151,7 @@ $(function(){
       $('#da_group p').text('Saving, please wait...').removeClass('hide');
 
       $.ajax({
-        url : "disapprove/sales",
+        url : "<?php echo base_url(); ?>disapprove/sales",
         type: "POST",
         data: {'sid' : sid, 'da_reason' : da_reason},
         dataType: "JSON",
@@ -159,6 +164,8 @@ $(function(){
           // update info
           $('#da_group .control-label').text('Disapproved');
           $('#da_group p').text('Reason: '+data);
+          $("#include_for_upload").prop("disabled", true);
+          $("#exclude_for_upload").prop("disabled", true);
         },
         error: function (jqXHR, textStatus, errorThrown)
         {

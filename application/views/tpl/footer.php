@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
         <div class="ajax-loader hide" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; ">
             <div style="background: linear-gradient(#000, #FFF, #FFF, #FFF, #FFF, #FFF, #FFF, #FFF, #000); opacity: .5; position: absolute; width: 100%; height: 100%;"></div>
-            <img src="<?php if(isset($dir)) echo $dir; ?>images/loader.gif" style="position: absolute; top: 35%; left: 45%;">
+            <img src="<?php echo base_url(); ?>images/loader.gif" style="position: absolute; top: 35%; left: 45%;">
         </div>
 
         <!--/.fluid-container-->
@@ -26,11 +26,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             return val;
         }
         function toFloat(val) {
-            //val = parseFloat(val.toString().replace(/[^\d\.]/g, ""));
             val = parseFloat(val.toString().replace(/[^-?\d\.]/g, ""));
             if (!val) val = 0;
             return val;
         }
+
+        function removeElement(array, elem) {
+          var index = array.indexOf(elem);
+          if (index > -1) {
+            array.splice(index, 1);
+          }
+        }
+
+        function find(array, value){
+          return array.some(function(arrVal){
+            return arrVal === value;
+          });
+        }
+
 
         $(document).ready(function(){
             $('select').select2();

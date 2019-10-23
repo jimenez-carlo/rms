@@ -44,7 +44,7 @@ class Dashboard extends MY_Controller {
 		$this->header_data('dir', './../');
 		$this->header_data('link',
 			'<link rel="stylesheet" href="../vendors/morris/morris.css">
-	     <link href="../vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
+	                 <link href="../vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
 		// UNPROCESSED
 		$global = $this->load->database('global', TRUE);

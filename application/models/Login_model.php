@@ -113,10 +113,13 @@ SQL;
           return $result->result_array();
 	}
 
-	public function get_access() {
-		$result = $this->db->query("SELECT * FROM tbl_page_access");
-		return $result->result_array();
+          return $result->result_array();
 	}
+
+        public function get_access() {
+          $result = $this->db->query("SELECT * FROM tbl_page_access");
+          return $result->result_array();
+        }
 
 	public function decrypt($password="") {
 	  $key = 'passwordforportal';

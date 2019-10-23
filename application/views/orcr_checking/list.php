@@ -5,9 +5,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 .block {
     margin: 1em;
 }
-.form-horizontal .controls {
-    padding-top: 5px;
-}
 </style>
 
 <div class="container-fluid form-horizontal">
@@ -44,8 +41,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </tbody>
           </table>
         </form>
-			</div>
-		</div>
+      </div>
+    </div>
 
     <!-- block -->
     <div class="block span10">
@@ -53,7 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="pull-left">Transaction <?php if(isset($topsheet)) print '# '.$topsheet->trans_no; ?></div>
       </div>
       <div class="block-content collapse in">
-        <?php 
+        <?php
         if(isset($view)) {
           print $view;
         }

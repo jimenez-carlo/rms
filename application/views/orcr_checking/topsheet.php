@@ -73,7 +73,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
       print '<th colspan="3"><p class="text-right">Expense</p></th>';
-      print '</tr>'; 
+      print '</tr>';
 
       foreach ($topsheet->misc as $misc)
       {
@@ -144,7 +144,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h3 class="modal-title">View attachment</h3>
       </div>
-      <div class="modal-body form">
+      <div class="modal-body form" style="max-height: 430px;">
         <div class="alert alert-error hide">
           <button class="close" data-dismiss="alert">&times;</button>
           <div class="error"></div>
