@@ -30,7 +30,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <div class="control-group">
               <div class="control-label">Deposit Slip</div>
-              <div class="controls text"><?php print '<a href="/rms_dir/deposit_slip/'.$return->rfid.'/'.$return->slip.'" target="_blank">'.$return->slip.'</a>'; ?></div>
+              <div class="controls text"><?php print '<a href="'.base_url().'rms_dir/deposit_slip/'.$return->rfid.'/'.$return->slip.'" target="_blank">'.$return->slip.'</a>'; ?></div>
             </div>
             <div class="control-group">
               <div class="control-label">Date Liquidated</div>

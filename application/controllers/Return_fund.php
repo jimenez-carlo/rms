@@ -18,6 +18,8 @@ class Return_fund extends MY_Controller {
 		$this->header_data('title', 'Return Fund');
 		$this->header_data('nav', 'return_fund');
 		$this->header_data('dir', './');
+                $this->footer_data('script', '<script src="'.base_url().'vendors/datatables/js/dataTables.select.min.js"></script>');
+                $this->footer_data('return_fund_js', '<script src="'.base_url().'assets/js/return_fund.js"></script>');
 
 		$param = new Stdclass();
 		$param->region = $this->input->post('region');
