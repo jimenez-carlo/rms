@@ -3,9 +3,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <!DOCTYPE html>
 <html class="no-js">
-    
+
     <head>
-        <title><?php if(isset($title)) echo $title; else echo 'Registration Monitoring System'; ?></title>
+        <title><?php echo 'RMS'; if(isset($title)) echo ' | '.$title; ?></title>
         <link rel="shortcut icon" href="<?php print base_url('images/favicon.ico') ?>">
         <!-- Bootstrap -->
         <link href="<?php print base_url('bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet" media="screen">
@@ -18,7 +18,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <link href="<?php print base_url('vendors/datepicker.css') ?>" rel="stylesheet" media="screen">
         <link href="<?php print base_url('vendors/uniform.default.css') ?>" rel="stylesheet" media="screen">
         <?php if(isset($link)) echo $link; ?>
-        
+
         <!-- JQUERY -->
         <script src="<?php print base_url('vendors/jquery-1.9.1.min.js') ?>"></script>
 
@@ -26,9 +26,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <script src="<?php print base_url('vendors/datatables/js/jquery.dataTables.min.js') ?>"></script>
         <script src="<?php print base_url('assets/DT_bootstrap.js') ?>"></script>
         <script src="<?php print base_url('vendors/bootstrap-datepicker.js') ?>"></script>
-        
+
         <script src="<?php print base_url('vendors/jquery.uniform.min.js') ?>"></script>
-        <script src="<?php print base_url('vendors/select2.min.js') ?>"></script> 
+        <script src="<?php print base_url('vendors/select2.min.js') ?>"></script>
         <script src="<?php print base_url('vendors/modernizr-2.6.2-respond-1.1.0.min.js') ?>"></script>
         <script src="<?php print base_url('assets/autocomma.js') ?>"></script>
 
