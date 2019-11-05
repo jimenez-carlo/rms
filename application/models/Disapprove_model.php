@@ -7,6 +7,15 @@ class Disapprove_model extends CI_Model{
 	{
 		parent::__construct();
                 $this->load->model('Caching_model', 'caching');
+                switch ($_SESSION['company']) {
+                  case 8:
+                    $this->and_company = " AND s.company = 8";
+                    break;
+
+                  default:
+                    $this->and_company = " AND s.company != 8";
+                    break;
+                }
 	}
 
         public function da_reason()
@@ -81,6 +90,7 @@ class Disapprove_model extends CI_Model{
 
         public function get_da_resolve()
         {
+
                 return $this->db->query("
                   SELECT
                     s.*, e.*, c.*, t.trans_no, ds.id, ds.da_status
@@ -95,8 +105,9 @@ class Disapprove_model extends CI_Model{
                   INNER JOIN
                     tbl_da_status ds ON s.da_reason = ds.id
                   WHERE
-                    s.da_reason = 11
-		  ORDER BY s.bcode")->result_object();
+                    s.da_reason = 11 {$this->and_company}
+                  ORDER BY s.bcode
+                ")->result_object();
         }
 
 	public function load_sales($sid)
