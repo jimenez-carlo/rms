@@ -95,6 +95,36 @@ class Cron extends MY_Controller {
                 $query = <<<SQL
                   SELECT
                     c.*, r.*, si_mat_no, regn_status, date_created
+                    ,CASE rrt_class
+                       WHEN 'NCR'      THEN 1
+                       WHEN 'REGION 1' THEN 2
+                       WHEN 'REGION 2' THEN 3
+                       WHEN 'REGION 3' THEN 4
+                       WHEN 'REGION 4' THEN 5
+                       WHEN 'REGION 4 B' THEN 6
+                       WHEN 'REGION 5' THEN 7
+                       WHEN 'REGION 6' THEN 8
+                       WHEN 'REGION 7' THEN 9
+                       WHEN 'REGION 8' THEN 10
+                       WHEN 'IX'   THEN 11
+                       WHEN 'X'    THEN 12
+                       WHEN 'XI'   THEN 13
+                       WHEN 'XII'  THEN 14
+                       WHEN 'XIII' THEN 15
+                      ELSE 0
+                    END AS region
+                    ,CASE rrt_class
+                        WHEN 'REGION 1'   THEN 'R1'
+                        WHEN 'REGION 2'   THEN 'R2'
+                        WHEN 'REGION 3'   THEN 'R3'
+                        WHEN 'REGION 4'   THEN 'R4'
+                        WHEN 'REGION 4 B' THEN 'R4b'
+                        WHEN 'REGION 5'   THEN 'R5'
+                        WHEN 'REGION 6'   THEN 'R6'
+                        WHEN 'REGION 7'   THEN 'R7'
+                        WHEN 'REGION 8'   THEN 'R8'
+                        ELSE rrt_class
+                    END AS r_code
                   FROM
                     customer_tbl c
 		  INNER JOIN rrt_reg_tbl r ON branch_code = branch
@@ -104,34 +134,20 @@ class Cron extends MY_Controller {
 		  WHERE left(date_sold, 10) >= '2018-08-01'
 		  AND (left(date_created, 10) BETWEEN '$date_from' AND  '$date_yesterday')
 SQL;
-		// WHERE engine_no = ''
+
                 $dev_rms_result     = $this->dev_rms->query($query)->result_object();
                 $mdi_dev_rms_result = $this->mdi_dev_rms->query($query)->result_object();
                 $result = array_merge($dev_rms_result, $mdi_dev_rms_result);
 
+                $branches_result = $this->global->query("select bid, b_code from tbl_branches")->result_object();
+                $branches = array();
+                foreach ($branches_result as $branch) {
+                  $branches[$branch->b_code] = $branch->bid;
+                }
+
 		foreach ($result as $row)
 		{
-			// branch dtls
-			switch ($row->rrt_class)
-			{
-				case 'NCR': $region = 1; $r_code = 'NCR'; break;
-				case 'REGION 1': $region = 2; $r_code = 'R1'; break;
-				case 'REGION 2': $region = 3; $r_code = 'R2'; break;
-				case 'REGION 3': $region = 4; $r_code = 'R3'; break;
-				case 'REGION 4': $region = 5; $r_code = 'R4'; break;
-				case 'REGION 4 B': $region = 6; $r_code = 'R4b'; break;
-				case 'REGION 5': $region = 7; $r_code = 'R5'; break;
-				case 'REGION 6': $region = 8; $r_code = 'R6'; break;
-				case 'REGION 7': $region = 9; $r_code = 'R7'; break;
-				case 'REGION 8': $region = 10; $r_code = 'R8'; break;
-				case 'IX': $region = 11; $r_code = 'IX'; break;
-				case 'X': $region = 12; $r_code = 'X'; break;
-				case 'XI': $region = 13; $r_code = 'XI'; break;
-				case 'XII': $region = 14; $r_code = 'XII'; break;
-				case 'XIII': $region = 15; $r_code = 'XIII'; break;
-				default: $region = 0;
-			}
-                        if ($region > 10) {
+                        if ($row->region > 10) {
                           $company = 8; // MDI
                         } else {
                           $company = (substr($row->branch, 0, 1) == 6)
@@ -139,31 +155,32 @@ SQL;
                               : substr($row->branch, 0, 1);
                         }
 
-			$branch = $this->global->query("select * from tbl_branches where b_code = '".$row->branch."'")->row();
-
 			// lto_transmittal
-			$code = 'LT-'.$r_code.'-'
+			$code = 'LT-'.$row->r_code.'-'
 				.substr($row->branch, 0, 1).'0'
 				.substr($row->date_created, 2, 2)
 				.substr($row->date_created, 5, 2)
 				.substr($row->date_created, 8, 2);
-			$transmittal = $this->db->query("select * from tbl_lto_transmittal
-				where code = '".$code."'")->row();
+
+                        $transmittal = $this->db->query("
+                          SELECT
+                            *
+                          FROM
+                            tbl_lto_transmittal
+                          WHERE
+                            code = '".$code."'")->row();
+
 			if (empty($transmittal))
 			{
 				$transmittal = new Stdclass();
 				$transmittal->date = $row->date_created;
 				$transmittal->code = $code;
-				$transmittal->region = $region;
+				$transmittal->region = $row->region;
 				$transmittal->company = $company;
 				$this->db->insert('tbl_lto_transmittal', $transmittal);
 				$transmittal->ltid = $this->db->insert_id();
 			}
 
-			// engine
-			//if($row->engine_no == 'E472-800781'){
-			//echo "<script>alert('a21');</script>";
-			//}
 			$engine = $this->db->query("select * from tbl_engine
 				where engine_no = '".$row->engine_no."'")->row();
 			if (empty($engine))
@@ -199,10 +216,10 @@ SQL;
 				$sales = new Stdclass();
 				$sales->engine = $engine->eid;
 				$sales->customer = $customer->cid;
-				$sales->branch = (!empty($branch)) ? $branch->bid : 0;
+				$sales->branch = (!empty($row->branch)) ? $branches[$row->branch] : 0;
 				$sales->bcode = $row->branch_code;
 				$sales->bname = $row->branch_name;
-				$sales->region = $region;
+				$sales->region = $row->region;
 				$sales->company = $company;
 				$sales->date_sold = $row->date_sold;
 				$sales->si_no = $row->sales_invoice;
