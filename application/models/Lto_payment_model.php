@@ -234,4 +234,30 @@ SQL;
 			order by bcode desc, date_sold desc")->result_object();
 		return $payment;
 	}
+
+        public function extract_to_csv($param) {
+          $extract_csv = $this->db->query("
+              SELECT
+                e.engine_no, e.chassis_no,
+                'Motorcycle without Side Car' as type,
+                CONCAT(b.b_code,' ',b.name) as branchnames,
+                CONCAT(c.last_name,',',c.first_name) as customername
+              FROM
+                tbl_sales s
+              INNER JOIN
+                tbl_engine e ON e.eid = s.engine
+              INNER JOIN
+                tbl_customer c ON c.cid = s.customer
+              LEFT JOIN
+                portal_global_2.tbl_branches b on b.b_code = bcode
+              WHERE
+                s.status = 2 AND LEFT(s.pending_date, 10) BETWEEN '".$param->date_from."'
+                AND '".$param->date_to."' AND s.region = ".$param->region."
+	  	AND left(s.bcode, 1) = '".$param->company."'
+                ORDER BY s.bcode
+          ")->result_array();
+
+          return $extract_csv;
+        }
+
 }

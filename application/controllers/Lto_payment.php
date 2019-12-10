@@ -46,26 +46,17 @@ class Lto_payment extends MY_Controller {
 		$this->template('lto_payment/extract_form', $data);
 	}
 
-	public function csv() {
-		$param = new Stdclass();
-		$param->region = $_SESSION['region'];
-		$param->company = $this->input->post('company');
-		$param->date_from = $this->input->post('date_from');
-		$param->date_to = $this->input->post('date_to');
+        public function csv() {
+          $param = new Stdclass();
+          $param->region = $_SESSION['region'];
+          $param->company = $this->input->post('company');
+          $param->date_from = $this->input->post('date_from');
+          $param->date_to = $this->input->post('date_to');
 
-	  $data['result'] = $this->db->query("select engine_no, chassis_no, 'Motorcycle without Side Car' as type, CONCAT(b.b_code,' ',b.name) as branchnames, CONCAT(c.last_name,',',c.first_name) as customername
-	  	from tbl_sales a
-	  	inner join tbl_engine on eid = engine
-		inner join tbl_customer c on a.customer = c.cid
-		left join portal_global_db.tbl_branches b on b.b_code = bcode
-	  	where status = 2
-	  	and left(pending_date, 10) between '".$param->date_from."' and '".$param->date_to."'
-	  	and a.region = ".$param->region."
-	  	and left(bcode, 1) = '".$param->company."'
-	  	order by a.bcode")->result_array();
-	  $data['param'] = $param;
-		$this->load->view('lto_payment/extract_csv', $data);
-	}
+          $data['result'] = $this->lto_payment->extract_to_csv($param);
+          $data['param'] = $param;
+          $this->load->view('lto_payment/extract_csv', $data);
+        }
 
         public function view($lpid) {
           $payment = $this->lto_payment->load_payment($lpid);
