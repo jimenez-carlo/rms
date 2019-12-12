@@ -29,13 +29,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <div class="control-group">
               <div class="control-label">Type of Sales</div>
               <div class="controls">
-               
+
 		<select id="sales_type" name="sales_type">
 		<option value="0" <?php if($sales->sales_type == 'Brand New (Cash)') echo 'selected'; ?>>Brand New (Cash)</option>
 		<option value="1" <?php if($sales->sales_type == 'Brand New (Installment)') echo 'selected'; ?>>Brand New (Installment)</option>
 		</select>
               </div>
-		
+
             </div>
             <div class="control-group">
               <div class="control-label">Customer Name</div>
@@ -99,9 +99,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="controls">
                 <?php
                 $registration_type = array(
-                  'Regular Regn. Paid' => 'Regular Regn. Paid', 
-                  'With Regn. Subsidy' => 'With Regn. Subsidy', 
-                  'Free Registration' => 'Free Registration', 
+                  'Regular Regn. Paid' => 'Regular Regn. Paid',
+                  'With Regn. Subsidy' => 'With Regn. Subsidy',
+                  'Free Registration' => 'Free Registration',
+                  'Regn. under NIA' => 'Regn. under NIA'
                 );
                 print form_dropdown('registration_type', $registration_type, set_value('registration_type', $sales->registration_type));
                 ?>
