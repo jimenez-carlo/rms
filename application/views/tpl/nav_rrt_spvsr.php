@@ -94,7 +94,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Liquidation <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>liquidation">Liquidation</a>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>liquidation">Monitoring</a>
                                         <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>return_fund">Return Fund</a>
                                     </li>
                                 </ul>
