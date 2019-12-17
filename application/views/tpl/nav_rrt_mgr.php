@@ -27,15 +27,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </li>
                         </ul>
                         <ul class="nav">
-                            <!--li class="dropdown <?php if(isset($nav) && $nav=="confirmation") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Confirmation <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>confirm/fund">Fund</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>confirm/cash_advance">Old RMS</a>
-                                    </li>
-                                </ul>
-                            </li-->
                             <?php
                             $reprint = $topsheet+$rerfo;
                             $reprint = ($reprint == '0') ? '' : '<span class="badge badge-warning">'.$reprint.'</span>';
@@ -69,18 +60,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="bank") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>fund/bank">RRT Bank Accounts</a>
                             </li>
-                            <!-- <li <?php if(isset($nav) && $nav=="report") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>sales/missing_branch">Missing Branches Report</a>
-                            </li>
-                            <li class="dropdown <?php if(isset($nav) && $nav=="report") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Report <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>dashboard">Dashboard</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund/audit">Fund Audit</a>
-                                    </li>
-                                </ul>
-                            </li> -->
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

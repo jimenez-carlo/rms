@@ -27,13 +27,6 @@ class Reprint extends MY_Controller {
     {
       foreach ($approve as $key => $val) {
         $this->topsheet->approve_printing($key,0);
-
-                                /*
-                                $topsheet = $this->db->get_where('tbl_topsheet', array('tid' => $key));
-                                $trans_no = $this->topsheet->get_trans_no($key);
-                                $_SESSION['messages'][] = 'Approve request for reprinting of topsheet '.$trans_no;
-                                $this->login->saveLog('approved reprinting request ['.$trans_no.']');
-                                 */
       }
     }
 

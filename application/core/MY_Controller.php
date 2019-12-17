@@ -120,10 +120,9 @@ class MY_Controller extends CI_Controller {
 				break;
 
 			case 107: // RRT MGR
-				$data['topsheet'] = $this->db->query("select count(*) as count from tbl_topsheet
-					where print = 2")->row()->count;
-				$data['rerfo'] = $this->db->query("select count(*) as count from tbl_rerfo
-					where print = 2")->row()->count;
+                                $regions = ($_SESSION['company'] === '8') ? ' AND region BETWEEN 11 AND 15 ' : ' AND region BETWEEN 1 AND 10';
+				$data['topsheet'] = $this->db->query("SELECT COUNT(*) AS count FROM tbl_topsheet WHERE print = 2 $regions")->row()->count;
+				$data['rerfo'] = $this->db->query("SELECT COUNT(*) AS count FROM tbl_rerfo WHERE print = 2 $regions")->row()->count;
 				$this->load->view('tpl/nav_rrt_mgr', $data);
 				break;
 

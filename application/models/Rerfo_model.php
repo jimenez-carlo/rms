@@ -6,15 +6,14 @@ class Rerfo_model extends CI_Model{
   public function __construct()
   {
     parent::__construct();
-    $this->andCompany = ($this->session->company === '8') ? ' AND company = 8' : ' AND company != 8';
+    $this->andRegion = ($this->session->company === '8') ? ' AND region >= 11' : ' AND region <= 10';
   }
 
   public function list_rerfo($param)
   {
     $date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-3 days')) : $param->date_from;
     $date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
-    $branch = (!empty($param->branch) && is_numeric($param->branch))
-      ? " and r.bcode = '".$param->branch."'" : '';
+    $branch = (!empty($param->branch) && is_numeric($param->branch)) ? " and r.bcode = '".$param->branch."'" : '';
 
     $print = '';
     if (!empty($param->print) && is_numeric($param->print)) {
@@ -152,7 +151,7 @@ class Rerfo_model extends CI_Model{
 
   public function get_rerfo_request()
   {
-    return $this->db->query("select * from tbl_rerfo where print = 2 {$this->andCompany}")->result_object();
+    return $this->db->query("SELECT * FROM tbl_rerfo WHERE print = 2 {$this->andRegion}")->result_object();
   }
 
   public function save_validated($rid, $check)
