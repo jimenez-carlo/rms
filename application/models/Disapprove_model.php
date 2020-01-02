@@ -59,12 +59,14 @@ class Disapprove_model extends CI_Model{
 	public function load_list($param)
 	{
                 /* ---
-                  Position 3 = Accounting | Position 108 = RRT
+                  Position 3 = Accounting | Position 108 = RRT | Position 107 = RRT Manager
                 */
-                if($this->session->position === '3' && $this->session->company !== '8') {
-                  $region = "s.region <= 10";
-                } elseif($this->session->position === '3' && $this->session->company === '8') {
-                  $region = "s.region >= 11";
+                if(in_array($this->session->position, ['3', '107'])) {
+                  if ($this->session->company !== '8') {
+                    $region = "s.region <= 10";
+                  } else {
+                    $region = "s.region >= 11";
+                  }
                 } else {
                   $region = "s.region = '$param->region'";
                 }
