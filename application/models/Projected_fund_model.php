@@ -153,21 +153,49 @@ class Projected_fund_model extends CI_Model{
 
 	public function save_voucher($voucher, $ltid)
 	{
-		$company = $this->db->query("SELECT company FROM tbl_lto_transmittal WHERE ltid in (".$ltid.")")->row();
-                if (!empty($company)) {
-                  $voucher->company = $company->company;
+                $this->db->simple_query('SET SESSION group_concat_max_len=15000');
+                $batch = $this->db->query("
+                  SELECT
+                    GROUP_CONCAT(s.sid SEPARATOR ',') AS sids, lt.company
+                  FROM
+                    tbl_sales s
+                  INNER JOIN
+                    tbl_lto_transmittal lt ON s.lto_transmittal = lt.ltid
+                  WHERE
+                    lt.ltid in (".$ltid.") AND voucher = 0
+                  GROUP BY
+                    lt.company
+                ")->row();
+
+                if (!empty($batch)) {
+                  $voucher->company = $batch->company;
                 }
 
 		$this->db->insert('tbl_voucher', $voucher);
 		$voucher->vid = $this->db->insert_id();
 
-		$this->db->query("update tbl_sales
-			set voucher = ".$voucher->vid."
-			WHERE lto_transmittal in (".$ltid.")");
+                $this->db->query("
+                  UPDATE
+                    tbl_sales
+                  SET
+                    voucher = ".$voucher->vid.",
+                    user = ".$_SESSION['uid']."
+                  WHERE
+                    sid IN (".$batch->sids.")
+                ");
 
-		$fund = $this->db->query("SELECT * FROM tbl_fund WHERE fid = ".$voucher->fund)->row();
+                $fund = $this->db->query("
+                  SELECT
+                    *
+                  FROM
+                    tbl_fund
+                  WHERE
+                    fid = ".$voucher->fund
+                )->row();
+
 		$voucher->region  = $this->region[$fund->region];
 		$voucher->company = $this->company[$fund->company];
+
 		return $voucher;
 	}
 
