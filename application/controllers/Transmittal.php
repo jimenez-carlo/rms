@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Transmittal extends MY_Controller {
-	
-	public function __construct() { 
+
+	public function __construct() {
 		parent::__construct();
 		$this->load->helper('url');
 		$this->load->model('Transmittal_model', 'transmittal');
@@ -16,7 +16,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', './');
 
-		$data['table'] = $this->transmittal->get_rrt_transmittal($_SESSION['region']); 
+		$data['table'] = $this->transmittal->get_rrt_transmittal($_SESSION['region']);
 		$this->template('transmittal/report', $data);
 	}
 
@@ -27,7 +27,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', './../../');
 
-		$data['table'] = $this->transmittal->get_rrt_intransit($bcode); 
+		$data['table'] = $this->transmittal->get_rrt_intransit($bcode);
 		$this->template('transmittal/intransit', $data);
 	}
 
@@ -38,7 +38,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', './../../');
 
-		$data['table'] = $this->transmittal->get_rrt_received($bcode); 
+		$data['table'] = $this->transmittal->get_rrt_received($bcode);
 		$this->template('transmittal/received', $data);
 	}
 
@@ -78,7 +78,7 @@ class Transmittal extends MY_Controller {
 		$this->access(1);
 		$this->header_data('title', 'Transmittal');
 		$this->header_data('nav', 'transmittal');
-		$this->header_data('dir', './../');
+		$this->header_data('dir', base_url());
 
 		$data['table'] = $this->transmittal->get_branch_transmittal($_SESSION['branch']);
 		$this->template('transmittal/branch_list', $data);

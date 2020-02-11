@@ -252,10 +252,9 @@ class Login extends CI_Controller {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
                   return array(
-                    'ulid'				=> $log->ulid,
+                    'ulid'	  => $log->ulid,
                     'uid'         => 0,
                     'username'    => $username,
-                    'password'    => 'dummy',
                     'lastname'    => 'De Vera',
                     'firstname'   => 'Mary Jane',
                     'middlename'  => '',
@@ -265,6 +264,27 @@ class Login extends CI_Controller {
                     'department'  => '0',
                     'sys_access'  => array(),
                     'page_access' => array(),
+                    'company'     => '5'
+                  );
+                }
+
+                if ($username == 'siteadmin-mdi' && $password == '4f24CXrh') {
+                  // for marketing, orcr extract
+                  $log = $this->login->add_user_custom_log($username);
+                  return array(
+                    'ulid'	  => $log->ulid,
+                    'uid'         => 0,
+                    'username'    => $username,
+                    'lastname'    => 'Husain',
+                    'firstname'   => 'Maria Rose Pearl',
+                    'middlename'  => '',
+                    'ext'         => '',
+                    'branch'      => '8000',
+                    'position'    => '-2',
+                    'department'  => '0',
+                    'sys_access'  => array(),
+                    'page_access' => array(),
+                    'company'     => '8'
                   );
                 }
 

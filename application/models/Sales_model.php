@@ -46,14 +46,14 @@ class Sales_model extends CI_Model{
 		$this->load->model('Fund_model', 'fund');
 
 		$this->topsheet_region = $this->reg_code;
-                $this->query = ($_SESSION['company'] != 8) ? ' company != 8 ' : ' company = 8 ';
+                $this->company = ($_SESSION['company'] != 8) ? ' company != 8 ' : ' company = 8 ';
 	}
 
 	public function dd_branches() {
           $result = $this->db->query(
             'SELECT DISTINCT bcode, bname
               FROM tbl_sales
-             WHERE '.$this->query.'ORDER BY bcode'
+             WHERE '.$this->company.'ORDER BY bcode'
           )->result_object();
 
           $branches = array();
@@ -183,20 +183,27 @@ class Sales_model extends CI_Model{
 	public function customer_status_report($param)
 	{
 		$branch = (!empty($param->branch) && is_numeric($param->branch))
-			? " and bcode = '".$param->branch."'" : ''; //'region = '.$param->region;
+			? " AND bcode = '".$param->branch."'" : ''; //'region = '.$param->region;
 		$status = (is_numeric($param->status))
-			? ' and status = '.$param->status : '';
+			? ' AND status = '.$param->status : '';
 		$name = (!empty($param->name))
-			? " and concat(first_name, ' ', last_name) like '%".$param->name."%'" : '';
+			? " AND concat(first_name, ' ', last_name) LIKE '%".$param->name."%'" : '';
 		$engine_no = (!empty($param->engine_no))
-			? " and engine_no like '%".$param->engine_no."%'" : '';
+			? " AND engine_no LIKE '%".$param->engine_no."%'" : '';
 
-		$result = $this->db->query("select * from tbl_sales
-			inner join tbl_engine on engine = eid
-			inner join tbl_customer on customer = cid
-			where 1=1".$branch.$status.$name.$engine_no."
-			AND ".$this->query."order by sid desc
-			limit 1000")->result_object();
+                $result = $this->db->query("
+                  SELECT
+                    *
+                  FROM
+                    tbl_sales
+                  INNER JOIN
+                    tbl_engine ON engine = eid
+                  INNER JOIN
+                    tbl_customer ON customer = cid
+                  WHERE
+                    1=1 ".$branch.$status.$name.$engine_no." AND ".$this->company."
+                  ORDER BY sid DESC LIMIT 1000
+                ")->result_object();
 
 		foreach ($result as $key => $sales)
 		{
