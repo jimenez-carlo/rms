@@ -30,6 +30,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="orcr_extract") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>orcr_extract">ORCR EXTRACT</a>
                             </li>
+                            <li <?php if(isset($nav) && $nav=="sales") echo 'class="active"'; ?>>
+                                <a href="<?php if(isset($dir)) echo $dir; ?>sales">Customer Status</a>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

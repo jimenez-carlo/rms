@@ -243,6 +243,7 @@ class Login extends CI_Controller {
                     'branch'      => '9000',
                     'position'    => '-1',
                     'department'  => '0',
+                    'company'     => '5',
                     'sys_access'  => array(),
                     'page_access' => array(),
                   );
