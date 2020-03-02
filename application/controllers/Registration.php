@@ -171,6 +171,12 @@ class Registration extends MY_Controller {
             $new_sales->registration = $this->input->post('registration');
             $new_sales->da_reason = 11;
             $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
+            $new_da_history = array(
+              'sales_id' => $sales->sid,
+              'da_status_id' => 11,
+              'uid' => $_SESSION['uid']
+            );
+            $this->db->insert('tbl_da_history', $new_da_history);
             break;
 
           case 2: // no si/ar

@@ -37,7 +37,12 @@ class Disapprove extends MY_Controller {
 
     $this->db->trans_start();
     $this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
-    $this->db->insert('tbl_da_history', $this->disapprove->da_status_history($sales->sid));
+    $new_da_history = array(
+      'sales_id' => $sales->sid,
+      'da_status_id' => $sales->da_reason,
+      'uid' => $_SESSION['uid']
+    );
+    $this->db->insert('tbl_da_history', $new_da_history);
     $this->db->trans_complete();
 
     if ($this->db->trans_status() === TRUE) {
@@ -106,4 +111,7 @@ class Disapprove extends MY_Controller {
     }
   }
 
+  public function misc_expense() {
+    var_dump($_POST); die();
+  }
 }
