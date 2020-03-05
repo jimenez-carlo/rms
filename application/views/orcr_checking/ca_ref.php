@@ -3,22 +3,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <form class="form-horizontal" method="post" style="margin:0;">
   <?php
-  print form_hidden('tid', $topsheet->tid);
+  print form_hidden('vid', $ca_ref['vid']);
   print form_hidden('summary', 1);
   ?>
 
   <fieldset>
     <div class="control-group span4">
-      <div class="control-label">Date</div>
-      <div class="controls"><?php print $topsheet->date; ?></div>
+      <div class="control-label" style="padding-top:0">Date</div>
+      <div class="controls"><?php print $ca_ref['date']; ?></div>
     </div>
     <div class="control-group span4">
-      <div class="control-label">Region</div>
-      <div class="controls"><?php print $topsheet->region; ?></div>
+      <div class="control-label" style="padding-top:0">Region</div>
+      <div class="controls"><?php print $ca_ref['region']; ?></div>
     </div>
     <div class="control-group span4">
-      <div class="control-label">Company</div>
-      <div class="controls"><?php print $topsheet->company; ?></div>
+      <div class="control-label" style="padding-top:0">Company</div>
+      <div class="controls"><?php print $ca_ref['company']; ?></div>
     </div>
   </fieldset>
 
@@ -32,11 +32,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p>Type of Sales</p></th>
         <th><p>Registration Type</p></th>
         <th><p>Reference #</p></th>
-        <th><p>CA Ref #</p></th>
         <th><p class="text-right">Amount Given</p></th>
         <th><p class="text-right">LTO Registration</p></th>
         <th><p class="text-right">Total Expense</p></th>
         <th><p class="text-right">Balance</p></th>
+        <th><p>Status</p></th>
+        <th><p>Disapprove</p></th>
       </tr>
     </thead>
     <tbody>
@@ -44,26 +45,34 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       $total_amt = 0;
       $total_exp = 0;
 
-      foreach ($topsheet->sales as $sales)
+      foreach (json_decode($ca_ref['sales']) as $sales)
       {
-        $sales->amount = ($sales->registration_type == 'Free Registration' || stripos($sales->registration_type, 'subsidy') !== false) ? 1500 : $sales->amount;
+        $sales->amount = ($sales->registration_type == 'Free Registration' || stripos($sales->registration_type, 'subsidy') !== false) ? 900 : $sales->amount;
+        $clickable = ($sales->status === 'Registered') ? 'onclick="attachment('.$sales->sid.', 1)"' : '';
+        if ($sales->disapprove === null) {
+          $disapprove = '<td class="text-success">Ok</td>';
+        } elseif ($sales->disapprove === 'Resolved') {
+          $disapprove = '<td class="text-success">'.$sales->disapprove.'</td>';
+        } else {
+          $disapprove = '<td class="text-error">'.$sales->disapprove.'</td>';
+        }
 
-        print '<tr class="sales-'.$sales->sid.'" onclick="attachment('.$sales->sid.', 1)">';
+        print '<tr class="sales-'.$sales->sid.'" '.$clickable.'>';
         print '<td>';
         print '<input type="hidden" name="sid[]" value="'.$sales->sid.'" disabled>';
         print $sales->bcode.' '.$sales->bname;
         print '</td>';
-
         print '<td>'.$sales->date_sold.'</td>';
         print '<td>'.$sales->engine_no.'</td>';
         print '<td>'.$sales->sales_type.'</td>';
         print '<td>'.$sales->registration_type.'</td>';
         print '<td>'.$sales->ar_no.'</td>';
-        print '<td>'.$sales->reference.'</td>';
         print '<td><p class="text-right sales-amt">'.number_format($sales->amount, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right sales-exp">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->amount - $sales->registration, 2, ".", ",").'</p></td>';
+        print '<td>'.$sales->status.'</td>';
+        print $disapprove;
         print '</tr>';
         $total_amt += $sales->amount;
         $total_exp += $sales->registration;
@@ -71,40 +80,48 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
       // Miscellaneous
       print '<tr style="border-top: double">';
-      print '<th><p>CA Ref #</p></th>';
       print '<th colspan="3"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
       print '<th colspan="3"><p class="text-right">Expense</p></th>';
-      print '<th><p class="text-right">Status</p></th>';
+      print '<th colspan="2"><p class="text-right">Status</p></th>';
       print '</tr>';
 
-      foreach ($topsheet->misc as $misc)
+      $misc_expenses = json_decode($ca_ref['misc_expense']);
+      foreach ($misc_expenses as $misc)
       {
-        print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
-        print '<td>'.$misc->reference.'</td>';
-        print '<td colspan="3">';
-        print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
-        print $misc->or_no;
-        print '</td>';
-
-        print '<td colspan="2">'.$misc->or_date.'</td>';
-        print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
-        print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
-        print '<td><p class="text-right">'.$misc->status.'</p></td>';
-        print '</tr>';
-        $total_exp += $misc->amount;
+        if ($misc->mid !== NULL) {
+          $text_color = (in_array($misc->status, array('Approved', 'Resolved'))) ? 'text-success' : 'text-error';
+          print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
+          print '<td colspan="3">';
+          print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
+          print $misc->or_no;
+          print '</td>';
+          print '<td colspan="2">'.$misc->or_date.'</td>';
+          print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
+          print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
+          print '<td colspan="2"><p class="text-right '.$text_color.'">'.$misc->status.'</p></td>';
+          print '</tr>';
+          $total_exp += $misc->amount;
+        } else {
+          print '<tr>';
+          print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
+          print '<td colspan="2"></td>';
+          print '<td colspan="2"></td>';
+          print '<td colspan="3"></td>';
+          print '</tr>';
+        }
       }
 
-      if (empty($topsheet->misc))
-      {
-        print '<tr>';
-        print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
-        print '<td colspan="2"></td>';
-        print '<td colspan="2"></td>';
-        print '<td colspan="3"></td>';
-        print '</tr>';
-      }
+      //if ($miscs))
+      //{
+      //  print '<tr>';
+      //  print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
+      //  print '<td colspan="2"></td>';
+      //  print '<td colspan="2"></td>';
+      //  print '<td colspan="3"></td>';
+      //  print '</tr>';
+      //}
       ?>
     </tbody>
     <tfoot style="border-top: dotted gray; font-size: 16px">
@@ -148,20 +165,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title">View attachment asdasdads</h3>
+        <h3 class="modal-title">View attachment</h3>
       </div>
       <div class="modal-body form" style="max-height: 430px;">
-        <div>asdasdasd</div>
         <div class="alert alert-error hide">
           <button class="close" data-dismiss="alert">&times;</button>
           <div class="error"></div>
         </div>
-        <div class="form-body">
+        <div class="form-body" style="height: 430px;">
           <!-- see attachment.php -->
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" onclick="for_upload(1)" class="btn btn-success include">Include For Upload</button>
+        <button id="include_for_upload" type="button" onclick="for_upload(1)" class="btn btn-success include">Include For Upload</button>
         <button type="button" onclick="for_upload(-1)" class="btn btn-success exclude">Exclude For Upload</button>
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
       </div>
@@ -190,7 +206,10 @@ function attachment(_id, _type) {
     dataType: "JSON",
     success: function(data)
     {
-      $('.form-body').html(data); // reset form on modals
+      //console.log(data.page);
+      //console.log(data.disable);
+      $('.form-body').html(data.page); // reset form on modals
+      $("#include_for_upload").prop("disabled", data.disable);
       $('#modal_form').modal('show'); // show bootstrap modal
     },
     error: function (jqXHR, textStatus, errorThrown)

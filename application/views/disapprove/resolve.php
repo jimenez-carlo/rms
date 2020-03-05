@@ -121,7 +121,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         dataType: "JSON",
         success: function(data)
         {
-          $(".form-body").html(data);
+          $(".form-body").html(data.page);
 	  $("#modal_form").modal("show");
         },
         error: function (jqXHR, textStatus, errorThrown)

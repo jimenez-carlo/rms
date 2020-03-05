@@ -291,9 +291,7 @@ SQL;
 		//exit;
 
                 foreach ($result as $row) {
-
                   $expense = $dev_ces2->query("SELECT rec_no, custcode FROM rms_expense WHERE engine_num = '{$row->engine_no}'")->row();
-
                   if (empty($expense)) {
                     $expense = new Stdclass();
                     $expense->nid = 0;
@@ -314,7 +312,6 @@ SQL;
                     if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
                     if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
                     $dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
-
                   }
                   $rows++;
                 }

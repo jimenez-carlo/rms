@@ -2,20 +2,20 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <form class="form-horizontal" method="post" style="margin:0;">
-  <?php print form_hidden('tid', $topsheet->tid); ?>
+  <?php print form_hidden('vid', $ca_ref['reference']); ?>
 
   <fieldset>
     <div class="control-group span4">
       <div class="control-label">Date</div>
-      <div class="controls"><?php print $topsheet->date; ?></div>
+      <div class="controls"><?php print $ca_ref['date']; ?></div>
     </div>
     <div class="control-group span4">
       <div class="control-label">Region</div>
-      <div class="controls"><?php print $topsheet->region; ?></div>
+      <div class="controls"><?php print $ca_ref['region']; ?></div>
     </div>
     <div class="control-group span4">
       <div class="control-label">Company</div>
-      <div class="controls"><?php print $topsheet->company; ?></div>
+      <div class="controls"><?php print $ca_ref['company']; ?></div>
     </div>
   </fieldset>
 
@@ -40,7 +40,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       $total_amt = 0;
       $total_exp = 0;
 
-      foreach ($topsheet->sales as $sales)
+      foreach (json_decode($ca_ref['sales']) as $sales)
       {
         print '<tr class="sales-'.$sales->sid.'" onclick="attachment('.$sales->sid.', 1)">';
         print '<td>';
@@ -68,9 +68,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
       print '<th colspan="3"><p class="text-right">Expense</p></th>';
-      print '</tr>'; 
+      print '</tr>';
 
-      foreach ($topsheet->misc as $misc)
+      foreach (json_decode($ca_ref['misc_expense']) as $misc)
       {
         print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
         print '<td colspan="3">';
@@ -85,7 +85,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         $total_exp += $misc->amount;
       }
 
-      if (empty($topsheet->misc))
+      if (empty($ca_ref['misc_expense']))
       {
         print '<tr>';
         print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';

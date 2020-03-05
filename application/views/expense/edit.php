@@ -15,6 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
           <fieldset class="span4">
             <?php
+              echo form_input('status', $status, array('class' => 'hide'));
               echo '<div class="control-group">';
               echo form_label('Reference # (SI/OR)', 'or_no', array('class' => 'control-label'));
               echo '<div class="controls">';
@@ -54,6 +55,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo '<div class="control-group">';
               echo form_label('Remarks', 'remarks', array('class' => 'control-label'));
               echo '<div class="controls">';
+
               echo '<textarea name="remarks">'.$misc->remarks.'</textarea>';
               echo '</div></div>';
             ?>
@@ -72,7 +74,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<div class="attachment temp" style="position:relative">';
                 print form_hidden('files[]', $file);
 
-                $path = '/rms_dir/misc/'.$misc->mid.'/'.$file;
+                $path = base_url().'rms_dir/misc/'.$misc->mid.'/'.$file;
                 print '<img src="'.$path.'" style="margin:5px; border:solid">';
 
                 print '<a href="#" style="background:#BDBDBD; color:black; padding:0.5em; position:absolute; top: 5px">X</a>';
@@ -109,8 +111,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               </div>
             </div>
             <div class="form-actions">
-              <input type="submit" name="upload" value="Upload" class="btn btn-success">
-              <!-- <a class="btn btn-success" onclick="upload()">Upload</a> -->
+              <!-- <input type="submit" name="upload" value="Upload" class="btn btn-success"> -->
+              <a class="btn btn-success" onclick="upload()">Upload</a>
             </div>
           </div>
         </form>

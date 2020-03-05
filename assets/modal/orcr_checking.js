@@ -1,4 +1,3 @@
-
 var sid;
 
 function hold(_sid)
@@ -37,7 +36,7 @@ function save_hold()
         $('#modal_form').modal('hide');
         location.reload();
       }
-      else 
+      else
       {
         $(".alert-error").removeClass("hide");
         $(".error").html("");
@@ -58,18 +57,18 @@ $(function(){
     var index = $(this).index()+1;
     $(".tbl-sales tbody tr:eq("+index+")").removeClass("hide");
   });
-  
+
   $(".tbl-sales tbody tr.attachments .close").click(function(){
     $(this).closest("tr").addClass("hide");
   });
-  
+
   $(".misc-hold").click(function(){
     $(this).addClass("hide");
     $(".misc-cancel").removeClass("hide");
     $(".new-remarks").removeClass("hide");
     $("input[name=misc_save]").removeClass("hide");
   });
-  
+
   $(".misc-cancel").click(function(){
     $(".misc-hold").removeClass("hide");
     $(this).addClass("hide");

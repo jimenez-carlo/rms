@@ -24,8 +24,6 @@ class MY_Controller extends CI_Controller {
                 15 => 'Region XIII'
         );
 
-
-
 	public $reg_code = array(
 		1 => 'NCR',
 		2 => 'R1',

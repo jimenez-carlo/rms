@@ -19,12 +19,35 @@ class Orcr_checking_model extends CI_Model{
 		parent::__construct();
                 if ($_SESSION['company'] != 8) {
                   $this->companyQry = ' AND t.company != 8';
+                  $this->andSalesCompany = ' AND s.company != 8';
                 } else {
                   $this->region  = $this->mdi_region;
                   $this->company = $this->mdi;
                   $this->companyQry = ' AND t.company = 8';
+                  $this->andSalesCompany = ' AND s.company = 8';
                 }
 	}
+
+        public function get_ca_for_checking()
+        {
+          //SELECT
+          //	v.reference
+          //FROM
+          //    `tbl_sales` `s`
+          //        LEFT JOIN
+          //    `tbl_voucher` `v` ON `v`.`vid` = `s`.`voucher`
+          //WHERE
+          //    `s`.`status` = 4 AND s.company != 8 AND v.vid IS NOT NULL
+          //GROUP BY v.reference, s.region
+          //ORDER BY s.region ASC;
+          $this->db->select('v.vid, v.reference');
+          $this->db->from('tbl_voucher v');
+          $this->db->join('tbl_sales s','v.vid = s.voucher AND v.vid = s.fund', 'inner');
+          $this->db->where('s.status = 4 '.$this->andSalesCompany.' AND v.vid IS NOT NULL');
+          $this->db->group_by(array('v.vid', 's.region'));
+          $this->db->order_by('s.region ASC, v.reference DESC');
+          return $this->db->get()->result_array();
+        }
 
 	public function get_list_for_checking($date)
 	{
@@ -53,14 +76,85 @@ class Orcr_checking_model extends CI_Model{
 		return $result;
 	}
 
+        public function load_ca($data)
+        {
+
+          $vid = $data['vid'];
+          $sid = (!empty($data['sid'])) ? ' AND s.sid IN ('.implode(',', $data['sid']).')' : '';
+          $mid = (!empty($data['mid'])) ? ' AND m.mid in ('.implode(',', $data['mid']).')' : '';
+          // 'Brand New (Cash)',
+          // 'Brand New (Installment)'
+          $sql = <<<SQL
+            SELECT
+              vid, fund, date,
+              reference, voucher_no, dm_no,
+              amount, transfer_date, process_date,
+              offline, voucher_status, process_timestamp,
+              transfer_timestamp, region, company,
+              CONCAT('[', GROUP_CONCAT(DISTINCT misc_expense ORDER BY mid SEPARATOR ','), ']') AS misc_expense, sales
+            FROM (
+              SELECT
+                v.vid, v.fund, SUBSTR(v.date, 1, 10) AS date, v.reference,
+                v.voucher_no, v.dm_no, v.amount, v.transfer_date,
+                v.process_date, v.offline, v.status AS voucher_status, v.process_timestamp,
+                v.transfer_timestamp, r.region, c.company_code AS company, m.mid,
+                CONCAT(
+                  '[',
+                    GROUP_CONCAT(
+                      JSON_OBJECT(
+                        'sid', s.sid, 'engine_no', e.engine_no,
+                        'bcode', s.bcode, 'bname', s.bname,
+                        'date_sold', SUBSTR(s.date_sold, 1, 10), 'sales_type', st.sales_type, 'registration_type', s.registration_type,
+                        'si_no', s.si_no, 'ar_no', s.ar_no, 'amount', s.amount,
+                        'insurance', s.insurance, 'registration', s.registration,
+                        'status', ss.status, 'disapprove', ds.da_status
+                      )
+                      ORDER BY FIELD(s.status, 4, 5, 3, 2, 1, 0), FIELD(s.da_reason, 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+                      SEPARATOR ','
+                    ),
+                    ']'
+                ) AS sales,
+                JSON_OBJECT(
+                  'mid', m.mid, 'region', m.region, 'date', m.date,
+                  'or_no', m.or_no, 'or_date', SUBSTR(m.or_date, 1, 10), 'amount', m.amount,
+                  'type', mt.type, 'remarks', mxh1.remarks, 'status', ms.status_name,
+                  'other', m.other, 'topsheet', m.topsheet, 'batch', m.batch, 'ca_ref', m.ca_ref
+                ) AS misc_expense
+              FROM tbl_voucher v
+              LEFT JOIN tbl_fund f ON v.fund = f.fid
+              LEFT JOIN tbl_region r ON f.region = r.rid
+              LEFT JOIN tbl_company c ON v.company = c.cid
+              LEFT JOIN tbl_misc m ON v.vid = m.ca_ref
+              LEFT JOIN tbl_misc_type mt ON m.type = mt.mtid
+              LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+              LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+	      LEFT JOIN tbl_misc_status ms ON mxh1.status = ms.id
+              LEFT JOIN tbl_sales s ON s.voucher = v.vid
+              LEFT JOIN tbl_sales_status ss ON s.status = ss.ssid
+              LEFT JOIN tbl_sales_type st ON s.sales_type = st.stid
+              LEFT JOIN tbl_da_status ds ON s.da_reason = ds.id
+              LEFT JOIN tbl_engine e ON e.eid = s.engine
+              WHERE v.vid = $vid $sid $mid AND (ms.id IN (2,5,6) OR m.mid IS NULL) AND mxh2.mid IS NULL
+              GROUP BY v.vid , v.fund , v.date , v.reference , v.voucher_no , v.dm_no , v.amount , v.transfer_date,
+                       v.process_date , v.offline , v.status , v.process_timestamp , v.transfer_timestamp , r.region,
+                       v.company, m.mid, mxh1.id
+            ) AS first_select
+            GROUP BY vid, fund, date, reference, voucher_no, dm_no, amount, transfer_date, process_date,
+                     offline, voucher_status, process_timestamp, transfer_timestamp, company, sales
+SQL;
+          $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
+          $result =  $this->db->query($sql)->result_array();
+
+          return $result[0];
+        }
+
 	public function load_topsheet($data)
 	{
 		$sid = (!empty($data['sid'])) ? ' and sid in ('.implode(',', $data['sid']).')' : '';
 		$mid = (!empty($data['mid'])) ? ' and mid in ('.implode(',', $data['mid']).')' : '';
 		$mid = (!empty($data['summary']) && empty($mid)) ? ' and 1 = 2' : $mid;
 
-		$topsheet = $this->db->query("select * from tbl_topsheet
-			where tid = ".$data['tid'])->row();
+		$topsheet = $this->db->query("SELECT * FROM tbl_topsheet WHERE tid = ".$data['tid'])->row();
 		$topsheet->region  = $this->region[$topsheet->region];
 		$topsheet->company = $this->company[$topsheet->company];
 		$topsheet->date = substr($topsheet->date, 0, 10);
@@ -68,20 +162,22 @@ class Orcr_checking_model extends CI_Model{
 		$topsheet->total_expense = 0;
 		$topsheet->total_credit = 0;
 		$topsheet->check = 0;
-
                 $topsheet->sales = $this->db->query("
-                        select *,
-			case when registration_type = 'Free Registration' then si_no
-				when registration_type = 'With Regn. Subsidy' then concat(si_no, '<br>', ar_no)
-				else ar_no end as ar_no
-			from tbl_sales
-			inner join tbl_engine on engine = eid
-			inner join tbl_customer on customer = cid
-			where topsheet = ".$topsheet->tid."
-			and batch = 0
-			and da_reason <= 0
-			".$sid."
-			order by bcode")->result_object();
+                  SELECT
+                    *,
+                    CASE
+                      WHEN registration_type = 'Free Registration' THEN si_no
+		      WHEN registration_type = 'With Regn. Subsidy' then concat(si_no, '<br>', ar_no)
+                      ELSE ar_no
+                    END as ar_no
+                    ,tbl_voucher.reference
+		  FROM tbl_sales
+		  INNER JOIN tbl_engine on engine = eid
+		  INNER JOIN tbl_customer on customer = cid
+		  INNER JOIN tbl_voucher on vid = tbl_sales.fund
+		  WHERE topsheet = ".$topsheet->tid." AND batch = 0 AND da_reason <= 0 ".$sid."
+                  ORDER by reference DESC, bcode ASC
+                ")->result_object();
 		foreach ($topsheet->sales as $key => $sales)
 		{
 			$sales->date_sold = substr($sales->date_sold, 0, 10);
@@ -93,12 +189,27 @@ class Orcr_checking_model extends CI_Model{
 		}
 
 		$this->load->model('Expense_model', 'misc');
-		$topsheet->misc = $this->db->query("select *,
-				left(or_date, 10) as or_date
-			from tbl_misc
-			where topsheet = ".$topsheet->tid."
-			and batch = 0
-			".$mid)->result_object();
+                $topsheet->misc = $this->db->query("
+                        SELECT
+                          *
+			  ,LEFT(or_date, 10) as or_date
+                          ,v.reference
+                          ,CASE
+                            m.status
+                            WHEN 0 THEN 'For Approval'
+		            WHEN 1 THEN 'Rejected'
+		            WHEN 2 THEN 'Approved'
+		            WHEN 3 THEN 'For Liquidation'
+		            WHEN 4 THEN 'Liquidated'
+                          END AS status
+                        FROM
+                          tbl_misc m
+                        INNER JOIN
+                          tbl_voucher v ON v.vid = m.ca_ref
+                        WHERE
+                          topsheet = ".$topsheet->tid."
+                        AND batch = 0 ".$mid
+                )->result_object();
 		foreach ($topsheet->misc as $misc)
 		{
 			$misc->or_date = substr($misc->or_date, 0, 10);
@@ -139,7 +250,22 @@ class Orcr_checking_model extends CI_Model{
 
 	public function misc_attachment($mid)
 	{
-		$misc = $this->db->query("select * from tbl_misc where mid = ".$mid)->row();
+                $misc = $this->db->query("
+                  SELECT
+                    m.mid, m.region, m.date, m.or_no, m.or_date,
+                    m.amount, m.offline, m.other, m.topsheet, m.batch,
+                    m.ca_ref, mxh.*, mt.type, v.reference
+                  FROM
+                    tbl_misc m
+                  INNER JOIN
+                    tbl_voucher v ON v.vid = m.ca_ref
+                  INNER JOIN
+                    tbl_misc_expense_history mxh USING (mid)
+                  INNER JOIN
+                    tbl_misc_type mt ON m.type = mt.mtid
+                  WHERE
+                    mid = $mid AND mxh.id = (SELECT MAX(id) FROM tbl_misc_expense_history WHERE mid = $mid)
+                ")->row();
 
 		$this->load->helper('directory');
 		$folder = './rms_dir/misc/'.$misc->mid.'/';

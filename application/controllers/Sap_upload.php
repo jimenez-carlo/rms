@@ -25,6 +25,7 @@ class Sap_upload extends MY_Controller {
 		}
 
 		$data['table'] = $this->batch->list_for_upload();
+                var_dump($this->db->last_query()); die();
 		$this->template('sap_upload/list', $data);
 	}
 

@@ -1,7 +1,7 @@
 function upload()
 {
-	$(".messages").remove();
-	
+  $(".messages").remove();
+
   $.ajax({
     url : "upload",
     type: "POST",
@@ -18,13 +18,13 @@ function upload()
       	$(".attachments").html("");
       	$(".attachments").html(attachment);
 
-				$(".attachment-block").addClass("span8");
-	      $(".sales-block").removeClass("hide");
+        $(".attachment-block").addClass("span8");
+        $(".sales-block").removeClass("hide");
       }
-      else 
+      else
       {
         $("body").prepend(data.message);
-      }	
+      }
     },
     error: function (jqXHR, textStatus, errorThrown)
     {
@@ -52,7 +52,7 @@ $(function(){
 		$(".attachment-block").addClass("span8");
 		$(".sales-block").removeClass("hide");
 	}
-	
+
 	$("#save").on("click", function() {
 		 return confirm('Are you sure you want to save?');
 	});

@@ -17,6 +17,7 @@ class Orcr_checking extends MY_Controller {
 		$this->header_data('dir', './');
 
 		$data['tid'] = $this->input->post('tid');
+		$data['vid'] = $this->input->post('vid');
 		$data['sid'] = $this->input->post('sid');
 		$data['mid'] = $this->input->post('mid');
 		$data['summary'] = $this->input->post('summary');
@@ -32,15 +33,28 @@ class Orcr_checking extends MY_Controller {
                   $data['mid'] = null;
 		}
 
-                if (!empty($data['tid'])) {
-                  $topsheet = $this->orcr_checking->load_topsheet($data);
-                  $data['topsheet'] = $topsheet;
-
-                  $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/topsheet';
+                if (!empty($data['vid'])) {
+                  $data['ca_ref']  = $this->orcr_checking->load_ca($data);
+                  //echo '<pre>';
+                  //print_r($data['ca_ref']['sales']); exit;
+                  //var_dump(json_decode($data['ca_ref']['sales'])); die();
+                  $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/ca_ref';
                   $data['view'] = $this->load->view($view, $data, TRUE);
                 }
 
-		$data['table'] = $this->orcr_checking->get_list_for_checking("");
+                //if (!empty($data['tid'])) {
+                //  $topsheet = $this->orcr_checking->load_topsheet($data);
+                //  $data['topsheet'] = $topsheet;
+                //  // echo '<pre>';
+                //  // print_r($data['topsheet']); die();
+
+                //  $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/topsheet';
+                //  $data['view'] = $this->load->view($view, $data, TRUE);
+                //}
+
+                $data['ca_refs'] = $this->orcr_checking->get_ca_for_checking();
+                // var_dump($data['ca_refs']); die();
+		// $data['table'] = $this->orcr_checking->get_list_for_checking("");
 		$this->template('orcr_checking/list', $data);
 	}
 
@@ -53,15 +67,17 @@ class Orcr_checking extends MY_Controller {
 		{
 			case 1:
 				$data['sales'] = $this->orcr_checking->sales_attachment($id);
-				$view = $this->load->view('orcr_checking/sales_attachment', $data, TRUE);
+				$response['page'] = $this->load->view('orcr_checking/sales_attachment', $data, TRUE);
+                                $response['disable'] = (!in_array($data['sales']->da_reason, array(0,11))) ? true : false;
 				break;
 			case 2:
 				$data['misc'] = $this->orcr_checking->misc_attachment($id);
-				$view = $this->load->view('orcr_checking/misc_attachment', $data, TRUE);
+				$response['page'] = $this->load->view('orcr_checking/misc_attachment', $data, TRUE);
+				$response['disable'] = ($data['misc']->status == 5) ? true : false;
 				break;
 		}
 
-		echo json_encode($view);
+		echo json_encode($response);
 	}
 
 	public function save($data)

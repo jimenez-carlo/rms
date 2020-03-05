@@ -112,6 +112,6 @@ class Disapprove extends MY_Controller {
   }
 
   public function misc_expense() {
-    var_dump($_POST); die();
+    $this->disapprove->da_misc_expense($this->input->post());
   }
 }

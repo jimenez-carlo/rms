@@ -33,10 +33,7 @@ class Expense extends MY_Controller {
 		$param->date_from = $this->input->post('date_from');
 		$param->date_to = $this->input->post('date_to');
 		$param->type = $this->input->post('type');
-		$param->status = $this->input->post('status');
-		
-		$param->status = (empty($param->status) && !is_numeric($param->status))
-			? $data['default_status'] : $param->status;
+		$param->status = (empty($this->input->post('status')) && !is_numeric($this->input->post('status'))) ? $data['default_status'] : $this->input->post('status');
 
 		$data['table'] = $this->expense->list_misc($param);
 		$data['type'] = $this->expense->type;
@@ -65,13 +62,14 @@ class Expense extends MY_Controller {
 		}
 
 		$reference = array('0' => '- select a reference -');
-		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region'])->result_object();
+		$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region']." ORDER BY vid DESC")->result_object();
 		foreach ($result as $row) {
 			$reference[$row->vid] = $row->reference;
 		}
 		$data['reference'] = $reference;
 
 		$data['type'] = $this->expense->type;
+                $data['status'] = 0; // For Approval
 		$this->template('expense/add', $data);
 	}
 
@@ -79,7 +77,7 @@ class Expense extends MY_Controller {
 	{
 		$this->load->model('File_model', 'file');
 		$file = $this->file->upload_single();
-		
+
 		if (!empty($file))
 		{
 			echo json_encode(array("status" => TRUE, "file" => $file));
@@ -132,7 +130,6 @@ class Expense extends MY_Controller {
 		$misc->type = $this->input->post('type');
 		$misc->other = $this->input->post('other');
 		$misc->ca_ref = $this->input->post('ca_ref');
-		$misc->remarks = $this->input->post('remarks');
 
 		if (empty($misc->mid)) {
 			$this->db->insert('tbl_misc', $misc);
@@ -141,6 +138,14 @@ class Expense extends MY_Controller {
 		else {
 			$this->db->update('tbl_misc', $misc, array('mid' => $misc->mid));
 		}
+
+                $history = array(
+                  'mid' => $misc->mid,
+                  'remarks' => $this->input->post('remarks'),
+                  'status' => $this->input->post('status'),
+                  'uid' => $_SESSION['uid']
+                );
+                $this->db->insert('tbl_misc_expense_history', $history);
 
 		$files = $this->input->post('files');
 		$files = (empty($files)) ? array() : $files;
@@ -193,14 +198,15 @@ class Expense extends MY_Controller {
 		}
 
 		$reference = array('0' => '- select a reference -');
-		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region'])->result_object();
+		$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region'])->result_object();
 		foreach ($result as $row) {
 			$reference[$row->vid] = $row->reference;
 		}
+
 		$data['reference'] = $reference;
-		
 		$data['misc'] = $this->expense->edit_misc($mid);
 		$data['type'] = $this->expense->type;
+		$data['status'] = ($data['misc']->status == 5) ? 6 : 0; // For Approval or Approved
 		$this->template('expense/edit', $data);
 	}
 
@@ -209,7 +215,13 @@ class Expense extends MY_Controller {
 		$mid = $this->input->post('mid');
 		if (empty($mid)) redirect('expense');
 
-		$this->db->query("update tbl_misc set status = 2 where mid = ".$mid);
+                $status = 2;
+		$this->db->query("update tbl_misc set status = ".$status." where mid = ".$mid);
+                $history = array(
+                  'mid' => $mid,
+                  'status' => $status
+                );
+                $this->db->insert('tbl_misc_expense_history', $history);
 		$misc = $this->db->query("select * from tbl_misc where mid = ".$mid)->row();
 
 		$this->db->query("update tbl_fund set cash_on_hand = cash_on_hand - ".$misc->amount." where fid = ".$misc->region);
@@ -227,6 +239,12 @@ class Expense extends MY_Controller {
 		$misc->reason = $this->input->post('reason');
 		$misc->status = 1;
 		$this->db->update('tbl_misc', $misc, array('mid' => $mid));
+                $history = array(
+                  'mid' => $mid,
+                  'remarks' => $misc->reason,
+                  'status' => $misc->status
+                );
+                $this->db->insert('tbl_misc_expense_history', $history);
 		$misc = $this->db->query("select or_no from tbl_misc where mid = ".$mid)->row();
 
 		$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was updated successfully'.
@@ -268,7 +286,7 @@ class Expense extends MY_Controller {
 				$reference[$row->vid] = $row->reference;
 			}
 			$data['reference'] = $reference;
-			
+
 			$data['misc'] = $this->expense->edit_misc($mid);
 			$data['type'] = $this->expense->type;
 			$data['status'] = $this->expense->status;

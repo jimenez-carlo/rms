@@ -85,7 +85,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     print '<div id="da_group" class="control-group">';
     print '<div class="control-label"></div>';
     print '<div class="controls">';
-    print '<a class="btn btn-success trigger">Disapprove</a>';
+    print '<a class="btn btn-warning trigger">Disapprove</a>';
     print form_dropdown('da_reason', $da_reason, 0, array('data-sid' => $sales->sid, 'class' => 'hide'));
     print '<a class="btn btn-success save hide">Save</a>';
     print '<p class="hide"></p>';
@@ -114,17 +114,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script type="text/javascript">
 $(function(){
   $(document).ready(function(){
-        $(".details").attr("style", "position:fixed; top:20%;");
-        $(".attachments").attr("style", "margin-left:30%");
+    $(".details").attr("style", "position:fixed; top:20%;");
+    $(".attachments").attr("style", "margin-left:30%");
 
     $('.modal-body').on("scroll", function(){
       if ($(this).scrollTop() > 50) {
         $(".details").attr("style", "position:fixed; top:20%;");
         $(".attachments").attr("style", "margin-left:30%");
-      }
-      else {
-        // $(".details").removeAttr("style");
-        // $(".attachments").removeAttr("style");
       }
     });
 

@@ -16,10 +16,3 @@ $('input[type=checkbox]').on('click', function(){
   });
 });
 
-
-$(document).ready(function(){
-  console.log('test');
-});
-
-
-
