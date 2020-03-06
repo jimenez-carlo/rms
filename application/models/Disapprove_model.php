@@ -37,14 +37,27 @@ class Disapprove_model extends CI_Model{
 
 	public function branch_list($param)
 	{
-                $region = ($this->session->position === '3') ? '> 0' : "= '$param->region'";
+                switch ($this->session->position_name) {
+                  case 'Accounts Payable Clerk':
+                  case 'RRT National Registration Manager':
+                    $condition = ($this->session->company_code === 'MDI') ? 'bcode >= 8000 AND da_reason > 0' : ' bcode < 8000 AND da_reason > 0';
+                    break;
+                  case 'RRT Supervisor':
+                  case 'RRT Branch Secretary':
+                    $condition = "region = '$param->region' AND da_reason > 0";
+                    break;
+                  default:
+                    $condition = 'bcode = '.$this->session->branch_code;
+                    break;
+                }
+
                 $result = $this->db->query("
                   SELECT
                     DISTINCT bcode, bname
                   FROM
                     tbl_sales
                   WHERE
-                    region $region AND da_reason > 0
+                    $condition
                   ORDER BY bcode
                 ")->result_object();
 
@@ -58,20 +71,24 @@ class Disapprove_model extends CI_Model{
 
 	public function load_list($param)
 	{
-                /* ---
-                  Position 3 = Accounting | Position 108 = RRT | Position 107 = RRT Manager
-                */
-                if(in_array($this->session->position, ['3', '107'])) {
-                  if ($this->session->company !== '8') {
-                    $region = "s.region <= 10";
-                  } else {
-                    $region = "s.region >= 11";
-                  }
-                } else {
-                  $region = "s.region = '$param->region'";
-                }
-
 		$branch = (empty($param->branch))  ? "" : " AND s.bcode = '$param->branch'";
+                $da_status = 'AND s.da_reason > 0 AND s.da_reason != 11';
+
+                switch ($this->session->position_name) {
+                  case 'Accounts Payable Clerk':
+                  case 'RRT National Registration Manager':
+                    $condition = ($this->session->company_code === 'MDI') ? 's.bcode >= 8000' : 's.bcode < 8000';
+                    break;
+                  case 'RRT Supervisor':
+                  case 'RRT Branch Secretary':
+                    $condition = "s.region = '$param->region'";
+                    break;
+                  default:
+                    $condition = 's.bcode = '.$this->session->branch_code;
+                    $da_status = 'AND s.da_reason IN(2,3,10)';
+                    $branch = '';
+                    break;
+                }
 
                 return $this->db->query("
                   SELECT
@@ -85,8 +102,7 @@ class Disapprove_model extends CI_Model{
                   INNER JOIN
                     tbl_topsheet t ON topsheet = tid
                   WHERE
-                    {$region} {$branch}
-                    AND s.da_reason > 0 AND s.da_reason != 11
+                    {$condition} {$branch} {$da_status}
 		  ORDER BY s.bcode")->result_object();
 	}
 

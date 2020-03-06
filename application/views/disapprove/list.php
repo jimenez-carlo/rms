@@ -9,6 +9,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <div class="pull-left">Disapprove List</div>
       </div>
       <div class="block-content collapse in">
+        <?php if(!in_array($this->session->position_name, array('Branch Secretary', 'Branch Head1', 'Cash Custodian'))): ?>
       	<form class="form-horizontal" method="post">
       		<div class="control-group span5">
       			<div class="control-label">Branch</div>
@@ -21,6 +22,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       			<input type="submit" name="search" value="Search" class="btn btn-success">
       		</div>
       	</form>
+        <?php endif; ?>
 
       	<hr>
 
@@ -37,6 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	              <th><p>SI #</p></th>
 	              <th><p>Registration Type</p></th>
 	              <th><p>AR #</p></th>
+	              <th><p>Amount Given</p></th>
 	              <th><p>Registration Expense</p></th>
 	              <th><p>CR #</p></th>
 	              <th><p>Topsheet</p></th>
@@ -60,6 +63,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	            print '<td>'.$row->si_no.'</td>';
 	            print '<td>'.$row->registration_type.'</td>';
 	            print '<td>'.$row->ar_no.'</td>';
+	            print '<td>'.$row->amount.'</td>';
 	            print '<td>'.$row->registration.'</td>';
 	            print '<td>'.$row->cr_no.'</td>';
 	            print '<td>'.$row->trans_no.'</td>';

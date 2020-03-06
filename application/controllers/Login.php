@@ -49,18 +49,21 @@ class Login extends CI_Controller {
                                         if ($raw['user_info']->position == $value['position']) {
                                           $log = $this->login->add_user_log($raw['user_info']->username, $raw['user_info']->firstname, $raw['user_info']->lastname);
                                           $user_info = array(
-                                            'ulid'        => $log->ulid,
-                                            'uid'         => $raw['user_info']->uid,
-                                            'username'    => $raw['user_info']->username,
-                                            'password'    => $raw['user_info']->password,
-                                            'lastname'    => $raw['user_info']->lastname,
-                                            'firstname'   => $raw['user_info']->firstname,
-                                            'middlename'  => $raw['user_info']->middlename,
-                                            'ext'         => $raw['user_info']->ext,
-                                            'branch'      => $raw['user_info']->branch,
-                                            'position'    => $raw['user_info']->position,
-                                            'department'  => $raw['user_info']->department,
-                                            'company'     => $raw['user_info']->company,
+                                            'ulid' => $log->ulid,
+                                            'uid' => $raw['user_info']->uid,
+                                            'username' => $raw['user_info']->username,
+                                            'password' => $raw['user_info']->password,
+                                            'lastname' => $raw['user_info']->lastname,
+                                            'firstname' => $raw['user_info']->firstname,
+                                            'middlename' => $raw['user_info']->middlename,
+                                            'ext' => $raw['user_info']->ext,
+                                            'branch_id' => $raw['user_info']->bid,
+                                            'branch_code' => $raw['user_info']->b_code,
+                                            'position' => $raw['user_info']->position_id,
+                                            'position_name' => $raw['user_info']->position_name,
+                                            'department' => $raw['user_info']->department,
+                                            'company' => $raw['user_info']->company_id,
+                                            'company_code'=> $raw['user_info']->company_code,
                                             'sys_access'  => $raw['sys_access'],
                                             'page_access' => $raw['page_access']
                                           );
