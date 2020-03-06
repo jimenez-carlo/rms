@@ -34,23 +34,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="transmittal") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>transmittal/branch">Transmittal</a>
                             </li>
-                            <!-- <li class="dropdown <?php if(isset($nav) && $nav=="orcr") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">OR CR<?php print $orcr; ?> <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>transmittal/branch">Transmittal<?php print $orcr; ?></a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>sales/orcr">Print</a>
-                                    </li>
-                                </ul>
-                            </li> -->
-                            <!-- <li class="dropdown <?php if(isset($nav) && $nav=="report") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Report <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>dashboard">Dashboard</a>
-                                    </li>
-                                </ul>
-                            </li> -->
+                            <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
+                                <a href="<?php if(isset($dir)) echo $dir; ?>disapprove">Disapproved Sales</a>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

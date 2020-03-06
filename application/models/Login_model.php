@@ -87,14 +87,22 @@ SQL;
 
           $query  = <<<SQL
             SELECT
-              a.username, a.password, b.*, c.company
+              u.username, u.password, b.*,
+              p.pid AS position_id, p.name AS position_name,
+              ui.*, c.cid AS company_id,
+              c.code AS company_code
             FROM
-              tbl_users a
+              tbl_users u
             INNER JOIN
-              tbl_users_info b ON a.uid=b.uid
+              tbl_users_info ui ON u.uid=ui.uid
             LEFT JOIN
-              tbl_branches c ON b.branch = c.bid
-            WHERE username="$username"
+              tbl_branches b ON ui.branch = b.bid
+            LEFT JOIN
+              tbl_positions p ON ui.position = p.pid
+            LEFT JOIN
+              tbl_companies c ON b.company = c.cid
+            WHERE
+              username="$username"
 SQL;
 
           $result = $global->query($query);
