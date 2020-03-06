@@ -72,6 +72,7 @@ class Disapprove_model extends CI_Model{
 	public function load_list($param)
 	{
 		$branch = (empty($param->branch))  ? "" : " AND s.bcode = '$param->branch'";
+                $da_status = 'AND s.da_reason > 0 AND s.da_reason != 11';
 
                 switch ($this->session->position_name) {
                   case 'Accounts Payable Clerk':
@@ -84,6 +85,7 @@ class Disapprove_model extends CI_Model{
                     break;
                   default:
                     $condition = 's.bcode = '.$this->session->branch_code;
+                    $da_status = 'AND s.da_reason IN(2,3,10)';
                     $branch = '';
                     break;
                 }
@@ -100,7 +102,7 @@ class Disapprove_model extends CI_Model{
                   INNER JOIN
                     tbl_topsheet t ON topsheet = tid
                   WHERE
-                    {$condition} {$branch} AND s.da_reason > 0 AND s.da_reason != 11
+                    {$condition} {$branch} {$da_status}
 		  ORDER BY s.bcode")->result_object();
 	}
 
