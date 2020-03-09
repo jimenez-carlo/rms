@@ -580,7 +580,7 @@ class Dashboard extends MY_Controller {
               SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END) AS done
             FROM
               tbl_sales
-            WHERE region != 1 AND lto_payment = 0 {$company}
+            WHERE region NOT IN(1, 8) AND lto_payment = 0 {$company}
 
             UNION
 
