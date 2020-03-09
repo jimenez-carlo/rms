@@ -99,10 +99,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="controls">
                 <?php
                 $registration_type = array(
-                  'Regular Regn. Paid' => 'Regular Regn. Paid',
-                  'With Regn. Subsidy' => 'With Regn. Subsidy',
                   'Free Registration' => 'Free Registration',
-                  'Regn. under NIA' => 'Regn. under NIA'
+                  'Regn. under NIA' => 'Regn. under NIA',
+                  'Regular Regn. Paid' => 'Regular Regn. Paid',
+                  'Self Registration' => 'Self Registration',
+                  'With Regn. Subsidy' => 'With Regn. Subsidy'
                 );
                 print form_dropdown('registration_type', $registration_type, set_value('registration_type', $sales->registration_type));
                 ?>
