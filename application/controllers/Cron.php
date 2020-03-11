@@ -86,44 +86,56 @@ class Cron extends MY_Controller {
 
 	public function rms_create()
 	{
-		$start = date("Y-m-d H:i:s");
 		$rows = 0;
 
-		$date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-7 days'));
-		$date_yesterday = $this->input->post('date_yesterday') ?? date('Y-m-d', strtotime('-1 days'));
+                $start = date("Y-m-d H:i:s");
+                $date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-7 days'));
+                $date_yesterday = $this->input->post('date_yesterday') ?? date('Y-m-d', strtotime('-1 days'));
+                $engine_numbers = '';
+                $date_created = '';
+
+                if ($this->input->post('engine_nums')) {
+                  $trimmed = trim($this->input->post('engine_nums'), ' \t\n\r\0\x0B\"\,\.');
+                  $remove_qoute = str_replace(array("'",'"'), '', $trimmed);
+                  $fix_comma = str_replace(array(', ', ' ,'), ',', $remove_qoute);
+                  $final_format = "'".implode("','", explode(',', $fix_comma))."'";
+                  $engine_numbers = "AND engine_no IN ({$final_format})";
+                } else {
+		  $date_created = "AND (left(date_created, 10) BETWEEN '{$date_from}' AND  '{$date_yesterday}')";
+                }
 
                 $query = <<<SQL
                   SELECT
                     c.*, r.*, si_mat_no, regn_status, date_created
                     ,CASE rrt_class
-                       WHEN 'NCR'      THEN 1
-                       WHEN 'REGION 1' THEN 2
-                       WHEN 'REGION 2' THEN 3
-                       WHEN 'REGION 3' THEN 4
-                       WHEN 'REGION 4' THEN 5
-                       WHEN 'REGION 4 B' THEN 6
-                       WHEN 'REGION 5' THEN 7
-                       WHEN 'REGION 6' THEN 8
-                       WHEN 'REGION 7' THEN 9
-                       WHEN 'REGION 8' THEN 10
-                       WHEN 'IX'   THEN 11
-                       WHEN 'X'    THEN 12
-                       WHEN 'XI'   THEN 13
-                       WHEN 'XII'  THEN 14
-                       WHEN 'XIII' THEN 15
+                      WHEN 'NCR'      THEN 1
+                      WHEN 'REGION 1' THEN 2
+                      WHEN 'REGION 2' THEN 3
+                      WHEN 'REGION 3' THEN 4
+                      WHEN 'REGION 4' THEN 5
+                      WHEN 'REGION 4 B' THEN 6
+                      WHEN 'REGION 5' THEN 7
+                      WHEN 'REGION 6' THEN 8
+                      WHEN 'REGION 7' THEN 9
+                      WHEN 'REGION 8' THEN 10
+                      WHEN 'IX'   THEN 11
+                      WHEN 'X'    THEN 12
+                      WHEN 'XI'   THEN 13
+                      WHEN 'XII'  THEN 14
+                      WHEN 'XIII' THEN 15
                       ELSE 0
                     END AS region
                     ,CASE rrt_class
-                        WHEN 'REGION 1'   THEN 'R1'
-                        WHEN 'REGION 2'   THEN 'R2'
-                        WHEN 'REGION 3'   THEN 'R3'
-                        WHEN 'REGION 4'   THEN 'R4'
-                        WHEN 'REGION 4 B' THEN 'R4b'
-                        WHEN 'REGION 5'   THEN 'R5'
-                        WHEN 'REGION 6'   THEN 'R6'
-                        WHEN 'REGION 7'   THEN 'R7'
-                        WHEN 'REGION 8'   THEN 'R8'
-                        ELSE rrt_class
+                      WHEN 'REGION 1'   THEN 'R1'
+                      WHEN 'REGION 2'   THEN 'R2'
+                      WHEN 'REGION 3'   THEN 'R3'
+                      WHEN 'REGION 4'   THEN 'R4'
+                      WHEN 'REGION 4 B' THEN 'R4b'
+                      WHEN 'REGION 5'   THEN 'R5'
+                      WHEN 'REGION 6'   THEN 'R6'
+                      WHEN 'REGION 7'   THEN 'R7'
+                      WHEN 'REGION 8'   THEN 'R8'
+                      ELSE rrt_class
                     END AS r_code
                   FROM
                     customer_tbl c
@@ -131,8 +143,7 @@ class Cron extends MY_Controller {
 		  INNER JOIN si_tbl_print ON si_engin_no = engine_no AND si_custcode = customer_id
 		  INNER JOIN regn_status ON engine_nr = engine_no
 		  INNER JOIN transmittal_tbl ON transmittal_code = transmittal_no
-		  WHERE left(date_sold, 10) >= '2018-08-01'
-		  AND (left(date_created, 10) BETWEEN '$date_from' AND  '$date_yesterday')
+		  WHERE LEFT(date_sold, 10) >= '2018-08-01' {$date_created} {$engine_numbers}
 SQL;
 
                 $dev_rms_result     = $this->dev_rms->query($query)->result_object();
