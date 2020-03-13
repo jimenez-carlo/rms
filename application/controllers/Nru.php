@@ -36,8 +36,8 @@ class Nru extends MY_Controller {
 			$this->template('nru/list', $data);
 	 	} else {
 	 		$data['ltid'] = (is_array($data['ltid'])) ? current(array_keys($data['ltid'])) : $data['ltid'];
-
 		 	if (empty($data['registration']) || $back_key == 1) {
+                                $data['action'] = current($this->input->post('ltid'));
 				$data['transmittal'] = $this->nru->load_sales($data);
 		 		$this->template('nru/registration', $data);
 		 	}
@@ -64,7 +64,6 @@ class Nru extends MY_Controller {
 	public function save_nru($data)
 	{
 		$this->load->model('Login_model', 'login');
-
                 foreach ($data['registration'] as $sid => $registration)
                 {
                   if ($registration == 0) continue;

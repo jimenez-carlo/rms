@@ -14,31 +14,71 @@ class Nru_model extends CI_Model{
 
 	public function load_list($data)
 	{
-		$result = $this->db->query("select t.*,
-				left(date, 10) as date,
-				count(*) as sales
-			from tbl_lto_transmittal t
-			inner join tbl_sales on lto_transmittal = ltid
-			where t.region = ".$data['region']."
-			and status = 2
-			group by ltid
-			order by date desc")->result_object();
+                $result = $this->db->query("
+                  SELECT
+                    t.*, LEFT(date, 10) AS date, COUNT(*) as sales, payment_method
+                  FROM
+                    tbl_lto_transmittal t
+                  INNER JOIN
+                    tbl_sales ON lto_transmittal = ltid
+                  WHERE
+                    t.region = ".$data['region']." AND status = 2
+                  GROUP BY
+                    ltid, payment_method
+                  ORDER BY
+                    date desc
+                ")->result_object();
 		return $result;
 	}
 
 	public function load_sales($data)
 	{
-		$transmittal = $this->db->query("select *
-			from tbl_lto_transmittal
-			where ltid = ".$data['ltid'])->row();
-		$transmittal->sales = $this->db->query("select *
-			from tbl_sales
-			inner join tbl_engine on eid = engine
-			inner join tbl_customer on cid = customer
-			where lto_transmittal = ".$data['ltid']."
-			and status = 2
-			order by bcode")->result_object();
-		return $transmittal;
+                switch ($data['action']) {
+                  case 'View':
+                    $payment_method = 'EPP';
+                    break;
+                  default:
+                    $payment_method = 'CASH';
+                    break;
+                }
+
+                $transmittal = $this->db->query("
+		  SELECT
+		    CONCAT(
+                      '{',
+                        '\"ltid\": \"', lt.ltid, '\",',
+                        '\"code\": \"', lt.code, '\",',
+                        '\"region\": \"', lt.region, '\",',
+                        '\"company\": \"', lt.company, '\",',
+                        '\"payment_method\": \"', s.payment_method, '\",',
+                        '\"sales\": ', CONCAT(
+		    	  '[', GROUP_CONCAT(
+		    	    JSON_OBJECT(
+		    	      'sid', s.sid, 'branch', CONCAT(s.bcode, ' ', s.bname), 'registration', s.registration,
+		    	      'pending_date', SUBSTR(s.pending_date, 1, 10), 'date_sold', SUBSTR(s.date_sold, 1, 10),
+		    	      'engine_no', e.engine_no , 'customer_name', CONCAT(c.first_name, ' ',c.last_name
+		    	    )
+		    	  )
+		    	  ORDER BY s.bcode
+		    	  SEPARATOR ','
+		    	  ), ']'
+                        ),
+                      '}'
+                    ) AS sales
+		  FROM
+		    tbl_sales s
+		  INNER JOIN
+		    tbl_engine e ON e.eid = s.engine
+		  INNER JOIN
+		    tbl_customer c ON s.customer = c.cid
+		  INNER JOIN
+		    tbl_lto_transmittal lt ON s.lto_transmittal = lt.ltid
+		  WHERE
+		    lt.ltid = {$data['ltid']} AND s.payment_method = '{$payment_method}'
+		  GROUP BY ltid
+                ")->row()->sales;
+
+		return json_decode($transmittal);
 	}
 
 	public function get_cash($data)
@@ -80,9 +120,9 @@ class Nru_model extends CI_Model{
 		foreach ($data['registration'] as $sid => $registration)
 		{
 			$sales = new Stdclass();
-		  $sales->sid = $sid;
-		  $sales->registration = $registration;
-		  $sales->status = 3;
+                        $sales->sid = $sid;
+                        $sales->registration = $registration;
+                        $sales->status = 3;
 			$this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
 
 			$engine_no = $this->db->query("select engine_no from tbl_engine
@@ -101,7 +141,7 @@ class Nru_model extends CI_Model{
 					used_date = current_timestamp,
 					status = 2
 					where cid = ".$check->cid);
-      	$check_tot += $check->amount;
+                                $check_tot += $check->amount;
 			}
 		}
 
