@@ -42,6 +42,7 @@ class Nru_model extends CI_Model{
                     break;
                 }
 
+                $this->db->simple_query("SET SESSION group_concat_max_len=999999");
                 $transmittal = $this->db->query("
 		  SELECT
 		    CONCAT(

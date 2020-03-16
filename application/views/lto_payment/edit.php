@@ -65,7 +65,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             <hr>
 
-            <table class="table">
+            <table id="table-engine" class="table">
               <thead>
                 <tr>
                   <th><p>Branch</p></th>
@@ -82,7 +82,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                   print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                   print '<td>'.$sales->cust_code.'</td>';
-                  print '<td><a href="'.base_url().'sales/view/'.$sales->sid.'" target="_blank">'.$sales->engine_no.'</a></td>';
+                  print '<td><a class="a-engine" href="'.base_url().'sales/view/'.$sales->sid.'" target="_blank">'.$sales->engine_no.'</a></td>';
                   print '<td><input type="checkbox" name="remove[]" value="'.$sales->sid.'"></td>';
                   print '</tr>';
                 }
@@ -103,17 +103,64 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </div>
 
 <script type="text/javascript">
+  var count = 0;
+  var LPID = <?php echo $lpid; ?>;
   $(function(){
     $('a.add_more').click(function(){
       var tfoot = $(this).closest('tfoot');
-
       var valid = 1;
-      tfoot.find('input[name^=engine_no]').each(function(){
-        if (!$(this).val()) valid = 0;
+
+      $('.a-engine').each(function(){
+        if ($(this).text() == $('#new_entry').val()) {
+          valid = 0;
+          return false;
+        }
       });
 
       if (valid) {
-        tfoot.prepend('<tr><td>Engine #</td><td colspan="4"><input type="text" name="engine_no[]"></td></tr>');
+        if (count !== 0) {
+          var engine_number = $('#new_entry').val();
+          var engine_status = 'LTO Pending';
+          $.ajax({
+            url: "<?php echo base_url(); ?>api",
+            method: "get",
+            data: {
+              "engine": engine_number,
+              "status": engine_status,
+              "payment_method": "EPP",
+              "region": "<?php echo $region; ?>",
+              "company_id": "<?php echo $payment->company; ?>"
+            },
+            success: function(result) {
+              var sales = JSON.parse(result);
+              sales.forEach(function(sale) {
+                if (sale.lto_payment == LPID) {
+                  console.log('Engine# '+sales[0].engine_no+' is already exist.');
+                } else if(sale.status_name != engine_status) {
+                  console.log('Engine# '+sales[0].engine_no+' status is not '+engine_status+'.');
+                } else {
+                    $('#table-engine tbody').append(' \
+                      <tr> \
+                        <td>'+sale.bcode+' '+sale.bname+'</td> \
+                        <td>'+sale.last_name+' '+sale.first_name+'</td> \
+                        <td>'+sale.cust_code+'</td> \
+                        <td> \
+                          <a class="a-engine" href="<?php echo base_url();?>sales/view/473821" target="_blank">'+sale.engine_no+'</a> \
+                          <input type="hidden" name="engine_no[]" value="'+sale.engine_no+'"> \
+                        </td> \
+                        <td> \
+                          <!-- <input type="checkbox" name="remove[]" value="'+sale.sid+'"> --> \
+                        </td> \
+                      </tr> \
+                    ');
+                }
+              });
+            }
+          });
+          $('#new_entry').parent().parent().remove();
+        }
+        count++;
+        tfoot.prepend('<tr><td>Engine #</td><td colspan="4"><input id="new_entry" type="text" name="engine_no[]"></td></tr>');
       }
     });
   });

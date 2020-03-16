@@ -89,20 +89,21 @@ class Fund_model extends CI_Model{
 	{
 		$this->load->model('Cmc_model', 'cmc');
 
-		$result = $this->db->query("select * from tbl_fund
-			where region = ".$region)->result_object();
+		$result = $this->db->query("SELECT * FROM tbl_fund WHERE region = ".$region)->result_object();
 		foreach ($result as $key => $fund)
 		{
-			$row = $this->db->query("select
-					ifnull(sum(
-						case when status = 3 then registration else 0 end
-					), 0) as lto_pending,
-					ifnull(sum(
-						case when status > 3 then registration else 0 end
-					), 0) as for_liquidation
-				from tbl_sales
-				where status > 2 and status < 7
-				and region = ".$region)->row();
+                        $row = $this->db->query("
+                            SELECT
+				IFNULL(SUM(
+					CASE when status = 3 then registration else 0 end
+				), 0) as lto_pending,
+				IFNULL(SUM(
+					CASE when status > 3 then registration else 0 end
+				), 0) AS for_liquidation
+			    FROM tbl_sales
+			    WHERE status > 2 AND status < 7
+                            AND region = ".$region
+                        )->row();
 
 			$fund->lto_pending = $row->lto_pending;
 			$fund->for_liquidation = $row->for_liquidation;
