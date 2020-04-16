@@ -32,6 +32,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <hr>
           <div class="form-actions">
             <input type="submit" name="submit[1]" value="Create RMS data based on data from LTO Transmittal System [rms_create]" class="btn btn-success">
+            <div class="control-group" style="margin-top:10px">
+              <div class="control-label pt-0">
+                Input Engine Number
+                <p class="muted" style="font-size: 10px; text-align:left; padding-left:35px;">Engine number must be comma separated without space.<br> e.g E1234-5678,E5678-1234,E2323-2322</p>
+              </div>
+              <div class="controls">
+                <textarea style="height:130px;" name="engine_nums"></textarea>
+              </div>
+            </div>
             <hr>
             <input type="submit" name="submit[2]" value="Update rms_expense table for BOBJ Report [rms_expense]" class="btn btn-success">
             <hr>

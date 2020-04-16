@@ -42,7 +42,7 @@ input[type='text'].numeric {
   width: 27%;
   height: 100%;
   background: #FFFFFF;
-} 
+}
 
 #login {
   background: linear-gradient(to right, #1D4E0A, #48C51A) no-repeat fixed 0% 0% transparent !important;
@@ -339,4 +339,25 @@ footer {
 
 .controls.text {
   padding-top: 5px;
+}
+.pt-0 {
+  padding-top:0px!important;
+}
+.pt-1 {
+  padding-top:1px;
+}
+.pt-2 {
+  padding-top:1px;
+}
+.pt-3 {
+  padding-top:1px;
+}
+.pt-4 {
+  padding-top:4px;
+}
+.p-relative {
+  position:relative;
+}
+.p-absolute {
+  position:absolute;
 }

@@ -92,21 +92,6 @@ SQL;
 		$this->db->insert('tbl_lto_payment', $payment);
 		$payment->lpid = $this->db->insert_id();
 
-		// if (!empty($payment->screenshot)) {
-		// 	// create folder
-		// 	$folder = './rms_dir/lto_screenshot/'.$payment->lpid.'/';
-		// 	if (!is_dir($folder)) mkdir($folder, 0777, true);
-
-		// 	// delete dir files
-		// 	$this->load->helper('directory');
-		// 	$dir_files = directory_map($folder, 1);
-		// 	foreach ($dir_files as $file) {
-		// 		if (!empty($file)) unlink($folder.$file);
-		// 	}
-
-		// 	rename('./rms_dir/temp/'.$payment->screenshot, $folder.$payment->screenshot);
-		// }
-
 		$path = './rms_dir/temp/'.$batch;
 		$file = fopen($path, 'r');
 		$header = fgetcsv($file, 4096, ';', '"');
@@ -135,21 +120,6 @@ SQL;
 	public function update_payment($payment, $remove, $engine_no)
 	{
 		$this->db->update('tbl_lto_payment', $payment, array('lpid' => $payment->lpid));
-
-		// if (isset($payment->screenshot)) {
-		// 	// create folder
-		// 	$folder = './rms_dir/lto_screenshot/'.$payment->lpid.'/';
-		// 	if (!is_dir($folder)) mkdir($folder, 0777, true);
-
-		// 	// delete dir files
-		// 	$this->load->helper('directory');
-		// 	$dir_files = directory_map($folder, 1);
-		// 	foreach ($dir_files as $file) {
-		// 		if (!empty($file)) unlink($folder.$file);
-		// 	}
-
-		// 	rename('./rms_dir/temp/'.$payment->screenshot, $folder.$payment->screenshot);
-		// }
 
 		if (!empty($remove)) {
 			foreach ($remove as $sid) {
@@ -237,24 +207,22 @@ SQL;
 
         public function extract_to_csv($param) {
           $extract_csv = $this->db->query("
-              SELECT
-                e.engine_no, e.chassis_no,
-                'Motorcycle without Side Car' as type,
-                CONCAT(b.b_code,' ',b.name) as branchnames,
-                CONCAT(c.last_name,',',c.first_name) as customername
-              FROM
-                tbl_sales s
-              INNER JOIN
-                tbl_engine e ON e.eid = s.engine
-              INNER JOIN
-                tbl_customer c ON c.cid = s.customer
-              LEFT JOIN
-                portal_global_2.tbl_branches b on b.b_code = bcode
-              WHERE
-                s.status = 2 AND LEFT(s.pending_date, 10) BETWEEN '".$param->date_from."'
-                AND '".$param->date_to."' AND s.region = ".$param->region."
-	  	AND left(s.bcode, 1) = '".$param->company."'
-                ORDER BY s.bcode
+            SELECT
+              e.engine_no, e.chassis_no,
+              'Motorcycle without Side Car' as type,
+              CONCAT(s.bcode,' ',s.bname) as branchnames,
+              CONCAT(c.last_name,',',c.first_name) as customername
+            FROM
+              tbl_sales s
+            INNER JOIN
+              tbl_engine e ON e.eid = s.engine
+            INNER JOIN
+              tbl_customer c ON c.cid = s.customer
+            WHERE
+              s.status = 2 AND s.region = ".$param->region."
+              AND LEFT(s.bcode, 1) = '".$param->company."' AND s.payment_method = 'EPP'
+              AND s.pending_date BETWEEN '".$param->date_from." 00:00:00' AND '".$param->date_to." 23:59:59'
+              ORDER BY s.bcode
           ")->result_array();
 
           return $extract_csv;
