@@ -86,66 +86,24 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 
 switch(ENVIRONMENT):
 
-  case 'development':
-
-    defined('BASE_URL')      ? null : define('BASE_URL', 'http://172.18.0.85:8000/rms_dev');
-
-    # RMS_DB
-    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.4');
-    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'root');
-    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'rootdev');
-    defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
-
-    # PORTAL GLOBAL DB
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.17.0.4');
-    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'root');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'rootdev');
-    defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db');
-
-    # MNC, MTI, HPTI DEV_CES2
-    defined('DEV_CES_DB_HOST')      ? null : define('DEV_CES_DB_HOST', '172.17.0.3');
-    defined('DEV_CES_DB_USER')      ? null : define('DEV_CES_DB_USER', 'root');
-    defined('DEV_CES_DB_PASSWORD')  ? null : define('DEV_CES_DB_PASSWORD', 'rootdev');
-    defined('DEV_CES_DB_NAME')      ? null : define('DEV_CES_DB_NAME', 'dev_ces2');
-
-    # MDI_DEV_CES2
-    defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '172.17.0.3');
-    defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'root');
-    defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'rootdev');
-    defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'mdi_dev_ces2');
-
-    # DEV_RMS
-    defined('DEV_RMS_DB_HOST')      ? null : define('DEV_RMS_DB_HOST', '172.17.0.3');
-    defined('DEV_RMS_DB_USER')      ? null : define('DEV_RMS_DB_USER', 'root');
-    defined('DEV_RMS_DB_PASSWORD')  ? null : define('DEV_RMS_DB_PASSWORD', 'rootdev');
-    defined('DEV_RMS_DB_NAME')      ? null : define('DEV_RMS_DB_NAME', 'dev_rms');
-
-    # MDI_DEV_RMS
-    defined('MDI_DEV_RMS_DB_HOST')      ? null : define('MDI_DEV_RMS_DB_HOST', '172.17.0.3');
-    defined('MDI_DEV_RMS_DB_USER')      ? null : define('MDI_DEV_RMS_DB_USER', 'root');
-    defined('MDI_DEV_RMS_DB_PASSWORD')  ? null : define('MDI_DEV_RMS_DB_PASSWORD', 'rootdev');
-    defined('MDI_DEV_RMS_DB_NAME')      ? null : define('MDI_DEV_RMS_DB_NAME', 'mdi_dev_rms');
-
-  break;
-
   case 'testing':
 
-    defined('BASE_URL')      ? null : define('BASE_URL', 'http://172.18.0.222:8080/rms_test');
+    defined('BASE_URL')      ? null : define('BASE_URL', 'https://staging.motortrade.com.ph/rms-staging');
 
-    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.3');
-    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'test');
-    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'm012rm1!ar');
+    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.4');
+    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'root');
+    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'dev');
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.17.0.3');
-    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'test');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'm012rm1!ar');
+    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.17.0.4');
+    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'root');
+    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'dev');
     defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db_55');
 
     # MDI_DEV_CES2
-    defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '172.17.0.3');
-    defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'test');
-    defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'm012rm1!ar');
+    defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '172.17.0.4');
+    defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'root');
+    defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'dev');
     defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'mdi_dev_ces2');
 
     break;
