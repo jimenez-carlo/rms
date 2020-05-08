@@ -20,37 +20,43 @@ class Sap_upload extends MY_Controller {
 		$save = $this->input->post('save');
 		if(!empty($save))
 		{
-			$bid = current(array_keys($save));
-			$this->liquidate($bid);
+			$subid = current(array_keys($save));
+			$this->liquidate($subid);
 		}
 
 		$data['table'] = $this->batch->list_for_upload();
-                var_dump($this->db->last_query()); die();
 		$this->template('sap_upload/list', $data);
 	}
 
-	public function sap($bid)
+	public function sap($subid)
 	{
-		$data['batch'] = $this->batch->sap_upload($bid);
+		$data = $this->batch->sap_upload($subid);
 		$this->load->view('sap_upload/sap', $data);
 	}
 
-	public function liquidate($bid)
+	public function liquidate($subid)
 	{
 		$this->form_validation->set_rules('doc_no', 'Document #', 'required');
 
 		if ($this->form_validation->run() == TRUE) {
-			$this->save_liquidated($bid);
+			$this->save_liquidated($subid);
 		}
 	}
 
-	private function save_liquidated($bid)
-	{
+	private function save_liquidated($subid)
+        {
+                $misc_exp = $this->input->post('misc_exp');
+
 		$batch = new Stdclass();
-		$batch->bid = $bid;
+		$batch->subid = $subid;
 		$batch->doc_no = $this->input->post('doc_no');
-		$batch->download_date = date('Y-m-d H:i:s');
+                $batch->download_date = date('Y-m-d H:i:s');
+		$batch->is_uploaded = 1;
 		$batch = $this->batch->liquidate_batch($batch);
+
+                if ($misc_exp) {
+                  $this->batch->liquidate_misc_exp($misc_exp);
+                }
 
 		$_SESSION["messages"][] = 'Document Number '.$batch->doc_no.' for Transaction # '.$batch->trans_no.' was saved successfully.';
 	}

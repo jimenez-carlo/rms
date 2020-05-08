@@ -34,3 +34,4 @@ rms-clone.tgz
 *.stTheme.cache
 *.sublime-workspace
 *.sublime-project
+application/config/constants.php

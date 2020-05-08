@@ -92,21 +92,59 @@ class Fund_model extends CI_Model{
 		$result = $this->db->query("SELECT * FROM tbl_fund WHERE region = ".$region)->result_object();
 		foreach ($result as $key => $fund)
 		{
-                        $row = $this->db->query("
-                            SELECT
-				IFNULL(SUM(
-					CASE when status = 3 then registration else 0 end
-				), 0) as lto_pending,
-				IFNULL(SUM(
-					CASE when status > 3 then registration else 0 end
-				), 0) AS for_liquidation
-			    FROM tbl_sales
-			    WHERE status > 2 AND status < 7
-                            AND region = ".$region
-                        )->row();
+                        $sql = <<<QRY
+			  SELECT
+                            IFNULL(
+			      SUM(
+				CASE
+				  WHEN s.status = 3 THEN registration
+				  ELSE 0
+				END
+			      ), 0
+		            ) AS lto_pending,
+                            IFNULL(
+                              SUM(
+                                CASE
+                                  WHEN s.status > 3 THEN s.registration + s.tip
+                                  ELSE 0
+                                END), 0
+                            ) AS for_liquidation
+		            ,CASE
+			      WHEN mxh1.status IN (2,3) THEN m.amount
+                              ELSE 0
+		            END AS misc_expense_amount
+                          FROM
+                            tbl_sales s
+                          LEFT JOIN
+                            tbl_voucher v ON v.vid = s.voucher
+                          LEFT JOIN
+                            tbl_misc m ON m.ca_ref = v.vid
+                          LEFT JOIN
+                            tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
+                          LEFT JOIN
+                            tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
+                          WHERE
+                            s.status > 2 AND s.status < 7 AND s.payment_method = 'CASH'
+                            AND s.region = 1 AND mxh2.id IS NULL
+                          GROUP BY
+                            m.mid, misc_expense_amount;
+QRY;
+
+                        //OLD QUERY
+                        //SELECT
+			//    IFNULL(SUM(
+			//    	CASE WHEN status = 3 THEN registration ELSE 0 end
+			//    ), 0) as lto_pending,
+			//    IFNULL(SUM(
+			//    	CASE WHEN status > 3 THEN registration+tip ELSE 0 end
+			//    ), 0) AS for_liquidation
+			//FROM tbl_sales
+			//WHERE status > 2 AND status < 7
+                        //AND region = ".$region
+                        $row = $this->db->query($sql)->row();
 
 			$fund->lto_pending = $row->lto_pending;
-			$fund->for_liquidation = $row->for_liquidation;
+			$fund->for_liquidation = $row->for_liquidation + $row->misc_expense_amount;
 
 			$fund->region = ($_SESSION['company'] != 8) ? $this->region[$fund->region] : $this->mdi_region[$fund->region];
 			$fund->company_cid = $fund->company;

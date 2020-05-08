@@ -441,15 +441,25 @@ class Dashboard extends MY_Controller {
 
 		// topsheet
 		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
-		$result = $this->db->query("select count(*) as count,
-			case when status = 0 then 'unprocessed'
-				when status = 1 then 'incomplete'
-				when status = 2 then 'sap_upload'
-				when status = 3 then 'done'
-			end as status
-			from tbl_topsheet
-			where ".$region."
-			group by 2")->result_object();
+                $result = $this->db->query("
+                    SELECT
+                      COUNT(*) AS count,
+                      CASE
+                        WHEN s.status = 4 AND susb.subid IS NULL THEN 'unprocessed'
+			-- WHEN status = 1 THEN 'incomplete'
+			WHEN s.status = 4 AND sub.is_uploaded = 0 THEN 'sap_upload'
+			WHEN s.status = 5 THEN 'done'
+		      END AS status
+                    FROM
+                      tbl_sales s
+                    LEFT JOIN
+                      tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
+                    LEFT JOIN
+                      tbl_sap_upload_batch sub ON susb.subid = sub.subid
+                    WHERE
+                      ".$region."
+                    GROUP BY status
+                ")->result_object();
 
 		$data['ts_unprocessed'] = 0;
 		$data['ts_incomplete'] = 0;
@@ -587,24 +597,28 @@ class Dashboard extends MY_Controller {
             SELECT
               'For Checking' AS label,
               COUNT(*) AS total,
-              SUM(CASE WHEN batch = 0 THEN 1 ELSE 0 END) AS pending,
-              SUM(CASE WHEN batch > 0 THEN 1 ELSE 0 END) AS done
+              SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS pending,
+              SUM(CASE WHEN status > 4 THEN 1 ELSE 0 END) AS done
             FROM
               tbl_sales
-            WHERE topsheet > 0 AND da_reason < 1 {$company}
+            WHERE
+              1=1 {$company}
 
             UNION
 
             SELECT
               'For SAP Uploading' as label,
               COUNT(*) AS total,
-              SUM(CASE WHEN s.status = 4 THEN 1 END) AS pending,
+              SUM(CASE WHEN sub.is_uploaded = 0 THEN 1 END) AS pending,
               SUM(CASE WHEN s.status = 5 THEN 1 END) AS done
             FROM
               tbl_sales s
-            INNER JOIN
-              tbl_batch b ON b.bid = s.batch
-            WHERE s.status >= 4 {$company}
+            LEFT JOIN
+              tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
+            LEFT JOIN
+              tbl_sap_upload_batch sub ON susb.subid = sub.subid
+            WHERE
+              s.status >= 4 {$company}
           ")->result_object();
 
           $data['table'] = $result;

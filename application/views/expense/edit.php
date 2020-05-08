@@ -56,7 +56,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo form_label('Remarks', 'remarks', array('class' => 'control-label'));
               echo '<div class="controls">';
 
-              echo '<textarea name="remarks">'.$misc->remarks.'</textarea>';
+              echo '<textarea name="remarks"></textarea>';
               echo '</div></div>';
             ?>
             <div class="form-actions">

@@ -77,8 +77,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   );
   if ($sales->da_reason > 0 && $sales->da_reason != 11) {
     print '<div class="control-group">';
-    print '<div class="control-label">Disapproved</div>';
-    print '<div class="controls">Reason: '.$da_reason[$sales->da_reason].'</div>';
+    print '<div class="control-label">Reason of Disapproved</div>';
+    print '<div class="controls">'.$da_reason[$sales->da_reason].'</div>';
     print '</div>';
   }
   else {
@@ -129,7 +129,7 @@ $(function(){
       $('#da_group a.trigger').addClass('hide');
 
       // trigger to disapprove, show select reason
-      $('#da_group .control-label').text('Reason for Disapprove');
+      $('#da_group .control-label').text('Disapprove Reason');
       $('#da_group select[name=da_reason]').removeClass('hide');
       $('#da_group hr').removeClass('hide');
       $('#da_group a.save').removeClass('hide');

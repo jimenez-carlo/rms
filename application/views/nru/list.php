@@ -50,6 +50,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <td></td>
                   <td></td>
                   <td></td>
+                  <td></td>
                 </tr>';
               }
               ?>

@@ -81,6 +81,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 </div>
 
 <script type="text/javascript">
+setTimeout(function(){
+  window.scrollTo(0, 0);
+}, 1000);
+
 function tid(_tid) {
   $('.list-form input').val(_tid);
   $('.list-form').submit();

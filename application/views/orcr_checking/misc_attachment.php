@@ -39,7 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   print '<div class="controls"><textarea id="misc_da_remarks" name="remarks" required></textarea></div>';
   print '</div>';
 
-  if ($misc->status == 5) {
+  if (in_array($misc->status, array(3, 5))) {
     print '<div class="control-group">';
     print '<div class="control-label" style="padding:0">Disapproved Reason</div>';
     print '<div class="controls">'.$misc->remarks.'</div>';

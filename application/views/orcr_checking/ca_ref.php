@@ -3,33 +3,38 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <form class="form-horizontal" method="post" style="margin:0;">
   <?php
-  print form_hidden('vid', $ca_ref['vid']);
-  print form_hidden('summary', 1);
+    if (isset($CA)) {
+      print form_hidden('CA', $batch_ref['vid']);
+    }
+    if (isset($EPP)) {
+      print form_hidden('EPP', $batch_ref['lpid']);
+    }
+    print form_hidden('summary', 1);
   ?>
 
   <fieldset>
     <div class="control-group span4">
       <div class="control-label" style="padding-top:0">Date</div>
-      <div class="controls"><?php print $ca_ref['date']; ?></div>
+      <div class="controls"><?php print $batch_ref['date']; ?></div>
     </div>
     <div class="control-group span4">
       <div class="control-label" style="padding-top:0">Region</div>
-      <div class="controls"><?php print $ca_ref['region']; ?></div>
+      <div class="controls"><?php print $batch_ref['region']; ?></div>
     </div>
     <div class="control-group span4">
       <div class="control-label" style="padding-top:0">Company</div>
-      <div class="controls"><?php print $ca_ref['company']; ?></div>
+      <div class="controls"><?php print $batch_ref['company']; ?></div>
     </div>
   </fieldset>
 
   <hr>
-  <table class="table tbl-sales" style="margin:0;">
+  <table class="table tbl-sales table-condensed" style="display:block; margin:0;">
     <thead>
       <tr>
         <th><p>Branch</p></th>
         <th width=75><p>Date Sold</p></th>
         <th width=125><p>Engine #</p></th>
-        <th><p>Type of Sales</p></th>
+        <th><p>Sales Type</p></th>
         <th><p>Registration Type</p></th>
         <th><p>Reference #</p></th>
         <th><p class="text-right">Amount Given</p></th>
@@ -37,21 +42,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p class="text-right">Total Expense</p></th>
         <th><p class="text-right">Balance</p></th>
         <th><p>Status</p></th>
-        <th><p>Disapprove</p></th>
+        <th><p>Acctg. Status</p></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody style="<!-- display:block; --> max-height:690px; overflow:auto;">
       <?php
       $total_amt = 0;
       $total_exp = 0;
 
-      foreach (json_decode($ca_ref['sales']) as $sales)
+      foreach (json_decode($batch_ref['sales']) as $sales)
       {
         $sales->amount = ($sales->registration_type == 'Free Registration' || stripos($sales->registration_type, 'subsidy') !== false) ? 900 : $sales->amount;
-        $clickable = ($sales->status === 'Registered') ? 'onclick="attachment('.$sales->sid.', 1)"' : '';
+        $clickable = ($sales->selectable) ? 'onclick="attachment('.$sales->sid.', 1)"' : '';
         if ($sales->disapprove === null) {
           $disapprove = '<td class="text-success">Ok</td>';
-        } elseif ($sales->disapprove === 'Resolved') {
+        } elseif (in_array($sales->disapprove, array('Resolved', 'For Sap Uploading'))) {
           $disapprove = '<td class="text-success">'.$sales->disapprove.'</td>';
         } else {
           $disapprove = '<td class="text-error">'.$sales->disapprove.'</td>';
@@ -74,10 +79,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         print '<td>'.$sales->status.'</td>';
         print $disapprove;
         print '</tr>';
-        $total_amt += $sales->amount;
-        $total_exp += $sales->registration;
+        if ($sales->status === "Registered") {
+          $total_amt += $sales->amount;
+          $total_exp += $sales->registration;
+        }
       }
 
+    print '</tbody>';
+    print '<tbody style="display:block;">';
       // Miscellaneous
       print '<tr style="border-top: double">';
       print '<th colspan="3"><p>OR #</p></th>';
@@ -87,30 +96,30 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       print '<th colspan="2"><p class="text-right">Status</p></th>';
       print '</tr>';
 
-      $misc_expenses = json_decode($ca_ref['misc_expense']);
-      foreach ($misc_expenses as $misc)
-      {
-        if ($misc->mid !== NULL) {
-          $text_color = (in_array($misc->status, array('Approved', 'Resolved'))) ? 'text-success' : 'text-error';
-          print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
-          print '<td colspan="3">';
-          print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
-          print $misc->or_no;
-          print '</td>';
-          print '<td colspan="2">'.$misc->or_date.'</td>';
-          print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
-          print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
-          print '<td colspan="2"><p class="text-right '.$text_color.'">'.$misc->status.'</p></td>';
-          print '</tr>';
-          $total_exp += $misc->amount;
-        } else {
-          print '<tr>';
-          print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
-          print '<td colspan="2"></td>';
-          print '<td colspan="2"></td>';
-          print '<td colspan="3"></td>';
-          print '</tr>';
+      $misc_expenses = json_decode($misc_expense);
+      if ($misc_expenses !== NULL) {
+        foreach ($misc_expenses as $misc)
+        {
+            $text_color = (in_array($misc->status, array('Approved', 'Resolved', 'For Liquidation'))) ? 'text-success' : 'text-error';
+            print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
+            print '<td colspan="3">';
+            print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
+            print $misc->or_no;
+            print '</td>';
+            print '<td colspan="2">'.$misc->or_date.'</td>';
+            print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
+            print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
+            print '<td colspan="2"><p class="text-right '.$text_color.'">'.$misc->status.'</p></td>';
+            print '</tr>';
+            $total_exp += $misc->amount;
         }
+      } else {
+        print '<tr>';
+        print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
+        print '<td colspan="2"></td>';
+        print '<td colspan="2"></td>';
+        print '<td colspan="3"></td>';
+        print '</tr>';
       }
 
       //if ($miscs))
@@ -124,7 +133,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       //}
       ?>
     </tbody>
-    <tfoot style="border-top: dotted gray; font-size: 16px">
+    <tfoot style="<!-- display:block; --> border-top: dotted gray; font-size: 16px">
       <tr>
         <th colspan="8"></th>
         <th><p>For Upload</p></th>
@@ -206,8 +215,6 @@ function attachment(_id, _type) {
     dataType: "JSON",
     success: function(data)
     {
-      //console.log(data.page);
-      //console.log(data.disable);
       $('.form-body').html(data.page); // reset form on modals
       $("#include_for_upload").prop("disabled", data.disable);
       $('#modal_form').modal('show'); // show bootstrap modal

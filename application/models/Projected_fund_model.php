@@ -38,7 +38,8 @@ class Projected_fund_model extends CI_Model{
           }
 
           $get_fund_per_region = $this->db->query("
-            SELECT f.*,
+            SELECT
+              f.*,
               IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_1,
               IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_1,
               IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
@@ -47,34 +48,16 @@ class Projected_fund_model extends CI_Model{
               IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6,
               IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
               IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8,
-              CASE
-                WHEN f.region = 1 THEN 'NCR'
-	        WHEN f.region = 2 THEN 'Region 1'
-	        WHEN f.region = 3 THEN 'Region 2'
-	        WHEN f.region = 4 THEN 'Region 3'
-	        WHEN f.region = 5 THEN 'Region 4A'
-	        WHEN f.region = 6 THEN 'Region 4B'
-	        WHEN f.region = 7 THEN 'Region 5'
-	        WHEN f.region = 8 THEN 'Region 6'
-	        WHEN f.region = 9 THEN 'Region 7'
-	        WHEN f.region = 10 THEN 'Region 8'
-                WHEN f.region = 11 THEN 'Region IX'
-                WHEN f.region = 12 THEN 'Region X'
-                WHEN f.region = 13 THEN 'Region XI'
-                WHEN f.region = 14 THEN 'Region XII'
-                WHEN f.region = 15 THEN 'Region XIII'
-              END AS region,
-              CASE
-                WHEN f.company = 1 THEN 'MNC'
-	        WHEN f.company = 2 THEN 'MTI'
-	        WHEN f.company = 6 THEN 'MTI'
-	        WHEN f.company = 3 THEN 'HPTI'
-                WHEN f.company = 8 THEN 'MDI'
-              END AS company
+              r.region,
+              c.company_code AS company
             FROM
               tbl_fund f
             LEFT JOIN
               tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
+            INNER JOIN
+              tbl_company c ON s.company = c.cid
+            INNER JOIN
+              tbl_region r ON s.region = r.rid
             WHERE
               {$company} AND s.voucher = 0 AND s.payment_method = 'CASH'
             GROUP BY f.fid

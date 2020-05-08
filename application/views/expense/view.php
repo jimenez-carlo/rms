@@ -42,7 +42,7 @@
           echo '<div class="control-group">';
           echo form_label('Remarks', '', array('class' => 'control-label'));
           echo '<div class="controls text">';
-          echo $misc->remarks;
+          echo '<textarea disabled>'.$misc->remarks.'</textarea>';
           echo '</div></div>';
 
           echo '<div class="control-group reason hide">';
