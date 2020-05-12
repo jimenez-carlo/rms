@@ -86,7 +86,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       }
 
     print '</tbody>';
-    print '<tbody style="display:block;">';
+    print '<tbody>';
       // Miscellaneous
       print '<tr style="border-top: double">';
       print '<th colspan="3"><p>OR #</p></th>';
@@ -100,7 +100,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       if ($misc_expenses !== NULL) {
         foreach ($misc_expenses as $misc)
         {
-            $text_color = (in_array($misc->status, array('Approved', 'Resolved', 'For Liquidation'))) ? 'text-success' : 'text-error';
+            $text_color = (in_array($misc->status, array('Approved', 'Resolved', 'For Liquidation', 'Liquidated'))) ? 'text-success' : 'text-error';
             print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
             print '<td colspan="3">';
             print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
@@ -111,7 +111,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
             print '<td colspan="2"><p class="text-right '.$text_color.'">'.$misc->status.'</p></td>';
             print '</tr>';
-            $total_exp += $misc->amount;
+
+            if (array('Approved', 'Resolved')) {
+              $total_exp += $misc->amount;
+            }
         }
       } else {
         print '<tr>';
@@ -122,31 +125,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         print '</tr>';
       }
 
-      //if ($miscs))
-      //{
-      //  print '<tr>';
-      //  print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
-      //  print '<td colspan="2"></td>';
-      //  print '<td colspan="2"></td>';
-      //  print '<td colspan="3"></td>';
-      //  print '</tr>';
-      //}
       ?>
     </tbody>
-    <tfoot style="<!-- display:block; --> border-top: dotted gray; font-size: 16px">
+    <tfoot style="border-top: dotted gray; font-size: 16px">
       <tr>
-        <th colspan="8"></th>
+        <th colspan="10"></th>
         <th><p>For Upload</p></th>
         <th><p>Total</p></th>
       </tr>
       <tr>
-        <th colspan="7"></th>
+        <th colspan="9"></th>
         <th><p class="text-right">Amount</p></th>
         <th><p class="text-right fup-amt" style="color:red">&#x20b1 0.00</p></th>
         <th><p class="text-right tot-amt">&#x20b1 <?php print number_format($total_amt, 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="7">
+        <th colspan="9">
           <p class="form-msg msg1" style="color:red">Balance for upload must not be zero.</p>
           <p class="form-msg msg2" style="color:red">Balance for upload must not be negative.</p>
           <p class="form-msg msg3" style="color:red">Remaining amount will not be able to accomodate remaining expenses.</p>
@@ -157,7 +151,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p class="text-right tot-exp">&#x20b1 <?php print number_format($total_exp, 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="7">
+        <th colspan="9">
           <input type="submit" name="submit" value="Preview Summary" class="btn btn-success">
         </th>
         <th><p class="text-right">Balance</p></th>

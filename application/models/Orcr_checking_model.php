@@ -230,7 +230,7 @@ SQL;
                     'mid', m.mid, 'region', m.region,
                     'date', m.date, 'or_no', m.or_no,
                     'or_date', SUBSTR(m.or_date, 1, 10),
-                    'amount', m.amount, 'type', mt.type,
+                    'amount', FORMAT(m.amount, 2), 'type', mt.type,
                     'remarks', mxh1.remarks, 'status', sts.status_name,
                     'other', m.other, 'topsheet', m.topsheet,
                     'batch', m.batch, 'ca_ref', m.ca_ref
@@ -247,7 +247,7 @@ SQL;
             LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
             LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
             LEFT JOIN tbl_status sts ON mxh1.status = sts.status_id AND sts.status_type = 'MISC_EXP'
-            WHERE {$where_param} AND (sts.status_id IN (2, 3, 5, 6) OR m.mid IS NULL) AND mxh2.mid IS NULL
+            WHERE {$where_param} AND (sts.status_id IN (2, 3, 4, 5, 6) OR m.mid IS NULL) AND mxh2.mid IS NULL
             GROUP BY {$groupby_param}
 SQL;
           $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
@@ -323,7 +323,6 @@ SQL;
                      offline, voucher_status, process_timestamp, transfer_timestamp, company, sales
 SQL;
           $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
-          var_dump($sql); die();
           $result =  $this->db->query($sql)->result_array();
 
           return $result[0];
@@ -434,7 +433,7 @@ SQL;
                 $misc = $this->db->query("
                   SELECT
                     m.mid, m.region, m.date, m.or_no, m.or_date,
-                    m.amount, m.offline, m.other, m.topsheet, m.batch,
+                    FORMAT(m.amount, 2) AS amount, m.offline, m.other, m.topsheet, m.batch,
                     m.ca_ref, mxh1.*, mt.type, v.reference
                   FROM
                     tbl_misc m

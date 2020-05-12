@@ -71,7 +71,7 @@ class Orcr_checking extends MY_Controller {
         		case 2:
         			$data['misc'] = $this->orcr_checking->misc_attachment($id);
         			$response['page'] = $this->load->view('orcr_checking/misc_attachment', $data, TRUE);
-        			$response['disable'] = (in_array($data['misc']->status, array(3, 5))) ? true : false;
+        			$response['disable'] = (in_array($data['misc']->status, array(3, 4, 5))) ? true : false;
         			break;
         	}
 

@@ -29,30 +29,47 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   print '<div class="controls">'.$misc->amount.'</div>';
   print '</div>';
 
-  print '<div class="control-group">';
-  print '<div class="control-label">Remarks</div>';
-  print '<div class="controls">'.$misc->remarks.'</div>';
-  print '</div>';
-
-  print '<div class="control-group misc-da-remarks hide">';
-  print '<div class="control-label">Add Remarks</div>';
-  print '<div class="controls"><textarea id="misc_da_remarks" name="remarks" required></textarea></div>';
-  print '</div>';
-
-  if (in_array($misc->status, array(3, 5))) {
+  if ($misc->status !== "5") {
     print '<div class="control-group">';
-    print '<div class="control-label" style="padding:0">Disapproved Reason</div>';
+    print '<div class="control-label">Remarks</div>';
     print '<div class="controls">'.$misc->remarks.'</div>';
     print '</div>';
-  } else {
-    $da_reason = array(5 => 'Disapproved');
-    print '<div id="da_group" class="control-group">';
-    print '<div class="control-label"></div>';
-    print '<div class="controls">';
-    print '<a id="da_misc" class="btn btn-warning trigger">Disapprove</a>';
-    print form_dropdown('da_reason', $da_reason, 0, array('data-sid' => $misc->mid, 'class' => 'hide'));
-    print '<a class="btn btn-success save hide">Save</a>';
-    print '</div></div>';
+  }
+
+  print '<div class="control-group misc-da-remarks hide">';
+  print '<div class="control-label">Reason</div>';
+  print '<div class="controls">
+          <select id="misc_da_remarks" name="remarks" required>
+            <option>WRONG COMPANY INFO</option>
+            <option>WRONG AMOUNT</option>
+            <option>ADVANCE DATE OF EXPENSE VS CA EXPENSE</option>
+            <option>DUPLICATE ATTACHMENT</option>
+          </select>
+        </div>';
+  print '</div>';
+
+  switch ($misc->status) {
+    case '3':
+    case '5':
+      print '<div class="control-group">';
+      print '<div class="control-label" style="padding:0">Disapproved Reason</div>';
+      print '<div class="controls">'.$misc->remarks.'</div>';
+      print '</div>';
+      break;
+
+    case '4':
+      break;
+
+    default:
+      $da_reason = array(5 => 'Disapproved');
+      print '<div id="da_group" class="control-group">';
+      print '<div class="control-label"></div>';
+      print '<div class="controls">';
+      print '<a id="da_misc" class="btn btn-warning trigger">Disapprove</a>';
+      print form_dropdown('da_reason', $da_reason, 0, array('data-sid' => $misc->mid, 'class' => 'hide'));
+      print '<a class="btn btn-success save hide">Save</a>';
+      print '</div></div>';
+      break;
   }
   ?>
 </div>
@@ -115,7 +132,6 @@ $('.save').on('click', function(){
         dataType: "JSON",
         success: function(data)
         {
-          console.log(data);
           // update info
           $('#da_group .control-label').text('Disapproved');
           $('#da_group p').text('Reason: Test lang');
