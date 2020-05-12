@@ -26,11 +26,11 @@ class Disapprove_model extends CI_Model{
                 }
 
                 $this->db->cache_on();
-                $sql = "SELECT * FROM tbl_da_status WHERE id != 11";
+                $sql = "SELECT * FROM tbl_status WHERE status_id != 11 AND status_type = 'DA'";
                 $da_status = $this->db->query($sql)->result_array();
                 $status = [];
                 foreach ($da_status as $da) {
-                  $status[$da['id']] = $da['da_status'];
+                  $status[$da['status_id']] = $da['status_name'];
                 }
                 return $status;
         }
@@ -90,7 +90,7 @@ class Disapprove_model extends CI_Model{
                     break;
                 }
 
-                return $this->db->query("
+                $result = $this->db->query("
                   SELECT
                     s.*, e.*, c.*, t.trans_no
                   FROM
@@ -99,11 +99,13 @@ class Disapprove_model extends CI_Model{
                     tbl_engine e ON engine = eid
                   INNER JOIN
                     tbl_customer c ON customer = cid
-                  INNER JOIN
+                  LEFT JOIN
                     tbl_topsheet t ON topsheet = tid
                   WHERE
                     {$condition} {$branch} {$da_status}
 		  ORDER BY s.bcode")->result_object();
+
+                return $result;
 	}
 
         public function get_da_resolve()
@@ -111,7 +113,7 @@ class Disapprove_model extends CI_Model{
 
                 return $this->db->query("
                   SELECT
-                    s.*, e.*, c.*, t.trans_no, ds.id, ds.da_status
+                    s.*, e.*, c.*, t.trans_no, ds.status_id AS id, ds.status_name AS da_status
                   FROM
                     tbl_sales s
                   INNER JOIN
@@ -121,7 +123,7 @@ class Disapprove_model extends CI_Model{
                   INNER JOIN
                     tbl_topsheet t ON topsheet = tid
                   INNER JOIN
-                    tbl_da_status ds ON s.da_reason = ds.id
+                    tbl_status ds ON s.da_reason = ds.status_id AND ds.status_type = 'DA'
                   WHERE
                     s.da_reason = 11 {$this->and_company}
                   ORDER BY s.bcode

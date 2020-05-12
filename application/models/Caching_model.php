@@ -8,7 +8,7 @@ class Caching_model extends CI_Model{
         $id = 1;
         $sql = <<<SQL
           SELECT
-            (SELECT COUNT(*) FROM  tbl_da_status) count,
+            (SELECT COUNT(*) FROM  tbl_status WHERE status_type = 'DA') count,
             (SELECT count FROM tbl_handle_caching) old_count
 SQL;
         break;
