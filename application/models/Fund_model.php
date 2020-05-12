@@ -90,6 +90,12 @@ class Fund_model extends CI_Model{
 		$this->load->model('Cmc_model', 'cmc');
 
 		$result = $this->db->query("SELECT * FROM tbl_fund WHERE region = ".$region)->result_object();
+                $row = array(
+                  'lto_pending' => 0,
+                  'for_liquidation' => 0,
+                  'misc_expense_amount' => 0
+                );
+
 		foreach ($result as $key => $fund)
 		{
                         $sql = <<<QRY
@@ -97,7 +103,7 @@ class Fund_model extends CI_Model{
                             IFNULL(
 			      SUM(
 				CASE
-				  WHEN s.status = 3 THEN registration
+				  WHEN s.status = 3 THEN s.registration
 				  ELSE 0
 				END
 			      ), 0
@@ -105,14 +111,14 @@ class Fund_model extends CI_Model{
                             IFNULL(
                               SUM(
                                 CASE
-                                  WHEN s.status > 3 THEN s.registration + s.tip
+                                  WHEN s.status = 4 THEN s.registration + s.tip
                                   ELSE 0
                                 END), 0
                             ) AS for_liquidation
-		            ,CASE
+		            ,IFNULL(CASE
 			      WHEN mxh1.status IN (2,3) THEN m.amount
                               ELSE 0
-		            END AS misc_expense_amount
+		            END, 0) AS misc_expense_amount
                           FROM
                             tbl_sales s
                           LEFT JOIN
@@ -124,10 +130,9 @@ class Fund_model extends CI_Model{
                           LEFT JOIN
                             tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
                           WHERE
-                            s.status > 2 AND s.status < 7 AND s.payment_method = 'CASH'
-                            AND s.region = 1 AND mxh2.id IS NULL
+                            s.status > 2 AND s.status < 7 AND s.voucher > 0 AND s.region = $region AND mxh2.id IS NULL
                           GROUP BY
-                            m.mid, misc_expense_amount;
+                            m.mid, misc_expense_amount
 QRY;
 
                         //OLD QUERY
@@ -141,11 +146,14 @@ QRY;
 			//FROM tbl_sales
 			//WHERE status > 2 AND status < 7
                         //AND region = ".$region
-                        $row = $this->db->query($sql)->row();
+                        $get_result = $this->db->query($sql)->row_array();
 
-			$fund->lto_pending = $row->lto_pending;
-			$fund->for_liquidation = $row->for_liquidation + $row->misc_expense_amount;
+                        if (!empty($get_result)) {
+                          $row = $get_result;
+                        }
 
+			$fund->lto_pending = $row['lto_pending'];
+			$fund->for_liquidation = $row['for_liquidation'] + $row['misc_expense_amount'];
 			$fund->region = ($_SESSION['company'] != 8) ? $this->region[$fund->region] : $this->mdi_region[$fund->region];
 			$fund->company_cid = $fund->company;
                         $fund->company = ($_SESSION['company'] != 8) ? $this->company : $this->mdi;

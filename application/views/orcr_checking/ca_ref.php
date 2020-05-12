@@ -56,7 +56,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         $clickable = ($sales->selectable) ? 'onclick="attachment('.$sales->sid.', 1)"' : '';
         if ($sales->disapprove === null) {
           $disapprove = '<td class="text-success">Ok</td>';
-        } elseif (in_array($sales->disapprove, array('Resolved', 'For Sap Uploading'))) {
+        } elseif (in_array($sales->disapprove, array('Resolved', 'For Sap Uploading', 'Done'))) {
           $disapprove = '<td class="text-success">'.$sales->disapprove.'</td>';
         } else {
           $disapprove = '<td class="text-error">'.$sales->disapprove.'</td>';

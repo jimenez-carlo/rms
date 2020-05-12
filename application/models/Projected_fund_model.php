@@ -60,7 +60,7 @@ class Projected_fund_model extends CI_Model{
               tbl_region r ON s.region = r.rid
             WHERE
               {$company} AND s.voucher = 0 AND s.payment_method = 'CASH'
-            GROUP BY f.fid
+            GROUP BY f.fid, c.company_code
           ")->result_object();
 
           return $get_fund_per_region;

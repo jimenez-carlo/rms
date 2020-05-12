@@ -178,9 +178,14 @@ GBY;
                       'bcode', s.bcode, 'bname', s.bname,
                       'date_sold', SUBSTR(s.date_sold, 1, 10), 'sales_type', st.sales_type, 'registration_type', s.registration_type,
                       'si_no', s.si_no, 'ar_no', s.ar_no, 'amount', s.amount,
-                      'insurance', s.insurance, 'registration', s.registration,
-                      'status', ss.status, 'disapprove', CASE WHEN sub.subid IS NOT NULL THEN 'For Sap Uploading' ELSE sts.status_name END,
-                      'selectable', CASE WHEN ss.status = 'Registered' AND sub.subid IS NULL THEN true ELSE false END
+                      'insurance', s.insurance, 'registration', s.registration, 'status', ss.status_name,
+                      'disapprove',
+                      CASE
+                        WHEN sub.subid IS NOT NULL AND ss.status_name = 'Registered' THEN 'For Sap Uploading'
+                        WHEN ss.status_name = 'Liquidated' THEN 'Done'
+                        ELSE sts.status_name
+                      END,
+                      'selectable', CASE WHEN ss.status_name = 'Registered' AND sub.subid IS NULL THEN true ELSE false END
                     )
                     ORDER BY FIELD(s.status, 4, 5, 3, 2, 1, 0), FIELD(s.da_reason, 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
                     SEPARATOR ','
@@ -189,7 +194,7 @@ GBY;
               ) AS sales
             FROM tbl_sales s
             {$table_param}
-            LEFT JOIN tbl_sales_status ss ON s.status = ss.ssid
+            LEFT JOIN tbl_status ss ON s.status = ss.status_id AND ss.status_type = 'SALES'
             LEFT JOIN tbl_sap_upload_sales_batch sub ON s.sid = sub.sid
             LEFT JOIN tbl_sales_type st ON s.sales_type = st.stid
             LEFT JOIN tbl_status sts ON s.da_reason = sts.status_id AND sts.status_type = 'DA'

@@ -223,7 +223,7 @@ SQL;
 
 	public function liquidate_batch($batch)
 	{
-		// $this->db->update('tbl_sap_upload_batch', $batch, array('subid' => $batch->subid));
+		$this->db->update('tbl_sap_upload_batch', $batch, array('subid' => $batch->subid));
 		$batch = $this->db->query("select * from tbl_sap_upload_batch where subid = ".$batch->subid)->row();
 
                 $date = date('Y-m-d');

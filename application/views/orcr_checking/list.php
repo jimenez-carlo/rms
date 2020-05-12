@@ -37,23 +37,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     echo '</tr>';
                   }
                 }
-
-                // foreach ($table as $row)
-                // {
-                //   if (isset($topsheet) && $topsheet->tid == $row->tid) print '<tr class="info">';
-                //   else if ($row->alert > 0) print '<tr class="warning">';
-                //   else print '<tr>';
-                //   print '<td>
-                //           <a class="btn btn-success btn-mini" onclick="tid('.$row->tid.')">
-                //             <i class="icon-edit"></i>
-                //           </a> '.$row->trans_no.'</td>';
-                //   print '</tr>';
-                // }
-
-                // if (empty($table))
-                // {
-                //   print '<tr><td>No result.</td></tr>';
-                // }
               ?>
             </tbody>
           </table>

@@ -449,7 +449,7 @@ class Dashboard extends MY_Controller {
 			-- WHEN status = 1 THEN 'incomplete'
 			WHEN s.status = 4 AND sub.is_uploaded = 0 THEN 'sap_upload'
 			WHEN s.status = 5 THEN 'done'
-		      END AS status
+		      END AS label
                     FROM
                       tbl_sales s
                     LEFT JOIN
@@ -458,7 +458,7 @@ class Dashboard extends MY_Controller {
                       tbl_sap_upload_batch sub ON susb.subid = sub.subid
                     WHERE
                       ".$region."
-                    GROUP BY status
+                    GROUP BY label
                 ")->result_object();
 
 		$data['ts_unprocessed'] = 0;
@@ -467,7 +467,7 @@ class Dashboard extends MY_Controller {
 		$data['ts_done'] = 0;
 		foreach ($result as $row)
 		{
-			$data['ts_'.$row->status] = $row->count;
+			$data['ts_'.$row->label] = $row->count;
 		}
 
 		$ts_data = '';
@@ -586,7 +586,7 @@ class Dashboard extends MY_Controller {
             SELECT
               'For CA' AS label,
               COUNT(*) AS total,
-              SUM(CASE WHEN voucher = 0 THEN 1 ELSE 0 END) AS pending,
+              SUM(CASE WHEN voucher = 0 AND payment_method = 'CASH' THEN 1 ELSE 0 END) AS pending,
               SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END) AS done
             FROM
               tbl_sales
@@ -602,20 +602,20 @@ class Dashboard extends MY_Controller {
             FROM
               tbl_sales
             WHERE
-              1=1 {$company}
+              status >= 4 {$company}
 
             UNION
 
             SELECT
               'For SAP Uploading' as label,
               COUNT(*) AS total,
-              SUM(CASE WHEN sub.is_uploaded = 0 THEN 1 END) AS pending,
-              SUM(CASE WHEN s.status = 5 THEN 1 END) AS done
+              IFNULL(SUM(CASE WHEN sub.is_uploaded = 0 THEN 1 END),0) AS pending,
+              IFNULL(SUM(CASE WHEN s.status = 5 THEN 1 END),0) AS done
             FROM
               tbl_sales s
-            LEFT JOIN
+            INNER JOIN
               tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
-            LEFT JOIN
+            INNER JOIN
               tbl_sap_upload_batch sub ON susb.subid = sub.subid
             WHERE
               s.status >= 4 {$company}
