@@ -87,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <th><p>Entry Date</p></th>
               <th><p>Debit Memo #</p></th>
               <th><p>Date Deposited</p></th>
-              <th style="text-align:right;padding-right:10px;"><p>Amount</p></th>
+              <th><p>Amount</p></th>
               <th><p>Region</p></th>
               <!-- <th><p>Company</p></th> -->
               <th><p>Status</p></th>
@@ -103,7 +103,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<td>'.$row->date.'</td>';
               print '<td>'.$row->dm_no.'</td>';
               print '<td>'.$row->transfer_date.'</td>';
-              print '<td style="text-align:right;padding-right:10px;">'.number_format($row->amount,2,'.',',').'</td>';
+              print '<td>'.$row->amount.'</td>';
               print '<td>'.$row->region.'</td>';
               // print '<td>'.$row->company.'</td>';
               print '<td>'.$row->status.'</td>';
