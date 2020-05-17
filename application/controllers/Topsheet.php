@@ -22,7 +22,7 @@ class Topsheet extends MY_Controller {
 		$this->header_data('dir', './');
 
 		$param = new Stdclass();
-		$param->region = $_SESSION['region'];
+		$param->region = $_SESSION['region_id'];
 		$param->date_from = $this->input->post('date_from');
 		$param->date_to = $this->input->post('date_to');
 		$param->company = $this->input->post('company');
@@ -52,7 +52,7 @@ class Topsheet extends MY_Controller {
 			$data['tid'] = $tid;
 		}
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['mid'] = $this->input->post('mid');
 		$data['summary'] = $this->input->post('summary');
 		$tid = $this->input->post('tid');
@@ -140,7 +140,7 @@ class Topsheet extends MY_Controller {
           $this->header_data('nav', 'topsheet');
           $this->header_data('dir', './../');
 
-          $data['region'] = $_SESSION['region'];
+          $data['region'] = $_SESSION['region_id'];
           $data['rid'] = $this->input->post('rid');
           $data['tot_amt'] = $this->input->post('tot_amt');
           $data['tot_exp'] = $this->input->post('tot_exp');
@@ -158,7 +158,7 @@ class Topsheet extends MY_Controller {
           if (empty($data['rid']) || $back_key == 1) {
             $data['table'] = $this->topsheet->list_rerfo_for_topsheet();
             $data['regions'] = $this->topsheet->region;
-            $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region']].'-'.date('ymd');
+            $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region_id']].'-'.date('ymd');
             $this->template('topsheet/create', $data);
           } else if (empty($data['summary']) || $back_key == 2) {
             $data['miscs'] = $this->topsheet->list_misc_for_topsheet($data);
@@ -166,7 +166,7 @@ class Topsheet extends MY_Controller {
           } else {
             $data['topsheet'] = $this->topsheet->list_summary_for_topsheet($data);
             $data['regions'] = $this->topsheet->region;
-            $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region']].'-'.date('ymd');
+            $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region_id']].'-'.date('ymd');
             $this->template('topsheet/create_summary', $data);
           }
         }

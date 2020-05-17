@@ -83,82 +83,18 @@ class Login extends CI_Controller {
 						case 156:
 						case 109:
 						case 108: // if rrt, set region
-							$name = explode('-', $user_info['username']);
-							switch ($name[1]) {
-                                                        case 'NCR':
-                                                          $user_info['region'] = 1;
-                                                          break;
-
-                                                        case 'R1' :
-                                                          $user_info['region'] = 2;
-                                                          break;
-
-                                                        case 'R2' :
-                                                          $user_info['region'] = 3;
-                                                          break;
-
-                                                        case 'R3' :
-                                                          $user_info['region'] = 4;
-                                                          break;
-
-                                                        case 'R4A':
-                                                          $user_info['region'] = 5;
-                                                          break;
-
-                                                        case 'R4B':
-                                                          $user_info['region'] = 6;
-                                                          break;
-
-                                                        case 'R5' :
-                                                          $user_info['region'] = 7;
-                                                          break;
-
-                                                        case 'R6' :
-                                                          $user_info['region'] = 8;
-                                                          break;
-
-                                                        case 'R7' :
-                                                          $user_info['region'] = 9;
-                                                          break;
-
-                                                        case 'R8' :
-                                                          $user_info['region'] = 10;
-                                                          break;
-
-                                                        case 'R9' :
-                                                          $user_info['region'] = 11;
-                                                          break;
-
-                                                        case 'R10':
-                                                          $user_info['region'] = 12;
-                                                          break;
-
-                                                        case 'R11':
-                                                          $user_info['region'] = 13;
-                                                          break;
-
-                                                        case 'R12':
-                                                          $user_info['region'] = 14;
-                                                          break;
-
-                                                        case 'R13':
-                                                          $user_info['region'] = 15;
-                                                          break;
-                                                        default:
-                                                          $user_info['region'] = 0;
-                                                          $user_info['company'] = 1;
-							}
+                                                        $region =  $this->login->get_user_region($user_info['uid']);
+                                                        $user_info['region_id'] = $region['region_id'];
+                                                        $user_info['region'] = $region['region'];
 
 							$this->load->model('Cmc_model', 'cmc');
-							$user_info['branches'] = $this->cmc->get_region_branches($user_info['region']);
+							$user_info['branches'] = $this->cmc->get_region_branches($user_info['region_id']);
 							break;
-
 						case 72:
 						case 73:
 						case 81: // if ccn, set branch
 							$user_info['branch'] = substr($user_info['username'], 0, 4);
 							break;
-
 						case 3:
 						case 34:
 						case 53:

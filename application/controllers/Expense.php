@@ -29,7 +29,7 @@ class Expense extends MY_Controller {
   	}
 
   	$param = new Stdclass();
-  	$param->region = $_SESSION['region'];
+  	$param->region = $_SESSION['region_id'];
   	$param->date_from = $this->input->post('date_from');
   	$param->date_to = $this->input->post('date_to');
   	$param->type = $this->input->post('type');
@@ -62,7 +62,7 @@ class Expense extends MY_Controller {
   	}
 
   	$reference = array('0' => '- select a reference -');
-  	$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region']." ORDER BY vid DESC")->result_object();
+  	$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region_id']." ORDER BY vid DESC")->result_object();
   	foreach ($result as $row) {
   		$reference[$row->vid] = $row->reference;
   	}
@@ -123,7 +123,7 @@ class Expense extends MY_Controller {
   {
   	$misc = new Stdclass();
   	$misc->mid = $this->input->post('mid');
-  	$misc->region = $_SESSION['region'];
+  	$misc->region = $_SESSION['region_id'];
   	$misc->or_no = $this->input->post('or_no');
   	$misc->or_date = $this->input->post('or_date');
   	$misc->amount = $this->input->post('amount');
@@ -198,7 +198,7 @@ class Expense extends MY_Controller {
   	}
 
   	$reference = array('0' => '- select a reference -');
-  	$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region'])->result_object();
+  	$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region_id'])->result_object();
   	foreach ($result as $row) {
   		$reference[$row->vid] = $row->reference;
   	}
@@ -272,7 +272,7 @@ class Expense extends MY_Controller {
 
   	if (!empty($mid)) {
   		$reference = array('0' => '- select a reference -');
-  		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region'])->result_object();
+  		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region_id'])->result_object();
   		foreach ($result as $row) {
   			$reference[$row->vid] = $row->reference;
   		}
@@ -300,7 +300,7 @@ class Expense extends MY_Controller {
                   INNER JOIN
                     tbl_status s ON mxh1.status = s.status_id AND s.status_type = 'MISC_EXP'
                   WHERE
-                    m.region = ".$_SESSION['region']." AND mxh2.id IS NULL
+                    m.region = ".$_SESSION['region_id']." AND mxh2.id IS NULL
                 ")->result_object();
   		$this->template('expense/ca_ref', $data);
   	}

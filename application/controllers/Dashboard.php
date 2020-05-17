@@ -56,7 +56,7 @@ class Dashboard extends MY_Controller {
 		if ($_SESSION['position'] != 108)
 		{
 			$branches = $global->query("select b_code from tbl_branches
-				where ph_region = ".$_SESSION['region'])->result_object();
+				where ph_region = ".$_SESSION['region_id'])->result_object();
 			foreach ($branches as $branch)
 			{
 				$bcode[] = $branch->b_code;
@@ -285,7 +285,7 @@ class Dashboard extends MY_Controller {
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
-		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 's.region = '.$_SESSION['region'];
+		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 's.region = '.$_SESSION['region_id'];
 
 		// rerfo
 		$result = $this->db->query("select count(*) as count,
@@ -364,7 +364,7 @@ class Dashboard extends MY_Controller {
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
 		// sales
-		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
+		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region_id'];
 		$result = $this->db->query("SELECT count(*) as count,
 			case status when 0 then 'new'
 				when 1 then 'rejected'
@@ -440,7 +440,7 @@ class Dashboard extends MY_Controller {
 		}
 
 		// topsheet
-		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
+		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region_id'];
                 $result = $this->db->query("
                     SELECT
                       COUNT(*) AS count,
@@ -512,7 +512,7 @@ class Dashboard extends MY_Controller {
 		**  report of units tagged as self registration
 		**    with & without transmittal (independent, no process)
 		*/
-		$branches = $this->cmc->get_region_branches($_SESSION['region']);
+		$branches = $this->cmc->get_region_branches($_SESSION['region_id']);
 		$data['sr_with'] = $this->db->query("select sid from tbl_sales
 			where registration_type = 'Self Registration'and
 			transmittal_date IS NULL and

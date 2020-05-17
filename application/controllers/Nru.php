@@ -16,7 +16,7 @@ class Nru extends MY_Controller {
 		$this->header_data('nav', 'nru');
 		$this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['ltid'] = $this->input->post('ltid');
 		$data['company'] = $this->input->post('company');
 		$data['registration'] = $this->input->post('registration');
@@ -113,7 +113,7 @@ class Nru extends MY_Controller {
 		$this->header_data('nav', 'nru');
 		$this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['company'] = $this->input->post('company');
 		$data['ltid'] = $this->input->post('ltid');
 		$data['registration'] = $this->input->post('registration');

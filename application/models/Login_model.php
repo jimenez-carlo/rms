@@ -81,7 +81,6 @@ SQL;
 				'" . date('Y-m-d H:i:s', time()) . "')");
 	}
 
-
 	public function get_user_info($username) {
 	  $global = $this->load->database('global', TRUE);
 
@@ -111,13 +110,7 @@ SQL;
 
 	public function get_system_access($system="") {
 	  $global = $this->load->database('global', TRUE);
-          $result = $global->query("
-            SELECT
-              *
-            FROM
-              tbl_system_access
-            WHERE system = '$system'
-          ");
+          $result = $global->query("SELECT * FROM tbl_system_access tsa WHERE tsa.system = '$system'");
 
           return $result->result_array();
 	}
@@ -164,4 +157,15 @@ SQL;
 	    )
 	  );
 	}
+
+        public function get_user_region($user_id)
+        {
+          $this->db->select('rur.region_id, r.region');
+          $this->db->from('tbl_rrt_users_region rur');
+          $this->db->join('tbl_region r', 'rur.region_id = r.rid', 'inner');
+          $this->db->where('user_id', $user_id);
+          $region = $this->db->get()->row_array();
+          return $region;
+        }
+
 }

@@ -404,7 +404,7 @@ class Topsheet_model extends CI_Model{
 	{
 		return $this->db->query("select * from tbl_topsheet_sales
 			inner join tbl_topsheet on tid = topsheet
-			where region = ".$_SESSION['region']."
+			where region = ".$_SESSION['region_id']."
 			and hold = 1")->result_object();
 	}
 
@@ -419,7 +419,7 @@ class Topsheet_model extends CI_Model{
 	public function get_misc_on_hold_with_remarks()
 	{
 		return $this->db->query("select * from tbl_topsheet
-			where region = ".$_SESSION['region']."
+			where region = ".$_SESSION['region_id']."
 			and (select count(*) from tbl_batch
 			where misc = 1 and topsheet = tid) = 0
 			and (select count(*) from tbl_topsheet_misc_remarks
@@ -456,7 +456,7 @@ class Topsheet_model extends CI_Model{
 				(select sum(registration) + sum(tip) from tbl_sales
 				where topsheet = tid) as total_expense
 			from tbl_topsheet
-			where region = '.$_SESSION['region'].' and
+			where region = '.$_SESSION['region_id'].' and
 			trans_no like "%'.$trans_no.'%" and
 			print_date like "%'.$print_date.'%"
 			order by print_date desc, status')->result_object();
@@ -562,7 +562,7 @@ class Topsheet_model extends CI_Model{
 
 	public function list_rerfo_for_topsheet()
 	{
-		$trans_no = 'T-'.$this->reg_code[$_SESSION['region']].'-'.date('ymd');
+		$trans_no = 'T-'.$this->reg_code[$_SESSION['region_id']].'-'.date('ymd');
 		$row = $this->db->query("select tid from tbl_topsheet where trans_no = '".$trans_no."'")->row();
 		$tid = (!empty($row)) ? $row->tid : -2;
 
@@ -575,7 +575,7 @@ class Topsheet_model extends CI_Model{
 			from tbl_rerfo r
 			inner join tbl_sales on rerfo = rid
 				and (topsheet < 1 or topsheet = ".$tid.")
-			where r.region = ".$_SESSION['region']."
+			where r.region = ".$_SESSION['region_id']."
 			group by rid
 			having c = 0 or t > 0
 			order by r.bcode")->result_object();
@@ -587,7 +587,7 @@ class Topsheet_model extends CI_Model{
 		$this->load->model('Expense_model', 'misc');
 		$type = $this->misc->type;
 
-		$trans_no = 'T-'.$this->reg_code[$_SESSION['region']].'-'.date('ymd');
+		$trans_no = 'T-'.$this->reg_code[$_SESSION['region_id']].'-'.date('ymd');
 		$row = $this->db->query("select tid from tbl_topsheet where trans_no = '".$trans_no."'")->row();
 		$tid = (!empty($row)) ? $row->tid : -2;
 
@@ -649,14 +649,14 @@ class Topsheet_model extends CI_Model{
 
 	public function hyper_create($data)
 	{
-		$trans_no = 'T-'.$this->reg_code[$_SESSION['region']].'-'.date('ymd');
+		$trans_no = 'T-'.$this->reg_code[$_SESSION['region_id']].'-'.date('ymd');
 		$row = $this->db->query("select tid from tbl_topsheet where trans_no = '".$trans_no."'")->row();
 		$tid = (!empty($row)) ? $row->tid : 0;
 
 		if (empty($tid))
 		{
 			$topsheet = new Stdclass();
-			$topsheet->region = $_SESSION['region'];
+			$topsheet->region = $_SESSION['region_id'];
 			$topsheet->company = ($_SESSION['company'] != 8) ? 1 : 8;
 			$topsheet->date = date('Y-m-d');
 			$topsheet->trans_no = $trans_no;

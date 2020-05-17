@@ -17,14 +17,14 @@ class Rerfo extends MY_Controller {
 		$this->header_data('dir', './');
 
 		$param = new Stdclass();
-		$param->region = $_SESSION['region'];
+		$param->region = $_SESSION['region_id'];
 		$param->date_from = $this->input->post('date_from');
 		$param->date_to = $this->input->post('date_to');
 		$param->branch = $this->input->post('branch');
 		$param->status = $this->input->post('status');
 		$param->print = $this->input->post('print');
 
-		$data['branches'] = $this->rerfo->dd_branches($_SESSION['region']);
+		$data['branches'] = $this->rerfo->dd_branches($_SESSION['region_id']);
 		$data['table'] = $this->rerfo->list_rerfo($param);
 		$this->template('rerfo/list', $data);
 	}

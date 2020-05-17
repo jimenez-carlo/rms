@@ -304,7 +304,7 @@ QRY;
 		$cash = array();
 
 		$result = $this->db->query("select * from tbl_fund
-			where region = ".$_SESSION['region'])->result_object();
+			where region = ".$_SESSION['region_id'])->result_object();
 		foreach ($result as $fund) {
 			if($type == "check") $cash[$fund->company] = $fund->cash_on_check;
 			else $cash[$fund->company] = $fund->cash_on_hand;
@@ -315,7 +315,7 @@ QRY;
 
 	public function get_total_cash_on_hand()
 	{
-		return $this->db->query("select sum(cash_on_hand) as cash_on_hand from tbl_fund where region = ".$_SESSION['region']."
+		return $this->db->query("select sum(cash_on_hand) as cash_on_hand from tbl_fund where region = ".$_SESSION['region_id']."
 			group by region")->row()->cash_on_hand;
 	}
 

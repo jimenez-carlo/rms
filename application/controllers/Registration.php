@@ -61,7 +61,7 @@ class Registration extends MY_Controller {
 		$this->header_data('nav', 'registration');
 		$this->header_data('dir', './../');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['table'] = $this->registration->list_sales($data);
 		$this->template('registration/sales', $data);
 	}
@@ -222,7 +222,7 @@ class Registration extends MY_Controller {
           // update fund
           if ($expense != 0) {
             $fund = $this->db->query("select * from tbl_fund
-              where region = ".$_SESSION['region'])->row();
+              where region = ".$_SESSION['region_id'])->row();
 
             $new_fund = new Stdclass();
             $new_fund->cash_on_hand = $fund->cash_on_hand + $expense;
@@ -255,7 +255,7 @@ class Registration extends MY_Controller {
 		$this->header_data('nav', 'registration');
 		$this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['ltid'] = $this->input->post('ltid');
 		$data['registration'] = $this->input->post('registration');
 		$data['tip'] = $this->input->post('tip');

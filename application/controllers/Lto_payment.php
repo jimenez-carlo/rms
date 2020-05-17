@@ -48,7 +48,7 @@ class Lto_payment extends MY_Controller {
 
         public function csv() {
           $param = new Stdclass();
-          $param->region = $_SESSION['region'];
+          $param->region = $_SESSION['region_id'];
           $param->company = $this->input->post('company');
           $param->date_from = $this->input->post('date_from');
           $param->date_to = $this->input->post('date_to');
@@ -91,7 +91,7 @@ class Lto_payment extends MY_Controller {
 				// && ($screenshot = $this->lto_payment->upload_screenshot())
 				&& ($batch = $this->lto_payment->upload_batch())) {
 				$payment = new Stdclass();
-				$payment->region = $_SESSION['region'];
+				$payment->region = $_SESSION['region_id'];
 				$payment->company = $this->input->post('company');
 				$payment->reference = $this->input->post('reference');
 				$payment->ref_date = $this->input->post('ref_date');
@@ -101,7 +101,7 @@ class Lto_payment extends MY_Controller {
 			}
 		}
 
-		$data['region'] = $this->region[$_SESSION['region']];
+		$data['region'] = $this->region[$_SESSION['region_id']];
 		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 3 => 'HPTI', 6 => 'MTI');
 		$this->template('lto_payment/add', $data);
 	}
@@ -117,7 +117,7 @@ class Lto_payment extends MY_Controller {
 			if ($this->form_validation->run()) {
 				$new_payment = new Stdclass();
 				$new_payment->lpid = $lpid;
-				$new_payment->region = $_SESSION['region'];
+				$new_payment->region = $_SESSION['region_id'];
 				$new_payment->company = $this->input->post('company');
 				$new_payment->reference = $this->input->post('reference');
 				$new_payment->ref_date = $this->input->post('ref_date');
@@ -140,7 +140,7 @@ class Lto_payment extends MY_Controller {
 
 		$data['payment'] = $payment;
                 $data['lpid'] = $lpid;
-		$data['region'] = (isset($_SESSION['region'])) ? $this->region[$_SESSION['region']] : '';
+		$data['region'] = (isset($_SESSION['region_id'])) ? $this->region[$_SESSION['region_id']] : '';
 		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 2 => 'MTI', 3 => 'HPTI');
 		$this->template('lto_payment/edit', $data);
 	}

@@ -114,7 +114,7 @@ class Sales_model extends CI_Model{
 
 	public function get_sr_with($date_sold)
 	{
-		$branches = $this->cmc->get_region_branches($_SESSION['region']);
+		$branches = $this->cmc->get_region_branches($_SESSION['region_id']);
 		$sales = $this->db->query("select * from tbl_sales
 			left join tbl_engine on engine = eid
 			left join tbl_customer on customer = cid
@@ -137,7 +137,7 @@ class Sales_model extends CI_Model{
 
 	public function get_sr_without($date_sold)
 	{
-		$branches = $this->cmc->get_region_branches($_SESSION['region']);
+		$branches = $this->cmc->get_region_branches($_SESSION['region_id']);
 		$sales = $this->db->query("select * from tbl_sales
 			left join tbl_engine on engine = eid
 			left join tbl_customer on customer = cid
@@ -282,7 +282,7 @@ class Sales_model extends CI_Model{
 			if (empty($rerfo))
 			{
 				$rerfo = new Stdclass();
-				$rerfo->region = $_SESSION['region'];
+				$rerfo->region = $_SESSION['region_id'];
 				$rerfo->bcode = $sales->bcode;
 				$rerfo->bname = $sales->bname;
 				$rerfo->date = $sales->registration_date;
