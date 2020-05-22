@@ -81,7 +81,6 @@ SQL;
 				'" . date('Y-m-d H:i:s', time()) . "')");
 	}
 
-
 	public function get_user_info($username) {
 	  $global = $this->load->database('global', TRUE);
 
@@ -89,12 +88,14 @@ SQL;
             SELECT
               u.username, u.password, b.*,
               p.pid AS position_id, p.name AS position_name,
-              ui.*, c.cid AS company_id,
-              c.code AS company_code
+              ui.*, d.did AS dept_id, d.description AS dept_name,
+              c.cid AS company_id, c.code AS company_code
             FROM
               tbl_users u
             INNER JOIN
               tbl_users_info ui ON u.uid=ui.uid
+            INNER JOIN
+              tbl_departments d ON ui.department = d.did
             LEFT JOIN
               tbl_branches b ON ui.branch = b.bid
             LEFT JOIN
@@ -111,13 +112,7 @@ SQL;
 
 	public function get_system_access($system="") {
 	  $global = $this->load->database('global', TRUE);
-          $result = $global->query("
-            SELECT
-              *
-            FROM
-              tbl_system_access
-            WHERE system = '$system'
-          ");
+          $result = $global->query("SELECT * FROM tbl_system_access tsa WHERE tsa.system = '$system'");
 
           return $result->result_array();
 	}
@@ -164,4 +159,16 @@ SQL;
 	    )
 	  );
 	}
+
+        public function get_region_and_fund($user_id)
+        {
+          $this->db->select('fund.fid AS fund_id, rur.region_id, r.region');
+          $this->db->from('tbl_rrt_users_region rur');
+          $this->db->join('tbl_region r', 'rur.region_id = r.rid', 'inner');
+          $this->db->join('tbl_fund fund', 'r.rid = fund.region', 'inner');
+          $this->db->where('user_id', $user_id);
+          $region = $this->db->get()->row_array();
+          return $region;
+        }
+
 }

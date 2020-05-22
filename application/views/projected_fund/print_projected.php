@@ -88,6 +88,7 @@
   <tbody>
     <?php
     $total = 0;
+    $total_unit = 0;
     $budget = ((int) ($_SESSION['company']) == 8) ? 1200 : 900;
 
     foreach ($fund->sales as $sales)
@@ -100,6 +101,7 @@
       print '<td>'.number_format($amount, 2, '.', ',').'</td>';
       print '</tr>';
       $total += $amount;
+      $total_unit+=$sales->units;
     }
     ?>
   </tbody>
@@ -107,7 +109,7 @@
     <tr>
       <th>Total</th>
       <th></th>
-      <th></th>
+      <th><?php echo $total_unit; ?></th>
       <th style="text-align:right;">&#x20b1 <?php print number_format($total, 2, '.', ','); ?></th>
     </tr>
   </tfoot>

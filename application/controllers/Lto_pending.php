@@ -34,7 +34,7 @@ class Lto_pending extends MY_Controller {
 
 		if (empty($ltid))
 		{
-			$data['table'] = $this->lto_pending->load_list($_SESSION['region']);
+			$data['table'] = $this->lto_pending->load_list($_SESSION['region_id']);
 			$this->template('lto_pending/list', $data);
 		}
 		else

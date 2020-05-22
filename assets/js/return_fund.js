@@ -10,9 +10,25 @@ var return_fund_table = $("#return-fund-table").dataTable({
   "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
 });
 
-$('input[type=checkbox]').on('click', function(){
-  $.ajax({
-    url: BASE_URL+'return_fund'
-  });
+$('#rf-disapprove').on('click', function(){
+  $(this).attr('disabled', true);
+  $('.return_fund_disapprove').show();
 });
 
+
+$('#return-fund-save-disapprove').on('click', function(e){
+  e.preventDefault();
+  var confirm = ('This action cannot be undone: Disapprove. Continue?');
+  if (confirm) {
+    $('#return-disapprove-form').submit();
+  }
+});
+
+$('#input-amount').on('keyup', function(e) {
+  $("input[name='amount']").val($(this).val())
+});
+
+$('#save-correct-amount').on('click', function(e){
+  e.preventDefault();
+  $("#form-correct-amount").submit();
+});

@@ -56,20 +56,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               $regions = ($_SESSION['company'] != 8) ? $luzon_visayas : $mindanao;
 
               echo '<div class="control-group span5">';
-              echo form_label('Region', 'region', array('class' => 'control-label'));
+              echo form_label('Region', 'region_id', array('class' => 'control-label'));
               echo '<div class="controls">';
               switch ($_SESSION['position']) {
                 case 108: // RRT-SPVSR
-                  $set_region = $_SESSION['region'];
+                  $set_region = $_SESSION['region_id'];
                   $bool = array('disabled' => 'false');
                   break;
 
                 default: // TRSRY-SPVSR, ACCT-PAYCL, RRT-MGR
-                  $set_region = set_value('region');
+                  $set_region = set_value('region_id');
                   $bool = false;
                   break;
               }
-              echo form_dropdown('region', $regions, $set_region, $bool);
+              echo form_dropdown('region_id', $regions, $set_region, $bool);
               echo '</div></div>';
             ?>
             <div class="form-actions span4">

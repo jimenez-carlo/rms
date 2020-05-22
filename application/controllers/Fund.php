@@ -18,7 +18,7 @@ class Fund extends MY_Controller {
     $this->header_data('dir', './');
     $this->footer_data('script', '<script src="./assets/modal/rrt_fund.js"></script>');
 
-    $data['table'] = $this->fund->load_rrt_fund($_SESSION['region']);
+    $data['fund'] = $this->fund->load_rrt_fund($_SESSION['region_id']);
     $this->template('fund/view', $data);
   }
 
@@ -98,7 +98,7 @@ class Fund extends MY_Controller {
     $this->header_data('nav', 'fund');
     $this->header_data('dir', './../');
 
-    $region = $_SESSION['region'];
+    $region = $_SESSION['region_id'];
     $data['table'] = $this->db->query("select fh.*, company
       from tbl_fund_history fh
       inner join tbl_fund on fh.fund = fid
