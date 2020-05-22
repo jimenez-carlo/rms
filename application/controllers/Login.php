@@ -61,7 +61,8 @@ class Login extends CI_Controller {
                                             'branch_code' => $raw['user_info']->b_code,
                                             'position' => $raw['user_info']->position_id,
                                             'position_name' => $raw['user_info']->position_name,
-                                            'department' => $raw['user_info']->department,
+                                            'dept_id' => $raw['user_info']->dept_id,
+                                            'dept_name' => $raw['user_info']->dept_name,
                                             'company' => $raw['user_info']->company_id,
                                             'company_code'=> $raw['user_info']->company_code,
                                             'sys_access'  => $raw['sys_access'],
@@ -83,9 +84,11 @@ class Login extends CI_Controller {
 						case 156:
 						case 109:
 						case 108: // if rrt, set region
-                                                        $region =  $this->login->get_user_region($user_info['uid']);
-                                                        $user_info['region_id'] = $region['region_id'];
-                                                        $user_info['region'] = $region['region'];
+                                                        $region_and_fund =  $this->login->get_region_and_fund($user_info['uid']);
+
+                                                        $user_info['fund_id'] = $region_and_fund['fund_id'];
+                                                        $user_info['region_id'] = $region_and_fund['region_id'];
+                                                        $user_info['region'] = $region_and_fund['region'];
 
 							$this->load->model('Cmc_model', 'cmc');
 							$user_info['branches'] = $this->cmc->get_region_branches($user_info['region_id']);

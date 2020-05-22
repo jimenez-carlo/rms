@@ -86,81 +86,119 @@ class Fund_model extends CI_Model{
 	}
 
 	public function load_rrt_fund($region)
-	{
-		$this->load->model('Cmc_model', 'cmc');
+        {
+          $this->load->model('Cmc_model', 'cmc');
+          $fund = $this->db->query("SELECT * FROM tbl_fund WHERE fid = {$_SESSION['fund_id']}")->row_array();
 
-		$result = $this->db->query("SELECT * FROM tbl_fund WHERE region = ".$region)->result_object();
-                $row = array(
-                  'lto_pending' => 0,
-                  'for_liquidation' => 0,
-                  'misc_expense_amount' => 0
-                );
+          $result = array(
+            'lto_pending' => 0,
+            'liquidated' => 0,
+            'for_liquidation' => 0,
+          );
 
-		foreach ($result as $key => $fund)
-		{
-                        $sql = <<<QRY
-			  SELECT
-                            IFNULL(
-			      SUM(
-				CASE
-				  WHEN s.status = 3 THEN s.registration
-				  ELSE 0
-				END
-			      ), 0
-		            ) AS lto_pending,
-                            IFNULL(
-                              SUM(
-                                CASE
-                                  WHEN s.status = 4 THEN s.registration + s.tip
-                                  ELSE 0
-                                END), 0
-                            ) AS for_liquidation
-		            ,IFNULL(CASE
-			      WHEN mxh1.status IN (2,3) THEN m.amount
-                              ELSE 0
-		            END, 0) AS misc_expense_amount
-                          FROM
-                            tbl_sales s
-                          LEFT JOIN
-                            tbl_voucher v ON v.vid = s.voucher
-                          LEFT JOIN
-                            tbl_misc m ON m.ca_ref = v.vid
-                          LEFT JOIN
-                            tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
-                          LEFT JOIN
-                            tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
-                          WHERE
-                            s.status > 2 AND s.status < 7 AND s.voucher > 0 AND s.region = $region AND mxh2.id IS NULL
-                          GROUP BY
-                            m.mid, misc_expense_amount
+          $sql = <<<QRY
+            SELECT
+            	'lto_pending' AS label,
+            	IFNULL(SUM(IF(status = 3, registration, 0)), 0) AS amount
+            FROM
+              tbl_sales
+            WHERE
+            	region = {$region}
+            UNION
+	    SELECT
+	      'for_liquidation' AS label,
+              IFNULL(SUM(registration+tip), 0)
+              + ANY_VALUE(misc_for_liq_amount)
+              + ANY_VALUE(return_fund_for_liq_amount) AS amount
+	    FROM
+	      tbl_sales s
+            JOIN (
+              SELECT
+	        IFNULL(SUM(m.amount), 0) AS misc_for_liq_amount
+	      FROM
+	        tbl_voucher v
+	      LEFT JOIN
+	        tbl_misc m ON m.ca_ref = v.vid
+	      INNER JOIN
+	        tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
+	      INNER JOIN
+	        tbl_status st ON st.status_id = mxh1.status AND st.status_type = 'MISC_EXP'
+	      LEFT JOIN
+	        tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
+	      WHERE
+	        mxh2.id IS NULL AND v.fund = {$_SESSION['fund_id']} AND st.status_name IN ('Approved', 'Resolved', 'For Liquidation')
+	    ) AS misc_exp
+            JOIN (
+              SELECT
+	        SUM(rf.amount) AS return_fund_for_liq_amount
+	      FROM
+	        tbl_voucher v
+	      INNER JOIN
+	        tbl_return_fund rf ON v.vid = rf.fund
+	      INNER JOIN
+	        tbl_return_fund_history rfh_1 ON rfh_1.rfid = rf.rfid
+	      INNER JOIN
+	        tbl_status st ON st.status_id = rfh_1.status_id AND st.status_type = 'RETURN_FUND'
+	      LEFT JOIN
+	        tbl_return_fund_history rfh_2 ON rfh_1.rfid = rfh_2.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
+	      WHERE
+	        rfh_2.return_fund_history_id IS NULL AND v.fund = {$_SESSION['fund_id']} AND st.status_name = 'For Liquidation'
+	    ) AS return_fund
+            WHERE
+                s.region = {$region} AND s.status = 4
+            UNION
+	    SELECT
+	      'liquidated' AS label,
+              IFNULL(SUM(registration+tip), 0)
+              + ANY_VALUE(misc_liq_amount)
+              + ANY_VALUE(return_fund_liq_amount) AS amount
+	    FROM
+	      tbl_sales s
+            JOIN (
+              SELECT
+	        IFNULL(SUM(m.amount), 0) AS misc_liq_amount
+	      FROM
+	        tbl_voucher v
+	      LEFT JOIN
+	        tbl_misc m ON m.ca_ref = v.vid
+	      INNER JOIN
+	        tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
+	      INNER JOIN
+	        tbl_status st ON st.status_id = mxh1.status AND st.status_type = 'MISC_EXP'
+	      LEFT JOIN
+	        tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
+	      WHERE
+	        mxh2.id IS NULL AND v.fund = {$_SESSION['fund_id']} AND st.status_name IN ('Liquidated')
+	    ) AS misc_exp
+            JOIN (
+              SELECT
+	        SUM(rf.amount) AS return_fund_liq_amount
+	      FROM
+	        tbl_voucher v
+	      INNER JOIN
+	        tbl_return_fund rf ON v.vid = rf.fund
+	      INNER JOIN
+	        tbl_return_fund_history rfh_1 ON rfh_1.rfid = rf.rfid
+	      INNER JOIN
+	        tbl_status st ON st.status_id = rfh_1.status_id AND st.status_type = 'RETURN_FUND'
+	      LEFT JOIN
+	        tbl_return_fund_history rfh_2 ON rfh_1.rfid = rfh_2.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
+	      WHERE
+	        rfh_2.return_fund_history_id IS NULL AND v.fund = {$_SESSION['fund_id']} AND st.status_name = 'Liquidated'
+	    ) AS return_fund
+            WHERE
+                s.region = {$region} AND s.status = 5
 QRY;
+          $get_result = $this->db->query($sql)->result_array();
 
-                        //OLD QUERY
-                        //SELECT
-			//    IFNULL(SUM(
-			//    	CASE WHEN status = 3 THEN registration ELSE 0 end
-			//    ), 0) as lto_pending,
-			//    IFNULL(SUM(
-			//    	CASE WHEN status > 3 THEN registration+tip ELSE 0 end
-			//    ), 0) AS for_liquidation
-			//FROM tbl_sales
-			//WHERE status > 2 AND status < 7
-                        //AND region = ".$region
-                        $get_result = $this->db->query($sql)->row_array();
+          foreach ($get_result as $amount) {
+            $result[$amount['label']] = $amount['amount'];
+          }
 
-                        if (!empty($get_result)) {
-                          $row = $get_result;
-                        }
+          $final_fund = array_merge($result, $fund);
 
-			$fund->lto_pending = $row['lto_pending'];
-			$fund->for_liquidation = $row['for_liquidation'] + $row['misc_expense_amount'];
-			$fund->region = ($_SESSION['company'] != 8) ? $this->region[$fund->region] : $this->mdi_region[$fund->region];
-			$fund->company_cid = $fund->company;
-                        $fund->company = ($_SESSION['company'] != 8) ? $this->company : $this->mdi;
-                        $result[$key] = $fund;
-		}
-		return $result;
-	}
+          return $final_fund;
+        }
 
 	public function save_rrt_transaction($transaction, $check)
 	{

@@ -18,7 +18,7 @@ class Fund extends MY_Controller {
     $this->header_data('dir', './');
     $this->footer_data('script', '<script src="./assets/modal/rrt_fund.js"></script>');
 
-    $data['table'] = $this->fund->load_rrt_fund($_SESSION['region_id']);
+    $data['fund'] = $this->fund->load_rrt_fund($_SESSION['region_id']);
     $this->template('fund/view', $data);
   }
 

@@ -65,8 +65,28 @@ class Liquidation_model extends CI_Model{
                     WHERE
                       ca_ref = vid AND mxh2.id IS NULL AND mxh1.status = 4
                     ) AS misc_liquidated,
-                    (SELECT SUM(amount) FROM tbl_return_fund WHERE fund = vid AND liq_date IS NULL) AS return_for_liq,
-                    (SELECT SUM(amount) FROM tbl_return_fund WHERE fund = vid AND liq_date IS NOT NULL) AS return_liquidated
+                    (
+                      SELECT
+                        SUM(rf.amount)
+                      FROM
+                        tbl_return_fund rf
+                      JOIN
+                        tbl_return_fund_history rfh_1 USING(rfid)
+                      LEFT JOIN
+                        tbl_status st ON rfh_1.status_id = st.status_id AND status_type = 'RETURN_FUND'
+                      LEFT JOIN
+                        tbl_return_fund_history rfh_2 ON rfh_2.rfid = rfh_1.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
+                      WHERE
+                        rf.liq_date IS NULL AND rf.fund = v.vid AND rfh_2.return_fund_history_id IS NULL AND st.status_name = 'For Liquidation'
+                    ) AS return_for_liq,
+                    (
+                      SELECT
+                        SUM(amount)
+                      FROM
+                        tbl_return_fund
+                      WHERE
+                        fund = vid AND liq_date IS NOT NULL
+                    ) AS return_liquidated
                   FROM tbl_voucher v
                   INNER JOIN tbl_fund f ON fid = v.fund
                   INNER JOIN tbl_sales s ON s.fund = vid
