@@ -16,7 +16,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', './');
 
-		$data['table'] = $this->transmittal->get_rrt_transmittal($_SESSION['region']);
+		$data['table'] = $this->transmittal->get_rrt_transmittal($_SESSION['region_id']);
 		$this->template('transmittal/report', $data);
 	}
 

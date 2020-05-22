@@ -44,15 +44,32 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <td>
                   <span>
                     <?php
-                      print form_radio('status'.$key, 2, 
-                      (set_value('status'.$key, $sales->status) == 2));
-                    ?> Pending at LTO
+                      print form_radio(
+                        'status'.$key,
+                        'EPP',
+                        (set_value('status'.$key, 'EPP') == 'EPP')
+                      );
+                    ?> Pending at LTO EPP
                   </span><br>
                   <span>
                     <?php
-                      print form_radio('status'.$key, 1, 
-                      (set_value('status'.$key, $sales->status) == 1));
-                    ?> Rejected
+                      print form_radio(
+                        'status'.$key,
+                        'CASH',
+                        (set_value('status'.$key, false) == 'CASH')
+                      );
+                    ?> Pending at LTO CASH
+                  </span><br>
+                  <span>
+                    <?php
+                      print form_radio(
+                        'status'.$key,
+                        'REJECT',
+                        (in_array(
+                          set_value('status'.$key, $sales->status),
+                          array(1,'REJECT')
+                        ))
+                      ); ?> Rejected
                   </span>
                 </td>
 
@@ -81,7 +98,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $(function(){
   $(document).ready(function(){
     $("input[type=radio]").change(function(){
-      if ($(this).val() == 1) {
+      if ($(this).val() == 'REJECT') {
         $(this).closest("tr").find("select").select2("enable", true);
       }
       else {

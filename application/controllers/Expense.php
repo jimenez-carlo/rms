@@ -12,282 +12,297 @@ class Expense extends MY_Controller {
     $this->load->model('File_model', 'file');
   }
 
-	public function index()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Miscellaneous Expense');
-		$this->header_data('nav', 'expense');
-		$this->header_data('dir', './');
+  public function index()
+  {
+  	$this->access(1);
+  	$this->header_data('title', 'Miscellaneous Expense');
+  	$this->header_data('nav', 'expense');
+  	$this->header_data('dir', './');
 
-		if ($_SESSION['position'] == 108) { // spvsr
-			$data['add'] = $data['edit'] = 0;
-			$data['default_status'] = 0;
-		}
-		else {
-			$data['add'] = $data['edit'] = 1;
-			$data['default_status'] = 1;
-		}
+  	if ($_SESSION['position'] == 108) { // spvsr
+  		$data['add'] = $data['edit'] = 0;
+  		$data['default_status'] = 0;
+  	}
+  	else {
+  		$data['add'] = $data['edit'] = 1;
+  		$data['default_status'] = 1;
+  	}
 
-		$param = new Stdclass();
-		$param->region = $_SESSION['region'];
-		$param->date_from = $this->input->post('date_from');
-		$param->date_to = $this->input->post('date_to');
-		$param->type = $this->input->post('type');
-		$param->status = $this->input->post('status');
-		
-		$param->status = (empty($param->status) && !is_numeric($param->status))
-			? $data['default_status'] : $param->status;
+  	$param = new Stdclass();
+  	$param->region = $_SESSION['region_id'];
+  	$param->date_from = $this->input->post('date_from');
+  	$param->date_to = $this->input->post('date_to');
+  	$param->type = $this->input->post('type');
+  	$param->status = (empty($this->input->post('status')) && !is_numeric($this->input->post('status'))) ? $data['default_status'] : $this->input->post('status');
 
-		$data['table'] = $this->expense->list_misc($param);
-		$data['type'] = $this->expense->type;
-		$data['status'] = $this->expense->status;
-		$this->template('expense/list', $data);
-	}
+  	$data['table'] = $this->expense->list_misc($param);
+  	$data['type'] = $this->expense->type;
+  	$data['status'] = $this->expense->status;
+  	$this->template('expense/list', $data);
+  }
 
-	public function add()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Add Expense');
-		$this->header_data('nav', 'expense');
-		$this->header_data('dir', './../');
-		$this->footer_data('script', '
-			<script src="./../assets/js/expense.js"></script>');
+  public function add()
+  {
+  	$this->access(1);
+  	$this->header_data('title', 'Add Expense');
+  	$this->header_data('nav', 'expense');
+  	$this->header_data('dir', './../');
+  	$this->footer_data('script', '
+  		<script src="./../assets/js/expense.js"></script>');
 
-		$save = $this->input->post('save');
-		if (!empty($save)) $this->validate();
+  	$save = $this->input->post('save');
+  	if (!empty($save)) $this->validate();
 
-		$data['temp'] = array();
-		$upload = $this->input->post('upload');
-		if (!empty($upload)) {
-			$this->load->model('File_model', 'file');
-			$file = $this->file->upload_single();
-			$data['temp'][] = $file->filename;
-		}
+  	$data['temp'] = array();
+  	$upload = $this->input->post('upload');
+  	if (!empty($upload)) {
+  		$this->load->model('File_model', 'file');
+  		$file = $this->file->upload_single();
+  		$data['temp'][] = $file->filename;
+  	}
 
-		$reference = array('0' => '- select a reference -');
-		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region'])->result_object();
-		foreach ($result as $row) {
-			$reference[$row->vid] = $row->reference;
-		}
-		$data['reference'] = $reference;
+  	$reference = array('0' => '- select a reference -');
+  	$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region_id']." ORDER BY vid DESC")->result_object();
+  	foreach ($result as $row) {
+  		$reference[$row->vid] = $row->reference;
+  	}
+  	$data['reference'] = $reference;
 
-		$data['type'] = $this->expense->type;
-		$this->template('expense/add', $data);
-	}
+  	$data['type'] = $this->expense->type;
+          $data['status'] = 0; // For Approval
+  	$this->template('expense/add', $data);
+  }
 
-	public function upload()
-	{
-		$this->load->model('File_model', 'file');
-		$file = $this->file->upload_single();
-		
-		if (!empty($file))
-		{
-			echo json_encode(array("status" => TRUE, "file" => $file));
-		}
-		else
-		{
-			$message = $this->load->view('tpl/messages', array(), TRUE);
-			echo json_encode(array("status" => FALSE, "message" => $message));
-		}
-	}
+  public function upload()
+  {
+  	$this->load->model('File_model', 'file');
+  	$file = $this->file->upload_single();
 
-	private function validate()
-	{
-		$err_msg = array();
-		$type = $this->input->post('type');
-		$other = $this->input->post('other');
-		$files = $this->input->post('files');
-		$temp = $this->input->post('temp');
+  	if (!empty($file))
+  	{
+  		echo json_encode(array("status" => TRUE, "file" => $file));
+  	}
+  	else
+  	{
+  		$message = $this->load->view('tpl/messages', array(), TRUE);
+  		echo json_encode(array("status" => FALSE, "message" => $message));
+  	}
+  }
 
-		$this->form_validation->set_rules('or_no', 'Reference # (SI/OR)', 'required');
-		$this->form_validation->set_rules('or_date', 'OR Date', 'required');
-		$this->form_validation->set_rules('amount', 'Amount', 'required|is_numeric|non_zero');
-		$this->form_validation->set_rules('ca_ref', 'CA Reference', 'required');
+  private function validate()
+  {
+  	$err_msg = array();
+  	$type = $this->input->post('type');
+  	$other = $this->input->post('other');
+  	$files = $this->input->post('files');
+  	$temp = $this->input->post('temp');
 
-		$valid = $this->form_validation->run();
+  	$this->form_validation->set_rules('or_no', 'Reference # (SI/OR)', 'required');
+  	$this->form_validation->set_rules('or_date', 'OR Date', 'required');
+  	$this->form_validation->set_rules('amount', 'Amount', 'required|is_numeric|non_zero');
+  	$this->form_validation->set_rules('ca_ref', 'CA Reference', 'required');
 
-		if ($type == 4 && empty($other)) {
-			$err_msg[] = 'Please specify other type of expense.';
-		}
-		if (empty($files) && empty($temp)) {
-			$err_msg[] = 'Please upload an attachment.';
-		}
+  	$valid = $this->form_validation->run();
 
-		if (!empty($err_msg)) {
-			$_SESSION['warning'] = $err_msg;
-		}
-		else if ($valid) {
-			$this->save();
-		}
-	}
+  	if ($type == 4 && empty($other)) {
+  		$err_msg[] = 'Please specify other type of expense.';
+  	}
+  	if (empty($files) && empty($temp)) {
+  		$err_msg[] = 'Please upload an attachment.';
+  	}
 
-	private function save()
-	{
-		$misc = new Stdclass();
-		$misc->mid = $this->input->post('mid');
-		$misc->region = $_SESSION['region'];
-		$misc->or_no = $this->input->post('or_no');
-		$misc->or_date = $this->input->post('or_date');
-		$misc->amount = $this->input->post('amount');
-		$misc->type = $this->input->post('type');
-		$misc->other = $this->input->post('other');
-		$misc->ca_ref = $this->input->post('ca_ref');
-		$misc->remarks = $this->input->post('remarks');
+  	if (!empty($err_msg)) {
+  		$_SESSION['warning'] = $err_msg;
+  	}
+  	else if ($valid) {
+  		$this->save();
+  	}
+  }
 
-		if (empty($misc->mid)) {
-			$this->db->insert('tbl_misc', $misc);
-			$misc->mid = $this->db->insert_id();
-		}
-		else {
-			$this->db->update('tbl_misc', $misc, array('mid' => $misc->mid));
-		}
+  private function save()
+  {
+  	$misc = new Stdclass();
+  	$misc->mid = $this->input->post('mid');
+  	$misc->region = $_SESSION['region_id'];
+  	$misc->or_no = $this->input->post('or_no');
+  	$misc->or_date = $this->input->post('or_date');
+  	$misc->amount = $this->input->post('amount');
+  	$misc->type = $this->input->post('type');
+  	$misc->other = $this->input->post('other');
+  	$misc->ca_ref = $this->input->post('ca_ref');
 
-		$files = $this->input->post('files');
-		$files = (empty($files)) ? array() : $files;
-		$temp = $this->input->post('temp');
-		$temp = (empty($temp)) ? array() : $temp;
-		$file = $this->file->save_misc_scans2($misc, $files, $temp);
+  	if (empty($misc->mid)) {
+  		$this->db->insert('tbl_misc', $misc);
+  		$misc->mid = $this->db->insert_id();
+  	}
+  	else {
+  		$this->db->update('tbl_misc', $misc, array('mid' => $misc->mid));
+  	}
 
-		$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was saved successfully.';
-		redirect('expense');
-	}
+          $history = array(
+            'mid' => $misc->mid,
+            'remarks' => $this->input->post('remarks'),
+            'status' => $this->input->post('status'),
+            'uid' => $_SESSION['uid']
+          );
+          $this->db->insert('tbl_misc_expense_history', $history);
 
-	public function view()
-	{
-		$mid = $this->input->post('mid');
-		$data['misc'] = $this->expense->load_misc($mid);
+  	$files = $this->input->post('files');
+  	$files = (empty($files)) ? array() : $files;
+  	$temp = $this->input->post('temp');
+  	$temp = (empty($temp)) ? array() : $temp;
+  	$file = $this->file->save_misc_scans2($misc, $files, $temp);
 
-		if ($_SESSION['position'] == 108 && $data['misc']->approval) {
-			$data['approval'] = $data['reject'] = 1;
-		}
-		else {
-			$data['approval'] = $data['reject'] = 0;
-		}
+  	$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was saved successfully.';
+  	redirect('expense');
+  }
 
-		$view = $this->load->view('expense/view', $data, TRUE);
-		echo json_encode($view);
-	}
+  public function view()
+  {
+  	$mid = $this->input->post('mid');
+  	$data['misc'] = $this->expense->load_misc($mid);
 
-	public function edit()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Expense Record');
-		$this->header_data('nav', 'expense');
-		$this->header_data('dir', './../');
-		$this->footer_data('script', '
-			<script src="./../assets/js/expense.js"></script>');
+  	if ($_SESSION['position'] == 108 && $data['misc']->approval) {
+  		$data['approval'] = $data['reject'] = 1;
+  	}
+  	else {
+  		$data['approval'] = $data['reject'] = 0;
+  	}
+
+  	$view = $this->load->view('expense/view', $data, TRUE);
+  	echo json_encode($view);
+  }
+
+  public function edit()
+  {
+  	$this->access(1);
+  	$this->header_data('title', 'Expense Record');
+  	$this->header_data('nav', 'expense');
+  	$this->header_data('dir', './../');
+  	$this->footer_data('script', '
+  		<script src="./../assets/js/expense.js"></script>');
 
 
-		$edit = $this->input->post('edit');
-		$mid = current(array_keys($edit));
+  	$edit = $this->input->post('edit');
+  	$mid = current(array_keys($edit));
 
-		$save = $this->input->post('save');
-		if (!empty($save)) $this->validate();
+  	$save = $this->input->post('save');
+  	if (!empty($save)) $this->validate();
 
-		$data['temp'] = array();
-		$upload = $this->input->post('upload');
-		if (!empty($upload)) {
-			$this->load->model('File_model', 'file');
-			$file = $this->file->upload_single();
-			$data['temp'][] = $file->filename;
-		}
+  	$data['temp'] = array();
+  	$upload = $this->input->post('upload');
+  	if (!empty($upload)) {
+  		$this->load->model('File_model', 'file');
+  		$file = $this->file->upload_single();
+  		$data['temp'][] = $file->filename;
+  	}
 
-		$reference = array('0' => '- select a reference -');
-		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region'])->result_object();
-		foreach ($result as $row) {
-			$reference[$row->vid] = $row->reference;
-		}
-		$data['reference'] = $reference;
-		
-		$data['misc'] = $this->expense->edit_misc($mid);
-		$data['type'] = $this->expense->type;
-		$this->template('expense/edit', $data);
-	}
+  	$reference = array('0' => '- select a reference -');
+  	$result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region_id'])->result_object();
+  	foreach ($result as $row) {
+  		$reference[$row->vid] = $row->reference;
+  	}
 
-	public function approve()
-	{
-		$mid = $this->input->post('mid');
-		if (empty($mid)) redirect('expense');
+  	$data['reference'] = $reference;
+  	$data['misc'] = $this->expense->edit_misc($mid);
+  	$data['type'] = $this->expense->type;
+  	$data['status'] = ($data['misc']->status == 5) ? 6 : 0; // For Approval or Approved
+  	$this->template('expense/edit', $data);
+  }
 
-		$this->db->query("update tbl_misc set status = 2 where mid = ".$mid);
-		$misc = $this->db->query("select * from tbl_misc where mid = ".$mid)->row();
+  public function approve()
+  {
+  	$mid = $this->input->post('mid');
+  	if (empty($mid)) redirect('expense');
 
-		$this->db->query("update tbl_fund set cash_on_hand = cash_on_hand - ".$misc->amount." where fid = ".$misc->region);
+  	$misc_expense_history->mid = $mid;
+  	$misc_expense_history->status = 2; // APPROVE
+          $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
+  	$misc = $this->db->query("select * from tbl_misc where mid = ".$mid)->row();
 
-		$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was updated successfully'.
-		redirect('expense');
-	}
+  	$this->db->query("update tbl_fund set cash_on_hand = cash_on_hand - ".$misc->amount." where fid = ".$misc->region);
 
-	public function reject()
-	{
-		$mid = $this->input->post('mid');
-		if (empty($mid)) redirect('expense');
+  	$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was updated successfully'.
+  	redirect('expense');
+  }
 
-		$misc = new Stdclass();
-		$misc->reason = $this->input->post('reason');
-		$misc->status = 1;
-		$this->db->update('tbl_misc', $misc, array('mid' => $mid));
-		$misc = $this->db->query("select or_no from tbl_misc where mid = ".$mid)->row();
+  public function reject()
+  {
+  	$mid = $this->input->post('mid');
+  	if (empty($mid)) redirect('expense');
 
-		$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was updated successfully'.
-		redirect('expense');
-	}
+  	$misc_expense_history = new Stdclass();
+  	$misc_expense_history->mid = $mid;
+  	$misc_expense_history->status = 1; // REJECTED
+  	$misc_expense_history->remarks = $this->input->post('reason');
+          $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
+  	$misc = $this->db->query("select or_no from tbl_misc where mid = ".$mid)->row();
 
-	public function ca_ref()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Update CA Reference');
-		$this->header_data('nav', 'expense');
-		$this->header_data('dir', './../');
+  	$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was updated successfully'.
+  	redirect('expense');
+  }
 
-		$mid = $this->input->post('mid');
+  public function ca_ref()
+  {
+  	$this->access(1);
+  	$this->header_data('title', 'Update CA Reference');
+  	$this->header_data('nav', 'expense');
+  	$this->header_data('dir', './../');
 
-		$update = $this->input->post('update');
-		if (!empty($update)) {
-			$mid = current(array_keys($update));
-		}
+  	$mid = $this->input->post('mid');
 
-		$save = $this->input->post('save');
-		if (!empty($save)) {
-			$this->form_validation->set_rules('ca_ref', 'CA Reference', 'required');
+  	$update = $this->input->post('update');
+  	if (!empty($update)) {
+  		$mid = current(array_keys($update));
+  	}
 
-			if ($this->form_validation->run()) {
-				$misc = new Stdclass();
-				$misc->ca_ref = $this->input->post('ca_ref');
-				$this->db->update('tbl_misc', $misc, array('mid' => $mid));
+  	$save = $this->input->post('save');
+  	if (!empty($save)) {
+  		$this->form_validation->set_rules('ca_ref', 'CA Reference', 'required');
 
-				$mid = null;
-				$_SESSION['messages'][] = 'Record updated successfully.';
-			}
-		}
+  		if ($this->form_validation->run()) {
+  			$misc = new Stdclass();
+  			$misc->ca_ref = $this->input->post('ca_ref');
+  			$this->db->update('tbl_misc', $misc, array('mid' => $mid));
 
-		if (!empty($mid)) {
-			$reference = array('0' => '- select a reference -');
-			$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region'])->result_object();
-			foreach ($result as $row) {
-				$reference[$row->vid] = $row->reference;
-			}
-			$data['reference'] = $reference;
-			
-			$data['misc'] = $this->expense->edit_misc($mid);
-			$data['type'] = $this->expense->type;
-			$data['status'] = $this->expense->status;
-			$this->template('expense/ca_ref_up', $data);
-		}
-		else {
-			// echo "select m.*, v.reference as ca_ref, t.trans_no as topsheet
-			//	from tbl_misc m
-			//	left join tbl_voucher v on ca_ref = vid
-			//	left join tbl_topsheet t on topsheet = tid
-			//	where m.region = ".$_SESSION['region'];
-			$data['type'] = $this->expense->type;
-			$data['status'] = $this->expense->status;
-			$data['table'] = $this->db->query("select m.*, v.reference as ca_ref, t.trans_no as topsheet
-				from tbl_misc m
-				left join tbl_voucher v on ca_ref = vid
-				left join tbl_topsheet t on topsheet = tid
-				where m.region = ".$_SESSION['region'])->result_object();
-			$this->template('expense/ca_ref', $data);
-		}
-	}
+  			$mid = null;
+  			$_SESSION['messages'][] = 'Record updated successfully.';
+  		}
+  	}
+
+  	if (!empty($mid)) {
+  		$reference = array('0' => '- select a reference -');
+  		$result = $this->db->query("select vid, reference from tbl_voucher where fund = ".$_SESSION['region_id'])->result_object();
+  		foreach ($result as $row) {
+  			$reference[$row->vid] = $row->reference;
+  		}
+  		$data['reference'] = $reference;
+
+  		$data['misc'] = $this->expense->edit_misc($mid);
+  		$data['type'] = $this->expense->type;
+  		$data['status'] = $this->expense->status;
+  		$this->template('expense/ca_ref_up', $data);
+  	} else {
+  		$data['type'] = $this->expense->type;
+  		$data['status'] = $this->expense->status;
+                $data['table'] = $this->db->query("
+                  SELECT
+                    m.*, v.reference as ca_ref,
+                    s.status_name AS status
+                  FROM
+                    tbl_misc m
+                  LEFT JOIN
+                    tbl_voucher v on ca_ref = vid
+                  INNER JOIN
+                    tbl_misc_expense_history mxh1 USING(mid)
+                  LEFT JOIN
+                    tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
+                  INNER JOIN
+                    tbl_status s ON mxh1.status = s.status_id AND s.status_type = 'MISC_EXP'
+                  WHERE
+                    m.region = ".$_SESSION['region_id']." AND mxh2.id IS NULL
+                ")->result_object();
+  		$this->template('expense/ca_ref', $data);
+  	}
+  }
 }

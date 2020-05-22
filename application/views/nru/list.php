@@ -17,6 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th><p>Transmittal Date</p></th>
                 <th><p>Company</p></th>
                 <th><p># of Units</p></th>
+                <th><p>Payment Method</p></th>
                 <th><p></p></th>
               </tr>
             </thead>
@@ -30,7 +31,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print "<td>".$row->date."</td>";
                 print "<td>".$company[$row->company]."</td>";
                 print "<td>".$row->sales."</td>";
-                print '<td><input type="submit" name="ltid['.$row->ltid.']" value="Update" class="btn btn-success"></td>';
+                print "<td>".$row->payment_method."</td>";
+                switch ($row->payment_method) {
+                  case 'EPP':
+                    print '<td><input type="submit" name="ltid['.$row->ltid.']" value="View" class="btn btn-primary" style="width:70px;"></td>';
+                    break;
+                  default:
+                    print '<td><input type="submit" name="ltid['.$row->ltid.']" value="Update" class="btn btn-success" style="width:70px;"></td>';
+                }
                 print "</tr>";
               }
 
@@ -38,6 +46,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               {
                 print '<tr>
                   <td>No result.</td>
+                  <td></td>
                   <td></td>
                   <td></td>
                   <td></td>

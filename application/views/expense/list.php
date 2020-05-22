@@ -71,7 +71,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	            	$misc->type = ($misc->type == 'Others')
 	            		? '(Others) '.$misc->other : $misc->type;
 	            	$misc->status = ($misc->status == 'Rejected')
-	            		? 'Rejected due to:<br>'.$misc->reason : $misc->status;
+	            		? 'Rejected due to:<br>'.$misc->remarks : $misc->status;
 	            	$edit_btn = ($edit && $misc->edit) ? '<input type="submit" name="edit['.$misc->mid.']" value="Edit" class="btn btn-success edit">' : '';
 
 	              print '<tr>';

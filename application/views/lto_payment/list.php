@@ -146,10 +146,11 @@ $(function(){
 			"iDisplayLength": 5,
 			"aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
 		});
-    $(".table").on('click', 'a.receipt', function(){
-      $('#modal_form .modal-body img').attr('src', '/rms_dir/lto_receipt/<?php print $payment->lpid.'/'.$payment->receipt; ?>');
-      $('#modal_form').modal('show');
-    });
+
+                $(".table").on('click', 'a.receipt', function(){
+                  $('#modal_form .modal-body img').attr('src', '/rms_dir/lto_receipt/<?php print $payment->lpid.'/'.$payment->receipt; ?>');
+                  $('#modal_form').modal('show');
+                });
 	});
 });
 </script>

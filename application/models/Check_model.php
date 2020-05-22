@@ -30,7 +30,7 @@ class Check_model extends CI_Model{
 
 		$result = $this->db->query("select * from tbl_check c
 			inner join tbl_fund on fid = c.fund
-			where region = ".$_SESSION['region']."
+			where region = ".$_SESSION['region_id']."
 			and left(check_date, 10) between '".$date_from."' and '".$date_to."'
 			".$status."
 			limit 1000")->result_object();

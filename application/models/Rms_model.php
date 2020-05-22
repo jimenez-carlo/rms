@@ -20,7 +20,7 @@ class Rms_model extends CI_Model{
 	}
 
 	public function get_topsheet_stat_count($status) {
-		if($_SESSION['position']!=98) $region = ' AND region = '.$_SESSION['region'];
+		if($_SESSION['position']!=98) $region = ' AND region = '.$_SESSION['region_id'];
 		else $region = '';
 
 		$result = $this->db->query("SELECT
@@ -235,7 +235,7 @@ class Rms_model extends CI_Model{
 	public function count_transmittal($month,$year) {
 		$result = $this->db->query("SELECT
 																	tmid
-																FROM tbl_transmittal 
+																FROM tbl_transmittal
 																WHERE
 																	YEAR(trans_date) = $year AND
 																	MONTH(trans_date) = $month");
@@ -245,7 +245,7 @@ class Rms_model extends CI_Model{
 	public function count_total_transmittal($year) {
 		$result = $this->db->query("SELECT
 																	tmid
-																FROM tbl_transmittal 
+																FROM tbl_transmittal
 																WHERE
 																	YEAR(trans_date) = $year");
 		return $result->num_rows();

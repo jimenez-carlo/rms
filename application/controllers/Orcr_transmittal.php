@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Orcr_transmittal extends MY_Controller {
-	
-	public function __construct() { 
+
+	public function __construct() {
 		parent::__construct();
 		$this->load->helper('url');
     $this->load->model('Login_model', 'login');
@@ -31,12 +31,12 @@ class Orcr_transmittal extends MY_Controller {
 					if ($(this).val() == 0)
 					{
 						$("textarea.sid-"+sid).removeClass("hide");
-						
+
 					}
 					else
 					{
 						$("textarea.sid-"+sid).addClass("hide").val("");
-						
+
 					}
 				});
 				$(":checked").change();
@@ -119,7 +119,7 @@ class Orcr_transmittal extends MY_Controller {
 			$data['transmittal'] = $transmittal;
 		}
 
-		$this->template('orcr_transmittal/list', $data); 
+		$this->template('orcr_transmittal/list', $data);
 	}
 
 	public function receive($sid)
@@ -176,10 +176,10 @@ class Orcr_transmittal extends MY_Controller {
 		$sales = array();
 		$branch = $this->input->post('branch');
 		$status = $this->input->post('status');
-		
+
 		// enable branch filter
 		$this->load->model("Cmc_model", "cmc");
-		$data["branch"] = $this->cmc->get_branches_tbl("","","","","","",$_SESSION['region']);
+		$data["branch"] = $this->cmc->get_branches_tbl("","","","","","",$_SESSION['region_id']);
 
 		$branch = $this->input->post('branch');
 		$status = $this->input->post('status');
@@ -214,7 +214,7 @@ class Orcr_transmittal extends MY_Controller {
 			// get branches
 			$global = $this->load->database('global', TRUE);
 			$branches = array();
-			$result = $global->get_where('tbl_branches', array('ph_region' => $_SESSION['region']))->result_object();
+			$result = $global->get_where('tbl_branches', array('ph_region' => $_SESSION['region_id']))->result_object();
 
 			foreach ($result as $branch)
 			{
@@ -296,7 +296,7 @@ class Orcr_transmittal extends MY_Controller {
 	    			$obj->remarks_user = $_SESSION['username'];
 	    			$obj->remarks_name = $_SESSION['firstname'].' '.$_SESSION['lastname'];
 	    			$this->db->insert('tbl_orcr_remarks', $obj);
-				
+
 						$transmittal->sales = $this->sales->get_sales_by_transmittal($ttid);
 
 						foreach ($transmittal->sales as $key => $row)

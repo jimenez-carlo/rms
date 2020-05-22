@@ -23,7 +23,7 @@ function save_doc()
         $('#modal_form').modal('hide');
         location.reload();
       }
-      else 
+      else
       {
         $(".alert-error").removeClass("hide");
         $(".error").html("");
@@ -37,13 +37,15 @@ function save_doc()
   });
 }
 
-function set_id(index)
+function set_id(index, subid)
 {
   // disable all
   $(".table tbody tr .doc_no").prop('disabled', true);
   $(".table tbody tr .save").prop('disabled', true);
+  $(".misc_exp").prop('disabled', true);
 
   // enable specific
+  $("#"+subid).prop('disabled', false);
   $(".table tbody tr:eq("+index+") .doc_no").prop('disabled', false);
   $(".table tbody tr:eq("+index+") .save").prop('disabled', false);
 }
