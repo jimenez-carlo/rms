@@ -20,7 +20,7 @@ class Disapprove extends MY_Controller {
     $this->header_data('dir', './');
 
     $param = new Stdclass();
-    $param->region = $this->session->region;
+    $param->region = $this->session->region_id;
     $param->branch = $this->input->post('branch');
 
     $data['branch'] = $this->disapprove->branch_list($param);
