@@ -220,7 +220,7 @@ class Registration extends MY_Controller {
           }
 
           // update fund
-          if ($expense != 0) {
+          if ($expense !== 0 && $sales->payment_method === "CASH") {
             $fund = $this->db->query("select * from tbl_fund
               where region = ".$_SESSION['region_id'])->row();
 

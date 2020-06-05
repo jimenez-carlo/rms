@@ -268,21 +268,35 @@ class Sales_model extends CI_Model{
 		$sales->user = $_SESSION['uid'];
 		$this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
 
-		$sales = $this->db->query("select * from tbl_sales
-			inner join tbl_engine on engine = eid
-			where sid = ".$sales->sid)->row();
-		$sales->registration_date = substr($sales->registration_date, 0, 10);
+                $query = <<<SQL
+                  SELECT
+                    sid, branch, bcode, bname, region,
+                    company, registration, rerfo, eid, engine_no,
+                    DATE_FORMAT(registration_date, '%Y-%m-%d') AS registration_date
+                  FROM
+                    tbl_sales
+                  INNER JOIN
+                    tbl_engine ON engine = eid
+                  WHERE
+                    sid = {$sales->sid}
+SQL;
+                $sales = $this->db->query($query)->row();
 
 		// rerfo
 		if ($sales->rerfo == 0)
 		{
-			$rerfo = $this->db->query("select * from tbl_rerfo
-				where bcode = ".$sales->bcode."
-				and date = '".$sales->registration_date."'")->row();
+                        $rerfo = $this->db->query("
+                          SELECT
+                            *
+                          FROM
+                            tbl_rerfo
+                          WHERE bcode = ".$sales->bcode." AND date = '".$sales->registration_date."'"
+                        )->row();
+
 			if (empty($rerfo))
 			{
 				$rerfo = new Stdclass();
-				$rerfo->region = $_SESSION['region_id'];
+				$rerfo->region = $sales->region;
 				$rerfo->bcode = $sales->bcode;
 				$rerfo->bname = $sales->bname;
 				$rerfo->date = $sales->registration_date;
@@ -293,7 +307,9 @@ class Sales_model extends CI_Model{
 				$this->db->insert('tbl_rerfo', $rerfo);
 				$rerfo->rid = $this->db->insert_id();
 			}
+
 			$sales->rerfo = $rerfo->rid;
+                        $this->db->query("UPDATE tbl_sales SET rerfo = ".$sales->rerfo." WHERE sid = ".$sales->sid);
 		}
 
 		// topsheet
@@ -319,10 +335,6 @@ class Sales_model extends CI_Model{
 		// 	}
 		// 	$sales->topsheet = $topsheet->tid;
 		// }
-
-		$this->db->query("update tbl_sales
-			set rerfo = ".$sales->rerfo."
-			where sid = ".$sales->sid);
 		$this->login->saveLog('Saved Registration Expense [Php '.$sales->registration.'] for Engine # '.$sales->engine_no.' ['.$sales->sid.']');
 	}
 

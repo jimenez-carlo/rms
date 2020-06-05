@@ -185,7 +185,7 @@ GBY;
                         WHEN ss.status_name = 'Liquidated' THEN 'Done'
                         ELSE sts.status_name
                       END,
-                      'selectable', CASE WHEN ss.status_name = 'Registered' AND sub.subid IS NULL THEN true ELSE false END
+                      'selectable', IF(ss.status_name = 'Registered' AND sub.subid IS NULL, true,false)
                     )
                     ORDER BY FIELD(s.status, 4, 5, 3, 2, 1, 0), FIELD(s.da_reason, 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
                     SEPARATOR ','
@@ -210,19 +210,16 @@ SQL;
 
         public function get_misc_expense($data)
         {
+          $misc_exp = NULL;
+
           if (isset($data['CA'])) {
-            $where_param = "v.vid = {$data['CA']}";
-            $groupby_param = "v.vid";
-          }
+            $and_misc_expense_id = '';
+            if (isset($data['mid'])) {
+              $and_misc_expense_id = "AND m.mid IN (".implode($data['mid'], ',').")";
+            }
 
-          if (isset($data['EPP'])) {
-            $where_param = "lp.lpid = {$data['EPP']}";
-            $groupby_param = "lp.lpid";
-          }
-
-          $sql = <<<SQL
+            $sql = <<<SQL
             SELECT
-              -- v.reference,
               CONCAT(
                 '[',
                 GROUP_CONCAT(
@@ -247,13 +244,16 @@ SQL;
             LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
             LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
             LEFT JOIN tbl_status sts ON mxh1.status = sts.status_id AND sts.status_type = 'MISC_EXP'
-            WHERE {$where_param} AND (sts.status_id IN (2, 3, 4, 5, 6) OR m.mid IS NULL) AND mxh2.mid IS NULL
-            GROUP BY {$groupby_param}
+            WHERE v.vid = {$data['CA']} {$and_misc_expense_id} AND (sts.status_id IN (2, 3, 4, 5, 6) OR m.mid IS NULL) AND mxh2.mid IS NULL
+            GROUP BY v.vid
 SQL;
-          $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
-          $misc_expense_result =  $this->db->query($sql)->row_array();
+            $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
+            $misc_expense_result =  $this->db->query($sql)->row_array();
 
-          return $misc_expense_result['misc_expense'];
+            $misc_exp = $misc_expense_result['misc_expense'];
+          }
+
+          return $misc_exp;
         }
 
         public function load_ca($data)

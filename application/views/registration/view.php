@@ -18,6 +18,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php
             if (isset($sales)) {
               print form_hidden('sid', $sales->sid);
+              print form_hidden('payment_method', $sales->payment_method);
 
               print '<div class="control-group">';
               print '<div class="control-label">Branch</div>';

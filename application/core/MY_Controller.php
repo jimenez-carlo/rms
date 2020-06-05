@@ -5,16 +5,12 @@ class MY_Controller extends CI_Controller {
 
 	public function __construct() {
 	  parent::__construct();
-          $this->load->helper('url');
+          $this->load->helper(array('form', 'url'));
+          $this->load->library('form_validation');
 
           if (!isset($_SESSION['uid'])) {
             redirect('login');
           }
-
-          $this->load->helper('form');
-
-          $this->load->helper(array('form', 'url'));
-          $this->load->library('form_validation');
 	}
 
 	public $region = array(
@@ -83,7 +79,9 @@ class MY_Controller extends CI_Controller {
 	public function access($page)
 	{
 		// no credentials
-		if (!$this->session->has_userdata('username')) redirect('login');
+                if (!$this->session->has_userdata('username')) {
+                  redirect('login');
+                }
 
 		// special custom login, always grant
 		if ($_SESSION['uid'] == 0) return;

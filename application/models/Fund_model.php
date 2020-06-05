@@ -87,8 +87,14 @@ class Fund_model extends CI_Model{
 
 	public function load_rrt_fund($region)
         {
-          $this->load->model('Cmc_model', 'cmc');
-          $fund = $this->db->query("SELECT * FROM tbl_fund WHERE fid = {$_SESSION['fund_id']}")->row_array();
+          $fund = $this->db->query("
+            SELECT
+              fid, region, company, bank, FORMAT(fund, 2) AS fund, FORMAT(cash_on_hand, 2) AS cash_on_hand,
+              FORMAT(cash_on_check, 2) AS cash_on_check, FORMAT(check_on_hold, 2) AS cash_on_hold,
+              fund_date, FORMAT(m_balance, 2) AS m_balance, acct_number, sign_1, sign_2, sign_3
+            FROM
+              tbl_fund WHERE fid = {$_SESSION['fund_id']}
+          ")->row_array();
 
           $result = array(
             'lto_pending' => 0,
@@ -98,18 +104,20 @@ class Fund_model extends CI_Model{
 
           $sql = <<<QRY
             SELECT
-            	'lto_pending' AS label,
-            	IFNULL(SUM(IF(status = 3, registration, 0)), 0) AS amount
+              'lto_pending' AS label,
+              FORMAT(IFNULL(SUM(IF(status = 3, registration, 0)), 0), 2) AS amount
             FROM
               tbl_sales
             WHERE
-            	region = {$region}
+              region = {$region}
             UNION
 	    SELECT
 	      'for_liquidation' AS label,
-              IFNULL(SUM(registration+tip), 0)
-              + ANY_VALUE(misc_for_liq_amount)
-              + ANY_VALUE(return_fund_for_liq_amount) AS amount
+              FORMAT(
+                IFNULL(
+                  SUM(registration+tip) + ANY_VALUE(misc_for_liq_amount) + ANY_VALUE(return_fund_for_liq_amount), 0
+                ), 2
+              ) AS amount
 	    FROM
 	      tbl_sales s
             JOIN (
@@ -130,7 +138,7 @@ class Fund_model extends CI_Model{
 	    ) AS misc_exp
             JOIN (
               SELECT
-	        SUM(rf.amount) AS return_fund_for_liq_amount
+	        IFNULL(SUM(rf.amount), 0) AS return_fund_for_liq_amount
 	      FROM
 	        tbl_voucher v
 	      INNER JOIN
@@ -145,13 +153,15 @@ class Fund_model extends CI_Model{
 	        rfh_2.return_fund_history_id IS NULL AND v.fund = {$_SESSION['fund_id']} AND st.status_name = 'For Liquidation'
 	    ) AS return_fund
             WHERE
-                s.region = {$region} AND s.status = 4
+                s.region = {$region} AND s.status = 4 AND s.payment_method = "CASH"
             UNION
 	    SELECT
 	      'liquidated' AS label,
-              IFNULL(SUM(registration+tip), 0)
-              + ANY_VALUE(misc_liq_amount)
-              + ANY_VALUE(return_fund_liq_amount) AS amount
+              FORMAT(
+                IFNULL(
+                  SUM(registration+tip) + ANY_VALUE(misc_liq_amount) + ANY_VALUE(return_fund_liq_amount), 0
+                ), 2
+              ) AS amount
 	    FROM
 	      tbl_sales s
             JOIN (
@@ -172,7 +182,7 @@ class Fund_model extends CI_Model{
 	    ) AS misc_exp
             JOIN (
               SELECT
-	        SUM(rf.amount) AS return_fund_liq_amount
+	        IFNULL(SUM(rf.amount), 0) AS return_fund_liq_amount
 	      FROM
 	        tbl_voucher v
 	      INNER JOIN
@@ -187,7 +197,7 @@ class Fund_model extends CI_Model{
 	        rfh_2.return_fund_history_id IS NULL AND v.fund = {$_SESSION['fund_id']} AND st.status_name = 'Liquidated'
 	    ) AS return_fund
             WHERE
-                s.region = {$region} AND s.status = 5
+              s.region = {$region} AND s.status = 5 AND s.payment_method = "CASH"
 QRY;
           $get_result = $this->db->query($sql)->result_array();
 

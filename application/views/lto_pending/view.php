@@ -15,6 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <table class="table">
             <thead>
               <tr>
+                <th><p>#</p></th>
                 <th><p>Branch</p></th>
                 <th style="width: 8%"><p>Date Sold</p></th>
                 <th><p>Engine #</p></th>
@@ -27,12 +28,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
+              $count = 1;
               foreach ($transmittal->sales as $sales)
               {
                 $key = '['.$sales->sid.']';
                 $sales->status = ($sales->status == 1) ? 1 : 2;
 
                 print '<tr>';
+                print '<td>'.$count.'</td>';
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
@@ -76,6 +79,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php
                 print '<td>'.form_dropdown('lto_reason'.$key, $reasons, set_value('lto_reason'.$key, $sales->lto_reason)).'</td>';
                 print '</tr>';
+                $count++;
               }
               ?>
             </tbody>

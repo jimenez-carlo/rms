@@ -31,6 +31,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <table class="table tbl-sales table-condensed" style="display:block; margin:0;">
     <thead>
       <tr>
+        <th><p>#</p></th>
         <th><p>Branch</p></th>
         <th width=75><p>Date Sold</p></th>
         <th width=125><p>Engine #</p></th>
@@ -47,6 +48,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </thead>
     <tbody style="<!-- display:block; --> max-height:690px; overflow:auto;">
       <?php
+      $count = 1;
       $total_amt = 0;
       $total_exp = 0;
 
@@ -63,6 +65,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         }
 
         print '<tr class="sales-'.$sales->sid.'" '.$clickable.'>';
+        print '<td>'.$count.'</td>';
+        $count++;
         print '<td>';
         print '<input type="hidden" name="sid[]" value="'.$sales->sid.'" disabled>';
         print $sales->bcode.' '.$sales->bname;
@@ -89,26 +93,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     print '<tbody>';
       // Miscellaneous
       print '<tr style="border-top: double">';
-      print '<th colspan="3"><p>OR #</p></th>';
+      print '<th colspan="2"><p>#</p></th>';
+      print '<th colspan="2"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
-      print '<th colspan="3"><p class="text-right">Expense</p></th>';
+      print '<th colspan="2"><p class="text-right">Expense</p></th>';
       print '<th colspan="2"><p class="text-right">Status</p></th>';
       print '</tr>';
 
       $misc_expenses = json_decode($misc_expense);
       if ($misc_expenses !== NULL) {
+        $exp_count = 1;
         foreach ($misc_expenses as $misc)
         {
             $text_color = (in_array($misc->status, array('Approved', 'Resolved', 'For Liquidation', 'Liquidated'))) ? 'text-success' : 'text-error';
             print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
-            print '<td colspan="3">';
+            print '<td colspan="2">'.$exp_count.'</td>';
+            print '<td colspan="2">';
             print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
             print $misc->or_no;
             print '</td>';
             print '<td colspan="2">'.$misc->or_date.'</td>';
             print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
-            print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
+            print '<td colspan="2"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
             print '<td colspan="2"><p class="text-right '.$text_color.'">'.$misc->status.'</p></td>';
             print '</tr>';
 

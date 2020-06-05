@@ -54,7 +54,7 @@
 
           <div class="form-actions">
             <?php
-              if ($approval) print ' <button type="submit" name="approve" class="btn btn-success approve">Approved</button>';
+              if ($approval) print ' <button type="submit" name="approve" class="btn btn-success approve">Approve</button>';
               if ($reject) print ' <button type="submit" name="reject" class="btn btn-danger reject">Reject</button>';
             ?>
           </div>

@@ -5,9 +5,7 @@ class Expense extends MY_Controller {
 
   public function __construct() {
     parent::__construct();
-    $this->load->helper(array('form', 'url'));
     $this->load->library('upload');
-    $this->load->library('form_validation');
     $this->load->model('Expense_model', 'expense');
     $this->load->model('File_model', 'file');
   }

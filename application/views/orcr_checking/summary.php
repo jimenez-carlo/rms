@@ -27,6 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   <table class="table tbl-sales" style="margin:0;">
     <thead>
       <tr>
+        <th><p>#</p></th>
         <th><p>Branch</p></th>
         <th width=75><p>Date Sold</p></th>
         <th width=125><p>Engine #</p></th>
@@ -43,10 +44,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <?php
       $total_amt = 0;
       $total_exp = 0;
+      $row_count = 1;
 
       foreach (json_decode($batch_ref['sales']) as $sales)
       {
         print '<tr class="sales-'.$sales->sid.'" onclick="attachment('.$sales->sid.', 1)">';
+        print '<td>'.$row_count.'</td>';
+        $row_count++;
         print '<td>';
         print '<input type="hidden" name="sid[]" value="'.$sales->sid.'">';
         print $sales->bcode.' '.$sales->bname;
@@ -68,32 +72,37 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
       // Miscellaneous
       print '<tr style="border-top: double">';
-      print '<th colspan="3"><p>OR #</p></th>';
+      print '<th colspan="2"><p>#</p></th>';
+      print '<th colspan="2"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
-      print '<th colspan="3"><p class="text-right">Expense</p></th>';
+      print '<th colspan="2"><p class="text-right">Expense</p></th>';
       print '</tr>';
 
       if (empty($misc_expense)) {
         print '<tr>';
-        print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
+        print '<td colspan="2"></td>';
+        print '<td colspan="2"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
         print '<td colspan="2"></td>';
         print '<td colspan="2"></td>';
-        print '<td colspan="3"></td>';
+        print '<td colspan="2"></td>';
         print '</tr>';
       } else {
+        $exp_row_count = 1;
         foreach (json_decode($misc_expense) as $misc)
         {
           print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
-          print '<td colspan="3">';
+          print '<td colspan="2">'.$exp_row_count.'</td>';
+          print '<td colspan="2">';
           print '<input type="hidden" name="mid[]" value="'.$misc->mid.'">';
           print $misc->or_no;
           print '</td>';
 
           print '<td colspan="2">'.$misc->or_date.'</td>';
           print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
-          print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
+          print '<td colspan="2"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
           print '</tr>';
+          $exp_row_count++;
           $total_exp += $misc->amount;
         }
       }

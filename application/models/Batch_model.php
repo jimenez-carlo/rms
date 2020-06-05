@@ -28,7 +28,7 @@ class Batch_model extends CI_Model{
               c.company_code AS company,
               sub.is_uploaded,
               sub.download_date
-              ,GROUP_CONCAT(DISTINCT m.mid separator ',') AS misc_expense_id
+              ,GROUP_CONCAT(DISTINCT mid separator ',') AS misc_expense_id
             FROM
               tbl_sap_upload_batch sub
             JOIN
@@ -40,9 +40,12 @@ class Batch_model extends CI_Model{
             INNER JOIN
               tbl_company c ON s.company = c.cid
             LEFT JOIN
-              tbl_voucher v ON s.voucher = v.vid
+              tbl_voucher  v ON v.vid = s.voucher
             LEFT JOIN
-              tbl_misc m ON v.vid = m.ca_ref
+            (SELECT
+               m.mid, m.ca_ref
+            FROM
+              tbl_misc m
             LEFT JOIN
               tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
             LEFT JOIN
@@ -50,7 +53,10 @@ class Batch_model extends CI_Model{
             LEFT JOIN
               tbl_status st ON mxh1.status = st.status_id AND st.status_type = 'MISC_EXP'
             WHERE
-              sub.is_uploaded = 0 AND mxh2.id IS NULL $this->companyQry AND (st.status_name = 'For Liquidation' OR st.status_name IS NULL)
+              mxh2.id IS NULL AND st.status_name = 'For Liquidation'
+            ) AS miscellaneous_expense ON ca_ref = v.vid
+            WHERE
+              sub.is_uploaded = 0 $this->companyQry
             GROUP BY subid, region, company
             ORDER BY sub.date_created DESC
             LIMIT 1000
