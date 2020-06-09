@@ -1,23 +1,92 @@
 $('.edit-actual-docs').on('click', function(e){
   $(this).hide();
   var id = $(this).val();
-  $('#td-'+id).append('<input id="input-'+id+'" class="input-medium" name="transmittal_number" type="text" placeholder="Input Transmittal Number" required>');
+  $('#td-'+id).empty().append(
+    '<input id="tn-'+id+'" class="input-medium" name="transmittal_number" type="text" placeholder="Input Transmittal Number" required>'
+  );
   $('#save-'+$(this).val()).show();
 });
 
 $('.save-actual-docs').on('click', function(){
+  var actual_docs_id = $(this).closest('tr').prop('id');
   var id = $(this).val();
-  if ($('#input-'+id).val().length == 0) {
+  //console.log(actual_docs_id);
+  save_transmittal_no(id);
+});
+
+/*
+$('.receive').on('click', function(){
+  var confirmed = confirm('This action cannot be undone: Transmittal Number. Continue?');
+  if (confirmed) {
+    var actual_docs_id = $(this).closest('tr').prop('id');
+    var data = {
+      'actual_docs_id': actual_docs_id,
+      'date_received_by_acctg': true
+    };
+    var promise = data_send(data);
+    promise.success(function(data) {
+      $('#date-recived-'+actual_docs_id).append(data.date_received);
+    });
+  }
+});
+*/
+
+$('[name=deposit_slip]').on('change', function(e){
+  var actual_docs_id = $(this).closest('tr').prop('id');
+  var dep_slip_values = [ "Original", "Not Original" ];
+
+  var data_to_send = {
+    'actual_docs_id': actual_docs_id,
+    'deposit_slip': $(this).val()
+  };
+
+  if (dep_slip_values.indexOf(data_to_send.deposit_slip) !== -1) {
+    var promise = data_send(data_to_send);
+    promise.success(function(data){
+      $('#status-'+data.actual_docs_id).empty().append(data.status);
+      if (data_to_send.deposit_slip === 'Original') {
+        $(this).attr('disabled', true);
+        $('#date-complete-'+data.actual_docs_id).empty().append(data.date_completed);
+      } else {
+        $('#date-incomplete-'+data.actual_docs_id).empty().append(data.date_incomplete);
+      }
+    });
+  }
+});
+
+function data_send(dataSend) {
+  return $.ajax({
+    //url : BASE_URL+'actual_docs/save_transmittal_number',
+    data: dataSend,
+    dataType: "json",
+    type: "POST",
+    beforeSend: function(){
+      $(this).prop('disabled');
+      $('.ajax-loader').show();
+    },
+    complete: function(){
+      $('.ajax-loader').hide();
+    }
+  });
+}
+
+function save_transmittal_no(id) {
+  if ($('#tn-'+id).val().length == 0) {
     confirm('Please input transmittal number.');
   } else {
     var confirmed = confirm('This action cannot be undone: Transmittal Number. Continue?');
 
     if (confirmed) {
-      var new_transmittal_number = $('#input-'+id).val();
+      var voucher_or_lto_payment_id = $('#id-'+id).val();
+      var transmittal_number = $('#tn-'+id).val();
+      var payment_method = $('#pt-'+id).val();
+
       $.ajax({
         url : BASE_URL+'actual_docs/save_transmittal_number',
         data: {
-          'transmittal_number': new_transmittal_number
+          'voucher_or_lto_payment_id': voucher_or_lto_payment_id,
+          'transmittal_number': transmittal_number,
+          'payment_method': payment_method
         },
         dataType: "json",
         type: "POST",
@@ -30,11 +99,12 @@ $('.save-actual-docs').on('click', function(){
         },
         success: function(data) {
           $('#actual_docs').before(data.message);
-          $('#td-'+id).empty().append(new_transmittal_number);
+          $('#td-'+id).empty().append(transmittal_number);
         },
         error: function (jqXHR, textStatus, errorThrown){
         }
       });
     }
   }
-});
+
+}

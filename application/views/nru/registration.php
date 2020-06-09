@@ -39,6 +39,7 @@ input[type="text"] {
                 <?php endif; ?>
               </tr>
               <tr>
+                <th width="1px"><p>#</p></th>
                 <th><p>Branch</p></th>
                 <th><p>LTO Pending Date</p></th>
                 <th><p>Date Sold</p></th>
@@ -52,12 +53,14 @@ input[type="text"] {
             </thead>
             <tbody>
               <?php
+              $count = 1;
               foreach($transmittal->sales as $sales)
               {
                 $key = "[".$sales->sid."]";
                 $sales->fund = 1;
 
                 print '<tr>';
+                print '<td width="1px">'.$count.'</td>';
                 print '<td>'.$sales->branch.'</td>';
                 print '<td>'.$sales->pending_date.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
@@ -70,6 +73,7 @@ input[type="text"] {
                   print '</td>';
                 }
                 print '</tr>';
+               $count++;
               }
               ?>
             </tbody>

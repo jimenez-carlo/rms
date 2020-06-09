@@ -80,7 +80,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								print '<td>'.$row->ref_date.'</td>';
 								print '<td><a href="lto_payment/view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
 
-								print '<td>'.$region[$row->region].' '.$company[$row->company].'</td>';
+								print '<td>'.$row->region.' '.$row->company.'</td>';
 								print '<td>'.number_format($row->amount, 2, '.', ',').'</td>';
 
 								if (empty($row->doc_no)) print '<td>Pending</td>';

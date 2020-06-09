@@ -108,7 +108,7 @@ class Cron extends MY_Controller {
                   SELECT
                     c.*, r.*, si_mat_no, regn_status, date_created
                     ,CASE rrt_class
-                      WHEN 'NCR'      THEN 1
+                      WHEN 'NCR' THEN 1
                       WHEN 'REGION 1' THEN 2
                       WHEN 'REGION 2' THEN 3
                       WHEN 'REGION 3' THEN 4

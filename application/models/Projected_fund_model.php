@@ -100,7 +100,9 @@ class Projected_fund_model extends CI_Model{
             INNER JOIN
               tbl_sales s ON s.lto_transmittal = t.ltid
             WHERE
-              t.region = ".$fund->region." AND LEFT(s.bcode, 1) = '".$cid."' AND voucher = 0 AND registration_type != 'Self Registration' AND s.payment_method = 'CASH'
+              t.region = ".$fund->region." AND LEFT(s.bcode, 1) = '".$cid."'
+              AND voucher = 0 AND registration_type != 'Self Registration'
+              AND s.payment_method = 'CASH'
             GROUP BY t.date, t.company, t.ltid
           ")->result_object();
 
