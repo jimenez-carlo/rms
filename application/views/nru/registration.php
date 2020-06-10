@@ -39,7 +39,7 @@ input[type="text"] {
                 <?php endif; ?>
               </tr>
               <tr>
-                <th><p>#</p></th>
+                <th width="1px"><p>#</p></th>
                 <th><p>Branch</p></th>
                 <th><p>LTO Pending Date</p></th>
                 <th><p>Date Sold</p></th>
@@ -53,14 +53,14 @@ input[type="text"] {
             </thead>
             <tbody>
               <?php
-              $unit_count = 1;
+              $count = 1;
               foreach($transmittal->sales as $sales)
               {
                 $key = "[".$sales->sid."]";
                 $sales->fund = 1;
 
                 print '<tr>';
-                print '<td>'.$unit_count.'</td>';
+                print '<td width="1px">'.$count.'</td>';
                 print '<td>'.$sales->branch.'</td>';
                 print '<td>'.$sales->pending_date.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
@@ -73,7 +73,7 @@ input[type="text"] {
                   print '</td>';
                 }
                 print '</tr>';
-                $unit_count++;
+               $count++;
               }
               ?>
             </tbody>
@@ -93,7 +93,6 @@ $(function(){
 
       if (!registration) registration = "0.00";
       $(".registration_all").val(registration).change();
-
       $(".registration").val(registration).change();
       // $('.fund').removeAttr('checked');
       // $('.fund'+fund).click();

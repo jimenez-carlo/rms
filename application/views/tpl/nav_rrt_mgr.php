@@ -60,7 +60,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="bank") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>fund/bank">RRT Bank Accounts</a>
                             </li>
-                            <li><a href="<?php echo base_url(); ?>disapprove">Disapprove</a></li>
+                            <li <?php if(isset($nav) && $nav=="actual_docs") echo 'class="active"'; ?>>
+                                <a href="<?php if(isset($dir)) echo $dir; ?>actual_docs">Actual Docs</a>
+                            </li>
+                            <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
+                              <a href="<?php echo base_url(); ?>disapprove">Disapprove</a>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

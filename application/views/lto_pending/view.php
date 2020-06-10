@@ -42,6 +42,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->registration_type.'</td>';
                 print '<td>'.$sales->transmittal_date.'</td>';
+                $count++;
                 ?>
 
                 <td>

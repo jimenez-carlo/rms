@@ -10,16 +10,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 			<div class="block-content collapse in">
 				<form class="form-horizontal" method="post">
 					<fieldset>
-            <div class="control-group span5">
-              <div class="control-label">Date</div>
-              <div class="controls">
-                <span style="display: inline-block; width: 50px">From:</span>
-                <?php print form_input('date_from', set_value('date_from', date('Y-m-d', strtotime('-5 days'))), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
-                <br>
-                <span style="display: inline-block; width: 50px">To:</span>
-                <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
-              </div>
-            </div>
+                                                <div class="control-group span5">
+                                                  <div class="control-label">Date</div>
+                                                  <div class="controls">
+                                                    <span style="display: inline-block; width: 50px">From:</span>
+                                                    <?php print form_input('date_from', set_value('date_from', date('Y-m-d', strtotime('-5 days'))), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
+                                                    <br>
+                                                    <span style="display: inline-block; width: 50px">To:</span>
+                                                    <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
+                                                  </div>
+                                                </div>
 
 						<div class="control-group span5">
 							<div class="control-label">Region</div>
@@ -29,7 +29,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                                 $region = array_merge(array(0 => '- Any -'), $region);
 								print form_dropdown('region', $region, set_value('region'));
 								}else{
-								print form_dropdown('region', $region, set_value('region', $_SESSION['region']), array('readonly'=>'true'));
+								print form_dropdown('region', $region, set_value('region', $_SESSION['region_id']), array('readonly'=>'true'));
 								}
 								?>
 							</div>
@@ -80,7 +80,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								print '<td>'.$row->ref_date.'</td>';
 								print '<td><a href="lto_payment/view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
 
-								print '<td>'.$region[$row->region].' '.$company[$row->company].'</td>';
+								print '<td>'.$row->region.' '.$row->company.'</td>';
 								print '<td>'.number_format($row->amount, 2, '.', ',').'</td>';
 
 								if (empty($row->doc_no)) print '<td>Pending</td>';

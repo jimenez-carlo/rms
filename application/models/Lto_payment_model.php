@@ -28,9 +28,13 @@ class Lto_payment_model extends CI_Model{
 
           $sql = <<<SQL
             SELECT
-              lp.*
+              lp.*, c.company_code AS company, r.region
             FROM
               tbl_lto_payment lp
+            INNER JOIN
+              tbl_company c ON c.cid = lp.company
+            INNER JOIN
+              tbl_region r ON r.rid = lp.region
             WHERE
               lp.ref_date BETWEEN '$param->date_from' AND '$param->date_to'
               $region $status $reference $this->compQuery

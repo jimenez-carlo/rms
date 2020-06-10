@@ -53,6 +53,16 @@ class Cmc_model extends CI_Model{
 		return $result->result_object();
 	}
 
+	public function rms_companies() {
+          if ($_SESSION['company_code'] === 'MDI') {
+              $where_company = 'cid = 8';
+          } else {
+              $where_company = 'cid != 8';
+          }
+          $companies = $this->db->get_where('tbl_company', $where_company)->result_array();
+          return $companies;
+	}
+
 	public function get_users_info($positions) {
 	  $results = array();
 
