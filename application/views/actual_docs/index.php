@@ -4,6 +4,40 @@
       <div class="navbar navbar-inner block-header">
         <div class="pull-left">Actual Docs</div>
       </div>
+      <div class="block-content collapse in">
+        <form class="form-horizontal" method="post">
+        <fieldset>
+          <div class="control-group span5">
+	    <div class="control-label">Region</div>
+	    <div class="controls">
+            <?php
+            $region_opts = array();
+            $default = 'any';
+            if($_SESSION['dept_name'] === 'Regional Registration' && $_SESSION['position_name'] === 'RRT General Clerk'){
+              $region_opts['readonly'] = 'true';
+              $default = $_SESSION['region_id'];
+            }
+            print form_dropdown('region', $region, set_value('region', $default), $region_opts);
+            ?>
+            </div>
+          </div>
+          <div class="control-group span5">
+            <div class="control-label">Status</div>
+            <div class="controls">
+              <?php print form_dropdown('status', array_merge(array('any' => '- Any -'), $status), set_value('status')); ?>
+            </div>
+          </div>
+          <div class="control-group span5">
+            <div class="control-label">Company</div>
+            <div class="controls">
+              <?php print form_dropdown('company', $company, set_value('company', 'any')); ?>
+            </div>
+          </div>
+          <div class="form-actions span5">
+	    <input type="submit" class="btn btn-success" value="Search" name="search">
+          </div>
+        </fieldset>
+      <div>
       <table class="table">
         <thead>
           <tr>
@@ -60,15 +94,21 @@
             <td id="td-<?php echo $reference['transmittal_id']; ?>">
               <?php echo ($reference['transmittal_number'] !== "") ? $reference['transmittal_number'] : "" ; ?>
             </td>
+            <td>
             <?php
-              $dep_slip_extra =
-              ($_SESSION['dept_name'] === 'Regional Registration' || $reference['deposit_slip'] === 'Original')
-              ? ['disabled'=> 'disabled'] : [];
+              echo ($_SESSION['dept_name'] === 'Accounting')
+                ? form_dropdown('deposit_slip', $dep_slip_option, $reference['deposit_slip'] ?? '')
+                : $reference['deposit_slip'];
             ?>
-            <td><?php echo form_dropdown('deposit_slip', $dep_slip_option, $reference['deposit_slip'], $dep_slip_extra); ?></td>
-            <td id="date-incomplete-<?php echo $reference['actual_docs_id']; ?>"><?php echo $reference['date_incomplete']; ?></td>
-            <td id="date-complete-<?php echo $reference['actual_docs_id']; ?>"><?php echo $reference['date_completed']; ?></td>
-            <td <?php echo ($_SESSION['dept_name'] === 'Accounting') ? 'id="status-'.$reference['actual_docs_id'].'"' : ''; ?>><?php echo $reference['status']; ?></td>
+            </td>
+            <td <?php echo (isset($reference['actual_docs_id'])) ? 'id="date-incomplete-'.$reference['actual_docs_id'].'"' : ''; ?>><?php echo $reference['date_incomplete']; ?></td>
+            <td <?php echo (isset($reference['actual_docs_id'])) ? 'id="date-complete-'.$reference['actual_docs_id'].'"' : ''; ?>><?php echo $reference['date_completed']; ?></td>
+            <td
+              <?php echo (isset($reference['actual_docs_id'])) ? 'id="status-'.$reference['actual_docs_id'].'"' : ''; ?>
+              <?php echo 'class="status-'.$reference['transmittal_id'].'"'; ?>
+            >
+              <?php echo $reference['status']; ?>
+            </td>
             <!-- <td><button class="btn btn-success receive">Save</button></td> -->
           </tr>
           <?php endforeach; ?>

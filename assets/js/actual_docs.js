@@ -1,4 +1,5 @@
 $('.edit-actual-docs').on('click', function(e){
+  e.preventDefault();
   $(this).hide();
   var id = $(this).val();
   $('#td-'+id).empty().append(
@@ -7,31 +8,16 @@ $('.edit-actual-docs').on('click', function(e){
   $('#save-'+$(this).val()).show();
 });
 
-$('.save-actual-docs').on('click', function(){
+$('.save-actual-docs').on('click', function(e){
+  e.preventDefault();
   var actual_docs_id = $(this).closest('tr').prop('id');
-  var id = $(this).val();
-  //console.log(actual_docs_id);
-  save_transmittal_no(id);
+  var temp_id = $(this).val();
+  save_transmittal_no(temp_id, actual_docs_id);
 });
 
-/*
-$('.receive').on('click', function(){
-  var confirmed = confirm('This action cannot be undone: Transmittal Number. Continue?');
-  if (confirmed) {
-    var actual_docs_id = $(this).closest('tr').prop('id');
-    var data = {
-      'actual_docs_id': actual_docs_id,
-      'date_received_by_acctg': true
-    };
-    var promise = data_send(data);
-    promise.success(function(data) {
-      $('#date-recived-'+actual_docs_id).append(data.date_received);
-    });
-  }
-});
-*/
 
 $('[name=deposit_slip]').on('change', function(e){
+  var that = $(this);
   var actual_docs_id = $(this).closest('tr').prop('id');
   var dep_slip_values = [ "Original", "Not Original" ];
 
@@ -41,22 +27,24 @@ $('[name=deposit_slip]').on('change', function(e){
   };
 
   if (dep_slip_values.indexOf(data_to_send.deposit_slip) !== -1) {
-    var promise = data_send(data_to_send);
+    var promise = data_send(data_to_send, BASE_URL+'actual_docs/update_status');
     promise.success(function(data){
-      $('#status-'+data.actual_docs_id).empty().append(data.status);
-      if (data_to_send.deposit_slip === 'Original') {
-        $(this).attr('disabled', true);
-        $('#date-complete-'+data.actual_docs_id).empty().append(data.date_completed);
+      if (data.actual_doc.deposit_slip === 'Original') {
+        that.select2('disable');
+        $('#date-complete-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.date_completed);
       } else {
-        $('#date-incomplete-'+data.actual_docs_id).empty().append(data.date_incomplete);
+        $('#date-incomplete-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.date_incomplete);
       }
+      $('#status-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.status);
+      $('.alert').remove();
+      $('#actual_docs').before(data.message);
     });
   }
 });
 
-function data_send(dataSend) {
+function data_send(dataSend, url) {
   return $.ajax({
-    //url : BASE_URL+'actual_docs/save_transmittal_number',
+    url: url,
     data: dataSend,
     dataType: "json",
     type: "POST",
@@ -70,24 +58,31 @@ function data_send(dataSend) {
   });
 }
 
-function save_transmittal_no(id) {
-  if ($('#tn-'+id).val().length == 0) {
+function save_transmittal_no(temp_id, actual_docs_id) {
+  if ($('#tn-'+temp_id).val().length == 0) {
     confirm('Please input transmittal number.');
   } else {
     var confirmed = confirm('This action cannot be undone: Transmittal Number. Continue?');
 
     if (confirmed) {
-      var voucher_or_lto_payment_id = $('#id-'+id).val();
-      var transmittal_number = $('#tn-'+id).val();
-      var payment_method = $('#pt-'+id).val();
+      var voucher_or_lto_payment_id = $('#id-'+temp_id).val();
+      var transmittal_number = $('#tn-'+temp_id).val();
+      var payment_method = $('#pt-'+temp_id).val();
+
+      if(actual_docs_id.length === 0) {
+        var actual_docs_id = null;
+      }
+
+      var dataToSend = {
+        'actual_docs_id': actual_docs_id,
+        'voucher_or_lto_payment_id': voucher_or_lto_payment_id,
+        'transmittal_number': transmittal_number,
+        'payment_method': payment_method,
+      }
 
       $.ajax({
         url : BASE_URL+'actual_docs/save_transmittal_number',
-        data: {
-          'voucher_or_lto_payment_id': voucher_or_lto_payment_id,
-          'transmittal_number': transmittal_number,
-          'payment_method': payment_method
-        },
+        data: dataToSend,
         dataType: "json",
         type: "POST",
         beforeSend: function(){
@@ -99,10 +94,11 @@ function save_transmittal_no(id) {
         },
         success: function(data) {
           $('#actual_docs').before(data.message);
-          $('#td-'+id).empty().append(transmittal_number);
-        },
-        error: function (jqXHR, textStatus, errorThrown){
+          $('#td-'+temp_id).empty().append(data.actual_docs.transmittal_number);
+          $('.status-'+temp_id).empty().append(data.actual_docs.status);
         }
+        //,error: function (jqXHR, textStatus, errorThrown){
+        //}
       });
     }
   }
