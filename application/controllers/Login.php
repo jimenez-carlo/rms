@@ -230,7 +230,7 @@ class Login extends CI_Controller {
 
 	private function custom_login($username, $password)
 	{
-		if ($username == 'BMI' && $password == 'G6U9wfw2') {
+		if ($username == 'BMI' && $password === 'Bmi00001') {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
 
