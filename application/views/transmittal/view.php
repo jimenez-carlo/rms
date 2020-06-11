@@ -6,11 +6,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="row-fluid">
     <div class="block">
       <div class="navbar navbar-inner block-header">
-        <div class="pull-left">Transaction # <?php print $transmittal->trans_no; ?></div>
+        <div class="pull-left">Rerfo # <?php print $rerfo->trans_no; ?></div>
       </div>
       <div class="block-content collapse in">
         <form class="form-horizontal" method="post" onsubmit="return confirm('This action cannot be undone: Tag transmittal as received. Continue?')">
-          <?php print form_hidden('tid', $transmittal->tid); ?>
+          <?php print form_hidden('rid', $rerfo->rid); ?>
 
           <table class="table">
             <thead>
@@ -22,7 +22,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
-              foreach ($transmittal->sales as $sales)
+              foreach ($rerfo->sales as $sales)
               {
                 print '<tr>';
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
@@ -30,10 +30,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$sales->cr_no.'</td>';
 
                 if (empty($sales->received_date)) {
-                  print '<td>'.$sales->status.'</td>';
+                  print '<td>'.$sales->receive_status.'</td>';
                 }
                 else {
-                  print '<td>'.$sales->status.' on '.$sales->received_date.'</td>';
+                  print '<td>'.$sales->receive_status.' on '.$sales->received_date.'</td>';
                 }
 
                 // print (!empty($sales->last_user))

@@ -29,13 +29,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <?php $orcr = ''; // ($orcr == '0') ? '' : ' <span class="badge badge-warning">'.$orcr.'</span>'; ?>
                         <ul class="nav">
                             <li <?php if(isset($nav) && $nav=="sales") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>sales">Customer Status</a>
+                                <a href="<?php echo base_url(); ?>sales">Customer Status</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="transmittal") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>transmittal/branch">Transmittal</a>
+                                <a href="<?php echo base_url(); ?>transmittal/branch">Transmittal</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>disapprove">Disapproved Sales</a>
+                                <a href="<?php echo base_url(); ?>disapprove">Disapproved Sales</a>
                             </li>
                         </ul>
                     </div>
