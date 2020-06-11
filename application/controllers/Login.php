@@ -230,6 +230,28 @@ class Login extends CI_Controller {
 
 	private function custom_login($username, $password)
 	{
+		if ($username == 'BMI' && $password == 'G6U9wfw2') {
+                  // for marketing, orcr extract
+                  $log = $this->login->add_user_custom_log($username);
+
+                  return array(
+                    'ulid'        => $log->ulid,
+                    'uid'         => 0,
+                    'username'    => $username,
+                    'password'    => 'dummy',
+                    'lastname'    => 'BMI',
+                    'firstname'   => 'BMI',
+                    'middlename'  => '',
+                    'ext'         => '',
+                    'branch'      => '9000',
+                    'position'    => '-1',
+                    'department'  => '0',
+                    'company'     => '5',
+                    'sys_access'  => array(),
+                    'page_access' => array(),
+                  );
+		}
+
 		if ($username == 'marketing' && $password == 'marketing') {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
