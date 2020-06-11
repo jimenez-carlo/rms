@@ -19,27 +19,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th><p>Check on Hold</p></th> -->
                 <th><p>Pending at LTO</p></th>
                 <th><p>Pending at ACCTG</p></th>
+                <th><p>Liquidated</p></th>
               </tr>
             </thead>
             <tbody>
-              <?php
-              $fid = 0;
-              $cid = 0;
-              foreach ($table as $row)
-              {
-                $fid = $row->fid;
-                $cid = $row->company_cid;
+            <?php
+              $fid = $fund['fid'];
+              $cid = $fund['company'];
 
-                print '<tr>';
-                print '<td>'.number_format($row->fund,2,'.',',').'</td>';
-                print '<td>'.number_format($row->cash_on_hand,2,'.',',').'</td>';
-                // print '<td>'.number_format($row->cash_on_check,2,'.',',').'</td>';
-                // print '<td>'.number_format($row->check_on_hold,2,'.',',').'</td>';
-                print '<td>'.number_format($row->lto_pending,2,'.',',').'</td>';
-                print '<td>'.number_format($row->for_liquidation,2,'.',',').'</td>';
-                print '</tr>';
-              }
-              ?>
+              print '<tr>';
+              print '<td>'.$fund['fund'].'</td>';
+              print '<td>'.$fund['cash_on_hand'].'</td>';
+              // print '<td>'.number_format($row->cash_on_check,2,'.',',').'</td>';
+              // print '<td>'.number_format($row->check_on_hold,2,'.',',').'</td>';
+              print '<td>'.$fund['lto_pending'].'</td>';
+              print '<td>'.$fund['for_liquidation'].'</td>';
+              print '<td>'.$fund['liquidated'].'</td>';
+              print '</tr>';
+            ?>
             </tbody>
           </table>
 

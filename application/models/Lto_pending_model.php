@@ -26,12 +26,11 @@ class Lto_pending_model extends CI_Model{
 	        t.*, LEFT(t.date, 10) AS date, COUNT(*) AS sales
 	    FROM
 	        tbl_lto_transmittal t
-	            INNER JOIN
+	    INNER JOIN
 	        tbl_sales ON lto_transmittal = ltid
 	    WHERE
-	        t.region = ".$region."
-	            AND registration_type != 'Self Registration'
-	            AND status < 2
+	        t.region = ".$region." AND registration_type != 'Self Registration'
+	        AND status < 2 AND voucher = 0 AND lto_payment = 0
 	    GROUP BY ltid
 	    ORDER BY t.date DESC
           ")->result_object();

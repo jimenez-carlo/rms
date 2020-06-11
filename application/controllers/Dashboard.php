@@ -5,7 +5,6 @@ class Dashboard extends MY_Controller {
 
   public function __construct() {
      parent::__construct();
-     $this->load->helper('url');
      $this->load->model('Cmc_model', 'cmc');
   }
 
@@ -56,7 +55,7 @@ class Dashboard extends MY_Controller {
 		if ($_SESSION['position'] != 108)
 		{
 			$branches = $global->query("select b_code from tbl_branches
-				where ph_region = ".$_SESSION['region'])->result_object();
+				where ph_region = ".$_SESSION['region_id'])->result_object();
 			foreach ($branches as $branch)
 			{
 				$bcode[] = $branch->b_code;
@@ -285,7 +284,7 @@ class Dashboard extends MY_Controller {
 			'<link rel="stylesheet" href="vendors/morris/morris.css">
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
-		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 's.region = '.$_SESSION['region'];
+		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 's.region = '.$_SESSION['region_id'];
 
 		// rerfo
 		$result = $this->db->query("select count(*) as count,
@@ -364,7 +363,7 @@ class Dashboard extends MY_Controller {
 	     <link href="vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
 
 		// sales
-		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
+		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region_id'];
 		$result = $this->db->query("SELECT count(*) as count,
 			case status when 0 then 'new'
 				when 1 then 'rejected'
@@ -440,16 +439,26 @@ class Dashboard extends MY_Controller {
 		}
 
 		// topsheet
-		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region'];
-		$result = $this->db->query("select count(*) as count,
-			case when status = 0 then 'unprocessed'
-				when status = 1 then 'incomplete'
-				when status = 2 then 'sap_upload'
-				when status = 3 then 'done'
-			end as status
-			from tbl_topsheet
-			where ".$region."
-			group by 2")->result_object();
+		$region = ($_SESSION['position'] == 107) ? '1 = 1' : 'region = '.$_SESSION['region_id'];
+                $result = $this->db->query("
+                    SELECT
+                      COUNT(*) AS count,
+                      CASE
+                        WHEN s.status = 4 AND susb.subid IS NULL THEN 'unprocessed'
+			-- WHEN status = 1 THEN 'incomplete'
+			WHEN s.status = 4 AND sub.is_uploaded = 0 THEN 'sap_upload'
+			WHEN s.status = 5 THEN 'done'
+		      END AS label
+                    FROM
+                      tbl_sales s
+                    LEFT JOIN
+                      tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
+                    LEFT JOIN
+                      tbl_sap_upload_batch sub ON susb.subid = sub.subid
+                    WHERE
+                      ".$region."
+                    GROUP BY label
+                ")->result_object();
 
 		$data['ts_unprocessed'] = 0;
 		$data['ts_incomplete'] = 0;
@@ -457,7 +466,7 @@ class Dashboard extends MY_Controller {
 		$data['ts_done'] = 0;
 		foreach ($result as $row)
 		{
-			$data['ts_'.$row->status] = $row->count;
+			$data['ts_'.$row->label] = $row->count;
 		}
 
 		$ts_data = '';
@@ -502,7 +511,7 @@ class Dashboard extends MY_Controller {
 		**  report of units tagged as self registration
 		**    with & without transmittal (independent, no process)
 		*/
-		$branches = $this->cmc->get_region_branches($_SESSION['region']);
+		$branches = $this->cmc->get_region_branches($_SESSION['region_id']);
 		$data['sr_with'] = $this->db->query("select sid from tbl_sales
 			where registration_type = 'Self Registration'and
 			transmittal_date IS NULL and
@@ -576,7 +585,7 @@ class Dashboard extends MY_Controller {
             SELECT
               'For CA' AS label,
               COUNT(*) AS total,
-              SUM(CASE WHEN voucher = 0 THEN 1 ELSE 0 END) AS pending,
+              SUM(CASE WHEN voucher = 0 AND payment_method = 'CASH' THEN 1 ELSE 0 END) AS pending,
               SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END) AS done
             FROM
               tbl_sales
@@ -587,24 +596,28 @@ class Dashboard extends MY_Controller {
             SELECT
               'For Checking' AS label,
               COUNT(*) AS total,
-              SUM(CASE WHEN batch = 0 THEN 1 ELSE 0 END) AS pending,
-              SUM(CASE WHEN batch > 0 THEN 1 ELSE 0 END) AS done
+              SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS pending,
+              SUM(CASE WHEN status > 4 THEN 1 ELSE 0 END) AS done
             FROM
               tbl_sales
-            WHERE topsheet > 0 AND da_reason < 1 {$company}
+            WHERE
+              status >= 4 {$company}
 
             UNION
 
             SELECT
               'For SAP Uploading' as label,
               COUNT(*) AS total,
-              SUM(CASE WHEN s.status = 4 THEN 1 END) AS pending,
-              SUM(CASE WHEN s.status = 5 THEN 1 END) AS done
+              IFNULL(SUM(CASE WHEN sub.is_uploaded = 0 THEN 1 END),0) AS pending,
+              IFNULL(SUM(CASE WHEN s.status = 5 THEN 1 END),0) AS done
             FROM
               tbl_sales s
             INNER JOIN
-              tbl_batch b ON b.bid = s.batch
-            WHERE s.status >= 4 {$company}
+              tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
+            INNER JOIN
+              tbl_sap_upload_batch sub ON susb.subid = sub.subid
+            WHERE
+              s.status >= 4 {$company}
           ")->result_object();
 
           $data['table'] = $result;

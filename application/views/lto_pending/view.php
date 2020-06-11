@@ -15,6 +15,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <table class="table">
             <thead>
               <tr>
+                <th><p>#</p></th>
                 <th><p>Branch</p></th>
                 <th style="width: 8%"><p>Date Sold</p></th>
                 <th><p>Engine #</p></th>
@@ -27,38 +28,59 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
+              $count = 1;
               foreach ($transmittal->sales as $sales)
               {
                 $key = '['.$sales->sid.']';
                 $sales->status = ($sales->status == 1) ? 1 : 2;
 
                 print '<tr>';
+                print '<td>'.$count.'</td>';
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->registration_type.'</td>';
                 print '<td>'.$sales->transmittal_date.'</td>';
+                $count++;
                 ?>
 
                 <td>
                   <span>
                     <?php
-                      print form_radio('status'.$key, 2, 
-                      (set_value('status'.$key, $sales->status) == 2));
-                    ?> Pending at LTO
+                      print form_radio(
+                        'status'.$key,
+                        'EPP',
+                        (set_value('status'.$key, 'EPP') == 'EPP')
+                      );
+                    ?> Pending at LTO EPP
                   </span><br>
                   <span>
                     <?php
-                      print form_radio('status'.$key, 1, 
-                      (set_value('status'.$key, $sales->status) == 1));
-                    ?> Rejected
+                      print form_radio(
+                        'status'.$key,
+                        'CASH',
+                        (set_value('status'.$key, false) == 'CASH')
+                      );
+                    ?> Pending at LTO CASH
+                  </span><br>
+                  <span>
+                    <?php
+                      print form_radio(
+                        'status'.$key,
+                        'REJECT',
+                        (in_array(
+                          set_value('status'.$key, $sales->status),
+                          array(1,'REJECT')
+                        ))
+                      ); ?> Rejected
                   </span>
                 </td>
 
                 <?php
                 print '<td>'.form_dropdown('lto_reason'.$key, $reasons, set_value('lto_reason'.$key, $sales->lto_reason)).'</td>';
                 print '</tr>';
+                $count++;
               }
               ?>
             </tbody>
@@ -81,7 +103,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $(function(){
   $(document).ready(function(){
     $("input[type=radio]").change(function(){
-      if ($(this).val() == 1) {
+      if ($(this).val() == 'REJECT') {
         $(this).closest("tr").find("select").select2("enable", true);
       }
       else {

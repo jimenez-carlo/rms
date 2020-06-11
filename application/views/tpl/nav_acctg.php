@@ -76,6 +76,7 @@ $dir = base_url();
                                   <li><a href="<?php echo base_url(); ?>disapprove">View Disapprove</a></li>
                                 </ul>
                             </li>
+                            <li><a href="./actual_docs">Actual Docs</a></li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

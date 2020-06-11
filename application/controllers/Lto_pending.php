@@ -34,7 +34,7 @@ class Lto_pending extends MY_Controller {
 
 		if (empty($ltid))
 		{
-			$data['table'] = $this->lto_pending->load_list($_SESSION['region']);
+			$data['table'] = $this->lto_pending->load_list($_SESSION['region_id']);
 			$this->template('lto_pending/list', $data);
 		}
 		else
@@ -54,7 +54,7 @@ class Lto_pending extends MY_Controller {
 		foreach ($status as $sid => $val)
 		{
 			// require reason field if rejected is chosen
-			if ($status[$sid] == 1 && $lto_reason[$sid] == 0)
+			if ($status[$sid] == 'REJECT' && $lto_reason[$sid] == 0)
 			{
 				$engine = $this->sales->get_engine($sid);
 				$err_msg[] = 'Reason for rejection of Engine # '.$engine.' is required.';
@@ -71,12 +71,28 @@ class Lto_pending extends MY_Controller {
 		$status = $this->input->post('status');
 		$lto_reason = $this->input->post('lto_reason');
 
-		foreach ($status as $sid => $val) {
-			$sales = new Stdclass();
-			$sales->sid = $sid;
-			$sales->status = $status[$sid];
-			$sales->lto_reason = $lto_reason[$sid];
-			$this->sales->save_lto_pending($sales);
+		foreach ($status as $sid => $payment_method) {
+                  switch ($payment_method) {
+                    case 'CASH':
+                    case 'EPP':
+                      $sales_status = 2;
+                      break;
+                    case 'REJECT':
+                      $sales_status = 1;
+                      $payment_method = NULL;
+                      break;
+                    default:
+                      $sales_status = 0;
+                      $payment_method = NULL;
+                      break;
+                  }
+
+                  $sales = new Stdclass();
+                  $sales->sid = $sid;
+                  $sales->status = $sales_status;
+                  $sales->lto_reason = $lto_reason[$sid];
+                  $sales->payment_method = $payment_method;
+                  $this->sales->save_lto_pending($sales);
 		}
 
 		$transmittal = $this->db->query("select * from tbl_lto_transmittal

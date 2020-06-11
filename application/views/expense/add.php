@@ -13,6 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <form method="post" enctype="multipart/form-data" class="form-horizontal" id="form" style="margin:0px;">
           <fieldset class="span4">
             <?php
+              echo form_input('status', $status, array('class' => 'hide'));
               echo '<div class="control-group">';
               echo form_label('Reference # (SI/OR)', 'or_no', array('class' => 'control-label'));
               echo '<div class="controls">';

@@ -28,50 +28,42 @@ class Projected_fund_model extends CI_Model{
    * View RRT Funds with Projected Funds
    */
 	public function get_projected_funds() {
-
-                // FOR MNC fid < 11
-                // FOR MDI fid >= 11
-          if ($_SESSION['company'] != 8) {
-
-            $result = $this->db->query("
-              SELECT f.*,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_1,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_1,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_3,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_6,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6
-              FROM
-                tbl_fund f
-              LEFT JOIN
-                tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
-              WHERE
-               f.fid < 11
-              GROUP BY f.fid
-            ")->result_object();
-
-          } else {
-            $result = $this->db->query("
-              SELECT f.*,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
-                IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8
-              FROM
-                tbl_fund f
-              LEFT JOIN
-                tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
-              WHERE
-                f.fid >= 11
-              GROUP BY f.fid")->result_object();
+          switch ($this->session->company_code) {
+            case 'CMC':
+                $company = 'f.company != 8';
+              break;
+            case 'MDI':
+                $company = 'f.company = 8';
+              break;
           }
 
-          foreach ($result as $key => $fund) {
-            $fund->region  = $this->region[$fund->region];
-            $fund->company = $this->company[$fund->company];
-            $result[$key] = $fund;
-          }
+          $get_fund_per_region = $this->db->query("
+            SELECT
+              f.*,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_1,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_1,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_3,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_6,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
+              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8,
+              r.region,
+              c.company_code AS company
+            FROM
+              tbl_fund f
+            LEFT JOIN
+              tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
+            INNER JOIN
+              tbl_company c ON s.company = c.cid
+            INNER JOIN
+              tbl_region r ON s.region = r.rid
+            WHERE
+              {$company} AND s.voucher = 0 AND s.payment_method = 'CASH'
+            GROUP BY f.fid, c.company_code
+          ")->result_object();
 
-          return $result;
-
+          return $get_fund_per_region;
 	}
 
   /**
@@ -97,22 +89,22 @@ class Projected_fund_model extends CI_Model{
 
           $budget = ((int) ($_SESSION['company']) == 8) ? 1200 : 900;
 
-          $fund->transmittal = $this->db->query(
-            "SELECT
-                t.ltid, t.code, t.region, t.company
-                 ,LEFT(t.date, 10) AS date
-                ,SUM($budget) AS amount
-                ,COUNT(*) AS sales
+          $fund->transmittal = $this->db->query("
+            SELECT
+              t.ltid, t.code, t.region, t.company
+              ,LEFT(t.date, 10) AS date
+              ,SUM($budget) AS amount
+              ,COUNT(*) AS sales
             FROM
-                tbl_lto_transmittal t
-                    INNER JOIN
-                tbl_sales s ON s.lto_transmittal = t.ltid
-            WHERE  t.region = ".$fund->region."
-                    AND LEFT(s.bcode, 1) = '".$cid."'
-                    AND voucher = 0
-                    AND registration_type != 'Self Registration'
-            GROUP BY t.date, t.company, t.ltid"
-          )->result_object();
+              tbl_lto_transmittal t
+            INNER JOIN
+              tbl_sales s ON s.lto_transmittal = t.ltid
+            WHERE
+              t.region = ".$fund->region." AND LEFT(s.bcode, 1) = '".$cid."'
+              AND voucher = 0 AND registration_type != 'Self Registration'
+              AND s.payment_method = 'CASH'
+            GROUP BY t.date, t.company, t.ltid
+          ")->result_object();
 
           return $fund;
         }
@@ -125,29 +117,32 @@ class Projected_fund_model extends CI_Model{
 		$company = ($fund->company == 2) ? 6 : $fund->company;
 		$fund->reference = 'CA-'.$region.'-'.date('ymd');
 
-		$ref_code = $this->db->query("SELECT count(*) as c FROM tbl_voucher
-			WHERE reference like '".$fund->reference."%'")->row()->c;
+                $ref_code = $this->db->query("
+                  SELECT
+                    COUNT(*) as c
+                  FROM
+                    tbl_voucher
+                  WHERE
+                    reference LIKE '".$fund->reference."%'
+                ")->row()->c;
 		$fund->reference .= ($ref_code == 0) ? '' : '-'.($ref_code++);
 
                 $fund->sales = $this->db->query("
                   SELECT
-                    bcode, bname, count(*) as units
+                    s.bcode, s.bname, count(*) as units
 		  FROM
-                    tbl_sales
+                    tbl_sales s
                   INNER JOIN
-                    tbl_engine on eid = engine
+                    tbl_engine e on e.eid = s.engine
                   INNER JOIN
-                    tbl_customer on cid = customer
+                    tbl_customer c on c.cid = s.customer
                   WHERE
-                    lto_transmittal in (".$ltid.")
-		  AND voucher = 0
-		  AND registration_type != 'Self Registration'
-                  GROUP BY bcode, bname
+                    s.lto_transmittal in (".$ltid.")
+                    AND s.voucher = 0 AND s.registration_type != 'Self Registration' AND s.payment_method = 'CASH'
+                  GROUP BY s.bcode, s.bname
                 ")->result_object();
 
 		$fund->region = $this->region[$fund->region];
-		$fund->company = $this->company[$fund->company];
-		$fund->company = '';
 		return $fund;
 	}
 
@@ -162,7 +157,7 @@ class Projected_fund_model extends CI_Model{
                   INNER JOIN
                     tbl_lto_transmittal lt ON s.lto_transmittal = lt.ltid
                   WHERE
-                    lt.ltid in (".$ltid.") AND voucher = 0
+                    lt.ltid IN (".$ltid.") AND voucher = 0 AND s.registration_type != 'Self Registration' AND s.payment_method = 'CASH'
                   GROUP BY
                     lt.company
                 ")->row();

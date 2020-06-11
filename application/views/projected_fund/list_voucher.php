@@ -56,20 +56,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               $regions = ($_SESSION['company'] != 8) ? $luzon_visayas : $mindanao;
 
               echo '<div class="control-group span5">';
-              echo form_label('Region', 'region', array('class' => 'control-label'));
+              echo form_label('Region', 'region_id', array('class' => 'control-label'));
               echo '<div class="controls">';
               switch ($_SESSION['position']) {
                 case 108: // RRT-SPVSR
-                  $set_region = $_SESSION['region'];
+                  $set_region = $_SESSION['region_id'];
                   $bool = array('disabled' => 'false');
                   break;
 
                 default: // TRSRY-SPVSR, ACCT-PAYCL, RRT-MGR
-                  $set_region = set_value('region');
+                  $set_region = set_value('region_id');
                   $bool = false;
                   break;
               }
-              echo form_dropdown('region', $regions, $set_region, $bool);
+              echo form_dropdown('region_id', $regions, $set_region, $bool);
               echo '</div></div>';
             ?>
             <div class="form-actions span4">
@@ -87,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <th><p>Entry Date</p></th>
               <th><p>Debit Memo #</p></th>
               <th><p>Date Deposited</p></th>
-              <th style="text-align:right;padding-right:10px;"><p>Amount</p></th>
+              <th><p>Amount</p></th>
               <th><p>Region</p></th>
               <!-- <th><p>Company</p></th> -->
               <th><p>Status</p></th>
@@ -103,7 +103,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<td>'.$row->date.'</td>';
               print '<td>'.$row->dm_no.'</td>';
               print '<td>'.$row->transfer_date.'</td>';
-              print '<td style="text-align:right;padding-right:10px;">'.number_format($row->amount,2,'.',',').'</td>';
+              print '<td>'.$row->amount.'</td>';
               print '<td>'.$row->region.'</td>';
               // print '<td>'.$row->company.'</td>';
               print '<td>'.$row->status.'</td>';

@@ -3,6 +3,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
 
+	public function __construct() {
+	  parent::__construct();
+          $this->load->helper(array('form', 'url'));
+          $this->load->library('form_validation');
+
+          if (!isset($_SESSION['uid'])) {
+            redirect('login');
+          }
+	}
+
 	public $region = array(
 		1 => 'NCR',
 		2 => 'Region 1',
@@ -23,8 +33,6 @@ class MY_Controller extends CI_Controller {
                 14 => 'Region XII',
                 15 => 'Region XIII'
         );
-
-
 
 	public $reg_code = array(
 		1 => 'NCR',
@@ -58,15 +66,6 @@ class MY_Controller extends CI_Controller {
 	private static $header = array();
 	private static $footer = array();
 
-	public function __construct() {
-	  parent::__construct();
-          $this->load->helper('url');
-          $this->load->helper('form');
-
-          $this->load->helper(array('form', 'url'));
-          $this->load->library('form_validation');
-	}
-
 	public function header_data($key, $data)
 	{
 		self::$header[$key] = $data;
@@ -80,7 +79,9 @@ class MY_Controller extends CI_Controller {
 	public function access($page)
 	{
 		// no credentials
-		if (!$this->session->has_userdata('username')) redirect('login');
+                if (!$this->session->has_userdata('username')) {
+                  redirect('login');
+                }
 
 		// special custom login, always grant
 		if ($_SESSION['uid'] == 0) return;
