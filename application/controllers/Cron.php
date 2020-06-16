@@ -146,7 +146,6 @@ class Cron extends MY_Controller {
 		  WHERE LEFT(date_sold, 10) >= '2018-08-01' {$date_created} {$engine_numbers}
 SQL;
 
-                var_dump($query); die();
                 $dev_rms_result     = $this->dev_rms->query($query)->result_object();
                 $mdi_dev_rms_result = $this->mdi_dev_rms->query($query)->result_object();
                 $result = array_merge($dev_rms_result, $mdi_dev_rms_result);
