@@ -161,9 +161,7 @@ SQL;
                         if ($row->region > 10) {
                           $company = 8; // MDI
                         } else {
-                          $company = (substr($row->branch, 0, 1) == 6)
-                              ? 2
-                              : substr($row->branch, 0, 1);
+                          $company = substr($row->branch, 0, 1);
                         }
 
 			// lto_transmittal
