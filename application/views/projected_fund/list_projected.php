@@ -16,7 +16,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <th><p>Company</p></th>
               <th style="text-align:right;padding-right:10px;"><p>Cash in Bank</p></th>
               <th style="text-align:right;padding-right:10px;"><p>Cash on Hand</p></th>
-              <!-- <th style="text-align:right;padding-right:10px;"><p>Check on Hand</p></th> -->
               <th style="text-align:center" colspan="2"><p>Total Projected Cost</p></th>
               <?php if ($position == 3) print '<th><p></p></th>'; ?>
             </tr>
@@ -30,13 +29,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <tbody>
             <?php
             $comps = ($_SESSION['company'] != 8) ? array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI') : array(8 => 'MDI');
-
             foreach ($table as $row)
             {
               print '<tr>';
               print '<td>'.$row->region.'</td>';
-              // print '<td>'.$row->company.'</td>';
-
               foreach ($comps as $key => $comp) {
                 switch ($key) {
                   case 1: $voucher = $row->voucher_1; $transfer = $row->transfer_1; break;
@@ -64,6 +60,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 }
                 print '</tr><tr>';
               }
+
             }
 
             if (empty($table))

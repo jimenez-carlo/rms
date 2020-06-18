@@ -39,17 +39,16 @@ class Projected_fund_model extends CI_Model{
 
           $get_fund_per_region = $this->db->query("
             SELECT
-              f.*,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_1,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '1' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_1,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '3' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_3,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_6,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
-              IFNULL(SUM(CASE WHEN LEFT(bcode, 1) = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8,
-              r.region,
-              c.company_code AS company
+              f.fid, IF(c.cid = 1, f.fund, 0) AS fund, f.cash_on_hand,
+              IFNULL(SUM(CASE WHEN s.company = '1' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_1,
+              IFNULL(SUM(CASE WHEN s.company = '1' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_1,
+              IFNULL(SUM(CASE WHEN s.company = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
+              IFNULL(SUM(CASE WHEN s.company = '3' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_3,
+              IFNULL(SUM(CASE WHEN s.company = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_6,
+              IFNULL(SUM(CASE WHEN s.company = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6,
+              IFNULL(SUM(CASE WHEN s.company = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
+              IFNULL(SUM(CASE WHEN s.company = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8,
+              r.region, c.cid, c.company_code AS company
             FROM
               tbl_fund f
             LEFT JOIN
@@ -60,8 +59,9 @@ class Projected_fund_model extends CI_Model{
               tbl_region r ON s.region = r.rid
             WHERE
               {$company} AND s.voucher = 0 AND s.payment_method = 'CASH'
-            GROUP BY f.fid, c.company_code
+            GROUP BY f.fid, c.cid, c.company_code
           ")->result_object();
+          //echo '<pre>'; var_dump($this->db->last_query()); echo '</pre>'; die();
 
           return $get_fund_per_region;
 	}

@@ -108,7 +108,7 @@ class Transmittal_model extends CI_Model{
                     tbl_topsheet t ON s.topsheet = t.tid
                   WHERE
                     s.bcode = {$branch} AND t.transmittal_date IS NOT NULL
-                    AND s.status = 4
+                    AND s.status >= 4
                   GROUP BY r.rid
                   ORDER BY r.rid DESC
                 ")->result_object();
@@ -130,7 +130,7 @@ class Transmittal_model extends CI_Model{
                   INNER JOIN
                     tbl_customer c ON s.customer = c.cid
                   WHERE
-                    rerfo = ".$rid.$bcode." AND s.status = 4
+                    rerfo = ".$rid.$bcode." AND s.status >= 4
                   ORDER BY s.bcode
                 ")->result_object();
 

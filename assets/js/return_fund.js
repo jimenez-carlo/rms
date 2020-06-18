@@ -18,8 +18,8 @@ $('#rf-disapprove').on('click', function(){
 
 $('#return-fund-save-disapprove').on('click', function(e){
   e.preventDefault();
-  var confirm = confirm('This action cannot be undone: Disapprove. Continue?');
-  if (confirm) {
+  var confirmed = confirm('This action cannot be undone: Disapprove. Continue?');
+  if (confirmed) {
     $('#return-disapprove-form').submit();
   }
 });
