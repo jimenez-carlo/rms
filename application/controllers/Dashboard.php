@@ -589,7 +589,7 @@ class Dashboard extends MY_Controller {
               IFNULL(SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END), 0) AS done
             FROM
               tbl_sales
-            WHERE region NOT IN(1, 8) AND payment_method = 'CASH' {$company}
+            WHERE payment_method = 'CASH' {$company}
 
             UNION
 
