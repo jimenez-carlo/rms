@@ -18,7 +18,7 @@ class Projected_fund extends MY_Controller {
     $this->header_data('title', 'Projected Funds');
     $this->header_data('nav', 'projected_fund');
     $this->header_data('dir', './');
-    $this->footer_data('script', '<script src="assets/modal/projected_fund.js"></script>');
+    $this->footer_data('script', '<script src="assets/modal/projected_fund.js?v1.0.0"></script>');
 
     $data['position'] = $_SESSION['position'];
 

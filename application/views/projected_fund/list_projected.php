@@ -28,39 +28,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           </thead>
           <tbody>
             <?php
-            $comps = ($_SESSION['company'] != 8) ? array(1 => 'MNC', 3 => 'HPTI', 6 => 'MTI') : array(8 => 'MDI');
             foreach ($table as $row)
             {
-              print '<tr>';
-              print '<td>'.$row->region.'</td>';
-              foreach ($comps as $key => $comp) {
-                switch ($key) {
-                  case 1: $voucher = $row->voucher_1; $transfer = $row->transfer_1; break;
-                  case 3: $voucher = $row->voucher_3; $transfer = $row->transfer_3; break;
-                  case 6: $voucher = $row->voucher_6; $transfer = $row->transfer_6; break;
-                  case 8: $voucher = $row->voucher_8; $transfer = $row->transfer_8; break;
+              $company_ca_amount = json_decode($row->company_ca_amount);
+              foreach ($company_ca_amount as $ca) {
+                print '<tr>';
+                print ($ca->cid === '1') ? '<td>'.$row->region.'</td>' : '<td></td>';
+                print '<td>'.$ca->company.'</td>';
+                print ($ca->cid === '1') ? '<td style="text-align:right;padding-right:10px;">'.$row->fund.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
+                print ($ca->cid === '1') ? '<td style="text-align:right;padding-right:10px;">'.$row->cash_on_hand.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
+                print '<td style="text-align:right;padding-right:10px;">'.number_format($ca->for_ca,2,'.',',').'</td>';
+                print '<td style="text-align:right;padding-right:10px;">'.number_format($ca->for_deposit,2,'.',',').'</td>';
+                if ($position === "3") {
+                  $disabled = ($ca->for_ca > 0) ? '' : 'disabled';
+                  print '<td style="text-align:center"><button class="btn btn-success '.$disabled.'" onclick="create_voucher('.$row->fid.', '.$ca->cid.')" '.$disabled.'>Create CA</button></td>';
                 }
-
-                if ($key !=8 && $key > 1) {
-                  print '<td></td><td>'.$comp.'</td>';
-                  print '<td style="text-align:right;padding-right:10px;">-</td>';
-                  print '<td style="text-align:right;padding-right:10px;">-</td>';
-                } else {
-                  print '<td>'.$comp.'</td>';
-                  print '<td style="text-align:right;padding-right:10px;">'.number_format($row->fund,2,'.',',').'</td>';
-                  print '<td style="text-align:right;padding-right:10px;">'.number_format($row->cash_on_hand,2,'.',',').'</td>';
-                }
-
-                print '<td style="text-align:right;padding-right:10px;">'.number_format($voucher,2,'.',',').'</td>';
-                print '<td style="text-align:right;padding-right:10px;">'.number_format($transfer,2,'.',',').'</td>';
-
-                if ($position == 3) {
-                  $disabled = ($voucher > 0) ? '' : 'disabled';
-                  print '<td style="text-align:center"><button class="btn btn-success '.$disabled.'" onclick="create_voucher('.$row->fid.', '.$key.')" '.$disabled.'>Create CA</button></td>';
-                }
-                print '</tr><tr>';
+                print '</tr>';
               }
-
             }
 
             if (empty($table))

@@ -37,31 +37,41 @@ class Projected_fund_model extends CI_Model{
               break;
           }
 
-          $get_fund_per_region = $this->db->query("
+          $query = <<<SQL
             SELECT
-              f.fid, IF(c.cid = 1, f.fund, 0) AS fund, f.cash_on_hand,
-              IFNULL(SUM(CASE WHEN s.company = '1' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_1,
-              IFNULL(SUM(CASE WHEN s.company = '1' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_1,
-              IFNULL(SUM(CASE WHEN s.company = '3' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_3,
-              IFNULL(SUM(CASE WHEN s.company = '3' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_3,
-              IFNULL(SUM(CASE WHEN s.company = '6' AND s.voucher = 0 THEN 900 ELSE 0 END), '0.00') AS voucher_6,
-              IFNULL(SUM(CASE WHEN s.company = '6' AND s.voucher > 0 THEN 900 ELSE 0 END), '0.00') AS transfer_6,
-              IFNULL(SUM(CASE WHEN s.company = '8' AND s.voucher = 0 THEN 1200 ELSE 0 END), '0.00') AS voucher_8,
-              IFNULL(SUM(CASE WHEN s.company = '8' AND s.voucher > 0 THEN 1200 ELSE 0 END), '0.00') AS transfer_8,
-              r.region, c.cid, c.company_code AS company
-            FROM
-              tbl_fund f
-            LEFT JOIN
-              tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
-            INNER JOIN
-              tbl_company c ON s.company = c.cid
-            INNER JOIN
-              tbl_region r ON s.region = r.rid
-            WHERE
-              {$company} AND s.voucher = 0 AND s.payment_method = 'CASH'
-            GROUP BY f.fid, c.cid, c.company_code
-          ")->result_object();
-          //echo '<pre>'; var_dump($this->db->last_query()); echo '</pre>'; die();
+              fid, fund, cash_on_hand, region,
+              CONCAT('[',
+                GROUP_CONCAT('{
+                  "cid" : "', cid, '", "company" : "', company, '",
+                  "for_ca" : ', for_ca, ', "for_deposit" : ', for_deposit, '}'
+                  ORDER BY cid ASC
+                  SEPARATOR ','
+                ),
+              ']') AS company_ca_amount
+            FROM (
+              SELECT
+                  f.fid,
+                  f.fund AS fund,
+                  f.cash_on_hand,
+                  r.region, c.cid,
+                  c.company_code AS company,
+                  SUM(IF(s.voucher = 0, CASE WHEN s.company = '8' THEN 1200 ELSE 900 END, 0)) AS for_ca,
+                  SUM(IF(s.voucher > 0 AND s.fund = 0, CASE WHEN s.company = '8' THEN 1200 ELSE 900 END, 0)) AS for_deposit
+              FROM
+                  tbl_fund f
+                      LEFT JOIN
+                  tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
+                      LEFT JOIN
+                  tbl_company c ON s.company = c.cid
+                      LEFT JOIN
+                  tbl_region r ON s.region = r.rid
+              WHERE
+                  f.company != 8 AND s.payment_method = 'CASH'
+              GROUP BY f.fid , c.cid , c.company_code
+              ) AS first_select
+              GROUP BY fid, fund, cash_on_hand, region
+SQL;
+          $get_fund_per_region = $this->db->query($query)->result_object();
 
           return $get_fund_per_region;
 	}
