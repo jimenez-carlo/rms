@@ -585,19 +585,19 @@ class Dashboard extends MY_Controller {
             SELECT
               'For CA' AS label,
               COUNT(*) AS total,
-              SUM(CASE WHEN voucher = 0 AND payment_method = 'CASH' THEN 1 ELSE 0 END) AS pending,
-              SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END) AS done
+              IFNULL(SUM(CASE WHEN voucher = 0 AND payment_method = 'CASH' THEN 1 ELSE 0 END), 0) AS pending,
+              IFNULL(SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END), 0) AS done
             FROM
               tbl_sales
-            WHERE region NOT IN(1, 8) AND lto_payment = 0 {$company}
+            WHERE region NOT IN(1, 8) AND payment_method = 'CASH' {$company}
 
             UNION
 
             SELECT
               'For Checking' AS label,
               COUNT(*) AS total,
-              SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS pending,
-              SUM(CASE WHEN status > 4 THEN 1 ELSE 0 END) AS done
+              IFNULL(SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END), 0) AS pending,
+              IFNULL(SUM(CASE WHEN status > 4 THEN 1 ELSE 0 END), 0) AS done
             FROM
               tbl_sales
             WHERE
