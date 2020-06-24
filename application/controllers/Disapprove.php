@@ -35,7 +35,22 @@ class Disapprove extends MY_Controller {
     $sales->sid = $this->input->post('sid');
     $sales->da_reason = $this->input->post('da_reason');
 
+
     $this->db->trans_start();
+
+    if ($sales->da_reason === "1" && $this->input->post('payment_method') === 'CASH') { // 1 = Wrong Amount
+      $this->db->query("
+        UPDATE
+          tbl_fund f, tbl_voucher v, tbl_sales s
+        SET
+          f.cash_on_hand = f.cash_on_hand + s.registration
+        WHERE
+          f.fid = v.fund AND s.voucher = v.vid
+        AND
+          s.sid = {$sales->sid}
+      ");
+    }
+
     $this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
     $new_da_history = array(
       'sales_id' => $sales->sid,

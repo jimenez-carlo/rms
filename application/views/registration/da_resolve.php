@@ -38,6 +38,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               switch ($sales->da_reason)
               {
                 case 1: // wrong amount
+                  print form_input(['type'=>'hidden', 'name'=>'payment_method', 'value'=>$sales->payment_method]);
                   print '<div class="control-group">';
                   print '<div class="control-label">Registration</div>';
                   print '<div class="controls">'.form_input('registration', set_value('registration', $sales->registration)).'</div>';
