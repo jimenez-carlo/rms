@@ -30,9 +30,10 @@ $('[name=deposit_slip]').on('change', function(e){
     var promise = data_send(data_to_send, BASE_URL+'actual_docs/update_status');
     promise.success(function(data){
       if (data.actual_doc.deposit_slip === 'Original') {
-        that.select2('disable');
+        //that.select2('disable');
         $('#date-complete-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.date_completed);
       } else {
+        $('#date-complete-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.date_completed);
         $('#date-incomplete-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.date_incomplete);
       }
       $('#status-'+data.actual_doc.actual_docs_id).empty().append(data.actual_doc.status);
