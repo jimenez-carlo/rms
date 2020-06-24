@@ -117,7 +117,6 @@ class Registration extends MY_Controller {
           $temp = $this->input->post('temp');
           if (empty($files) && empty($temp)) $err_msg[] = 'File attachment is required.';
 
-          echo '<pre>'; var_dump($sales); echo '</pre>'; die();
           switch ($sales->da_reason) {
             case 1: // wrong amount
               $this->form_validation->set_rules('registration', 'Registration', 'required|is_numeric|non_zero');
