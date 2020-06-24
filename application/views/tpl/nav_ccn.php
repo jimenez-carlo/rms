@@ -37,6 +37,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>disapprove">Disapproved Sales</a>
                             </li>
+                            <li <?php if(isset($nav) && $nav=="repo") echo 'class="active"'; ?>>
+                                <a href="<?php echo base_url(); ?>repo">Repo</a>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->
