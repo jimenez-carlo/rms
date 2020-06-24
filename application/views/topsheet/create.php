@@ -112,7 +112,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <?php
             print form_hidden('tot_amt', $tot_amt);
             print form_hidden('tot_exp', $tot_exp);
-            print form_submit('submit', 'Continue', array('class' => 'btn btn-success'));
+            if (count($table) !== 0) {
+              print form_submit('submit', 'Continue', array('class' => 'btn btn-success'));
+            }
             ?>
           </div>
         </form>

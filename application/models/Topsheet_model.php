@@ -590,19 +590,27 @@ class Topsheet_model extends CI_Model{
 		$trans_no = 'T-'.$this->reg_code[$_SESSION['region_id']].'-'.date('ymd');
 		$row = $this->db->query("select tid from tbl_topsheet where trans_no = '".$trans_no."'")->row();
 		$tid = (!empty($row)) ? $row->tid : -2;
+                $sql = <<<SQL
+                  SELECT
+                    m.mid, m.region, m.date, m.or_no,
+                    DATE_FORMAT(m.or_date, '%Y-%m-%d') AS or_date,
+                    m.amount, m.offline, mt.type, m.other, m.topsheet,
+                    m.batch, m.ca_ref, mxh1.status
+                  FROM
+                    tbl_misc m
+                  INNER JOIN
+                    tbl_misc_type mt ON mt.mtid = m.type
+                  LEFT JOIN
+                    tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+                  LEFT JOIN
+                    tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+                  WHERE
+                    m.topsheet = {$tid}
+                    OR (m.region = {$data['region']} AND m.topsheet = 0 AND mxh1.status = 2)
+                    AND mxh2.id IS NULL
+SQL;
+		$result = $this->db->query($sql)->result_object();
 
-		$result = $this->db->query("select *
-			from tbl_misc
-			where topsheet = ".$tid."
-			or (region = ".$data['region']."
-			and topsheet = 0
-			and status = 2)")->result_object();
-		foreach ($result as $key => $misc)
-		{
-			$misc->or_date = substr($misc->or_date, 0, 10);
-			$misc->type = $type[$misc->type];
-			$result[$key] = $misc;
-		}
 		return $result;
 	}
 
@@ -624,8 +632,9 @@ class Topsheet_model extends CI_Model{
 
 		$summary->tot_meal = $summary->tot_transpo = $summary->tot_photo = $summary->tot_other = 0;
 
-		if (empty($data['mid'])) $summary->misc = array();
-		else {
+                if (empty($data['mid'])) {
+                  $summary->misc = array();
+                } else {
 			$result = $this->db->query("select *
 				from tbl_misc
 				where mid in (".implode(',', array_keys($data['mid'])).")")->result_object();
@@ -670,13 +679,13 @@ class Topsheet_model extends CI_Model{
 				where rerfo = ".$rid);
 		}
 
-		if (!empty($data['mid'])) {
-			foreach ($data['mid'] as $mid) {
-				$this->db->query("update tbl_misc
-					set topsheet = ".$tid."
-					where mid = ".$mid);
-			}
-		}
+		//if (!empty($data['mid'])) {
+		//	foreach ($data['mid'] as $mid) {
+		//		$this->db->query("update tbl_misc
+		//			set topsheet = ".$tid."
+		//			where mid = ".$mid);
+		//	}
+		//}
 
 		$_SESSION['messages'][] = $trans_no.' saved successfully';
 	}
