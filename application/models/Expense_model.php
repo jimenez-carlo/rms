@@ -36,7 +36,7 @@ class Expense_model extends CI_Model{
                 $result = $this->db->query("
                   SELECT
                     m.mid, m.region, m.date, m.or_no, SUBSTR(m.or_date, 1, 10) AS or_date,
-                    m.amount, mt.type, m.other, m.topsheet,
+                    FORMAT(m.amount, 2) AS amount, mt.type, m.other, m.topsheet,
                     m.batch, m.ca_ref, mxh1.id, mxh1.remarks,
                     s.status_name AS status,
                     CASE
@@ -57,7 +57,7 @@ class Expense_model extends CI_Model{
                   WHERE
                     m.region = ".$param->region."
                     AND LEFT(m.or_date,10) BETWEEN '".$date_from."' AND '".$date_to."' ".$type."
-                    AND mxh2.id IS NULL $status
+                    AND mxh2.id IS NULL AND mxh1.status != 90 $status
                   ORDER BY or_date DESC LIMIT 1000
                 ")->result_object();
 

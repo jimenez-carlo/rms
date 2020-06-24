@@ -61,6 +61,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             ?>
             <div class="form-actions">
               <input type="submit" name="save" value="Save" class="btn btn-success">
+              <button class="btn btn-danger" name="delete" value="true">Delete</button>
             </div>
           </fieldset>
 
@@ -116,17 +117,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
           </div>
         </form>
-
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="text/javascript">
 $(function(){
   $(document).ready(function(){
-  	var other = $('.other input').val();
-  	var or_date = $('.date input').val();
+    var other = $('.other input').val();
+    var or_date = $('.date input').val();
 
     $('select[name=type]').change(function(){
       if ($(this).val() == 4) {

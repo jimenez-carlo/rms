@@ -54,7 +54,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
       foreach (json_decode($batch_ref['sales']) as $sales)
       {
-        $sales->amount = ($sales->registration_type == 'Free Registration' || stripos($sales->registration_type, 'subsidy') !== false) ? 900 : $sales->amount;
+        $sales->amount = ($sales->registration_type == 'Free Registration' || stripos($sales->registration_type, 'subsidy') !== false) ? 1500 : $sales->amount;
         $clickable = ($sales->selectable) ? 'onclick="attachment('.$sales->sid.', 1)"' : '';
         if ($sales->disapprove === null) {
           $disapprove = '<td class="text-success">Ok</td>';
