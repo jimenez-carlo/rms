@@ -160,9 +160,9 @@ class Topsheet extends MY_Controller {
             $data['regions'] = $this->topsheet->region;
             $data['trans_no'] = 'T-'.$this->topsheet->reg_code[$_SESSION['region_id']].'-'.date('ymd');
             $this->template('topsheet/create', $data);
-          } else if (empty($data['summary']) || $back_key == 2) {
-            $data['miscs'] = $this->topsheet->list_misc_for_topsheet($data);
-            $this->template('topsheet/create_misc', $data);
+          //} else if (empty($data['summary']) || $back_key == 2) {
+          //  $data['miscs'] = $this->topsheet->list_misc_for_topsheet($data);
+          //  $this->template('topsheet/create_misc', $data);
           } else {
             $data['topsheet'] = $this->topsheet->list_summary_for_topsheet($data);
             $data['regions'] = $this->topsheet->region;

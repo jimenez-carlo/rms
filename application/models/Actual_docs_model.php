@@ -41,8 +41,8 @@ class Actual_docs_model extends CI_Model {
       SELECT
         actual_docs_id, transmittal_number, transmittal_id, id, reference,
         date_deposited, FORMAT(amount, 2) AS amount, payment_type, region,
-        company_code AS company, deposit_slip, date_incomplete, date_completed,
-        batch_date_created, status
+        company_code AS company, deposit_slip, disable_deposit_slip,
+        date_incomplete, date_completed, batch_date_created, status
       FROM (
         (SELECT
           ad.transmittal_number, actual_docs_id,
@@ -51,7 +51,8 @@ class Actual_docs_model extends CI_Model {
           CONCAT(v.vid,LOWER(REPLACE(v.reference,'-',''))) AS transmittal_id,
           v.vid AS id, v.reference, DATE_FORMAT(v.transfer_date, '%Y-%m-%d') AS date_deposited,
           v.company AS cid, f.region AS rid, v.amount, 'CA' AS payment_type
-          ,ad.deposit_slip, v.date AS batch_date_created, IFNULL(ad.status, 'New') AS status
+          ,ad.deposit_slip, DATE_ADD(IFNULL(ad.date_completed, NOW()), INTERVAL 24 HOUR) < NOW() AS disable_deposit_slip
+          ,v.date AS batch_date_created, IFNULL(ad.status, 'New') AS status
         FROM
           tbl_voucher v
         LEFT JOIN
@@ -70,7 +71,8 @@ class Actual_docs_model extends CI_Model {
           CONCAT(lp.lpid,LOWER(REPLACE(lp.reference,'-',''))) AS transmittal_id,
           lp.lpid AS id, lp.reference, DATE_FORMAT(lp.deposit_date, '%Y-%m-%d') AS date_deposited,
           lp.company AS cid, lp.region AS rid, lp.amount, 'EPP' AS payment_type
-          ,ad.deposit_slip, lp.created AS batch_date_created, IFNULL(ad.status, 'New') AS status
+          ,ad.deposit_slip, DATE_ADD(IFNULL(ad.date_completed, NOW()), INTERVAL 24 HOUR) < NOW() AS disable_deposit_slip
+          ,lp.created AS batch_date_created, IFNULL(ad.status, 'New') AS status
         FROM
           tbl_lto_payment lp
         LEFT JOIN
@@ -128,6 +130,7 @@ SQL;
       case 'Not Original':
         $actual_docs['date_incomplete'] = date('Y-m-d H:i:s');
         $actual_docs['status'] = 'Incomplete';
+        $actual_docs['date_completed'] = NULL;
         break;
       case 'Original':
         $actual_docs['date_completed'] = date('Y-m-d H:i:s');

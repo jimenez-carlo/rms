@@ -151,7 +151,17 @@ class Disapprove_model extends CI_Model{
 
         public function da_misc_expense($misc)
         {
-          //$this->db->update('tbl_misc', array('status' => 5), 'mid ='.$misc['mid']);
+          //Return Cash On Hand
+          $this->db->query("
+            UPDATE
+              tbl_misc m, tbl_fund f
+            SET
+              f.cash_on_hand = f.cash_on_hand + m.amount
+            WHERE
+              m.region = f.region AND m.mid = {$misc['mid']}
+          ");
+
+          // Insert history
           $misc['status'] = 5;
           $misc['uid'] = $_SESSION['uid'];
           return $this->db->insert('tbl_misc_expense_history', $misc);

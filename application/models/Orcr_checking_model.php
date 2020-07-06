@@ -63,13 +63,6 @@ class Orcr_checking_model extends CI_Model{
             ORDER BY region
           ")->result_array();
 
-          //$this->db->select('v.vid, v.reference');
-          //$this->db->from('tbl_voucher v');
-          //$this->db->join('tbl_sales s','v.vid = s.voucher AND v.vid = s.fund', 'inner');
-          //$this->db->where('s.status = 4 '.$this->andSalesCompany.' AND v.vid IS NOT NULL');
-          //$this->db->group_by(array('v.vid', 's.region'));
-          //$this->db->order_by('s.region ASC, v.reference DESC');
-          //return $this->db->get()->result_array();
         }
 
         public function get_list_for_checking($date)
@@ -370,25 +363,25 @@ SQL;
 
         	$this->load->model('Expense_model', 'misc');
                 $topsheet->misc = $this->db->query("
-                        SELECT
-                          *
-        		  ,LEFT(or_date, 10) as or_date
-                          ,v.reference
-                          ,CASE
-                            m.status
-                            WHEN 0 THEN 'For Approval'
-        	            WHEN 1 THEN 'Rejected'
-        	            WHEN 2 THEN 'Approved'
-        	            WHEN 3 THEN 'For Liquidation'
-        	            WHEN 4 THEN 'Liquidated'
-                          END AS status
-                        FROM
-                          tbl_misc m
-                        INNER JOIN
-                          tbl_voucher v ON v.vid = m.ca_ref
-                        WHERE
-                          topsheet = ".$topsheet->tid."
-                        AND batch = 0 ".$mid
+                  SELECT
+                    *
+        	    ,LEFT(or_date, 10) as or_date
+                    ,v.reference
+                    ,CASE
+                      m.status
+                      WHEN 0 THEN 'For Approval'
+        	      WHEN 1 THEN 'Rejected'
+        	      WHEN 2 THEN 'Approved'
+        	      WHEN 3 THEN 'For Liquidation'
+        	      WHEN 4 THEN 'Liquidated'
+                    END AS status
+                  FROM
+                    tbl_misc m
+                  INNER JOIN
+                    tbl_voucher v ON v.vid = m.ca_ref
+                  WHERE
+                    topsheet = ".$topsheet->tid."
+                  AND batch = 0 ".$mid
                 )->result_object();
         	foreach ($topsheet->misc as $misc)
         	{

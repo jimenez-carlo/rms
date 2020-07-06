@@ -9,6 +9,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <div class="span4 details">
   <?php
+  print form_input(['type'=>'hidden', 'name'=>'regn_amount', 'value'=>$sales->registration]);
+  print form_input(['type'=>'hidden', 'name'=>'payment_method', 'value'=>$sales->payment_method]);
   print '<div class="control-group">';
   print '<div class="control-label">Branch</div>';
   print '<div class="controls">'.$sales->bcode.' '.$sales->bname.'</div>';
@@ -141,6 +143,7 @@ $(function(){
       // trigger to save, get data
       var sid = $('#da_group select[name=da_reason]').attr('data-sid');
       var da_reason = $('#da_group select[name=da_reason]').val();
+      var payment_method = $('input[name=payment_method]').val();
 
       // saving...
       $('#da_group a.save').addClass('hide');
@@ -149,7 +152,10 @@ $(function(){
       $.ajax({
         url : "<?php echo base_url(); ?>disapprove/sales",
         type: "POST",
-        data: {'sid' : sid, 'da_reason' : da_reason},
+        data: {
+          'sid' : sid, 'da_reason' : da_reason,
+          'payment_method': payment_method
+        },
         dataType: "JSON",
         success: function(data)
         {

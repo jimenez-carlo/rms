@@ -67,8 +67,8 @@ class Expense extends MY_Controller {
   	$data['reference'] = $reference;
 
   	$data['type'] = $this->expense->type;
-          $data['status'] = 0; // For Approval
-  	$this->template('expense/add', $data);
+        $data['status'] = 0; // For Approval
+        $this->template('expense/add', $data);
   }
 
   public function upload()
@@ -177,8 +177,7 @@ class Expense extends MY_Controller {
   	$this->header_data('title', 'Expense Record');
   	$this->header_data('nav', 'expense');
   	$this->header_data('dir', './../');
-  	$this->footer_data('script', '
-  		<script src="./../assets/js/expense.js"></script>');
+  	$this->footer_data('script', '<script src="./../assets/js/expense.js"></script>');
 
 
   	$edit = $this->input->post('edit');
@@ -186,6 +185,10 @@ class Expense extends MY_Controller {
 
   	$save = $this->input->post('save');
   	if (!empty($save)) $this->validate();
+
+        if ($this->input->post('delete')) {
+          return $this->delete($this->input->post());
+        }
 
   	$data['temp'] = array();
   	$upload = $this->input->post('upload');
@@ -215,7 +218,7 @@ class Expense extends MY_Controller {
 
   	$misc_expense_history->mid = $mid;
   	$misc_expense_history->status = 2; // APPROVE
-          $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
+        $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
   	$misc = $this->db->query("select * from tbl_misc where mid = ".$mid)->row();
 
   	$this->db->query("update tbl_fund set cash_on_hand = cash_on_hand - ".$misc->amount." where fid = ".$misc->region);
@@ -233,7 +236,7 @@ class Expense extends MY_Controller {
   	$misc_expense_history->mid = $mid;
   	$misc_expense_history->status = 1; // REJECTED
   	$misc_expense_history->remarks = $this->input->post('reason');
-          $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
+        $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
   	$misc = $this->db->query("select or_no from tbl_misc where mid = ".$mid)->row();
 
   	$_SESSION['messages'][] = 'Reference # '.$misc->or_no.' was updated successfully'.
@@ -303,4 +306,17 @@ class Expense extends MY_Controller {
   		$this->template('expense/ca_ref', $data);
   	}
   }
+
+  public function delete($form)
+  {
+    $misc_expense_history = new Stdclass();
+    $misc_expense_history->mid = $form['mid'];
+    $misc_expense_history->status = 90; // DELETED
+    $misc_expense_history->remarks = 'Deleted';
+    $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
+
+    $_SESSION['messages'][] = 'Record was deleted successfully.';
+    redirect('expense');
+  }
+
 }

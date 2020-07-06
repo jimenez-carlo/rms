@@ -77,8 +77,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               if ($bcode != '0')
               {
                 print '<tr>
-                  <th>Total SUM</th>
-                  <th>SUB TOTAL</th>
+                  <th><!--Total SUM--></th>
+                  <th><!--SUB TOTAL--></th>
                   <th></th>
                   <th></th>
                   <th></th>
@@ -95,12 +95,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <td></td>
                   <td></td>
                   <td></td>
-                  <td></td> 
+                  <td></td>
                   <td></td>
                   </tr>';
               }
               ?>
             </tbody>
+<!--
             <tfoot>
               <tr style="color: red">
                 <th>TOTAL</th>
@@ -153,6 +154,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th style="text-align: right"><?php print number_format($tot_exp + $topsheet->tot_meal + $topsheet->tot_photo + $topsheet->tot_transpo + $topsheet->tot_other, 2, '.', ''); ?></th>
               </tr>
             </tfoot>
+-->
           </table>
 
           <div class="form-actions">

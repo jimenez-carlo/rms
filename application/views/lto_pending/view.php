@@ -46,7 +46,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 ?>
 
                 <td>
-                  <span>
+                  <label class="radio">
                     <?php
                       print form_radio(
                         'status'.$key,
@@ -54,8 +54,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         (set_value('status'.$key, 'EPP') == 'EPP')
                       );
                     ?> Pending at LTO EPP
-                  </span><br>
-                  <span>
+                  </label><br>
+                  <label class="radio">
                     <?php
                       print form_radio(
                         'status'.$key,
@@ -63,8 +63,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         (set_value('status'.$key, false) == 'CASH')
                       );
                     ?> Pending at LTO CASH
-                  </span><br>
-                  <span>
+                  </label><br>
+                  <label class="radio">
                     <?php
                       print form_radio(
                         'status'.$key,
@@ -74,7 +74,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                           array(1,'REJECT')
                         ))
                       ); ?> Rejected
-                  </span>
+                  </label>
                 </td>
 
                 <?php

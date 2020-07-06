@@ -141,7 +141,7 @@ class Lto_payment extends MY_Controller {
 		$data['payment'] = $payment;
                 $data['lpid'] = $lpid;
 		$data['region'] = (isset($_SESSION['region_id'])) ? $this->region[$_SESSION['region_id']] : '';
-		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 2 => 'MTI', 3 => 'HPTI');
+		$data['company'] = array(0 => '- Please select a company -', 1 => 'MNC', 6 => 'MTI', 3 => 'HPTI');
 		$this->template('lto_payment/edit', $data);
 	}
 

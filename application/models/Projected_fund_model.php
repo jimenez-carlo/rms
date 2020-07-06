@@ -60,7 +60,7 @@ class Projected_fund_model extends CI_Model{
               FROM
                   tbl_fund f
                       LEFT JOIN
-                  tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
+                  tbl_sales s ON s.region = f.region AND registration_type != 'Self Registration'
                       LEFT JOIN
                   tbl_company c ON s.company = c.cid
                       LEFT JOIN
@@ -83,7 +83,7 @@ SQL;
           $fund = $this->db->query("SELECT * FROM tbl_fund WHERE fid = ".$fid)->row();
 
           $region = $this->reg_code[$fund->region];
-          $company = ($fund->company == 2) ? 6 : $fund->company;
+          $company = $fund->company;
           $fund->reference = 'CA-'.$region.'-'.date('ymd');
 
           $ref_code = $this->db->query("
