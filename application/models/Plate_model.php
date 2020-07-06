@@ -348,7 +348,7 @@ class Plate_model extends CI_Model{
               ANY_VALUE(a.sid) AS sid, ANY_VALUE(a.received_dt) AS received_dt,
               ANY_VALUE(a.received_cust) AS received_cust, ANY_VALUE(a.plate_trans_no) AS plate_trans_no,
               b.branch AS bid,
-              ANY_VALUE(b.bcode),
+              ANY_VALUE(b.bcode) AS bcode,
               ANY_VALUE(b.mvf_no) as mvf_no,
               b.bname AS branchname,
               SUM(CASE WHEN a.status_id = '1' THEN 1 ELSE 0 END) AS forApproval,
