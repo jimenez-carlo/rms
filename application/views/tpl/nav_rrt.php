@@ -47,6 +47,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                 </ul>
                             </li>
+                            <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Plate <i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/UpdatePlate_BS">Update Plate</a>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/branch_list">Plate Transmittal</a>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/pending_list">Pending List</a>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="dropdown <?php if(isset($nav) && $nav=="expense") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Miscellaneous <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
@@ -56,9 +66,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                 </ul>
                             </li>
-                            <!-- <li <?php if(isset($nav) && $nav=="expense") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>expense">Miscellaneous</a>
-                            </li> -->
                             <li <?php if(isset($nav) && $nav=="rerfo") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>rerfo">Rerfo</a>
                             </li>
