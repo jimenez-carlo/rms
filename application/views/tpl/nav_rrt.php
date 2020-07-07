@@ -8,7 +8,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                      <span class="icon-bar"></span>
                      <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="<?php if(isset($dir)) echo $dir; ?>">RMS</a>
+                    <a class="brand" href="<?php echo base_url(); ?>">RMS</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav pull-right">
                             <li class="dropdown <?php if(isset($nav) && $nav=="profile") echo 'active'; ?>">
@@ -19,31 +19,41 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>profile">Profile</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>profile">Profile</a>
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>logout">Logout</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>logout">Logout</a>
                                     </li>
                                 </ul>
                             </li>
                         </ul>
                         <ul class="nav">
                             <li <?php if(isset($nav) && $nav=="sales") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>sales">Customer Status</a>
+                                <a href="<?php echo base_url(); ?>sales">Customer Status</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="pending") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>lto_pending">LTO</a>
+                                <a href="<?php echo base_url(); ?>lto_pending">LTO</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="nru") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>nru">NRU</a>
+                                <a href="<?php echo base_url(); ?>nru">NRU</a>
                             </li>
                             <li class="dropdown <?php if(isset($nav) && $nav=="registration") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Registration <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>registration">Engine Search</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>registration/pending_list">Pending List</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>registration">Engine Search</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>registration/pending_list">Pending List</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Plate <i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/UpdatePlate_BS">Update Plate</a>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/branch_list">Plate Transmittal</a>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/pending_list">Pending List</a>
                                     </li>
                                 </ul>
                             </li>
@@ -51,25 +61,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Miscellaneous <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>expense">List</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>expense/ca_ref">CA Reference Update (Temporary)</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>expense">List</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>expense/ca_ref">CA Reference Update (Temporary)</a>
                                     </li>
                                 </ul>
                             </li>
-                            <!-- <li <?php if(isset($nav) && $nav=="expense") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>expense">Miscellaneous</a>
-                            </li> -->
                             <li <?php if(isset($nav) && $nav=="rerfo") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>rerfo">Rerfo</a>
+                                <a href="<?php echo base_url(); ?>rerfo">Rerfo</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="topsheet") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>topsheet">Topsheet</a>
+                                <a href="<?php echo base_url(); ?>topsheet">Topsheet</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="transmittal") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>transmittal">Transmittal</a>
+                                <a href="<?php echo base_url(); ?>transmittal">Transmittal</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>disapprove">Disapprove</a>
+                                <a href="<?php echo base_url(); ?>disapprove">Disapprove</a>
+                            </li>
+                            <li <?php if(isset($nav) && $nav=="actual_docs") echo 'class="active"'; ?>>
+                              <a href="<?php echo base_url(); ?>actual_docs">Actual Docs</a>
                             </li>
                             <!-- <li class="dropdown <?php if(isset($nav) && $nav=="attachment") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Attachment <i class="caret"></i></a>

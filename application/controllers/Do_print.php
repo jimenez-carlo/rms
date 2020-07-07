@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Do_print extends CI_Controller {
-	
-	public function __construct() { 
+
+	public function __construct() {
 		parent::__construct();
 		$this->load->helper('url');
 	}
@@ -28,7 +28,7 @@ class Do_print extends CI_Controller {
 			$this->load->model('Cmc_model', 'cmc');
 
 			$get_stid = $this->sales_transmittal->get_id(array('transmittal' => $tmid));
-			
+
 			$sales = array();
 			foreach ($get_stid as $row)
 			{
@@ -128,9 +128,9 @@ class Do_print extends CI_Controller {
 	    	// load topsheet based on branch and date
 			$this->load->model("Accounting_model", "accounting");
 			$topsheet = $this->accounting->load_topsheet_repo($bid, $exp_date);
-			
+
 			// determine if report has been created
-			$arid = $this->db->query("select arid from tbl_acct_report 
+			$arid = $this->db->query("select arid from tbl_acct_report
 				where branch = ".$bid."
 				and left(exp_date, 10) = '".$exp_date."'")->row();
 
@@ -147,10 +147,10 @@ class Do_print extends CI_Controller {
 		{
 	    	// load topsheet based on branch and date
 			$this->load->model("Accounting_model", "accounting");
-			$topsheet = $this->accounting->load_topsheet_bnew($_SESSION['region'], $exp_date, $bid);
-			
+			$topsheet = $this->accounting->load_topsheet_bnew($_SESSION['region_id'], $exp_date, $bid);
+
 			// determine if report has been created
-			$arid = $this->db->query("select arid from tbl_acct_report 
+			$arid = $this->db->query("select arid from tbl_acct_report
 				where branch = ".$bid."
 				and left(exp_date, 10) = '".$exp_date."'")->row();
 

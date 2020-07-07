@@ -16,7 +16,7 @@ class Nru extends MY_Controller {
 		$this->header_data('nav', 'nru');
 		$this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['ltid'] = $this->input->post('ltid');
 		$data['company'] = $this->input->post('company');
 		$data['registration'] = $this->input->post('registration');
@@ -36,8 +36,8 @@ class Nru extends MY_Controller {
 			$this->template('nru/list', $data);
 	 	} else {
 	 		$data['ltid'] = (is_array($data['ltid'])) ? current(array_keys($data['ltid'])) : $data['ltid'];
-
 		 	if (empty($data['registration']) || $back_key == 1) {
+                                $data['action'] = current($this->input->post('ltid'));
 				$data['transmittal'] = $this->nru->load_sales($data);
 		 		$this->template('nru/registration', $data);
 		 	}
@@ -64,7 +64,7 @@ class Nru extends MY_Controller {
 	public function save_nru($data)
 	{
 		$this->load->model('Login_model', 'login');
-
+                $this->db->trans_start();
                 foreach ($data['registration'] as $sid => $registration)
                 {
                   if ($registration == 0) continue;
@@ -75,15 +75,34 @@ class Nru extends MY_Controller {
                   $sales->status = 3;
                   $this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
 
-                  $engine_no = $this->db->query("select engine_no from tbl_engine
-                    inner join tbl_sales on eid = engine
-                    where sid = ".$sales->sid)->row()->engine_no;
+                  $engine_no = $this->db->query("SELECT engine_no FROM tbl_engine INNER JOIN tbl_sales on eid = engine WHERE sid = ".$sales->sid)->row()->engine_no;
                   $this->login->saveLog('Saved Registration Expense [Php '.$registration.'] for Engine # '.$engine_no.' ['.$sid.']');
                 }
+                $this->db->query("
+                  UPDATE
+                    tbl_fund
+                  SET
+                    cash_on_hand = cash_on_hand - {$data['total_regn']}
+                  WHERE
+                    region = {$data['region']}
+                ");
+                $new= $this->db->query("
+                  SELECT fund, cash_on_hand FROM tbl_fund WHERE region = {$data['region']}
+                ")->row_array();
 
-		$transmittal = $this->db->query("select * from tbl_lto_transmittal
-			where ltid = ".$data['ltid'])->row();
-		$_SESSION['messages'][] = "Transmittal # ".$transmittal->code." updated successfully.";
+                $this->db->query("
+                  INSERT INTO
+                    tbl_fund_history(fund, out_amount, new_fund, new_hand, new_check, type)
+                  VALUES ({$data['region']}, {$data['total_regn']}, {$new['fund']}, {$new['cash_on_hand']}, 0, 5)
+                ");
+                $this->db->trans_complete();
+
+                if ($this->db->trans_status()) {
+		  $transmittal = $this->db->query("SELECT code FROM tbl_lto_transmittal WHERE ltid = ".$data['ltid'])->row();
+		  $_SESSION['messages'][] = "Transmittal # ".$transmittal->code." updated successfully.";
+                } else {
+		  $_SESSION['messages'][] = "Something went wrong.";
+                }
 		redirect('nru');
 	}
 
@@ -94,7 +113,7 @@ class Nru extends MY_Controller {
 		$this->header_data('nav', 'nru');
 		$this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['company'] = $this->input->post('company');
 		$data['ltid'] = $this->input->post('ltid');
 		$data['registration'] = $this->input->post('registration');

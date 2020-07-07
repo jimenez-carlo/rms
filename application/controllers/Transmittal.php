@@ -16,7 +16,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', './');
 
-		$data['table'] = $this->transmittal->get_rrt_transmittal($_SESSION['region']);
+		$data['table'] = $this->transmittal->get_rrt_transmittal($_SESSION['region_id']);
 		$this->template('transmittal/report', $data);
 	}
 
@@ -51,10 +51,10 @@ class Transmittal extends MY_Controller {
 		$this->footer_data('script', '
 			<script src="./../../assets/modal/transmittal.js"></script>');
 
-		$tid = $this->input->post('tid');
+		$rid = $this->input->post('rid');
 
 		$view = $this->input->post('view_tr');
-		if (!empty($view)) $tid = current(array_keys($view));
+		if (!empty($view)) $rid = current(array_keys($view));
 
 		$receive = $this->input->post('receive');
 		if (!empty($receive)) {
@@ -62,14 +62,14 @@ class Transmittal extends MY_Controller {
 			$this->receive($sid);
 		}
 
-		if (empty($tid)) {
+		if (empty($rid)) {
 			if ($_SESSION['position'] == 108) redirect('topsheet');
 			else redirect('transmittal/branch');
 		}
 
 		$branch = ($_SESSION['position'] == 108) ? 0 : $_SESSION['branch'];
 
-		$data['transmittal'] = $this->transmittal->load_transmittal($tid, $branch);
+		$data['rerfo'] = $this->transmittal->load_rerfo($rid, $branch);
 		$this->template('transmittal/view', $data);
 	}
 
@@ -80,7 +80,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', base_url());
 
-		$data['table'] = $this->transmittal->get_branch_transmittal($_SESSION['branch']);
+		$data['table'] = $this->transmittal->get_branch_rerfo($_SESSION['branch']);
 		$this->template('transmittal/branch_list', $data);
 	}
 

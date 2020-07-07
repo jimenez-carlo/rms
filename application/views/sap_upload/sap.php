@@ -1,4 +1,5 @@
 <?php
+// echo '<pre>'; var_dump($batch); echo '</pre>'; die();
 $list = array();
 $line = array(
   "Counter V_COUNTER", "Document Date BKPF-BLART", "Posting Date BKPF-BUDAT",
@@ -14,80 +15,103 @@ $line = array(
 $list[] = $line;
 
 $ctr = 0;
-$company = $batch->bcode;
-
-// include misc
-$sales_misc = (empty($batch->misc)) ? 0 : ($batch->meal + $batch->photocopy + $batch->transportation + $batch->others) / count($batch->sales);
-
-foreach ($batch->sales as $sales)
+foreach ($batch as $sales)
 {
-	$bcode = $sales->bcode;
-	$company = substr($sales->bcode, 0, 1);
-
-	if ($sales->registration_type == 'Free Registration')
-	{
-		$reference = $sales->si_no;
-		$sap_code = '215450';
-	}
-	else
-	{
-		$reference = $sales->ar_no;
-		$sap_code = ($company == 1) ? "219".substr($bcode, 1, 3)
-			: "219".$company.substr($bcode, 2, 2);
-	}
-
 	$ctr++;
-	$date_sold = date('m/d/Y', strtotime($sales->date_sold));
+        $misc_expense = $misc_expenses[$sales['reference_number']] ?? 0;
+        $regn_and_misc_expense = $sales['regn_expense'] + $misc_expense;
 
-	// subsidy ar
-	$expense = $sales->registration + $sales->tip + $sales_misc;
-	if (stripos($sales->registration_type, 'subsidy') !== false && $sales->amount < $expense) $expense = $sales->amount;
+        switch ($sales['registration_type']) {
+          case 'Free Registration':
+	    //debit SI
+	    $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','31',$sales['account_key'],'',
+              number_format($regn_and_misc_expense, 2, '.', ''),
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['reference_number'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
 
-	//debit
-	$line = array(
-		$ctr,
-		$date_sold,$date_sold,'KR',$company.'000','PHP','',$reference,'','31',$batch->account_key,'',
-		number_format($expense, 2, '.', ''),
-		'','','','','','','','',$bcode.'000',$bcode.'000','','',$sales->reference,$sales->cust_code,
-	);
-	$list[] = $line;
+	    //credit SI
+	    $line = array(
+	    	$ctr,
+	    	$sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','40',$sales['sap_code'],'',
+	    	number_format($regn_and_misc_expense, 2, '.', ''),
+                    '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
+            break;
 
-	//credit
-	$line = array(
-		$ctr,
-		$date_sold,$date_sold,'KR',$company.'000','PHP','',$reference,'','40',$sap_code,'',
-		number_format($expense, 2, '.', ''),
-		'','','','','','','','',$bcode.'000',$bcode.'000','','',$sales->last_name.', '.$sales->first_name,$sales->cust_code,
-	);
-	$list[] = $line;
+          case 'Regular Regn. Paid':
+          case 'Regn. under NIA':
+	    //debit AR
+	    $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['ar_no'],'','31',$sales['account_key'],'',
+              number_format($regn_and_misc_expense, 2, '.', ''),
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['reference_number'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
 
-	// subsidy si
-	$expense = $sales->registration + $sales->tip + $sales_misc;
-	if (stripos($sales->registration_type, 'subsidy') !== false && $sales->amount < $expense)
-	{
-		$ctr++;
-		$reference = $sales->si_no;
-		$sap_code = '215450';
-		$expense = $expense - $sales->amount;
+	    //credit AR
+	    $line = array(
+	    	$ctr,
+	    	$sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['ar_no'],'','40',$sales['sap_code'],'',
+	    	number_format($regn_and_misc_expense, 2, '.', ''),
+                    '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
+            break;
 
-		//debit
-		$line = array(
-			$ctr,
-			$date_sold,$date_sold,'KR',$company.'000','PHP','',$reference,'','31',$batch->account_key,'',
-			number_format($expense, 2, '.', ''),
-			'','','','','','','','',$bcode.'000',$bcode.'000','','',$sales->reference,$sales->cust_code,
-		);
-		$list[] = $line;
+          case 'With Regn. Subsidy':
+            $si_exp = 0;
+            $ar_exp = 0;
+            if ($regn_and_misc_expense > $sales['ar_amount']) {
+              $si_exp = $regn_and_misc_expense - $sales['ar_amount'];
+              $ar_exp = $sales['ar_amount'];
+            } elseif ($regn_and_misc_expense <= $sales['ar_amount']) {
+              $ar_exp = $regn_and_misc_expense;
+            }
 
-		//credit
-		$line = array(
-			$ctr,
-			$date_sold,$date_sold,'KR',$company.'000','PHP','',$reference,'','40',$sap_code,'',
-			number_format($expense, 2, '.', ''),
-			'','','','','','','','',$bcode.'000',$bcode.'000','','',$sales->last_name.', '.$sales->first_name,$sales->cust_code,
-		);
-		$list[] = $line;
-	}
+	    //debit SI
+	    $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','31',$sales['account_key'],'',
+              number_format($si_exp, 2, '.', ''),
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['reference_number'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
+
+	    //credit SI
+	    $line = array(
+	    	$ctr,
+	    	$sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','40',$sales['sap_code'],'',
+	    	number_format($si_exp, 2, '.', ''),
+                    '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
+
+            $ctr++;
+	    //debit AR
+	    $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['ar_no'],'','31',$sales['account_key'],'',
+              number_format($ar_exp, 2, '.', ''),
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['reference_number'],$sales['cust_code'],
+	    );
+	    $list[] = $line;
+
+	    //credit AR
+            $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['ar_no'],'','40',$sales['sap_code'],'',
+              number_format($ar_exp, 2, '.', ''),
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
+            );
+	    $list[] = $line;
+            break;
+        }
+
 }
 
 header('Content-Type: application/csv');

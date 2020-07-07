@@ -20,7 +20,7 @@ class Disapprove extends MY_Controller {
     $this->header_data('dir', './');
 
     $param = new Stdclass();
-    $param->region = $this->session->region;
+    $param->region = $this->session->region_id;
     $param->branch = $this->input->post('branch');
 
     $data['branch'] = $this->disapprove->branch_list($param);
@@ -35,9 +35,29 @@ class Disapprove extends MY_Controller {
     $sales->sid = $this->input->post('sid');
     $sales->da_reason = $this->input->post('da_reason');
 
+
     $this->db->trans_start();
+
+    if ($sales->da_reason === "1" && $this->input->post('payment_method') === 'CASH') { // 1 = Wrong Amount
+      $this->db->query("
+        UPDATE
+          tbl_fund f, tbl_voucher v, tbl_sales s
+        SET
+          f.cash_on_hand = f.cash_on_hand + s.registration
+        WHERE
+          f.fid = v.fund AND s.voucher = v.vid
+        AND
+          s.sid = {$sales->sid}
+      ");
+    }
+
     $this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
-    $this->db->insert('tbl_da_history', $this->disapprove->da_status_history($sales->sid));
+    $new_da_history = array(
+      'sales_id' => $sales->sid,
+      'da_status_id' => $sales->da_reason,
+      'uid' => $_SESSION['uid']
+    );
+    $this->db->insert('tbl_da_history', $new_da_history);
     $this->db->trans_complete();
 
     if ($this->db->trans_status() === TRUE) {
@@ -106,4 +126,7 @@ class Disapprove extends MY_Controller {
     }
   }
 
+  public function misc_expense() {
+    $this->disapprove->da_misc_expense($this->input->post());
+  }
 }

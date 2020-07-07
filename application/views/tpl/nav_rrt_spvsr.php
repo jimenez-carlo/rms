@@ -68,15 +68,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                 </ul>
                             </li>
-                            <!-- <li <?php if(isset($nav) && $nav=="expense") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>expense">Miscellaneous</a>
-                            </li> -->
+
+                            <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Plate <i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/branch_list">Plate Transmittal</a>
+                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/pending_list">Pending List</a>
+                                    </li>
+                                </ul>
+                            </li>
+
                             <li <?php if(isset($nav) && $nav=="rerfo") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>rerfo">Rerfo</a>
                             </li>
-                            <!-- <li <?php if(isset($nav) && $nav=="topsheet") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>topsheet">Topsheet</a>
-                            </li> -->
+
                             <li class="dropdown <?php if(isset($nav) && ($nav=="topsheet" || $nav=="disapprove")) echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Topsheet <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
@@ -99,20 +105,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                 </ul>
                             </li>
-                            <!-- <li class="dropdown <?php if(isset($nav) && $nav=="report") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Report <?php if($not_received > 0) { ?><span class="badge badge-warning"><?php echo $not_received; ?></span><?php } ?> <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>dashboard">Dashboard</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>dashboard/unprocessed">Unprocessed</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>expense/rejected">Expense (Rejected)</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund/passbook">Fund Audit</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>topsheet/status">Topsheet Status</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>transmittal/status">Transmittal Status <?php if($not_received > 0) { ?><span class="badge badge-warning"><?php echo $not_received; ?></span><?php } ?></a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>self_registration">Self Registration</a>
-                                    </li>
-                                </ul>
-                            </li> -->
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

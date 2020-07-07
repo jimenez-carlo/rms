@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
 <div class="container-fluid">
-	<div class="row-fluid">
+  <div class="row-fluid">
     <!-- block -->
     <div class="block">
       <div class="navbar navbar-inner block-header">
@@ -29,14 +29,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             foreach($table as $row)
             {
               print '<tr>';
-              print '<td><center><a href="sap_upload/sap/'.$row->bid.'" id="download" onclick="set_id('.$id_index.')"><span class="icon icon-download" style="font-size:125%;"></span></a></center></td>';
+              if ($row->misc_expense_id) {
+                print '<input id="'.$row->subid.'" class="misc_exp" type="hidden" name="misc_exp" value="'.$row->misc_expense_id.'" disabled>';
+              }
+              print '<td><center><a href="sap_upload/sap/'.$row->subid.'" id="download" onclick="set_id('.$id_index.', '.$row->subid.')"><span class="icon icon-download" style="font-size:125%;"></span></a></center></td>';
               print '<td>'.$row->trans_no.'</td>';
               print '<td>'.$row->post_date.'</td>';
               print '<td>'.$row->region.'</td>';
               print '<td>'.$row->company.'</td>';
               print '<td><input type="text" name="doc_no" class="doc_no" disabled></td>';
               // print '<td><input type="hidden" name="bid" value="'.$row->bid.'"></td>';
-              print '<td><input type="submit" name="save['.$row->bid.']" value="Save" class="btn btn-success save" onclick="return confirm(\'Please make sure all information are correct before proceeding. Continue?\')" disabled></td>';
+              print '<td><input type="submit" name="save['.$row->subid.']" value="Save" class="btn btn-success save" onclick="return confirm(\'Please make sure all information are correct before proceeding. Continue?\')" disabled></td>';
               // print '<td><a onclick="save('.$row->bid.')" class="btn btn-success save" disabled>Save</a></td>';
               print '</tr>';
               $id_index++;

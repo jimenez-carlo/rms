@@ -32,6 +32,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p>Type of Sales</p></th>
         <th><p>Registration Type</p></th>
         <th><p>Reference #</p></th>
+        <th><p>CA Ref #</p></th>
         <th><p class="text-right">Amount Given</p></th>
         <th><p class="text-right">LTO Registration</p></th>
         <th><p class="text-right">Total Expense</p></th>
@@ -58,6 +59,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         print '<td>'.$sales->sales_type.'</td>';
         print '<td>'.$sales->registration_type.'</td>';
         print '<td>'.$sales->ar_no.'</td>';
+        print '<td>'.$sales->reference.'</td>';
         print '<td><p class="text-right sales-amt">'.number_format($sales->amount, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right sales-exp">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
@@ -69,15 +71,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
       // Miscellaneous
       print '<tr style="border-top: double">';
+      print '<th><p>CA Ref #</p></th>';
       print '<th colspan="3"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
       print '<th colspan="3"><p class="text-right">Expense</p></th>';
+      print '<th><p class="text-right">Status</p></th>';
       print '</tr>';
 
       foreach ($topsheet->misc as $misc)
       {
         print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
+        print '<td>'.$misc->reference.'</td>';
         print '<td colspan="3">';
         print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
         print $misc->or_no;
@@ -86,6 +91,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         print '<td colspan="2">'.$misc->or_date.'</td>';
         print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
         print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
+        print '<td><p class="text-right">'.$misc->status.'</p></td>';
         print '</tr>';
         $total_exp += $misc->amount;
       }
@@ -142,9 +148,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title">View attachment</h3>
+        <h3 class="modal-title">View attachment asdasdads</h3>
       </div>
       <div class="modal-body form" style="max-height: 430px;">
+        <div>asdasdasd</div>
         <div class="alert alert-error hide">
           <button class="close" data-dismiss="alert">&times;</button>
           <div class="error"></div>

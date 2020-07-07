@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Rrt extends MY_Controller { 
+class Rrt extends MY_Controller {
 
   public function __construct() {
      parent::__construct();
@@ -35,8 +35,8 @@ class Rrt extends MY_Controller {
 			switch ($cid)
 			{
 				case 1: $row->company->name = 'MNC'; break;
-				case 2: $row->company->name = 'MTI'; break;
 				case 3: $row->company->name = 'HPTI'; break;
+				case 6: $row->company->name = 'MTI'; break;
 			}
 
 			$result[$key] = $row;

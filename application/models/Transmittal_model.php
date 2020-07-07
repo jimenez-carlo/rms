@@ -94,4 +94,46 @@ class Transmittal_model extends CI_Model{
 			order by received_date desc limit 1000")->result_object();
 		return $result;
 	}
+
+	public function get_branch_rerfo($branch)
+	{
+                $result = $this->db->query("
+                  SELECT
+                    r.*, COUNT(*) AS sales_count
+                  FROM
+                    tbl_rerfo r
+                  INNER JOIN
+                    tbl_sales s ON rerfo = rid
+                  INNER JOIN
+                    tbl_topsheet t ON s.topsheet = t.tid
+                  WHERE
+                    s.bcode = {$branch} AND t.transmittal_date IS NOT NULL
+                    AND s.status >= 4
+                  GROUP BY r.rid
+                  ORDER BY r.rid DESC
+                ")->result_object();
+
+		return $result;
+	}
+
+	public function load_rerfo($rid, $branch)
+	{
+		$bcode = (!empty($branch)) ? " AND s.bcode = '".$branch."'" : '';
+
+		$rerfo = $this->db->query("select * from tbl_rerfo where rid = ".$rid)->row();
+
+                $rerfo->sales = $this->db->query("
+                  SELECT
+                    *, IF(s.received_date IS NULL, 'Not Received', 'Received') AS receive_status
+                  FROM
+                    tbl_sales s
+                  INNER JOIN
+                    tbl_customer c ON s.customer = c.cid
+                  WHERE
+                    rerfo = ".$rid.$bcode." AND s.status >= 4
+                  ORDER BY s.bcode
+                ")->result_object();
+
+		return $rerfo;
+	}
 }

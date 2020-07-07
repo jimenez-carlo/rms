@@ -108,7 +108,7 @@ class Cron extends MY_Controller {
                   SELECT
                     c.*, r.*, si_mat_no, regn_status, date_created
                     ,CASE rrt_class
-                      WHEN 'NCR'      THEN 1
+                      WHEN 'NCR' THEN 1
                       WHEN 'REGION 1' THEN 2
                       WHEN 'REGION 2' THEN 3
                       WHEN 'REGION 3' THEN 4
@@ -158,13 +158,7 @@ SQL;
 
 		foreach ($result as $row)
 		{
-                        if ($row->region > 10) {
-                          $company = 8; // MDI
-                        } else {
-                          $company = (substr($row->branch, 0, 1) == 6)
-                              ? 2
-                              : substr($row->branch, 0, 1);
-                        }
+                        $company = substr($row->branch, 0, 1);
 
 			// lto_transmittal
 			$code = 'LT-'.$row->r_code.'-'
@@ -302,9 +296,7 @@ SQL;
 		//exit;
 
                 foreach ($result as $row) {
-
                   $expense = $dev_ces2->query("SELECT rec_no, custcode FROM rms_expense WHERE engine_num = '{$row->engine_no}'")->row();
-
                   if (empty($expense)) {
                     $expense = new Stdclass();
                     $expense->nid = 0;
@@ -325,7 +317,6 @@ SQL;
                     if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
                     if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
                     $dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
-
                   }
                   $rows++;
                 }

@@ -48,7 +48,11 @@ class Registration extends MY_Controller {
 		$da_resolve = 0;
 		if (!empty($data['sid'])) {
 			$data['sales']  = $this->sales->load_sales($data['sid']);
-			$da_resolve     = ($data['sales']->da_reason > 0);
+                        if ($data['sales']->da_reason === '11') {
+                          return show_404();
+                        }
+
+			$da_resolve = ($data['sales']->da_reason > 0);
 		}
 
 		return ($da_resolve) ? $this->template('registration/da_resolve', $data) : $this->template('registration/view', $data);
@@ -61,7 +65,7 @@ class Registration extends MY_Controller {
 		$this->header_data('nav', 'registration');
 		$this->header_data('dir', './../');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['table'] = $this->registration->list_sales($data);
 		$this->template('registration/sales', $data);
 	}
@@ -168,9 +172,32 @@ class Registration extends MY_Controller {
           switch ($sales->da_reason)
           {
           case 1: // wrong amount
+            // Update Registration Amount
             $new_sales->registration = $this->input->post('registration');
             $new_sales->da_reason = 11;
             $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
+
+            // Insert History
+            $new_da_history = array(
+              'sales_id' => $sales->sid,
+              'da_status_id' => 11,
+              'uid' => $_SESSION['uid']
+            );
+            $this->db->insert('tbl_da_history', $new_da_history);
+
+            // Update Cash on Hand
+            if ($this->input->post('payment_method') === 'CASH') {
+              $this->db->query("
+                UPDATE
+                  tbl_fund f, tbl_voucher v, tbl_sales s
+                SET
+                  f.cash_on_hand = f.cash_on_hand - s.registration
+                WHERE
+                  f.fid = v.fund AND s.voucher = v.vid
+                AND
+                  s.sid = {$sales->sid}
+              ");
+            }
             break;
 
           case 2: // no si/ar
@@ -214,9 +241,9 @@ class Registration extends MY_Controller {
           }
 
           // update fund
-          if ($expense != 0) {
+          if ($expense !== 0 && $sales->payment_method === "CASH") {
             $fund = $this->db->query("select * from tbl_fund
-              where region = ".$_SESSION['region'])->row();
+              where region = ".$_SESSION['region_id'])->row();
 
             $new_fund = new Stdclass();
             $new_fund->cash_on_hand = $fund->cash_on_hand + $expense;
@@ -249,7 +276,7 @@ class Registration extends MY_Controller {
 		$this->header_data('nav', 'registration');
 		$this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region'];
+		$data['region'] = $_SESSION['region_id'];
 		$data['ltid'] = $this->input->post('ltid');
 		$data['registration'] = $this->input->post('registration');
 		$data['tip'] = $this->input->post('tip');

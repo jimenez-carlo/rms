@@ -9,6 +9,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <div class="span4 details">
   <?php
+  print form_input(['type'=>'hidden', 'name'=>'regn_amount', 'value'=>$sales->registration]);
+  print form_input(['type'=>'hidden', 'name'=>'payment_method', 'value'=>$sales->payment_method]);
   print '<div class="control-group">';
   print '<div class="control-label">Branch</div>';
   print '<div class="controls">'.$sales->bcode.' '.$sales->bname.'</div>';
@@ -77,15 +79,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   );
   if ($sales->da_reason > 0 && $sales->da_reason != 11) {
     print '<div class="control-group">';
-    print '<div class="control-label">Disapproved</div>';
-    print '<div class="controls">Reason: '.$da_reason[$sales->da_reason].'</div>';
+    print '<div class="control-label">Reason of Disapproved</div>';
+    print '<div class="controls">'.$da_reason[$sales->da_reason].'</div>';
     print '</div>';
   }
   else {
     print '<div id="da_group" class="control-group">';
     print '<div class="control-label"></div>';
     print '<div class="controls">';
-    print '<a class="btn btn-success trigger">Disapprove</a>';
+    print '<a class="btn btn-warning trigger">Disapprove</a>';
     print form_dropdown('da_reason', $da_reason, 0, array('data-sid' => $sales->sid, 'class' => 'hide'));
     print '<a class="btn btn-success save hide">Save</a>';
     print '<p class="hide"></p>';
@@ -114,17 +116,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script type="text/javascript">
 $(function(){
   $(document).ready(function(){
-        $(".details").attr("style", "position:fixed; top:20%;");
-        $(".attachments").attr("style", "margin-left:30%");
+    $(".details").attr("style", "position:fixed; top:20%;");
+    $(".attachments").attr("style", "margin-left:30%");
 
     $('.modal-body').on("scroll", function(){
       if ($(this).scrollTop() > 50) {
         $(".details").attr("style", "position:fixed; top:20%;");
         $(".attachments").attr("style", "margin-left:30%");
-      }
-      else {
-        // $(".details").removeAttr("style");
-        // $(".attachments").removeAttr("style");
       }
     });
 
@@ -133,7 +131,7 @@ $(function(){
       $('#da_group a.trigger').addClass('hide');
 
       // trigger to disapprove, show select reason
-      $('#da_group .control-label').text('Reason for Disapprove');
+      $('#da_group .control-label').text('Disapprove Reason');
       $('#da_group select[name=da_reason]').removeClass('hide');
       $('#da_group hr').removeClass('hide');
       $('#da_group a.save').removeClass('hide');
@@ -145,6 +143,7 @@ $(function(){
       // trigger to save, get data
       var sid = $('#da_group select[name=da_reason]').attr('data-sid');
       var da_reason = $('#da_group select[name=da_reason]').val();
+      var payment_method = $('input[name=payment_method]').val();
 
       // saving...
       $('#da_group a.save').addClass('hide');
@@ -153,7 +152,10 @@ $(function(){
       $.ajax({
         url : "<?php echo base_url(); ?>disapprove/sales",
         type: "POST",
-        data: {'sid' : sid, 'da_reason' : da_reason},
+        data: {
+          'sid' : sid, 'da_reason' : da_reason,
+          'payment_method': payment_method
+        },
         dataType: "JSON",
         success: function(data)
         {
