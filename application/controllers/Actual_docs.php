@@ -14,7 +14,7 @@ class Actual_docs extends MY_Controller {
     $this->header_data('nav', 'actual_docs');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/actual_docs.js?v1.0.0"></script>');
     $status = array('Pending' => 'Pending', 'Incomplete' => 'Incomplete', 'Resend' => 'Resend', 'Complete' => 'Complete');
-    if ($_SESSION['position_name'] === 'RRT General Clerk') {
+    if (in_array($_SESSION['position_name'], ['RRT General Clerk', 'RRT Branch Secretary'])) {
       $status = array_merge(array('New' => 'New'), $status);
     }
     $data['status'] = $status;

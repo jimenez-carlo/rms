@@ -33,6 +33,7 @@ class Actual_docs_model extends CI_Model {
         $w_region = (isset($param['region']) && $param['region'] !== 'any') ? 'AND region = '.$param['region'] : '';
         break;
       case 'RRT General Clerk':
+      case 'RRT Branch Secretary':
         $w_region = 'AND region = '.$_SESSION['region_id'];
         break;
     }

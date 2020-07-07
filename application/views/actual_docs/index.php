@@ -13,7 +13,7 @@
             <?php
             $region_opts = array();
             $default = 'any';
-            if($_SESSION['dept_name'] === 'Regional Registration' && $_SESSION['position_name'] === 'RRT General Clerk'){
+            if($_SESSION['dept_name'] === 'Regional Registration' && in_array($_SESSION['position_name'], ['RRT General Clerk', 'RRT Branch Secretary'])){
               $region_opts['readonly'] = 'true';
               $default = $_SESSION['region_id'];
             }
