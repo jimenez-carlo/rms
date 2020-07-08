@@ -36,13 +36,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
                 print '<tr>';
                 print '<td>'.$count.'</td>';
+                $count++;
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->registration_type.'</td>';
                 print '<td>'.$sales->transmittal_date.'</td>';
-                $count++;
                 ?>
 
                 <td>
@@ -80,7 +80,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <?php
                 print '<td>'.form_dropdown('lto_reason'.$key, $reasons, set_value('lto_reason'.$key, $sales->lto_reason)).'</td>';
                 print '</tr>';
-                $count++;
               }
               ?>
             </tbody>
