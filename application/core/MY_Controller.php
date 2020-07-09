@@ -4,13 +4,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class MY_Controller extends CI_Controller {
 
 	public function __construct() {
-	  parent::__construct();
+          parent::__construct();
           $this->load->helper(array('form', 'url'));
           $this->load->library('form_validation');
 
-          if (!isset($_SESSION['uid'])) {
+          $dont_restrict_cron = !in_array(current_url(), array(
+            base_url('cron/rms_create'),
+            base_url('cron/rms_expense'),
+            base_url('cron/ar_amount')
+          ));
+
+          if (!isset($_SESSION['uid']) AND $dont_restrict_cron) {
             redirect('login');
           }
+
 	}
 
 	public $region = array(

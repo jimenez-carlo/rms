@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Page_access extends MY_Controller {
-	
-  public function __construct() { 
+
+  public function __construct() {
      parent::__construct();
      $this->load->helper('url');
   }
@@ -44,7 +44,7 @@ class Page_access extends MY_Controller {
 		$positions = $global->query("SELECT a.*,b.name,b.pid
 			FROM tbl_system_access a
 			LEFT JOIN tbl_positions b ON position=pid
-			WHERE system=20 "); // system id
+			WHERE system=33"); // system id
 		$data['positions'] = $positions->result_object();
 
 		$this->template('page_access_view', $data);

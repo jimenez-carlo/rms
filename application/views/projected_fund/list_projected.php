@@ -33,10 +33,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               $company_ca_amount = json_decode($row->company_ca_amount);
               foreach ($company_ca_amount as $ca) {
                 print '<tr>';
-                print ($ca->cid === '1') ? '<td>'.$row->region.'</td>' : '<td></td>';
+                print (in_array($ca->cid, ['1', '8'])) ? '<td>'.$row->region.'</td>' : '<td></td>';
                 print '<td>'.$ca->company.'</td>';
-                print ($ca->cid === '1') ? '<td style="text-align:right;padding-right:10px;">'.$row->fund.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
-                print ($ca->cid === '1') ? '<td style="text-align:right;padding-right:10px;">'.$row->cash_on_hand.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
+                print (in_array($ca->cid, ['1', '8'])) ? '<td style="text-align:right;padding-right:10px;">'.$row->fund.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
+                print (in_array($ca->cid, ['1', '8'])) ? '<td style="text-align:right;padding-right:10px;">'.$row->cash_on_hand.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
                 print '<td style="text-align:right;padding-right:10px;">'.number_format($ca->for_ca,2,'.',',').'</td>';
                 print '<td style="text-align:right;padding-right:10px;">'.number_format($ca->for_deposit,2,'.',',').'</td>';
                 if ($position === "3") {

@@ -30,7 +30,7 @@ class Login extends CI_Controller {
 				// global login
                                 if (empty($user_info)) {
                                   $raw['user_info'] = $this->login->get_user_info($username);
-                                  $raw['sys_access'] = $this->login->get_system_access(20);
+                                  $raw['sys_access'] = $this->login->get_system_access(33);
                                   $raw['page_access'] = $this->login->get_access();
 
                                   // validate 2 - username exists
