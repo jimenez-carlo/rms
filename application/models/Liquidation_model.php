@@ -32,12 +32,7 @@ class Liquidation_model extends CI_Model{
                 return $this->db->query("
                   SELECT
                     v.*, f.region,
-                    CASE
-                      WHEN v.company = 1 THEN 'MNC'
-                      WHEN v.company = 2 THEN 'MTI'
-                      WHEN v.company = 3 THEN 'HPTI'
-                      WHEN v.company = 8 THEN 'MDI'
-                    END AS companyname,
+                    c.company_code AS companyname,
                     COUNT(DISTINCT s.sid) AS sales_count,
                     IFNULL(SUM(CASE WHEN s.status < 3 THEN 1200 ELSE 0 END), 0) AS rrt_pending,
                     IFNULL(SUM(CASE WHEN s.status = 3 THEN registration ELSE 0 END), 0) AS lto_pending,
@@ -90,6 +85,7 @@ class Liquidation_model extends CI_Model{
                   FROM tbl_voucher v
                   INNER JOIN tbl_fund f ON fid = v.fund
                   INNER JOIN tbl_sales s ON s.fund = vid
+                  INNER JOIN tbl_company c ON c.cid = s.company
                   WHERE LEFT(transfer_date, 10) BETWEEN '".$date_from."' AND '".$date_to."' ".$region." ".$this->companyQry."
                   GROUP BY vid
                   ORDER BY transfer_date DESC
