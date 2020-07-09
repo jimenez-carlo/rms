@@ -22,13 +22,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
-              $company = array(1 => 'MNC', 6 => 'MTI', 3 => 'HPTI', 8 => 'MDI');
               foreach ($table as $row)
               {
                 print "<tr>";
                 print "<td>".$row->code."</td>";
                 print "<td>".$row->date."</td>";
-                print "<td>".$company[$row->company]."</td>";
+                print "<td>".$row->company."</td>";
                 print "<td>".$row->sales."</td>";
                 print "<td>".form_submit('view['.$row->ltid.']', 'Update', array('class' => 'btn btn-success'))."</td>";
                 print "</tr>";

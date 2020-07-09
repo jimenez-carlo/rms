@@ -30,16 +30,16 @@ class Projected_fund_model extends CI_Model{
 	public function get_projected_funds() {
           switch ($this->session->company_code) {
             case 'CMC':
-                $company = 'f.company != 8';
+                $company = 'AND f.company != 8';
               break;
             case 'MDI':
-                $company = 'f.company = 8';
+                $company = 'AND f.company = 8';
               break;
           }
 
           $query = <<<SQL
             SELECT
-              fid, fund, cash_on_hand, region,
+              fid, FORMAT(fund, 2) AS fund, FORMAT(cash_on_hand, 2) AS cash_on_hand, region,
               CONCAT('[',
                 GROUP_CONCAT('{
                   "cid" : "', cid, '", "company" : "', company, '",
@@ -66,7 +66,7 @@ class Projected_fund_model extends CI_Model{
                       LEFT JOIN
                   tbl_region r ON s.region = r.rid
               WHERE
-                  f.company != 8 AND s.payment_method = 'CASH'
+                  s.payment_method = 'CASH' $company
               GROUP BY f.fid , c.cid , c.company_code
               ) AS first_select
               GROUP BY fid, fund, cash_on_hand, region
