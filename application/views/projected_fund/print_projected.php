@@ -114,6 +114,7 @@
     </tr>
   </tfoot>
 </table>
+<p>Note: For cash advances, you are obligated to liquidate the above amount by submitting the original invoices with a voucher to the Head Office within 10 days from the date of deposit to your account. Otherwise, the amount shall be deducted from your salary. Please comply accordingly.</p>
 
 </body>
 </html>

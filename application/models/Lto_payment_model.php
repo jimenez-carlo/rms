@@ -215,7 +215,8 @@ SQL;
               e.engine_no, e.chassis_no,
               'Motorcycle without Side Car' as type,
               CONCAT(s.bcode,' ',s.bname) as branchnames,
-              CONCAT(c.last_name,',',c.first_name) as customername
+              CONCAT(c.last_name,',',c.first_name) as customername,
+              s.payment_method
             FROM
               tbl_sales s
             INNER JOIN
@@ -224,7 +225,7 @@ SQL;
               tbl_customer c ON c.cid = s.customer
             WHERE
               s.status = 2 AND s.region = ".$param->region."
-              AND LEFT(s.bcode, 1) = '".$param->company."' AND s.payment_method = 'EPP'
+              AND LEFT(s.bcode, 1) = '".$param->company."'
               AND s.pending_date BETWEEN '".$param->date_from." 00:00:00' AND '".$param->date_to." 23:59:59'
               ORDER BY s.bcode
           ")->result_array();

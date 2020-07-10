@@ -78,7 +78,12 @@ class Batch_model extends CI_Model{
                   END AS c_code,
                   CASE s.registration_type
                     WHEN 'Free Registration'  THEN '215450'
-                    ELSE CONCAT('219', SUBSTR(bcode, 1, 3))
+                    ELSE
+                      CONCAT('219',
+                      CASE
+                        WHEN c.company_code IN('MNC','MDI')   THEN SUBSTR(bcode, 2, 4)
+                        WHEN c.company_code IN('HPTI', 'MTI') THEN CONCAT(LEFT(bcode, 1),RIGHT(bcode,2))
+                      END)
                   END AS sap_code,
                   s.si_no, s.ar_no, s.amount AS ar_amount,
                   s.registration_type, f.acct_number AS account_key,
@@ -111,7 +116,9 @@ SQL;
 
                 $misc_exp_qry = <<<SQL
                   SELECT
-                    reference, FORMAT(amount / COUNT(*), 2) AS misc_expense_amount
+                    reference,
+                    FORMAT( (amount - MOD(amount, COUNT(*)) ) / COUNT(*), 2) AS misc_expense_amount,
+                    FORMAT(MOD(amount, COUNT(*)), 2) AS remainder
                   FROM (
                     SELECT
                       s.sid, reference, SUM(m.amount) AS amount
@@ -133,6 +140,7 @@ SQL;
                 $misc_expenses = array();
                 foreach ($get_misc_expense as $misc_expense) {
                   $misc_expenses[$misc_expense['reference']] = $misc_expense['misc_expense_amount'];
+                  $misc_expenses['remainder'] = $misc_expense['remainder'];
                 }
 
 		$this->load->model('Login_model', 'login');
