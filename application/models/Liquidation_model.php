@@ -25,7 +25,7 @@ class Liquidation_model extends CI_Model{
 
 	public function load_list($param)
 	{
-		$date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-15 days')) : $param->date_from;
+		$date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-3 days')) : $param->date_from;
 		$date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
 		$region = (is_numeric($param->region)) ? ' AND f.region = '.$param->region : '';
 
@@ -87,7 +87,7 @@ class Liquidation_model extends CI_Model{
                   INNER JOIN tbl_sales s ON s.fund = vid
                   INNER JOIN tbl_company c ON c.cid = s.company
                   WHERE LEFT(transfer_date, 10) BETWEEN '".$date_from."' AND '".$date_to."' ".$region." ".$this->companyQry."
-                  GROUP BY vid
+                  GROUP BY v.vid, c.cid
                   ORDER BY transfer_date DESC
                 ")->result_object();
 	}

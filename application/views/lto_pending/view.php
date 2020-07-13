@@ -28,6 +28,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
+              switch ($_SESSION['region']) {
+                case 'NCR':
+                case 'Region 6':
+                  $epp = 'EPP';
+                  $cash = false;
+                  break;
+
+                default:
+                  $epp = false;
+                  $cash = 'CASH';
+                  break;
+              }
               $count = 1;
               foreach ($transmittal->sales as $sales)
               {
@@ -51,7 +63,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       print form_radio(
                         'status'.$key,
                         'EPP',
-                        (set_value('status'.$key, 'EPP') == 'EPP')
+                        (set_value('status'.$key, $epp) == 'EPP')
                       );
                     ?> Pending at LTO EPP
                   </label><br>
@@ -60,7 +72,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       print form_radio(
                         'status'.$key,
                         'CASH',
-                        (set_value('status'.$key, false) == 'CASH')
+                        (set_value('status'.$key, $cash) == 'CASH')
                       );
                     ?> Pending at LTO CASH
                   </label><br>
