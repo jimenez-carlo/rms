@@ -81,10 +81,14 @@ class Sales_model extends CI_Model{
 		return $id;
 	}
 
-	public function get_sales($param)
+	public function get_sales($select, $where)
 	{
-		$result = $this->db->get_where('tbl_sales', $param);
-		return $result->result_object();
+                $result = $this->db->select($select)
+                                   ->from('tbl_sales s')
+                                   ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
+                                   ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
+                                   ->where($where);
+		return $result->get()->row_array();
 	}
 
 	public function get_sales_by_transmittal($tid)

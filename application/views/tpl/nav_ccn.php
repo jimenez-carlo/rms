@@ -37,8 +37,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>disapprove">Disapproved Sales</a>
                             </li>
-                            <li <?php if(isset($nav) && $nav=="repo") echo 'class="active"'; ?>>
-                                <a href="<?php echo base_url(); ?>repo">Repo</a>
+                            <li class="dropdown <?php echo (isset($nav) && $nav=="repo-registration") ? 'active' : ''; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Repo<i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>repo">Repo In</a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </div>
