@@ -40,8 +40,10 @@ class Orcr_checking_model extends CI_Model{
                 tbl_voucher v
               INNER JOIN
                 tbl_sales s ON v.vid = s.voucher AND v.vid = s.fund
+              LEFT JOIN
+                tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
               WHERE
-                s.status = 4 $this->andSalesCompany AND v.vid IS NOT NULL
+                s.status = 4 $this->andSalesCompany AND v.vid IS NOT NULL AND susb.sid IS NULL
               GROUP BY
                 v.vid, s.region
               ORDER BY
@@ -53,14 +55,16 @@ class Orcr_checking_model extends CI_Model{
                 tbl_lto_payment l
               INNER JOIN
                 tbl_sales s ON l.lpid = s.lto_payment
+              LEFT JOIN
+                tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
               WHERE
-                s.status = 4 $this->andSalesCompany AND l.lpid IS NOT NULL
+                s.status = 4 $this->andSalesCompany AND l.lpid IS NOT NULL AND susb.sid IS NULL
               GROUP BY
                 l.lpid, s.region
               ORDER BY
                 l.lpid DESC )
             ) AS result
-            ORDER BY region
+            ORDER BY region, reference, budget_type
           ")->result_array();
 
         }
@@ -166,6 +170,7 @@ GBY;
               CONCAT(
                 '[',
                   GROUP_CONCAT(
+                    DISTINCT
                     JSON_OBJECT(
                       'sid', s.sid, 'engine_no', e.engine_no,
                       'bcode', s.bcode, 'bname', s.bname,

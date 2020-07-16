@@ -17,11 +17,18 @@ $ctr = 0;
 foreach ($batch as $sales)
 {
 	$ctr++;
-        $misc_expense = $misc_expenses[$sales['reference_number']] ?? 0;
-        $regn_and_misc_expense = $sales['regn_expense'] + $misc_expense;
-        if ($ctr === 1) {
-          $regn_and_misc_expense += $misc_expenses['remainder'];
+        $regn_and_misc_expense = 0;
+
+        if (!empty($misc_expenses)) {
+          $misc_expense = $misc_expenses[$sales['reference_number']] ?? 0;
+          $regn_and_misc_expense += $misc_expense;
+          if ($ctr === 1) {
+            $regn_and_misc_expense += $misc_expenses['remainder'];
+          }
         }
+
+        $regn_and_misc_expense += $sales['regn_expense'];
+
         switch ($sales['registration_type']) {
           case 'Free Registration':
 	    //debit SI

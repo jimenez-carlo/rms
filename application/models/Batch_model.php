@@ -69,6 +69,7 @@ class Batch_model extends CI_Model{
 	{
               $sql = <<<SQL
                 SELECT
+                  DISTINCT
                   DATE_FORMAT(s.date_sold, '%m/%d/%Y') AS post_date,
                   CASE c.company_code
                     WHEN 'MNC'  THEN '1000'
@@ -138,9 +139,11 @@ SQL;
 SQL;
                 $get_misc_expense = $this->db->query($misc_exp_qry)->result_array();
                 $misc_expenses = array();
-                foreach ($get_misc_expense as $misc_expense) {
-                  $misc_expenses[$misc_expense['reference']] = $misc_expense['misc_expense_amount'];
-                  $misc_expenses['remainder'] = $misc_expense['remainder'];
+                if (!empty($get_misc_expense)) {
+                  foreach ($get_misc_expense as $misc_expense) {
+                    $misc_expenses[$misc_expense['reference']] = $misc_expense['misc_expense_amount'];
+                    $misc_expenses['remainder'] = $misc_expense['remainder'];
+                  }
                 }
 
 		$this->load->model('Login_model', 'login');
