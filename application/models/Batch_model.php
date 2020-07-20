@@ -91,7 +91,7 @@ class Batch_model extends CI_Model{
                   s.registration + s.tip AS regn_expense, -- NEED TO ADD misc expenses
                   CONCAT(s.bcode, '000') AS branch_code,
                   IFNULL(lp.reference, v.reference) AS reference_number,
-                  cust.cust_code, CONCAT(cust.last_name, ', ', cust.first_name) AS customer_name
+                  cust.cust_code, CONCAT(IFNULL(cust.last_name,''), ', ', IFNULL(cust.first_name,'')) AS customer_name
                 FROM
                   tbl_sap_upload_batch sub
 	        JOIN
