@@ -208,10 +208,8 @@ SQL;
    * Accounting to view list of Voucher
    */
         public function list_voucher($param) {
-          $status = (is_numeric($param->status))
-            ? ' AND status = '.$param->status : '';
-          $region = (is_numeric($param->region))
-            ? ' AND region = '.$param->region : '';
+          $status = (is_numeric($param->status)) ? ' AND status = '.$param->status : '';
+          $region = (!in_array($param->region, ['_any', NULL])) ? ' AND region = '.$param->region : '';
 
           $company = ($_SESSION['company'] != 8) ? ' AND region < 11' : ' AND region >= 11';
 
