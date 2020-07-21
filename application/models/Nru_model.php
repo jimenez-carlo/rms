@@ -75,7 +75,7 @@ class Nru_model extends CI_Model{
 		  INNER JOIN
 		    tbl_lto_transmittal lt ON s.lto_transmittal = lt.ltid
 		  WHERE
-		    lt.ltid = {$data['ltid']} AND s.payment_method = '{$payment_method}'
+		    s.status = 2 AND lt.ltid = {$data['ltid']} AND s.payment_method = '{$payment_method}'
 		  GROUP BY ltid
                 ")->row()->sales;
 
