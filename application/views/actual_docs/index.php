@@ -96,7 +96,7 @@
             </td>
             <td>
             <?php
-              echo ($_SESSION['dept_name'] === 'Accounting' && $reference['disable_deposit_slip'] === "0")
+              echo ($_SESSION['dept_name'] === 'Accounting' && $reference['disable_deposit_slip'] === "0" && $reference['status'] !== 'New')
                 ? form_dropdown('deposit_slip', $dep_slip_option, $reference['deposit_slip'] ?? '')
                 : $reference['deposit_slip'];
             ?>

@@ -31,7 +31,6 @@ class Actual_docs_model extends CI_Model {
     switch ($_SESSION['position_name']) {
       case 'Accounts Payable Clerk':
       case 'RRT National Registration Manager':
-        $where .= ' AND transmittal_number IS NOT NULL ';
         $w_region = (isset($param['region']) && $param['region'] !== 'any') ? 'AND region = '.$param['region'] : '';
         break;
       case 'RRT General Clerk':
