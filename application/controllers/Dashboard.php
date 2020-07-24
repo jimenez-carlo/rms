@@ -596,10 +596,14 @@ class Dashboard extends MY_Controller {
             SELECT
               'For Checking' AS label,
               COUNT(*) AS total,
-              IFNULL(SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END), 0) AS pending,
-              IFNULL(SUM(CASE WHEN status > 4 THEN 1 ELSE 0 END), 0) AS done
+              IFNULL(SUM(CASE WHEN s.status = 4 AND susb.subid IS NULL THEN 1 ELSE 0 END), 0) AS pending,
+              IFNULL(SUM(CASE WHEN susb.subid IS NOT NULL OR s.status = 5 THEN 1 ELSE 0 END), 0) AS done
             FROM
-              tbl_sales
+              tbl_sales s
+            LEFT JOIN
+              tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
+            LEFT JOIN
+              tbl_sap_upload_batch sub ON susb.subid = sub.subid
             WHERE
               status >= 4 {$company}
 
@@ -607,14 +611,14 @@ class Dashboard extends MY_Controller {
 
             SELECT
               'For SAP Uploading' as label,
-              COUNT(*) AS total,
+              IFNULL(SUM(IF(sub.is_uploaded = 0 OR s.status = 5, 1, 0)), 0) AS total,
               IFNULL(SUM(CASE WHEN sub.is_uploaded = 0 THEN 1 END),0) AS pending,
               IFNULL(SUM(CASE WHEN s.status = 5 THEN 1 END),0) AS done
             FROM
               tbl_sales s
-            INNER JOIN
+            LEFT JOIN
               tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
-            INNER JOIN
+            LEFT JOIN
               tbl_sap_upload_batch sub ON susb.subid = sub.subid
             WHERE
               s.status >= 4 {$company}
