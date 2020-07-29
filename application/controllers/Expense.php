@@ -179,12 +179,12 @@ class Expense extends MY_Controller {
   	$this->header_data('dir', './../');
   	$this->footer_data('script', '<script src="./../assets/js/expense.js"></script>');
 
-
-  	$edit = $this->input->post('edit');
-  	$mid = current(array_keys($edit));
-
+        $edit = $this->input->post('edit');
+  	$mid = (isset($edit)) ? current(array_keys($edit)) : $this->input->post('mid');
   	$save = $this->input->post('save');
-  	if (!empty($save)) $this->validate();
+        if (!empty($save)) {
+          $this->validate();
+        }
 
         if ($this->input->post('delete')) {
           return $this->delete($this->input->post());
