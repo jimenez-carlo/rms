@@ -158,7 +158,7 @@ SQL;
 
 	public function save_voucher($voucher, $ltid)
 	{
-                $this->db->simple_query('SET SESSION group_concat_max_len=15000');
+                $this->db->simple_query('SET SESSION group_concat_max_len=4294967295');
                 $batch = $this->db->query("
                   SELECT
                     GROUP_CONCAT(s.sid SEPARATOR ',') AS sids, lt.company
