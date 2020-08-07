@@ -64,8 +64,8 @@ WHERE;
       } else {
         $url = base_url().'repo/claim';
         $registration_date = $sales['registration_date'];
-        $date = new DateTime($registration_date);
-        $now = $date->modify("+1 year");
+        $date_registered = new DateTime($registration_date);
+        $expiry = $date_registered->modify("+1 year");
 
         $form = <<<HTML
           <form class="form-inline span6 offset3" method="post" action="{$url}">
@@ -123,7 +123,6 @@ WHERE;
                   </div>
                 </div>
 
-
                 <div class="form-inline row">
                   <div class="control-group span4 offset1">
                     <label class="control-label" for="date-sold">Date Sold</label>
@@ -135,7 +134,7 @@ WHERE;
                     <label class="control-label" for="date-regn">Date Registered</label>
                     <div class="controls">
                       <input id="date-regn" class="datepicker" type="text" name="regn-date" value="{$sales['registration_date']}" autocomplete="off">
-                      <span class="help-inline">{$date->diff($now)->format('%d days')}</span>
+                      <span class="help-inline">{$expiry->diff($date_registered)->format('Expire on %d days.')}</span>
                     </div>
                   </div>
                 </div>
@@ -151,7 +150,7 @@ HTML;
       $this->session->set_flashdata(['repo' =>  $repo_engines]);
       //$output['log'] = $sales;
       //$interval = date_diff('2020-01-01', date('Y-m-d'));
-      $output['log'] = $sales;
+      $output['log'] = $expiry;
       echo json_encode($output);
     }
   }
