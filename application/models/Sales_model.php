@@ -81,6 +81,15 @@ class Sales_model extends CI_Model{
 		return $id;
 	}
 
+        public function get_customer($where)
+        {
+          return $this->db
+            ->select()
+            ->from('tbl_customer c')
+            ->where($where)
+            ->get()->row_array();
+        }
+
 	public function get_sales($select, $where)
 	{
                 $result = $this->db->select($select)

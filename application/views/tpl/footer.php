@@ -44,24 +44,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           });
         }
 
-
         $(document).ready(function(){
-            $('select').select2();
-            $(".datepicker").datepicker({
-                  format: 'yyyy-mm-dd'
-                });
+          $('select').select2();
+          $(".datepicker").datepicker({
+            format: 'yyyy-mm-dd'
+          });
 
-            $(document).ajaxStart(function(){
-                $('.ajax-loader').removeClass('hide');
-            }).ajaxComplete(function(){
-                $('.ajax-loader').addClass('hide');
-            });
+          $(document).ajaxStart(function(){
+            $('.ajax-loader').show();
+          })
+          .ajaxStart(function() {
+            $('.alert').hide();
+          })
+          .ajaxComplete(function(){
+            $('.ajax-loader').hide();
+          });
 
-            $('form').submit(function(){
-                $(this).find('.numeric').each(function(){
-                    $(this).val( toFloat( $(this).val() ) );
-                });
+          $('form').submit(function(){
+            $(this).find('.numeric').each(function(){
+              $(this).val( toFloat( $(this).val() ) );
             });
+          });
         });
         </script>
         <?php if(isset($script)) echo $script; ?>
