@@ -17,17 +17,19 @@
           <td>Engine #</td>
           <td>MV File</td>
           <td>Branch</td>
-          <td>Expiration Date</td>
+          <td>Expiration</td>
+          <td></td>
         </tr>
       </thead>
       <tbody>
-        <?php foreach($repo_sales AS $repo_sale): ?>
+        <?php foreach($repo_inventory AS $repo): ?>
         <tr>
-          <td><?php echo $repo_sale['first_name']; ?></td>
-          <td><?php echo $repo_sale['engine_no']; ?></td>
-          <td><?php echo $repo_sale['mvf_no']; ?></td>
-          <td><?php echo $repo_sale['bcode'].' '.$repo_sale['bname']; ?></td>
-          <td></td>
+          <td><?php echo $repo['first_name']; ?></td>
+          <td><?php echo $repo['engine_no']; ?></td>
+          <td><?php echo $repo['mvf_no']; ?></td>
+          <td><?php echo $repo['bcode'].' '.$repo['bname']; ?></td>
+          <td><?php echo '<p class="text-'.$repo['status'].'">'.$repo['message'].'</p>'; ?></td>
+          <td><?php echo '<a class="btn btn-success" href="'.base_url('repo/registration/'.$repo['repo_sales_id']).'" target="_blank">Update</a>'; ?></td>
         </tr>
         <?php endforeach; ?>
       </tbody>

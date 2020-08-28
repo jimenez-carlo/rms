@@ -75,6 +75,7 @@ function get_engine(engine_number) {
         //  return error_msg('Duplicate Engine Number.');
         //}
       } else {
+        $('#form-landing').empty();
         return error_msg(data.error);
       }
     },
@@ -86,8 +87,6 @@ function get_engine(engine_number) {
 }
 
 $(document).on('focusout', '#get-cust', function(e) {
-  //if (e.keyCode === 13) {
-  //}
   console.log(e);
   var cust_code = $(this).val();
   if (check_length(cust_code)) {
@@ -117,13 +116,32 @@ $(document).on('click', '.claim', function(e){
       data: { eid: engine_id },
       dataType: 'json',
       success: function(data) {
-        //console.log(data.log);
         td.children().remove();
         td.prepend('<span style="color:green">Success! <i class="icon-ok"></i><span>')
         $('.bname-'+engine_id).empty().append(data.branch);
       }
     });
   }
+});
+
+$('#transfer, #renew').on('click', function(e) {
+  var unsavable = (!$('#transfer, #renew').is(':checked'));
+  $('#save').attr('disabled', unsavable);
+
+  if ($(this).attr('name') === 'regn_type[transfer]') {
+    var transfer_checked = $(this).is(':checked');
+    if (transfer_checked) {
+      $('#sold-y').prop('checked', true);
+    }
+    var bool = !(transfer_checked || $("input[name='sold']:checked").val() === 'yes');
+    repo_sales(bool);
+  }
+});
+
+$('input[type="radio"][name="sold"]').on('click', function() {
+  var sold = $(this).val();
+  var bool = (sold === 'yes') ? false : true;
+  repo_sales(bool);
 });
 
 $(document).on('focusin', '.datepicker', function() {
@@ -139,4 +157,18 @@ function check_length(value) {
   if (value.length > 5) {
     return true;
   }
+}
+
+function disable_save() {
+
+}
+
+function repo_sales(bool) {
+  $(' \
+    #rsf, #date-sold, \
+    #ar-num, #ar-amount, \
+    #get-cust, #first-name, \
+    #last-name \
+  ')
+  .prop('disabled', bool);
 }

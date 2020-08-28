@@ -17,11 +17,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>profile">Profile</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>profile">Profile</a>
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>logout">Logout</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>logout">Logout</a>
                                     </li>
                                 </ul>
                             </li>

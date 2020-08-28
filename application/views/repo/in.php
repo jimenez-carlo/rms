@@ -17,22 +17,6 @@
         <button id="search-repo-in" class="btn btn-success" type="submit">Search</button>
       </div>
     </div>
-    <!--
-    <table class="table">
-      <thead>
-        <tr>
-          <td>Customer</td>
-          <td>Engine #</td>
-          <td>MV File</td>
-          <td>Branch</td>
-          <td>Date Registered</td>
-          <td></td>
-        </tr>
-      </thead>
-      <tbody id="table_content" >
-      </tbody>
-    </table>
-    -->
   </div>
   <div id="form-landing" class="row"></div>
 </div>

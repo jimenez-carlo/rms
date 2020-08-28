@@ -17,6 +17,7 @@ SLCT;
       ->join('tbl_engine e', 'e.eid = rs.eid', 'inner')
       ->join('tbl_customer c', 'c.cid = rs.cid', 'left')
       ->where('rs.bcode = '.$_SESSION['branch_code'])
+      ->order_by('registration_date ASC')
       ->get()->result_array();
   }
 
@@ -66,18 +67,34 @@ SLCT;
     ");
   }
 
-  public function claim($engine_id, $customer_id) {
-    if (isset($engine_id) && isset($customer_id)) {
-      $repo_engines = $this->session->flashdata('repo');
+  public function claim() {
+    $repo = $this->session->flashdata('repo');
+    $engine_id = $repo['eid'];
+    $customer_id = $repo['cid'];
+    $get_repo = <<<SQL
+      SELECT
+        *
+      FROM
+        tbl_repo_sales
+      WHERE
+        eid = {$engine_id}
+SQL;
+    $repo = $this->db->query($get_repo)->row_array();
+    $data['registration_date'] = $this->input->post('regn-date');
+    $data['bcode'] = $_SESSION['branch_code'];
+    $data['bname'] = $_SESSION['branch_name'];
+    $data['company_id'] = $_SESSION['company'];
+
+    if (count($repo) > 0) {
+      $data['repo_sales_id'] = $repo['repo_sales_id'];
+      $this->db->update('tbl_repo_sales', $data);
+      echo json_encode(['log' => $exist]);
+    } else {
       $data['eid'] = $engine_id;
-      $data['bcode'] = $_SESSION['branch_code'];
-      $data['bname'] = $_SESSION['company_code'].' '.$_SESSION['branch_name'];
-      //$data['date_registered'] = $repo_engines[$data['eid']]['registration_date'];
-      //$data['cid'] = $repo_engines[$data['eid']]['cid'];
+      $data['cid'] = $customer_id;
+      $data['date_sold'] = $repo['date_sold'];
       if ($this->db->insert('tbl_repo_sales', $data)) {
-        //unset($repo_engines[$data['eid']]);
-        $this->session->set_flashdata(['repo' => $repo_engines]);
-        echo json_encode(['branch' => $data['bname'], 'log' => $this->session->flashdata('repo')]);
+        $_SESSION['messages'][] = 'Success!';
       }
     }
   }
@@ -86,4 +103,70 @@ SLCT;
     return null;
   }
 
+  public function expiration($date_registered) {
+    $now = new DateTime('now');
+    $date_expired = new DateTime($date_registered);
+    $date_expired->modify("+1 year");
+
+    $day   = 'day';
+    $month = 'month';
+    $year  = 'year';
+    $expired = '';
+    if ($date_expired > $now) {
+      $interval = $now->diff($date_expired);
+      $day   .= ($interval->d > 1) ? 's' : '';
+      $month .= ($interval->m > 1) ? 's' : '';
+      if (($interval->y == 0 && in_array($interval->m, [0,1]) && $interval->d < 31)) {
+        $expire['status'] = 'warning';
+      } else {
+        $expire['status'] = 'success';
+      }
+    } else {
+      $expire['status'] = 'error';
+      $interval = $date_expired->diff($now);
+      $day   .= ($interval->d > 1) ? 's' : '';
+      $month .= ($interval->m > 1) ? 's' : '';
+      $year  .= ($interval->y > 1) ? 's' : '';
+      $expired = 'expired';
+    }
+    $format = '';
+    $format .= ($interval->y !== 0) ? " %y {$year}" : '';
+    $format .= ($interval->m !== 0) ? " %m {$month} " : '';
+    $format .= ($interval->y !== 0 && $interval->m !== 0) ? " and " :'';
+    $format .= ($interval->d !== 0) ? " %d {$day}" : '';
+    $expire['message'] = $interval->format($format." ".$expired);
+
+    return $expire;
+  }
+
+  public function save_repo_sales($repo_sales_id, $data, $sold) {
+    $data['date_upload'] = date('Y-m-d H:i:s');
+    $rerfo_num = $_SESSION['branch_code'].'-'.date('Ymd');
+    // CHECK EXISTING RERFO
+    $query = "SELECT repo_rerfo_id FROM tbl_repo_rerfo WHERE rerfo_number = '{$rerfo_num}'";
+    $data['repo_rerfo_id'] = $this->db->query($query)->row('repo_rerfo_id');
+    if (!isset($data['repo_rerfo_id'])) {
+      // CREATE RERFO
+      $rerfo = ['rerfo_number' => $rerfo_num, 'status' => 'NEW'];
+      $this->db->insert('tbl_repo_rerfo', $rerfo);
+      $data['repo_rerfo_id'] = $this->db->insert_id();
+    }
+
+    if (!isset($data['regn_type']['transfer']) && $sold === 'no') {
+      // INSERT EXPENSE
+      if ($this->db->update('tbl_repo_sales', $data, "repo_sales_id = {$repo_sales_id}")) {
+        $this->history($repo_sales_id, 'RENEW', json_encode($data));
+      }
+    }
+  }
+
+  private function history($repo_sales_id, $action, $logs) {
+    $data = [
+      'repo_sales_id' => $repo_sales_id,
+      'user' => $_SESSION['username'],
+      'action' => $action,
+      'data' => $logs
+    ];
+    $this->db->insert('tbl_repo_history', $data);
+  }
 }
