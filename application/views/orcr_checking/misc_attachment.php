@@ -44,6 +44,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <option>WRONG AMOUNT</option>
             <option>ADVANCE DATE OF EXPENSE VS CA EXPENSE</option>
             <option>DUPLICATE ATTACHMENT</option>
+            <option>NOT FOR REGISTRATION EXPENSE</option>
+            <option>NO ATTACH OR</option>
+            <option>NO VOUCHER FOR ITINERARY</option>
           </select>
         </div>';
   print '</div>';
