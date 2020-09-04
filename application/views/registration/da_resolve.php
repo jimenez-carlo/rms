@@ -115,8 +115,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 foreach ($sales->files as $file)
                 {
                   $path = base_url().'/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
-                  print form_hidden('files[]', $file);
                   print '<div class="attachment" style="position:relative">';
+                  print form_hidden('files[]', $file);
                   print '<img src="'.$path.'" style="margin:1em; border:solid">';
                   print '<a href="#" style="background:#BDBDBD; color:black; padding:0.5em; position:absolute; top: 1em; right: 0">X</a>';
                   print '</div>';
@@ -128,12 +128,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               {
                 foreach ($temp as $file)
                 {
+                  $path = base_url().'/rms_dir/temp/'.$file;
                   print '<div class="attachment temp" style="position:relative">';
                   print form_hidden('temp[]', $file);
-
-                  $path = base_url().'/rms_dir/temp/'.$file;
                   print '<img src="'.$path.'" style="margin:1em; border:solid">';
-
                   print '<a href="#" style="background:#BDBDBD; color:black; padding:0.5em; position:absolute; top: 1em; right: 0">X</a>';
                   print '</div>';
                 }
@@ -226,12 +224,12 @@ $(function(){
   });
 
   $(document).on('click', '.attachment a', function(){
-    var filename = $(this).closest(".attachment").find("input").val();
+    var filename = $(this).closest(".attachment").find("img").attr('src');
     $(this).closest(".attachment").html('<span style="color:red">This file will be deleted upon saving. Reload the page to undo.</span>');
   });
 
   $(document).on('click', '.attachment.temp a', function(){
-    var filename = $(this).closest(".attachment").find("input").val();
+    var filename = $(this).closest(".attachment").find("img").attr('src');
     unlink(filename);
     $(this).closest(".attachment").remove();
 
