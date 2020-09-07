@@ -147,8 +147,9 @@ SQL;
                   INNER JOIN
                     tbl_customer c on c.cid = s.customer
                   WHERE
-                    s.lto_transmittal in (".$ltid.")
-                    AND s.voucher = 0 AND s.registration_type != 'Self Registration' AND s.payment_method = 'CASH'
+                    s.lto_transmittal in (".$ltid.") AND s.voucher = 0
+                    AND s.registration_type != 'Self Registration'
+                    AND s.payment_method = 'CASH' AND s.status != 1
                   GROUP BY s.bcode, s.bname
                 ")->result_object();
 
@@ -167,7 +168,8 @@ SQL;
                   INNER JOIN
                     tbl_lto_transmittal lt ON s.lto_transmittal = lt.ltid
                   WHERE
-                    lt.ltid IN (".$ltid.") AND voucher = 0 AND s.registration_type != 'Self Registration' AND s.payment_method = 'CASH'
+                    lt.ltid IN (".$ltid.") AND voucher = 0 AND s.registration_type != 'Self Registration'
+                    AND s.payment_method = 'CASH' AND s.status != 1
                   GROUP BY
                     lt.company
                 ")->row();
@@ -186,7 +188,7 @@ SQL;
                     voucher = ".$voucher->vid.",
                     user = ".$_SESSION['uid']."
                   WHERE
-                    sid IN (".$batch->sids.")
+                    sid IN (".$batch->sids.") AND s.status != 1
                 ");
 
                 $fund = $this->db->query("

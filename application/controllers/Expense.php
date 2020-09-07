@@ -206,6 +206,14 @@ class Expense extends MY_Controller {
 
   	$data['reference'] = $reference;
   	$data['misc'] = $this->expense->edit_misc($mid);
+        $data['hide'] = '';
+        $data['emphasis'] = '';
+
+        if($data['misc']->remarks === 'NOT FOR REGISTRATION EXPENSE') {
+          $data['hide'] = 'hide';
+          $data['emphasis'] = '<small class="muted">Delete only no reuploading.</small>';
+        }
+
   	$data['type'] = $this->expense->type;
   	$data['status'] = ($data['misc']->status == 5) ? 6 : 0; // For Approval or Approved
   	$this->template('expense/edit', $data);

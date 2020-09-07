@@ -1,5 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+//echo '<pre>'; var_dump($misc); echo '</pre>'; die();
 ?>
 
 <div class="container-fluid">
@@ -53,6 +54,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo '</div></div>';
 
               echo '<div class="control-group">';
+              echo form_label('Accounting Remarks', 'acctg-rmks', array('class' => 'control-label'));
+              echo '<div class="controls">';
+              echo '<p class="muted">'.$misc->remarks.'</p>';
+              echo  $emphasis;
+              echo '</div></div>';
+
+              echo '<div class="control-group">';
               echo form_label('Remarks', 'remarks', array('class' => 'control-label'));
               echo '<div class="controls">';
 
@@ -60,14 +68,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo '</div></div>';
             ?>
             <div class="form-actions">
-              <input type="submit" name="save" value="Save" class="btn btn-success">
+              <input  class="btn btn-success <?php echo $hide; ?>" type="submit" name="save" value="Save">
               <button class="btn btn-danger" name="delete" value="true">Delete</button>
             </div>
           </fieldset>
 
           <div class="span2"></div>
 
-          <div class="upload-form span6">
+          <div class="upload-form span6 <?php echo $hide; ?>">
             <div class="attachments">
               <?php
               foreach ($misc->files as $key => $file)
@@ -101,7 +109,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
 
             <!-- Upload Form -->
-            <div class="control-group" style="margin-top: 10px;">
+            <div class="control-group <?php echo $hide; ?>" style="margin-top: 10px;">
               <div class="control-label">
                 Attachment
               </div>
@@ -111,7 +119,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <br><b>You can only upload upto 1MB</b>
               </div>
             </div>
-            <div class="form-actions">
+            <div class="form-actions <?php echo $hide; ?>">
               <!-- <input type="submit" name="upload" value="Upload" class="btn btn-success"> -->
               <a class="btn btn-success" onclick="upload()">Upload</a>
             </div>
