@@ -183,12 +183,12 @@ SQL;
 
                 $this->db->query("
                   UPDATE
-                    tbl_sales
+                    tbl_sales s
                   SET
-                    voucher = ".$voucher->vid.",
-                    user = ".$_SESSION['uid']."
+                    s.voucher = ".$voucher->vid.",
+                    s.user = ".$_SESSION['uid']."
                   WHERE
-                    sid IN (".$batch->sids.") AND s.status != 1
+                    s.sid IN (".$batch->sids.") AND s.status != 1
                 ");
 
                 $fund = $this->db->query("
