@@ -41,10 +41,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Repo<i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php echo base_url(); ?>repo/in">Repo In</a>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/in'); ?>">Repo In</a>
                                     </li>
                                     <li>
-                                        <a tabindex="-1" href="<?php echo base_url(); ?>repo">Inventory</a>
+                                        <a tabindex="-1" href="<?php echo base_url('repo'); ?>">Inventory</a>
+                                    </li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/rerfo'); ?>">Rerfo</a>
+                                    </li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/rerfo_misc'); ?>">Misc Expense</a>
                                     </li>
                                 </ul>
                             </li>

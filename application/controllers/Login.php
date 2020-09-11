@@ -59,6 +59,7 @@ class Login extends CI_Controller {
                                             'ext' => $raw['user_info']->ext,
                                             'branch_id' => $raw['user_info']->bid,
                                             'branch_code' => $raw['user_info']->b_code,
+                                            'branch_name' => $raw['user_info']->name,
                                             'position' => $raw['user_info']->position_id,
                                             'position_name' => $raw['user_info']->position_name,
                                             'dept_id' => $raw['user_info']->dept_id,

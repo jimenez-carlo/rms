@@ -7,6 +7,7 @@ class Repo extends MY_Controller {
     parent::__construct();
     $this->load->model('Sales_model', 'sales');
     $this->load->model('Repo_model', 'repo');
+    $this->load->model('File_model', 'file');
   }
 
   private $jsversion = 'v1.0.0';
@@ -15,20 +16,17 @@ class Repo extends MY_Controller {
 
     $this->access(17);
     $this->header_data('title', 'Repo Registation');
+    $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     $repo_inventory = [];
     $repo_all = $this->repo->all();
     foreach ($repo_all as $repo) {
-      $expiry = $this->repo->expiration($repo['registration_date']);
+      $expiry = $this->repo->expiration($repo['date_registered']);
       $repo['status'] = $expiry['status'];
       $repo['message'] = $expiry['message'];
       $repo_inventory[] = $repo;
     }
     $data['repo_inventory'] = $repo_inventory;
-    //echo '<pre>'; var_dump($data); echo '</pre>'; die();
-
-    //echo '<pre>'; var_dump($this->db->last_query()); echo '</pre>';
-    //echo '<pre>'; var_dump($data['repo_sales']); echo '</pre>'; die();
     $this->template('repo/inventory.php', $data);
   }
 
@@ -40,121 +38,118 @@ class Repo extends MY_Controller {
     $this->template('repo/in.php', []);
   }
 
-  public function registration($repo_sales_id) {
+  public function registration($repo_inventory_id) {
     $this->header_data('title', 'Repo Registration');
     $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     if ($this->input->post('save')) {
-      $check_boxes = [ set_checkbox('regn_type[transfer]', '2'), set_radio('sold', 'yes') ];
-
-      if (in_array(' checked="checked"', $check_boxes)) {
-        $data['disable'] = '';
-      }
-
       $validation = [
-        [ 'field' => 'regn_type[]', 'label' => 'Registration Type', 'rules' => 'required' ],
-        [ 'field' => 'repo_sales[registration_amt]', 'label' => 'Registration Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_sales[insurance_amt]', 'label' => 'Insurance Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_sales[emission_amt]', 'label' => 'Emission Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_sales[date_regn]', 'label' => 'Registration Date', 'rules' => 'required' ]
+        //REGISTRATION
+        [ 'field' => 'repo_registration[registration_amt]', 'label' => 'Registration Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
+        [ 'field' => 'repo_registration[pnp_clearance_amt]', 'label' => 'PNP Clearance Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
+        [ 'field' => 'repo_registration[macro_etching_amt]', 'label' => 'Macro Etching', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
+        [ 'field' => 'repo_registration[insurance_amt]', 'label' => 'Insurance Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
+        [ 'field' => 'repo_registration[emission_amt]', 'label' => 'Emission Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
+        [ 'field' => 'repo_registration[date_registered]', 'label' => 'Registration Date', 'rules' => 'required' ],
+        //REPO SALE
+        [ 'field' => 'repo_sale[rsf_num]', 'label' => 'RSF#', 'rules' => 'required' ],
+        [ 'field' => 'repo_sale[ar_num]', 'label' => 'AR Number', 'rules' => 'required' ],
+        [ 'field' => 'repo_sale[ar_amt]', 'label' => 'Amount Given', 'rules' => 'required' ],
+        [ 'field' => 'repo_sale[date_sold]', 'label' => 'Date Sold', 'rules' => 'required' ],
+        //CUSTOMER
+        [ 'field' => 'customer[cust_code]', 'label' => 'Customer Code', 'rules' => 'required' ],
+        [ 'field' => 'customer[first_name]', 'label' => 'First Name', 'rules' => 'required' ],
+        [ 'field' => 'customer[last_name]', 'label' => 'Last Name', 'rules' => 'required' ],
       ];
-
-      if (isset($this->input->post('regn_type')['transfer']) || $this->input->post('sold') === 'yes') {
-        $validation[] = [ 'field' => 'rsf', 'label' => 'RSF#', 'rules' => 'required' ];
-        $validation[] = [ 'field' => 'cust_code', 'label' => 'Customer Code', 'rules' => 'required' ];
-        $validation[] = [ 'field' => 'first_name', 'label' => 'First Name', 'rules' => 'required' ];
-        $validation[] = [ 'field' => 'last_name', 'label' => 'Last Name', 'rules' => 'required' ];
-        $validation[] = [ 'field' => 'ar_num', 'label' => 'AR Number', 'rules' => 'required' ];
-        $validation[] = [ 'field' => 'ar_amt', 'label' => 'Amount Given', 'rules' => 'required|numeric|greater_than_equal_to[0]' ];
-      }
 
       $this->form_validation->set_rules($validation);
       if ($this->form_validation->run()) {
-        $this->repo->save_repo_sales($repo_sales_id, $this->input->post('repo_sales'), $this->input->post('sold'));
+        $repo_registration_id = $this->repo->save_registration(
+          $repo_inventory_id,
+          $this->input->post('repo_registration'),
+          $this->input->post('repo_sale'),
+          $this->input->post('customer')
+        );
+        $upload_attachments = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
       }
-
+      redirect('repo/view/'.$repo_inventory_id);
     }
 
-    $select_clause = <<<SQL
-      rs.repo_sales_id, e.*,
-      rs.rsf_num, rs.cid AS cid,
-      rsc.cust_code AS cust_code,
-      rsc.first_name AS first_name,
-      rsc.last_name AS last_name,
-      rs.bcode AS bcode, IFNULL(rs.bname, '') AS bname,
-      rs.registration_amt, rs.emission_amt, rs.insurance_amt,
-      DATE_FORMAT(rs.date_sold, '%Y-%m-%d') AS date_sold,
-      DATE_FORMAT(rs.date_regn, '%Y-%m-%d') AS date_regn
-SQL;
-      $where_clause = <<<SQL
-        rs.repo_sales_id = '{$repo_sales_id}'
-SQL;
-
-    $data['repo'] = $this->repo->get_sales($select_clause, $where_clause);
-    $expire = $this->repo->expiration($data['repo']['date_regn']);
+    $data['repo'] = $this->repo->engine_details($repo_inventory_id);
+    $date = (!$this->input->post('save')) ? $data['repo']['date_registered'] : $this->input->post('repo_registration')['date_registered'];
+    $expire = $this->repo->expiration($date);
 
     $data['repo']['expire_status'] = $expire['status'];
     $data['repo']['expire_message'] = $expire['message'];
     $data['disable'] = 'disabled';
 
-    //$this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?v1.0.0"></script>');
     $this->template('repo/registration.php', $data);
+  }
+
+  public function view($repo_inventory_id) {
+    $this->header_data('title', 'Repo View');
+    $this->header_data('nav', 'repo-view');
+
+    $data['repo'] = $this->repo->engine_details($repo_inventory_id);
+    foreach (json_decode($data['repo']['attachment'], 1) as $key => $attach) {
+      $data[$key] =  base_url($attach);
+    }
+
+    $expire = $this->repo->expiration($data['repo']['date_registered']);
+    $data['repo']['expire_status'] = $expire['status'];
+    $data['repo']['expire_message'] = $expire['message'];
+    $this->template('repo/view.php', $data);
   }
 
   public function get_sales() {
     if($this->input->post('engine_no')) {
-      $select_clause = <<<SELECT
+      $select_clause = <<<SQL
         e.*,
         s.sid, s.cr_no,
-        DATE_FORMAT(IFNULL(rs.registration_date, s.registration_date), '%Y-%m-%d') AS registration_date,
-        IFNULL(rs.cid,s.customer) AS cid,
-        IFNULL(rsc.cust_code, sc.cust_code) AS cust_code,
-        IFNULL(rsc.first_name, sc.first_name) AS first_name,
+        DATE_FORMAT(IFNULL(rr.date_registered, s.cr_date), '%Y-%m-%d') AS date_registered,
+        IFNULL(rsc.cid,sc.cid) AS customer_id,
+        IFNULL(rsc.cust_code,sc.cust_code) AS cust_code,
+        IFNULL(rsc.first_name,sc.first_name) AS first_name,
         IFNULL(rsc.last_name, sc.last_name) AS last_name,
         ,rs.repo_sales_id,
-        IFNULL(rs.bcode,s.bcode) AS bcode, IFNULL(rs.bname, '') AS bname,
+        IFNULL(ri.bcode,s.bcode) AS bcode, IFNULL(ri.bname, s.bname) AS bname,
         DATE_FORMAT(IFNULL(rs.date_sold, s.date_sold), '%Y-%m-%d') AS date_sold
-SELECT;
-      $where_clause = <<<WHERE
+SQL;
+      $where_clause = <<<SQL
         e.engine_no = '{$this->input->post("engine_no")}'
         AND (s.sid IS NULL OR s.status >= 4)
-WHERE;
+        AND (`ri`.`status` IS NULL OR ri.status != 'Registered')
+SQL;
 
-      $sales = $this->repo->get_sales($select_clause, $where_clause);
+      $sales = $this->repo->get_repo_in($select_clause, $where_clause);
 
       $output = [];
       if (empty($sales)) {
         $output['error'] = 'Engine number not found.';
       } elseif($sales['bcode'] === $_SESSION['branch_code']) {
-        $output['error'] = 'You already claimed the engine.';
+        $output['error'] = 'You already claimed this engine.';
       } else {
-        $url = base_url().'repo/claim';
-        $this->session->set_flashdata([
-          'repo' => [
-            'cid' => $sales['cid'],
-            'eid' => $sales['eid'],
-            'date_sold' => $sales['date_sold']
-          ]
-        ]);
-        $expire = $this->repo->expiration($sales['registration_date']);
-        $xpr_msg = ($expire['status'] === 'success') ? 'Expire on' : '';
+        $expire = $this->repo->expiration($sales['date_registered']);
+        $xpr_msg = ($expire['status'] === 'success') ? 'Expire in' : '';
+        $form_open =  form_open(base_url('repo/claim'), ["class" => "form-inline span6 offset3", "onsubmit" => "return confirm('Are you sure?');"]);
         $form = <<<HTML
-          <form class="form-inline span6 offset3" method="post" action="{$url}">
+          {$form_open}
+            <input type="hidden" name="engine_id" value="{$sales['eid']}" >
             <fieldset>
               <legend>Details</legend>
                 <div class="row">
                   <div class="control-group offset1">
                     <label>Branch</label>
-                    <input type="text" value="" disabled>
-                    <!-- <input id="customer-id" type="hidden" name="cid" type="text" value="{$sales['cid']}"> -->
+                    <input type="text" value="{$sales['bcode']} {$sales['bname']}" disabled>
+                    <!-- <input id="customer-id" type="hidden" name="cid" type="text" value="{$sales['customer_id']}"> -->
                   </div>
                 </div>
                 <div class="row">
                   <div class="control-group offset1">
                     <label for="get-cust">Customer Code</label>
                     <input id="get-cust" type="text" value="{$sales['cust_code']}" disabled>
-                    <!-- <input id="customer-id" type="hidden" name="cid" type="text" value="{$sales['cid']}"> -->
+                    <!-- <input id="customer-id" type="hidden" name="cid" type="text" value="{$sales['customer_id']}"> -->
                   </div>
                 </div>
                 <div class="form-inline row">
@@ -212,8 +207,8 @@ WHERE;
                   <div class="control-group {$expire['status']}">
                     <label class="control-label" for="date-regn">Date Registered</label>
                     <div class="controls">
-                      <input id="date-regn" class="datepicker" type="text" name="regn-date" value="{$sales['registration_date']}" autocomplete="off">
-                      <span class="help-inline">{$xpr_msg} {$expire['message']}.</span>
+                      <input type="text" name="date_registered" value="{$sales['date_registered']}" disabled>
+                      <span class="help-inline">{$xpr_msg} {$expire['message']}</span>
                     </div>
                   </div>
                 </div>
@@ -226,10 +221,7 @@ WHERE;
 HTML;
         $output['form'] = $form;
       }
-      //$this->session->set_flashdata(['repo' =>  $repo_engines]);
       $output['log'] = $this->session->flashdata('repo');
-      //$interval = date_diff('2020-01-01', date('Y-m-d'));
-      //$output['log'] = [$date_expired->format('Y-m-d'), $now->format('Y-m-d'), $registration_date];
       echo json_encode($output);
     }
   }
@@ -237,9 +229,7 @@ HTML;
   public function claim() {
     $this->access(17);
     if ($this->input->post('save')) {
-      $this->repo->claim();
-      $eid = $_SESSION['repo']['eid'];
-      $this->repo->insert_history($eid);
+      $this->repo->claim($this->input->post('engine_id'));
     }
 
     redirect('./repo/in');
@@ -253,25 +243,60 @@ HTML;
     }
   }
 
-  public function save_registration() {
-    //$validation = [
-    //  [ 'field' => 'regn_type[]', 'labels' => 'Registration Type', 'rules' => 'required' ],
-    //  [ 'field' => 'registration', 'labels' => 'Registration Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-    //  [ 'field' => 'insurance', 'labels' => 'Insurance Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-    //  [ 'field' => 'emission', 'labels' => 'Emission Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-    //  [ 'field' => 'regn_date', 'labels' => 'Registration Date', 'rules' => 'required' ],
-    //];
-    //$this->form_validation->set_rules($validation);
-
-    //if ($this->form_validation->run() == false) {
-    //  $warnings = explode("\n",validation_errors());
-    //  array_pop($warnings);
-    //  $_SESSION['warning'] = $warnings;
-    //}
-    //redirect($_SERVER['HTTP_REFERER']);
-    //echo '<pre>'; var_dump($_POST); echo '</pre>'; die();
+  public function rerfo() {
+    $this->header_data('title', 'Repo Rerfo');
+    $this->header_data('nav', 'repo-rerfo');
+    $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
+    $data['rerfos'] = $this->repo->rerfo_list();
+    $this->template('repo/rerfo_list.php', $data);
   }
 
+  public function rerfo_view($repo_rerfo_id) {
+    $this->header_data('title', 'Repo Rerfo View');
+    $this->header_data('nav', 'repo-rerfo-view');
+    $data['rerfo'] = $this->repo->rerfo($repo_rerfo_id);
+    $rerfo_misc = $data['rerfo'][0]['misc_expenses'];
+    $data['rerfo_number'] = $data['rerfo'][0]['rerfo_number'];
+    $data['rerfo_misc'] = (isset($rerfo_misc)) ? json_decode($rerfo_misc, 1) : NULL;
+
+    $this->template('repo/rerfo_view.php', $data);
+  }
+
+  public function rerfo_misc() {
+    $this->header_data('title', 'Repo Rerfo Misc Expense');
+    $this->header_data('nav', 'repo-rerfo-misc-expense');
+    $data['rerfos'] = $this->repo->rerfo_list();
+
+    if ($this->input->post("save")) {
+      $validation = [
+        [ 'field' => 'repo_rerfo_id', 'label' => 'Rerfo Number', 'rules' => 'required' ],
+        [ 'field' => 'expense_type', 'label' => 'Expense Type', 'rules' => 'required' ],
+        [ 'field' => 'amount', 'label' => 'Misc Expense Amount', 'rules' => 'required' ],
+      ];
+
+      $this->form_validation->set_rules($validation);
+      if ($this->form_validation->run()) {
+        $repo_rerfo_id = $this->input->post('repo_rerfo_id');
+        $expense_id = md5(date('Y-m-d H:m:s'));
+        $output = $this->repo->save_expense([
+          "repo_rerfo_id" => $repo_rerfo_id,
+          "data" => [
+             $expense_id => [
+              "expense_type" => $this->input->post('expense_type'),
+              "amount" => $this->input->post('amount'),
+              "image_path" => '/rms_dir/repo/rerfo/'.$repo_rerfo_id.'/'.$expense_id.'.jpg',
+              "is_deleted" => "0"
+            ]
+          ]
+        ]);
+
+        if ($output) {
+          $this->file->upload('misc', '/repo/rerfo/'.$repo_rerfo_id.'/', $expense_id.'.jpg');
+        }
+      }
+    }
+    $this->template('repo/rerfo_misc.php', $data);
+  }
 }
 
 
