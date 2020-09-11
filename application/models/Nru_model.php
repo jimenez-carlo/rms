@@ -16,15 +16,18 @@ class Nru_model extends CI_Model{
 	{
                 $result = $this->db->query("
                   SELECT
-                    t.*, LEFT(date, 10) AS date, COUNT(*) as sales, payment_method
+                    t.*, LEFT(t.date, 10) AS date, COUNT(*) as sales,
+                    s.payment_method, c.company_code AS company
                   FROM
                     tbl_lto_transmittal t
                   INNER JOIN
-                    tbl_sales ON lto_transmittal = ltid
+                    tbl_sales s ON s.lto_transmittal = t.ltid
+                  INNER JOIN
+                    tbl_company c ON c.cid = t.company
                   WHERE
                     t.region = ".$data['region']." AND status = 2
                   GROUP BY
-                    ltid, payment_method
+                    t.ltid, s.payment_method
                   ORDER BY
                     date desc
                 ")->result_object();
