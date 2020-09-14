@@ -39,6 +39,7 @@ class Repo extends MY_Controller {
   }
 
   public function registration($repo_inventory_id) {
+    $this->access(17);
     $this->header_data('title', 'Repo Registration');
     $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
@@ -244,6 +245,7 @@ HTML;
   }
 
   public function rerfo() {
+    $this->access(17);
     $this->header_data('title', 'Repo Rerfo');
     $this->header_data('nav', 'repo-rerfo');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
@@ -252,6 +254,7 @@ HTML;
   }
 
   public function rerfo_view($repo_rerfo_id) {
+    $this->access(17);
     $this->header_data('title', 'Repo Rerfo View');
     $this->header_data('nav', 'repo-rerfo-view');
     $data['rerfo'] = $this->repo->rerfo($repo_rerfo_id);
@@ -263,6 +266,7 @@ HTML;
   }
 
   public function rerfo_misc() {
+    $this->access(17);
     $this->header_data('title', 'Repo Rerfo Misc Expense');
     $this->header_data('nav', 'repo-rerfo-misc-expense');
     $data['rerfos'] = $this->repo->rerfo_list();
