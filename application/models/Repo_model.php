@@ -220,7 +220,7 @@ SQL;
 
     // CREATE RERFO
     if (!isset($registration['repo_rerfo_id'])) {
-      $rerfo = ['rerfo_number' => $rerfo_num, 'bcode', $_SESSION['branch_code'], 'status' => 'NEW'];
+      $rerfo = ['rerfo_number' => $rerfo_num, 'bcode' => $_SESSION['branch_code'], 'status' => 'NEW'];
       $this->db->insert('tbl_repo_rerfo', $rerfo);
       $registration['repo_rerfo_id'] = $this->db->insert_id();
     }
