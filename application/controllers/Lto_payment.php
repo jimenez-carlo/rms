@@ -32,7 +32,7 @@ class Lto_payment extends MY_Controller {
 		$data['status']  = $this->lto_payment->status;
 		$data['region']  = $this->region;
 		$data['company'] = $this->company;
-
+                $data['acctg'] = in_array($_SESSION['dept_name'], array('Accounting', 'Treasury'));
 		$this->template('lto_payment/list', $data);
 	}
 

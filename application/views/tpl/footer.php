@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
             <footer>
-                <p class="pull-left footer">Registration Monitoring System v2.3.10</p>
+                <p class="pull-left footer">Registration Monitoring System v2.3.11</p>
                 <p class="pull-right footer">&copy; CMC <?php print date('Y'); ?> </p>
             </footer>
         </div>
