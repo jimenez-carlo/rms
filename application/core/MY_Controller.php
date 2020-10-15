@@ -157,7 +157,7 @@ class MY_Controller extends CI_Controller {
 					from tbl_transmittal
 					where status = 0
 					and type <> 2
-					and branch = ".$_SESSION['branch'])->num_rows();
+					and branch = ".$_SESSION['branch_code'])->num_rows();
 				$this->load->view('tpl/nav_ccn', $data);
 				break;
 

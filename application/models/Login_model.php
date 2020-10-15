@@ -86,10 +86,13 @@ SQL;
 
           $query  = <<<SQL
             SELECT
-              u.username, u.password, b.*,
+              u.username, u.password, b.bid, b.b_code
+              ,CONCAT(c.code, ' ', b.name) AS branch_name
+              ,b.rm, b.am_ccod, b.am_csod, b.ch, b.hrbp, b.address,
               p.pid AS position_id, p.name AS position_name,
               ui.*, d.did AS dept_id, d.description AS dept_name,
               c.cid AS company_id, c.code AS company_code
+              ,rr.*
             FROM
               tbl_users u
             INNER JOIN
@@ -102,6 +105,8 @@ SQL;
               tbl_positions p ON ui.position = p.pid
             LEFT JOIN
               tbl_companies c ON b.company = c.cid
+            LEFT JOIN
+              tbl_rrt_region rr ON rr.rrt_region_id = b.rrt_region_id
             WHERE
               username="$username"
 SQL;

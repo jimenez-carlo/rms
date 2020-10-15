@@ -168,15 +168,15 @@ class Dashboard extends MY_Controller {
 
 		// Brand New Sales
 		$data['bnew_rejected'] = $this->db->query("select count(*) as c from tbl_sales
-			where bcode = ".$_SESSION['branch']."
+			where bcode = ".$_SESSION['branch_code']."
 			and (sales_type = 0 or sales_type = 1)
 			and status = 0")->row()->c;
 		$data['bnew_pending'] = $this->db->query("select count(*) as c from tbl_sales
-			where bcode = ".$_SESSION['branch']."
+			where bcode = ".$_SESSION['branch_code']."
 			and (sales_type = 0 or sales_type = 1)
 			and status in (1, 2, 3)")->row()->c;
 		$data['bnew_registered'] = $this->db->query("select count(*) as c from tbl_sales
-			where bcode = ".$_SESSION['branch']."
+			where bcode = ".$_SESSION['branch_code']."
 			and (sales_type = 0 or sales_type = 1)
 			and status = 4")->row()->c;
 
@@ -216,7 +216,7 @@ class Dashboard extends MY_Controller {
 		$result = $this->db->query("SELECT count(*) as count, case when received_date is null then 'transmitted' else 'received' end as status
 			FROM tbl_sales
 			inner join tbl_topsheet t on tid = topsheet
-			where bcode = ".$_SESSION['branch']."
+			where bcode = ".$_SESSION['branch_code']."
 			and t.transmittal_date is not null
 			group by 2")->result_object();
 

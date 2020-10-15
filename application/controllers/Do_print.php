@@ -121,7 +121,7 @@ class Do_print extends CI_Controller {
 
 	public function top_sheet($exp_date)
 	{
-		$bid = $_SESSION['branch'];
+		$bid = $_SESSION['branch_code'];
 
 		if (!empty($exp_date) && !empty($bid))
 		{
