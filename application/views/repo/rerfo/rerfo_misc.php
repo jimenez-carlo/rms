@@ -20,16 +20,26 @@
             <div class="control-group">
               <label class="control-label">Type</label>
               <div class="controls">
-                <select name="expense_type">
-                  <option value="Voucher Transportation">Voucher Transportation</option>
-                  <option value="Others">Others</option>
+                <select id="misc-type" name="expense_type">
+                  <option value="Transportation" <?php echo set_select('expense_type', 'Transportation', true); ?> >Transportation</option>
+                  <option value="Meals" <?php echo set_select('expense_type', 'Meals'); ?> >Meals</option>
+                  <option value="Xerox" <?php echo set_select('expense_type', 'Xerox'); ?> >Xerox</option>
+                  <option value="Tip: ORCR" <?php echo set_select('expense_type', 'Tip: ORCR'); ?> >Tip: ORCR</option>
+                  <option value="Tip: PNP/HPG" <?php echo set_select('expense_type', 'Tip: PNP/HPG'); ?> >Tip: PNP/HPG</option>
+                  <option value="Others" <?php echo set_select('expense_type', 'Others'); ?> >Others</option>
                 </select>
+              </div>
+            </div>
+            <div id="input-other" class="control-group <?php echo $hidden; ?>">
+              <label class="control-label">Others</label>
+              <div class="controls">
+                <input id="other" name="others" type="text" placeholder="Input Misc Expense" value="<?php echo set_value('others'); ?>" <?php echo $disabled; ?>>
               </div>
             </div>
             <div class="control-group">
               <label class="control-label">Amount</label>
               <div class="controls">
-                <input name="amount" type="text" placeholder="0.00">
+                <input name="amount" type="text" placeholder="0.00" value="<?php echo set_value('amount'); ?>">
               </div>
             </div>
             <div class="form-actions">
@@ -52,3 +62,16 @@
     </div>
   </div>
 </div>
+
+<script>
+$('#misc-type').on('change', function() {
+  var misc = $(this).val();
+  if (misc === 'Others') {
+    $('#input-other').removeClass('hidden');
+    $('#other').prop('disabled',false);
+  } else {
+    $('#input-other').addClass('hidden');
+    $('#other').prop('disabled',true);
+  }
+});
+</script>

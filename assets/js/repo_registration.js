@@ -159,9 +159,18 @@ function check_length(value) {
   }
 }
 
-function disable_save() {
-
-}
+$('#date-regn').on('focusout', function(){
+  $.ajax({
+    url: BASE_URL+'repo/get_expiration',
+    type: "POST",
+    data: { registration_date: $(this).val() },
+    dataType: 'json',
+    success: function(data) {
+      $('#regn-status').removeClass('error warning success').addClass(data.status);
+      $('#status-message').empty().append(data.message);
+    }
+  });
+});
 
 function repo_sales(bool) {
   $(' \
@@ -180,7 +189,20 @@ $(document).ready(function(){
     "oLanguage": {
       "sLengthMenu": "_MENU_ records per page"
     },
+    "bSort": false,
     "iDisplayLength": 5,
     "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+  });
+});
+
+$('#history').on('click', function(e){
+  e.preventDefault();
+  $.ajax({
+    url: BASE_URL+'repo/history/'+$(this).val(),
+    type: "POST",
+    dataType: 'json',
+    success: function(data) {
+      console.log(JSON.stringify(data, null, 2));
+    }
   });
 });

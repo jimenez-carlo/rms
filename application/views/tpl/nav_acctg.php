@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-$dir = base_url();
 ?>
         <div class="navbar navbar-fixed-top navbar-cmc">
             <div class="navbar-inner">
@@ -9,7 +8,7 @@ $dir = base_url();
                      <span class="icon-bar"></span>
                      <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="<?php if(isset($dir)) echo $dir; ?>">RMS</a>
+                    <a class="brand" href="<?php echo base_url(); ?>">RMS</a>
                     <div class="nav-collapse collapse">
                         <ul class="nav pull-right">
                             <li class="dropdown <?php if(isset($nav) && $nav=="profile") echo 'active'; ?>">
@@ -18,11 +17,11 @@ $dir = base_url();
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>profile">Profile</a>
+                                        <a tabindex="-1" href="<?php echo base_url('profile'); ?>">Profile</a>
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>logout">Logout</a>
+                                        <a tabindex="-1" href="<?php echo base_url('logout'); ?>">Logout</a>
                                     </li>
                                 </ul>
                             </li>
@@ -32,8 +31,12 @@ $dir = base_url();
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Projected Funds <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>projected_fund">Create CA</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>projected_fund/ca_list">CA List</a>
+                                        <a tabindex="-1" href="<?php echo base_url('projected_fund'); ?>">Create Bnew CA</a>
+                                        <a tabindex="-1" href="<?php echo base_url('projected_fund/ca_list'); ?>">CA List</a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/ca'); ?>">Create Repo CA</a>
                                     </li>
                                 </ul>
                             </li>
@@ -42,9 +45,9 @@ $dir = base_url();
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">LTO Payment <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>lto_payment">Overview</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>lto_payment/pending">Pending List</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>lto_payment/liquidation">Liquidation</a>
+                                        <a tabindex="-1" href="<?php echo base_url('lto_payment'); ?>">Overview</a>
+                                        <a tabindex="-1" href="<?php echo base_url('lto_payment/pending'); ?>">Pending List</a>
+                                        <a tabindex="-1" href="<?php echo base_url('lto_payment/liquidation'); ?>">Liquidation</a>
                                     </li>
                                 </ul>
                             </li>
@@ -64,19 +67,19 @@ $dir = base_url();
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Liquidation <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>liquidation">Monitoring</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>return_fund">Return Fund</a>
+                                        <a tabindex="-1" href="<?php echo base_url('liquidation'); ?>">Monitoring</a>
+                                        <a tabindex="-1" href="<?php echo base_url('return_fund'); ?>">Return Fund</a>
                                     </li>
                                 </ul>
                             </li>
                             <li class="dropdown">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Disapprove<i class="caret"></i></a>
                                 <ul class="dropdown-menu">
-                                  <li><a href="<?php echo base_url(); ?>disapprove/resolve">View Resolve</a></li>
-                                  <li><a href="<?php echo base_url(); ?>disapprove">View Disapprove</a></li>
+                                  <li><a href="<?php echo base_url('disapprove/resolve'); ?>">View Resolve</a></li>
+                                  <li><a href="<?php echo base_url('disapprove'); ?>">View Disapprove</a></li>
                                 </ul>
                             </li>
-                            <li><a href="./actual_docs">Actual Docs</a></li>
+                            <li><a href="<?php echo base_url('actual_docs'); ?>">Actual Docs</a></li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

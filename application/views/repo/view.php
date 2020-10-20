@@ -5,7 +5,7 @@
     <!-- block -->
     <div class="block">
       <div class="navbar navbar-inner block-header">
-          <div class="pull-left">Repo Registration</div>
+        <div class="pull-left">Repo View</div>
       </div>
       <div class="block-content collapse in">
         <fieldset class="span6">
@@ -42,36 +42,21 @@
           <br>
           <div class="form-inline row">
             <div class="control-group span4 offset1">
-              <label class="control-label" for="date-sold">Date Sold</label>
-              <div class="controls">
-                <input type="text" value="<?php echo $repo['date_sold']; ?>" disabled>
-              </div>
-            </div>
-            <div class="control-group span4" style="margin-left:2rem;">
-              <label class="control-label">Date Registered</label>
-              <div class="controls">
-                <input type="text" value="<?php echo $repo['date_registered']; ?>" disabled>
-                <span class="help-inline">
-                  <span class="text-<?php echo $repo['expire_status']; ?>">
-                    <?php if($repo['expire_status'] === 'error'): ?>
-                      <strong><?php echo $repo['expire_message']; ?></strong>
-                    <?php else: ?>
-                      <strong>Expire in:</strong><?php echo $repo['expire_message']; ?>
-                    <?php endif; ?>
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-inline row">
-            <div class="control-group span4 offset1">
               <label class="control-label">RSF#</label>
               <div class="controls">
                 <input type="text" <?php echo 'value="'.$repo['rsf_num'].'"'; ?> disabled>
               </div>
             </div>
             <div class="control-group span4" style="margin-left:2rem;">
+              <label class="control-label" for="date-sold">Date Sold</label>
+              <div class="controls">
+                <input type="text" value="<?php echo $repo['date_sold']; ?>" disabled>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-inline row">
+            <div class="control-group span4 offset1">
               <label class="control-label" for="get-cust">Customer Code</label>
               <div class="controls">
                 <input type="text" <?php echo 'value="'.$repo['cust_code'].'"'; ?> disabled>
@@ -95,7 +80,6 @@
               </div>
             </div>
           </div>
-
           <div class="form-inline row">
             <div class="control-group span4 offset1">
               <label class="control-label">AR#</label>
@@ -113,24 +97,33 @@
 
           <div class="form-inline row">
             <div class="control-group span4 offset1">
+              <label class="control-label">Date Registered</label>
+              <div class="controls">
+                <input type="text" value="<?php echo $repo['date_registered']; ?>" disabled>
+                <span class="help-inline">
+                  <span class="text-<?php echo $repo['expire_status']; ?>">
+                    <?php if($repo['expire_status'] === 'error'): ?>
+                      <strong><?php echo $repo['expire_message']; ?></strong>
+                    <?php else: ?>
+                      <strong>Expire in:</strong><?php echo $repo['expire_message']; ?>
+                    <?php endif; ?>
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <div class="control-group span4" style="margin-left:2rem;">
               <label class="control-label">Registration</label>
               <div class="controls">
                 <input type="text" value="<?php echo $repo['registration_amt']; ?>" disabled>
               </div>
             </div>
-
-            <div class="control-group span4" style="margin-left:2rem;">
-              <label class="control-label">PNP Clearance</label>
-              <div class="controls">
-                <input type="text" value="<?php echo $repo['pnp_clearance_amt']; ?>" disabled>
-              </div>
-            </div>
           </div>
           <div class="form-inline row">
             <div class="control-group span4 offset1">
-              <label class="control-label">Macro Etching</label>
+              <label class="control-label">PNP Clearance</label>
               <div class="controls">
-                <input type="text" value="<?php echo $repo['macro_etching_amt']; ?>" disabled>
+                <input type="text" value="<?php echo $repo['pnp_clearance_amt']; ?>" disabled>
               </div>
             </div>
 
@@ -149,48 +142,51 @@
               </div>
             </div>
             <div class="control-group span4" style="margin-left:2rem;">
-              <label class="control-label" for="tip-amount">Tip</label>
+              <label class="control-label">Macro Etching</label>
               <div class="controls">
-                <input id="tip-amount" type="text" value="<?php echo $repo['rr_tip_amt']; ?>" disabled>
+                <input type="text" value="<?php echo $repo['macro_etching_amt']; ?>" disabled>
               </div>
             </div>
           </div>
         </fieldset>
+        <?php if($attachment): ?>
         <div class="span6" style="overflow-x:auto; height: 700px; border:solid 0.1rem;">
-           <div class="control-group row" style="margin-left:8rem;">
-             <label class="control-label">Registration OR:</label>
-             <div class="controls">
-               <img class="img-rounded" src="<?php echo $registration_or; ?>" alt="Registration OR"/>
-             </div>
-           </div>
-
-           <div class="control-group row" style="margin-left:8rem;">
-             <label class="control-label">PNP Clearance:</label>
-             <div class="controls">
-               <img src="<?php echo $pnp_clearance; ?>" alt="PNP Clearance"/>
-             </div>
-           </div>
-
-           <div class="control-group row" style="margin-left:7.4rem;">
-             <label class="control-label">Macro Etching:</label>
-             <div class="controls">
-               <img src="<?php echo $macro_etching; ?>" alt="Macro Etching"/>
-             </div>
-           </div>
-
-           <div class="control-group row" style="margin-left:8rem;">
-             <label class="control-label">Insurance OR:</label>
-             <div class="controls">
-               <img src="<?php echo $insurance_or; ?>" alt="Insurance OR"/>
-             </div>
-           </div>
-           <div class="control-group row" style="margin-left:8rem;">
-             <label class="control-label">Emission OR:</label>
-             <div class="controls">
-               <img src="<?php echo $emission_or; ?>" alt="Emission OR"/>
-             </div>
-           </div>
+          <div class="control-group row" style="margin-left:8rem;">
+            <label class="control-label">Registration OR:</label>
+            <div class="controls">
+              <img class="img-rounded" src="<?php echo $registration_or; ?>" alt="Registration OR"/>
+            </div>
+          </div>
+          <hr>
+          <div class="control-group row" style="margin-left:8rem;">
+            <label class="control-label">PNP Clearance:</label>
+            <div class="controls">
+              <img src="<?php echo $pnp_clearance; ?>" alt="PNP Clearance"/>
+            </div>
+          </div>
+          <hr>
+          <div class="control-group row" style="margin-left:7.4rem;">
+            <label class="control-label">Macro Etching:</label>
+            <div class="controls">
+              <img src="<?php echo $macro_etching; ?>" alt="Macro Etching"/>
+            </div>
+          </div>
+          <hr>
+          <div class="control-group row" style="margin-left:8rem;">
+            <label class="control-label">Insurance OR:</label>
+            <div class="controls">
+              <img src="<?php echo $insurance_or; ?>" alt="Insurance OR"/>
+            </div>
+          </div>
+          <hr>
+          <div class="control-group row" style="margin-left:8rem;">
+            <label class="control-label">Emission OR:</label>
+            <div class="controls">
+              <img src="<?php echo $emission_or; ?>" alt="Emission OR"/>
+            </div>
+          </div>
         </div>
+        <?php endif; ?>
       </div>
     </div>
   </div>

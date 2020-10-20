@@ -5,7 +5,7 @@
       <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
     <div class="navbar navbar-inner block-header">
-        <div class="pull-left">Repo Inventory</div>
+      <div class="pull-left">Repo Rerfo</div>
     </div>
     <h2>RERFO# <?php echo $rerfo_number; ?></h2>
     <table class="table">
@@ -48,12 +48,13 @@
     </table>
     <hr>
     <h2>Miscellaneous Expense</h2>
+    <?php if(isset($rerfo_misc)): ?>
     <table class="table">
       <thead>
         <tr>
-          <td>Type</td>
-          <td>Amount</td>
-          <td>Status</td>
+          <th>Type</th>
+          <th>Amount</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -61,10 +62,13 @@
         <tr>
           <td><?php echo $misc['expense_type']; ?></td>
           <td><?php echo $misc['amount']; ?></td>
-          <td>Status</td>
+          <td><?php echo $misc['status']; ?></td>
         </tr>
         <?php endforeach; ?>
       </tbody>
     </table>
+    <?php else: ?>
+      <p>No misc expense.</p>
+    <?php endif; ?>
   </div>
 </div>
