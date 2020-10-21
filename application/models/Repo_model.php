@@ -96,42 +96,6 @@ class Repo_model extends CI_Model {
     return $engine_details;
   }
 
-
-  public function insert_history($engine_id) {
-    $engine_count = $this->db->select()
-      ->from('tbl_sales_history')
-      ->where('eid = '.$engine_id)
-      ->get()->num_rows();
-    if ($engine_count === 0) {
-      $result = $this->db->query("
-        SELECT
-          sid, engine AS eid, customer AS cid, bcode, bname, 'BNEW' AS sales_type,
-          DATE_FORMAT(date_sold, '%Y-%m-%d') AS date_sold,
-          DATE_FORMAT(registration_date, '%Y-%m-%d') AS date_registered
-        FROM
-          tbl_sales
-        WHERE
-          engine = {$engine_id}
-        ORDER BY sid DESC LIMIT 1
-      ")->row_array();
-
-      if (!empty($result)) {
-        $this->db->insert('tbl_sales_history', $result);
-      } else {
-        echo json_encode(['error' => 'Engine not found']); exit;
-      }
-    }
-
-    $this->db->query("
-      INSERT
-        tbl_sales_history
-        SELECT
-          NULL, eid, cid, bcode, bname, 'REPO', NULL, NULL
-        FROM
-          tbl_repo_sales WHERE eid = {$engine_id}
-    ");
-  }
-
   public function claim($engine_id) {
     $get_repo = <<<SQL
       SELECT
@@ -164,12 +128,13 @@ SQL;
       $data['repo_inventory_id'] = $this->db->insert_id();
 
       $select = "
-        s.sid, s.bcode, s.bname, s.date_sold,
+        s.sid, s.bcode, s.bname, r.region,
+        DATE_FORMAT(s.date_sold, '%Y-%m-%d') AS date_sold,
         DATE_FORMAT(s.cr_date, '%Y-%m-%d') AS date_registered,
-        r.region, c.cid, c.first_name, c.middle_name,
+        c.cid, c.cust_code, c.first_name, c.middle_name,
         c.last_name, e.*
 ";
-      $this->history(
+      $this->insert_history(
         $data['repo_inventory_id'],
         'BNEW',
         $this->db->select($select)
@@ -180,7 +145,7 @@ SQL;
         ->row_array()
       );
 
-      $this->history(
+      $this->insert_history(
         $data['repo_inventory_id'],
         'REPO_IN',
         $this->db->get_where('tbl_repo_inventory ri','ri.repo_inventory_id = '.$data['repo_inventory_id'])->row_array()
@@ -284,15 +249,25 @@ SQL;
 
     $this->db->query($update_qry);
 
-    $this->history(
+    $this->insert_history(
       $repo_inventory_id,
       'REGISTERED',
-      $this->db->get_where(
-        'tbl_repo_registration',
-        [
-          'repo_registration_id' => $registration['repo_registration_id']
-        ]
-      )->row_array()
+      $this
+        ->db
+        ->select("
+          ri.*, rr.repo_registration_id, rr.repo_rerfo_id,
+          rr.date_registered, rr.date_uploaded, rr.registration_type,
+          rr.registration_amt, rr.pnp_clearance_amt, rr.emission_amt,
+          rr.insurance_amt, rr.macro_etching_amt, rr.attachment,
+          DATE_FORMAT(rr.date_created, '%Y-%m-%d') AS date_created
+        ")
+        ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rr.repo_inventory_id', 'left')
+        ->get_where(
+          'tbl_repo_registration rr',
+          [
+            'rr.repo_registration_id' => $registration['repo_registration_id']
+          ]
+        )->row_array()
     );
 
     $this->db->trans_complete();
@@ -314,13 +289,23 @@ SQL;
 
     // REPO SALES
     if ($this->db->insert('tbl_repo_sales', $sales['repo_sale'])) {
-      $this->history(
+      $this->insert_history(
         $sales['repo_sale']['repo_inventory_id'],
         'REPO_SALES',
-        $this->db->get_where(
-          'tbl_repo_sales',
-          [ 'repo_sales_id' => $this->db->insert_id() ]
-        )->row_array()
+        $this
+          ->db
+          ->select("
+            c.*, ri.*, rs.repo_sales_id,
+            rs.rsf_num, rs.ar_num, rs.ar_amt,
+            rs.date_sold, DATE_FORMAT(rs.date_created, '%Y-%m-%d') AS date_created
+          ")
+          ->join('tbl_customer c', 'c.cid = rs.customer_id', 'join')
+          ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id', 'join')
+          ->get_where(
+            'tbl_repo_sales rs',
+            [ 'rs.repo_sales_id' => $this->db->insert_id() ]
+          )
+          ->row_array()
       );
     }
   }
@@ -527,7 +512,7 @@ SQL;
     return $this->db->status();
   }
 
-  private function history($repo_inventory_id, $action, array $logs) {
+  private function insert_history($repo_inventory_id, $action, array $logs) {
     $data = [
       'repo_inventory_id' => $repo_inventory_id,
       'user' => $_SESSION['username'],
@@ -537,4 +522,15 @@ SQL;
     $this->db->insert('tbl_repo_history', $data);
   }
 
+  public function get_history($repo_inventory_id) {
+    return $this
+      ->db
+      ->select('
+        repo_history_id, repo_inventory_id,
+        user, action, data,
+        DATE_FORMAT(date_created, "%Y-%m-%d") AS date_created
+      ')
+      ->get_where('tbl_repo_history', ['repo_inventory_id' => $repo_inventory_id])
+      ->result_array();
+  }
 }

@@ -13,7 +13,6 @@
             <legend>
               <p class="offset4" style="margin-top:0;margin-bottom:0;">
                 Rerfo# <?php echo $_SESSION['branch_code'].'-'.date('Ymd'); ?>
-                <button id="history" class="btn btn-warning" style="margin-left:20px;font-size:14px" value="<?php echo 1; ?>">History</button>
               </p>
             </legend>
             <div class="form-inline row">

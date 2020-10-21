@@ -78,7 +78,7 @@ class Repo extends MY_Controller {
         if (!$this->db->trans_status()) {
           redirect($_SERVER['HTTP_REFERER']);
         }
-
+        // Todo Add success message Success!!! (Engine #) Sold.
         $_SESSION['messages'][] = 'Success!!!';
         redirect('repo/inventory');
       }
@@ -91,7 +91,7 @@ class Repo extends MY_Controller {
     $data['repo']['expire_status'] = $expire['status'];
     $data['repo']['expire_message'] = $expire['message'];
     $data['disable'] = 'disabled';
-    $this->template('repo/sales.php', $data);
+    $this->template('repo/sales', $data);
   }
 
   public function registration($repo_inventory_id) {
@@ -138,6 +138,8 @@ class Repo extends MY_Controller {
     $this->header_data('nav', 'repo-view');
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, NULL);
+    $data['histories'] = $this->repo->get_history($repo_inventory_id);
+    //echo '<pre>'; var_dump($data['histories']); echo '</pre>'; die();
     if (isset($data['repo']['attachment'])) {
       $data['attachment'] = true;
       foreach (json_decode($data['repo']['attachment'], 1) as $key => $attach) {
@@ -396,12 +398,6 @@ HTML;
 
   public function get_expiration() {
     echo json_encode($this->repo->expiration($this->input->post('registration_date')));
-  }
-
-  public function history($repo_inventory_id) {
-    $this->load->model('Sales_history_model', 'sales_history');
-    $foo = json_encode($this->sales_history->repo($repo_inventory_id));
-    echo $foo;
   }
 
   public function ca() {

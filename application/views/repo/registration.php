@@ -13,7 +13,6 @@
           <fieldset>
             <legend>
               Rerfo# <?php echo $repo['rerfo_number']; ?>
-              <button id="history" class="btn btn-warning" style="margin-left:20px;font-size:14px" value="<?php echo 1; ?>">History</button>
             </legend>
             <div class="form-inline row">
               <div class="control-group span2 offset1">
