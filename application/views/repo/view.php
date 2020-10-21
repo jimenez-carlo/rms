@@ -8,12 +8,12 @@
         <div class="pull-left">Repo View</div>
       </div>
       <ul class="nav nav-tabs">
-        <li><a href="#view" data-toggle="tab">View</a></li>
-        <li class="active"><a href="#history" data-toggle="tab">History</a></li>
+        <li class="active"><a href="#view" data-toggle="tab">View</a></li>
+        <li ><a href="#history" data-toggle="tab">History</a></li>
       </ul>
       <div class="tab-content">
 
-        <div class="tab-pane" id="view">
+        <div class="tab-pane active" id="view">
           <div class="block-content collapse in">
             <fieldset class="span6">
               <div class="form-inline row">
@@ -196,7 +196,7 @@
           </div>
         </div>
 
-        <div class="tab-pane active" id="history">
+        <div class="tab-pane" id="history">
           <div class="block-content collapse in">
             <?php foreach($histories AS $history): ?>
               <?php
