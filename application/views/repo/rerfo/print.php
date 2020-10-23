@@ -174,21 +174,27 @@
       </thead>
       <tbody>
         <?php
-          $misc_expenses = json_decode($rerfo['misc_expenses'], true);
           $tot_exp = 0;
-          foreach ($misc_expenses as $expense) {
-            if ($expense['is_deleted'] !== "1") {
-              echo '<tr>
-                      <td>'.$expense['expense_type'].'</td>
-                      <td>'.number_format($expense['amount'], 2, '.', ',').'</td>
-                    </tr>';
-              $tot_exp += $expense['amount'];
+          $misc_expenses = json_decode($rerfo['misc_expenses'], true);
+          if (!empty($misc_expenses)) {
+            foreach ($misc_expenses as $expense) {
+              if ($expense['is_deleted'] !== "1") {
+                echo '<tr>
+                        <td>'.$expense['expense_type'].'</td>
+                        <td>'.number_format($expense['amount'], 2, '.', ',').'</td>
+                      </tr>';
+                $tot_exp += $expense['amount'];
+              }
             }
+            echo '<tr>
+                    <td>Total</td>
+                    <td>&#x20b1 '.number_format($tot_exp, 2, '.', ',').'</td>
+                  </tr>';
+          } else {
+            echo '<tr>
+                    <td colspan="2">No misc expense.</td>
+                  </tr>';
           }
-          echo '<tr>
-                  <td>Total</td>
-                  <td>&#x20b1 '.number_format($tot_exp, 2, '.', ',').'</td>
-                </tr>';
         ?>
       </tbody>
       <tfoot>
