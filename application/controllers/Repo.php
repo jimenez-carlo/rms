@@ -20,8 +20,6 @@ class Repo extends MY_Controller {
 
     $repo_inventory = [];
     $repo_all = $this->repo->all();
-    //echo '<pre>'; var_dump($this->db->last_query()); echo '</pre>';
-    //echo '<pre>'; var_dump($repo_all); echo '</pre>'; die();
     foreach ($repo_all as $repo) {
       $expiry = $this->repo->expiration($repo['date_registered']);
       $repo['status'] = $expiry['status'];
@@ -111,6 +109,12 @@ class Repo extends MY_Controller {
         [ 'field' => 'repo_registration[date_registered]', 'label' => 'Registration Date', 'rules' => 'required' ],
       ];
 
+      $tip = $this->repo->get_tip_matrix($_SESSION['rrt_region_id']);
+      if (isset($tip)) {
+        $validation[] =  [ 'field' => 'repo_registration[or_tip]', 'label' => 'OR Tip', 'rules' => 'required|numeric|less_than_equal_to['.$tip['repo_or'].']' ];
+        $validation[] =  [ 'field' => 'repo_registration[pnp_tip]', 'label' => 'PNP Tip', 'rules' => 'required|numeric|less_than_equal_to['.$tip['repo_or'].']' ];
+      }
+
       $this->form_validation->set_rules($validation);
       if ($this->form_validation->run()) {
         $repo_registration_id = $this->repo->save_registration(
@@ -118,8 +122,8 @@ class Repo extends MY_Controller {
           $this->input->post('repo_registration')
         );
         $upload_attachments = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
+        redirect('repo/view/'.$repo_inventory_id);
       }
-      redirect('repo/view/'.$repo_inventory_id);
     }
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'SALES');
@@ -343,23 +347,6 @@ HTML;
         $repo_rerfo_id = $this->input->post('repo_rerfo_id');
         $expense_id = md5(date('Y-m-d H:m:s'));
 
-        switch ($expense_type) {
-          case 'Tip: ORCR':
-          case 'Tip: PNP/HPG':
-            $upload = true;
-            $img_path = NULL;
-            break;
-          case 'Others':
-            $expense_type = $expense_type.': '.$this->input->post('others');
-            $upload = $this->file->upload('misc', '/repo/rerfo/'.$repo_rerfo_id.'/', $expense_id.'.jpg');
-            $img_path = ($upload === false) ? NULL : '/rms_dir/repo/rerfo/'.$repo_rerfo_id.'/'.$expense_id.'.jpg';
-            $upload = true;
-            break;
-          default:
-            $upload = $this->file->upload('misc', '/repo/rerfo/'.$repo_rerfo_id.'/', $expense_id.'.jpg');
-            $img_path = '/rms_dir/repo/rerfo/'.$repo_rerfo_id.'/'.$expense_id.'.jpg';
-        }
-
         if ($upload) {
           $misc_saved = $this->repo->save_expense([
             "repo_rerfo_id" => $repo_rerfo_id,
@@ -390,9 +377,9 @@ HTML;
     $this->template('repo/rerfo/rerfo_misc', $data);
   }
 
-  public function rerfo_print($rerfo_id) {
-    $data = $this->repo->print_rerfo($rerfo_id);
-    //echo '<pre>'; var_dump($data); echo '</pre>'; die();
+  public function rerfo_print($repo_rerfo_id) {
+    $data = $this->repo->print_rerfo($repo_rerfo_id);
+    //echo '<pre>'; var_dump(json_decode($data['rerfo']['misc_expenses'], true)); echo '</pre>'; die();
     $this->load->view('repo/rerfo/print', $data);
   }
 

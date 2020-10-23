@@ -231,13 +231,15 @@ SQL;
         tbl_repo_registration rr,
         tbl_repo_inventory ri
       SET
-        ri.status = 'Registered',
+        ri.status = 'REGISTERED',
         rr.date_registered = '{$registration['date_registered']}',
         rr.registration_amt = {$registration['registration_amt']},
         rr.pnp_clearance_amt = {$registration['pnp_clearance_amt']},
         rr.insurance_amt = {$registration['insurance_amt']},
         rr.emission_amt = {$registration['emission_amt']},
         rr.macro_etching_amt = {$registration['macro_etching_amt']},
+        rr.or_tip = {$registration['or_tip']},
+        rr.pnp_tip = {$registration['pnp_tip']},
         rr.date_uploaded = NOW(),
         rr.registration_type = 'RENEW & TRANSFER',
         rr.attachment = '{$registration['attachment']}'
@@ -359,7 +361,7 @@ SQL;
       ->get()->result_array();
   }
 
-  public function rerfo($rerfo_id)
+  public function rerfo($repo_rerfo_id)
   {
     return
       $this->db
@@ -370,7 +372,7 @@ SQL;
       ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
       ->join('tbl_engine e', 'ri.engine_id = e.eid', 'left')
       ->join('tbl_customer c', 'rs.customer_id = c.cid', 'left')
-      ->where('ri.bcode = '.$_SESSION['branch_code'])
+      ->where('rrf.repo_rerfo_id = '.$repo_rerfo_id .' AND ri.bcode = '.$_SESSION['branch_code'])
       ->get()->result_array();
   }
 
@@ -396,7 +398,7 @@ SQL;
     return [
       'rerfo' => $this->db
                       ->select("
-                        repo_rerfo_id, rerfo_number, bcode, bname,
+                        repo_rerfo_id, rerfo_number, bcode, bname, misc_expenses,
                         DATE_FORMAT(date_created,'%Y-%m-%d') AS date_created
                       ")
                       ->where('repo_rerfo_id = '.$rerfo_id)
@@ -533,4 +535,9 @@ SQL;
       ->get_where('tbl_repo_history', ['repo_inventory_id' => $repo_inventory_id])
       ->result_array();
   }
+
+  public function get_tip_matrix($region_id) {
+    return $this->db->get_where('tbl_tip', 'region_id = '. $region_id)->row_array();
+  }
+
 }

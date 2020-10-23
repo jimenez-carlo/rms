@@ -24,8 +24,6 @@
                   <option value="Transportation" <?php echo set_select('expense_type', 'Transportation', true); ?> >Transportation</option>
                   <option value="Meals" <?php echo set_select('expense_type', 'Meals'); ?> >Meals</option>
                   <option value="Xerox" <?php echo set_select('expense_type', 'Xerox'); ?> >Xerox</option>
-                  <option value="Tip: ORCR" <?php echo set_select('expense_type', 'Tip: ORCR'); ?> >Tip: ORCR</option>
-                  <option value="Tip: PNP/HPG" <?php echo set_select('expense_type', 'Tip: PNP/HPG'); ?> >Tip: PNP/HPG</option>
                   <option value="Others" <?php echo set_select('expense_type', 'Others'); ?> >Others</option>
                 </select>
               </div>

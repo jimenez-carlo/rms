@@ -110,18 +110,16 @@
           <th><p>Engine #</p></th>
           <th><p>Target</p></th>
           <th><p>Amount Given</p></th>
-          <th><p>LTO Registration</p></th>
+          <th><p>LTO OR</p></th>
           <th><p>PNP Clearance</p></th>
           <th><p>Insurance</p></th>
           <th><p>Macro Etching</p></th>
           <th><p>Emission</p></th>
-          <th><p>Balance</p></th>
         </tr>
       </thead>
       <tbody>
         <?php
-        $bal = 0;
-        $tot_tgt = $tot_amt = $tot_ins = $tot_reg = $tot_tip = $tot_bal = 0;
+        $tot_tgt = $tot_ar = $tot_or = $tot_pnp = $tot_ins = $tot_macr = $tot_emi = 0;
         foreach ($rerfo_engines as $rerfo_engine)
         {
           print '<tr>';
@@ -132,24 +130,22 @@
           print '<td>'.$rerfo_engine['cust_code'].'</td>';
           print '<td>'.$rerfo_engine['first_name'].' '.$rerfo_engine['last_name'].'</td>';
           print '<td>'.$rerfo_engine['engine_no'].'</td>';
-          print '<td style="text-align: right">1,500.00</td>';
+          print '<td style="text-align: right">3,600.00</td>'; // TODO Should be query in database.
           print '<td style="text-align: right">'.number_format($rerfo_engine['ar_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($rerfo_engine['registration_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($rerfo_engine['pnp_clearance_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($rerfo_engine['macro_etching_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($rerfo_engine['emission_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($rerfo_engine['insurance_amt'], 2, '.', ',').'</td>';
-
-          //$bal = 1500 - 300 - $sales->registration - $sales->tip;
-          print '<td style="text-align: right">'.number_format($bal, 2, '.', ',').'</td>';
           print '</tr>';
 
-          //$tot_tgt += 1500;
-          //$tot_amt += $sales->amount;
-          //$tot_ins += 300;
-          //$tot_reg += $sales->registration;
-          //$tot_tip += $sales->tip;
-          //$tot_bal += $bal;
+          $tot_tgt  += 3600;
+          $tot_ar   += $rerfo_engine['ar_amt'];
+          $tot_or   += $rerfo_engine['registration_amt'];
+          $tot_pnp  += $rerfo_engine['pnp_clearance_amt'];
+          $tot_macr += $rerfo_engine['macro_etching_amt'];
+          $tot_emi  += $rerfo_engine['emission_amt'];
+          $tot_ins  += $rerfo_engine['insurance_amt'];
         }
         ?>
         <tr>
@@ -160,27 +156,46 @@
           <td></td>
           <td></td>
           <td></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_tgt, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_amt, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_ins, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_reg, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_bal, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_bal, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_bal, 2, ".", ","); ?></td>
-          <td style="text-align: right">&#x20b1 <?php //print number_format($tot_bal, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_tgt, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_ar, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_or, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_pnp, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_macr, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_emi, 2, ".", ","); ?></td>
+          <td style="text-align: right">&#x20b1 <?php print number_format($tot_ins, 2, ".", ","); ?></td>
         </tr>
       </tbody>
       <thead>
         <tr><th colspan="12">Miscellaneous Expense</th></tr>
-        <tr><th>aa</th></tr>
+        <tr>
+          <th>Type</th>
+          <th>Amount</th>
+        </tr>
       </thead>
       <tbody>
-        <tr><td>sss</td></tr>
+        <?php
+          $misc_expenses = json_decode($rerfo['misc_expenses'], true);
+          $tot_exp = 0;
+          foreach ($misc_expenses as $expense) {
+            if ($expense['is_deleted'] !== "1") {
+              echo '<tr>
+                      <td>'.$expense['expense_type'].'</td>
+                      <td>'.number_format($expense['amount'], 2, '.', ',').'</td>
+                    </tr>';
+              $tot_exp += $expense['amount'];
+            }
+          }
+          echo '<tr>
+                  <td>Total</td>
+                  <td>&#x20b1 '.number_format($tot_exp, 2, '.', ',').'</td>
+                </tr>';
+        ?>
       </tbody>
       <tfoot>
+        <?php $tot_gran = $tot_or + $tot_pnp + $tot_ins + $tot_macr + $tot_emi + $tot_exp; ?>
         <tr class="tot-row">
           <th colspan="9">Total Expenses</th>
-          <th colspan="6" style="text-align: right">&#x20b1 <?php //print number_format($tot_reg, 2, ".", ","); ?></th>
+          <th colspan="6" style="text-align: right">&#x20b1 <?php print number_format($tot_gran, 2, ".", ","); ?></th>
         </tr>
         <tr><th colspan="12"><br><br></th></tr>
         <tr>

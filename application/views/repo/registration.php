@@ -163,7 +163,7 @@
             </div>
             <div class="form-inline row">
               <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[emission_amt]')) ? 'error' : ''; ?>">
-                <label class="control-label" for="emmission-amount">Emission</label>
+                <label class="control-label" for="emission-amount">Emission</label>
                 <div class="controls">
                   <input id="emission-amount" type="text" name="repo_registration[emission_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[emission_amt]', ''); ?>" required>
                 </div>
@@ -173,6 +173,22 @@
                 <label class="control-label" for="macro-etching-amount">Macro Etching</label>
                 <div class="controls">
                   <input id="macro-etching-amount" type="text" name="repo_registration[macro_etching_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[macro_etching_amt]', ''); ?>" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-inline row">
+              <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[or_tip]')) ? 'error' : ''; ?>">
+                <label class="control-label" for="or-tip">OR Tip</label>
+                <div class="controls">
+                  <input id="or-tip" type="text" name="repo_registration[or_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[or_tip]', ''); ?>" required>
+                </div>
+              </div>
+
+              <div class="control-group span2 <?php echo (form_error('repo_registration[macro_etching_amt]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
+                <label class="control-label" for="pnp-tip">PNP Tip</label>
+                <div class="controls">
+                  <input id="pnp-tip" type="text" name="repo_registration[pnp_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[pnp_tip]', ''); ?>" required>
                 </div>
               </div>
             </div>
