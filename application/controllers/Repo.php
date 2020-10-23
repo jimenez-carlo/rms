@@ -346,8 +346,10 @@ HTML;
       if ($this->form_validation->run()) {
         $repo_rerfo_id = $this->input->post('repo_rerfo_id');
         $expense_id = md5(date('Y-m-d H:m:s'));
+        $upload = $this->file->upload('misc', '/repo/rerfo/'.$repo_rerfo_id.'/', $expense_id.'.jpg');
 
         if ($upload) {
+          $img_path = '/rms_dir/repo/rerfo/'.$repo_rerfo_id.'/'.$expense_id.'.jpg';
           $misc_saved = $this->repo->save_expense([
             "repo_rerfo_id" => $repo_rerfo_id,
             "data" => [
