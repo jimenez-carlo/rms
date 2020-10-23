@@ -83,8 +83,7 @@
       }
     </style>
   </head>
-  <!-- <body onload="window.print();"> -->
-  <body>
+  <body onload="window.print();">
     <table>
       <thead>
         <tr>
