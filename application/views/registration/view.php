@@ -62,7 +62,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
               print '<div class="control-group">';
               print '<div class="control-label">Plate #</div>';
-              print '<div class="controls">'.form_input('plate_no', $sales->plate_no).'</div>';
+              print '<div class="controls">'.form_input('plate_no', set_value('plate_no', $sales->plate_number)).'</div>';
               print '</div>';
 
               print '<div class="form-actions">';

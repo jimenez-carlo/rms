@@ -178,12 +178,15 @@ class Sales_model extends CI_Model{
 		$this->load->model('Cmc_model', 'cmc');
 		$this->load->model('Fund_model', 'fund');
 
-		$sales = $this->db->query("select *,
-				left(date_sold, 10) as date_sold
-			from tbl_sales
-			inner join tbl_engine on engine = eid
-			inner join tbl_customer on customer = cid
-			where sid = ".$sid)->row();
+                $sales = $this->db->query("
+                  SELECT
+                    s.*, e.*, c.*, p.plate_number,
+                    DATE_FORMAT(s.date_sold, '%Y-%m-%d') as date_sold
+		  FROM tbl_sales s
+                  INNER JOIN tbl_engine e ON s.engine = e.eid
+                  INNER JOIN tbl_customer c ON s.customer = c.cid
+                  LEFT JOIN tbl_plate p ON p.plate_id = e.plate_id
+                  WHERE s.sid = ".$sid)->row();
 		$sales->branch = $this->cmc->get_branch($sales->branch);
 		$sales->fund = $this->fund->get_company_cash($sales->region, $sales->company);
 		$sales->sales_type = $this->sales_type[$sales->sales_type];
@@ -278,8 +281,32 @@ class Sales_model extends CI_Model{
 
 	public function save_registration($sales)
 	{
-		$sales->user = $_SESSION['uid'];
-		$this->db->update('tbl_sales', $sales, array('sid' => $sales->sid));
+                if (!empty($sales->plate_no)) {
+		  $this->load->model('Plate_model', 'plate');
+		  $plate_no_exist = $this->db->query("SELECT * FROM tbl_plate WHERE plate_number = '{$sales->plate_no}'")->result();
+                  if (!$plate_no_exist) {
+                    $this->plate->add_platenumber($sales->sid, $sales->plate_no, $sales->bcode);
+                  }
+                }
+
+                $uid = $_SESSION['uid'] ?? 0;
+                $this->db->query("
+                  UPDATE
+                    tbl_sales s,
+                    tbl_engine e
+                  SET
+                    s.status = {$sales->status},
+                    s.registration = {$sales->registration},
+                    s.tip = {$sales->tip},
+                    s.cr_date = '{$sales->cr_date}',
+                    s.cr_no = '{$sales->cr_no}',
+                    s.file = {$sales->file},
+                    s.registration_date = '{$sales->registration_date}',
+                    s.user = {$uid},
+                    e.mvf_no = '{$sales->mvf_no}'
+                  WHERE
+                    s.sid = {$sales->sid} AND e.eid = s.engine
+                ");
 
                 $query = <<<SQL
                   SELECT

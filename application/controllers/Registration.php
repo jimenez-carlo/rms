@@ -31,10 +31,20 @@ class Registration extends MY_Controller {
 		$submit = $this->input->post('submit');
 		if (!empty($submit)) {
 			$sid = $this->input->post('sid');
-			$sales = $this->db->query("select * from tbl_sales
-				inner join tbl_engine on eid = engine
-				inner join tbl_customer on cid = customer
-				where sid = ".$sid)->row();
+                        $sales = $this->db->query("
+                          SELECT
+                            s.*, e.*, c.*, p.plate_number
+                          FROM
+                            tbl_sales s
+                          INNER JOIN
+                            tbl_engine e ON e.eid = s.engine
+                          INNER JOIN
+                            tbl_customer c ON c.cid = s.customer
+                          LEFT JOIN
+                            tbl_plate p ON p.plate_id = e.plate_id
+                          WHERE
+                            s.sid = ".$sid
+                        )->row();
 			$this->submit_validate($sales);
 		}
 
@@ -225,6 +235,7 @@ class Registration extends MY_Controller {
 
           default: // not da, normal registration
             $new_sales->sid = $sales->sid;
+            $new_sales->bcode = $sales->bcode;
             $new_sales->registration = $this->input->post('registration');
             $new_sales->tip = $this->input->post('tip');
             $new_sales->cr_date = $this->input->post('cr_date');
