@@ -78,7 +78,7 @@
 <table>
   <thead>
     <tr>
-      <th>Rerfo</th>
+      <th>Reference</th>
       <th>Branch Code</th>
       <th>Branch Name</th>
       <th># of Units</th>
@@ -93,11 +93,10 @@
     {
       $amount = 0;
       print '<tr>';
-      print '<td>'.$print['rerfo_number'].'</td>';
+      print '<td>'.$print['reference'].'</td>';
       print '<td>'.$print['bcode'].'</td>';
       print '<td>'.$print['bname'].'</td>';
       print '<td>'.$print['no_of_unit'].'</td>';
-      //print '<td>'.$print['amount'].'</td>';
       print '<td>'.number_format($print['amount'], 2, '.', ',').'</td>';
       print '</tr>';
       $total += $print['amount'];

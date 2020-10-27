@@ -16,8 +16,8 @@
           <td>Customer</td>
           <td>Engine #</td>
           <td>MV File</td>
-          <!-- <td>Branch</td> -->
           <td>Status</td>
+          <td>Date Sold</td>
           <td>Date Registered</td>
           <td>Expiration</td>
           <td></td>
@@ -29,8 +29,8 @@
           <td><?php  echo $repo['last_name'].', '.$repo['first_name']; ?></td>
           <td><?php echo $repo['engine_no']; ?></td>
           <td><?php echo $repo['mvf_no']; ?></td>
-          <!-- <td><?php echo $repo['bcode'].' '.$repo['bname']; ?></td> -->
           <td><?php echo $repo['repo_status']; ?></td>
+          <td><?php echo $repo['date_sold']; ?></td>
           <td><?php echo $repo['date_registered']; ?></td>
           <td><?php echo '<p class="text-'.$repo['status'].'">'.$repo['message'].'</p>'; ?></td>
           <td>

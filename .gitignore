@@ -21,8 +21,8 @@ rms_dir/*
 !rms_dir/repo/*
 rms_dir/repo/registration/*
 !rms_dir/repo/registration/.gitkeep
-rms_dir/repo/rerfo/*
-!rms_dir/repo/rerfo/.gitkeep
+rms_dir/repo/batch/*
+!rms_dir/repo/batch/.gitkeep
 TODO.txt
 assets.tar
 assets/js/voucher_list.js

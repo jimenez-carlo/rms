@@ -87,11 +87,11 @@
     <table>
       <thead>
         <tr>
-          <th colspan="7">Branch: <?php print $rerfo['bcode'].' '.$rerfo['bname']; ?></th>
-          <th colspan="5">RERFO #: <?php print $rerfo['rerfo_number']; ?></th>
+          <th colspan="7">Branch: <?php print $batch['bcode'].' '.$batch['bname']; ?></th>
+          <th colspan="5">RERFO #: <?php print $batch['reference']; ?></th>
         </tr>
         <tr>
-          <th colspan="7">Period Covered: <?php print $rerfo['date_created']; ?></th>
+          <th colspan="7">Period Covered: <?php print $batch['date_created']; ?></th>
           <th colspan="5">Date: <?php print date('Y-m-d'); ?></th>
         </tr>
         <tr>
@@ -119,32 +119,32 @@
       <tbody>
         <?php
         $tot_tgt = $tot_ar = $tot_or = $tot_pnp = $tot_ins = $tot_macr = $tot_emi = 0;
-        foreach ($rerfo_engines as $rerfo_engine)
+        foreach ($batch_engines as $batch_engine)
         {
           print '<tr>';
-          print '<td>'.$rerfo_engine['registration_type'].'</td>';
-          print '<td>'.$rerfo_engine['ar_num'].'</td>';
+          print '<td>'.$batch_engine['registration_type'].'</td>';
+          print '<td>'.$batch_engine['ar_num'].'</td>';
           print '<td>Repo</td>';
-          print '<td>'.$rerfo_engine['date_sold'].'</td>';
-          print '<td>'.$rerfo_engine['cust_code'].'</td>';
-          print '<td>'.$rerfo_engine['first_name'].' '.$rerfo_engine['last_name'].'</td>';
-          print '<td>'.$rerfo_engine['engine_no'].'</td>';
+          print '<td>'.$batch_engine['date_sold'].'</td>';
+          print '<td>'.$batch_engine['cust_code'].'</td>';
+          print '<td>'.$batch_engine['first_name'].' '.$batch_engine['last_name'].'</td>';
+          print '<td>'.$batch_engine['engine_no'].'</td>';
           print '<td style="text-align: right">3,600.00</td>'; // TODO Should be query in database.
-          print '<td style="text-align: right">'.number_format($rerfo_engine['ar_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($rerfo_engine['registration_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($rerfo_engine['pnp_clearance_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($rerfo_engine['macro_etching_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($rerfo_engine['emission_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($rerfo_engine['insurance_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['ar_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['registration_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['pnp_clearance_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['macro_etching_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['emission_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['insurance_amt'], 2, '.', ',').'</td>';
           print '</tr>';
 
           $tot_tgt  += 3600;
-          $tot_ar   += $rerfo_engine['ar_amt'];
-          $tot_or   += $rerfo_engine['registration_amt'];
-          $tot_pnp  += $rerfo_engine['pnp_clearance_amt'];
-          $tot_macr += $rerfo_engine['macro_etching_amt'];
-          $tot_emi  += $rerfo_engine['emission_amt'];
-          $tot_ins  += $rerfo_engine['insurance_amt'];
+          $tot_ar   += $batch_engine['ar_amt'];
+          $tot_or   += $batch_engine['registration_amt'];
+          $tot_pnp  += $batch_engine['pnp_clearance_amt'];
+          $tot_macr += $batch_engine['macro_etching_amt'];
+          $tot_emi  += $batch_engine['emission_amt'];
+          $tot_ins  += $batch_engine['insurance_amt'];
         }
         ?>
         <tr>
@@ -174,7 +174,7 @@
       <tbody>
         <?php
           $tot_exp = 0;
-          $misc_expenses = json_decode($rerfo['misc_expenses'], true);
+          $misc_expenses = json_decode($batch['misc_expenses'], true);
           if (!empty($misc_expenses)) {
             foreach ($misc_expenses as $expense) {
               if ($expense['is_deleted'] !== "1") {

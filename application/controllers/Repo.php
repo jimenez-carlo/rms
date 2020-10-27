@@ -15,7 +15,8 @@ class Repo extends MY_Controller {
   public function index() {
 
     $this->access(17);
-    $this->header_data('title', 'Repo Registation');
+    $this->header_data('title', 'Repo Inventory');
+    $this->header_data('nav', 'repo-inventory');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     $repo_inventory = [];
@@ -27,15 +28,14 @@ class Repo extends MY_Controller {
       $repo_inventory[] = $repo;
     }
     $data['repo_inventory'] = $repo_inventory;
-    $this->template('repo/inventory.php', $data);
+    $this->template('repo/inventory', $data);
   }
 
   public function in() {
     $this->access(17);
-    $this->header_data('title', 'Repo Inventory');
-    $this->header_data('nav', 'repo-inventory');
+    $this->header_data('title', 'Repo In');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
-    $this->template('repo/in.php', []);
+    $this->template('repo/in', []);
   }
 
   public function sales($repo_inventory_id) {
@@ -49,7 +49,7 @@ class Repo extends MY_Controller {
         //REPO SALE
         [ 'field' => 'repo_sale[rsf_num]', 'label' => 'RSF#', 'rules' => 'required' ],
         [ 'field' => 'repo_sale[ar_num]', 'label' => 'AR Number', 'rules' => 'required' ],
-        [ 'field' => 'repo_sale[ar_amt]', 'label' => 'Amount Given', 'rules' => 'required' ],
+        [ 'field' => 'repo_sale[ar_amt]', 'label' => 'Amount Given', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
         [ 'field' => 'repo_sale[date_sold]', 'label' => 'Date Sold', 'rules' => 'required' ],
         //CUSTOMER
         [ 'field' => 'customer[cust_code]', 'label' => 'Customer Code', 'rules' => 'required' ],
@@ -61,14 +61,14 @@ class Repo extends MY_Controller {
       if ($this->form_validation->run()) {
         $this->db->trans_start();
         $sales = $this->input->post();
-        $repo_rerfo_id = $this->repo->generate_rerfo($repo_inventory_id);
+        $repo_batch_id = $this->repo->generate_batch();
 
-        $sales['repo_sale']['repo_rerfo_id'] = $repo_rerfo_id;
+        $sales['repo_sale']['repo_batch_id'] = $repo_batch_id;
         $sales['repo_sale']['repo_inventory_id'] = $repo_inventory_id;
         $this->repo->save_sales($sales);
         $this->repo->initialize_regn([
           'repo_inventory_id' => $repo_inventory_id,
-          'repo_rerfo_id' => $repo_rerfo_id
+          'repo_batch_id' => $repo_batch_id
         ]);
         $this->repo->update_inv_status($repo_inventory_id, 'SALES');
         $this->db->trans_complete();
@@ -143,7 +143,6 @@ class Repo extends MY_Controller {
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, NULL);
     $data['histories'] = $this->repo->get_history($repo_inventory_id);
-    //echo '<pre>'; var_dump($data['histories']); echo '</pre>'; die();
     if (isset($data['repo']['attachment'])) {
       $data['attachment'] = true;
       foreach (json_decode($data['repo']['attachment'], 1) as $key => $attach) {
@@ -301,39 +300,39 @@ HTML;
     }
   }
 
-  public function rerfo() {
+  public function batch() {
     $this->access(17);
-    $this->header_data('title', 'Repo Rerfo');
-    $this->header_data('nav', 'repo-rerfo');
+    $this->header_data('title', 'Repo Batch');
+    $this->header_data('nav', 'repo-batch');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
-    $data['rerfos'] = $this->repo->rerfo_list();
-    $this->template('repo/rerfo/rerfo_list.php', $data);
+    $data['batches'] = $this->repo->batch_list();
+    $this->template('repo/batch/list', $data);
   }
 
-  public function rerfo_view($repo_rerfo_id) {
+  public function batch_view($repo_batch_id) {
     $this->access(17);
-    $this->header_data('title', 'Repo Rerfo View');
-    $this->header_data('nav', 'repo-rerfo-view');
-    $data['rerfo'] = $this->repo->rerfo($repo_rerfo_id);
-    $rerfo_misc = $data['rerfo'][0]['misc_expenses'];
-    $data['rerfo_number'] = $data['rerfo'][0]['rerfo_number'];
-    $data['rerfo_misc'] = (isset($rerfo_misc)) ? json_decode($rerfo_misc, 1) : NULL;
+    $this->header_data('title', 'Repo Batch CA View');
+    $this->header_data('nav', 'repo-batch-ca-view');
+    $data['batch'] = $this->repo->batch($repo_batch_id);
+    $data['reference'] = $data['batch'][0]['reference'];
+    $batch_misc = $data['batch'][0]['misc_expenses'];
+    $data['batch_misc'] = (isset($batch_misc)) ? json_decode($batch_misc, 1) : NULL;
 
-    $this->template('repo/rerfo/rerfo_view.php', $data);
+    $this->template('repo/batch/view', $data);
   }
 
-  public function rerfo_misc() {
+  public function misc_exp() {
     $this->access(17);
-    $this->header_data('title', 'Repo Rerfo Misc Expense');
-    $this->header_data('nav', 'repo-rerfo-misc-expense');
-    $data['rerfos'] = $this->repo->rerfo_list();
+    $this->header_data('title', 'Repo Registration Misc Expense');
+    $this->header_data('nav', 'repo-registration-misc-expense');
+    $data['batches'] = $this->repo->batch_list();
     $data['hidden'] = 'hidden';
     $data['disabled'] = 'disabled';
 
     if ($this->input->post('save')) {
       $expense_type = $this->input->post('expense_type');
       $validation = [
-        [ 'field' => 'repo_rerfo_id', 'label' => 'Rerfo Number', 'rules' => 'required' ],
+        [ 'field' => 'repo_batch_id', 'label' => 'Reference Number', 'rules' => 'required' ],
         [ 'field' => 'expense_type', 'label' => 'Expense Type', 'rules' => 'required' ],
         [ 'field' => 'amount', 'label' => 'Misc Expense Amount', 'rules' => 'required' ],
       ];
@@ -344,14 +343,14 @@ HTML;
 
       $this->form_validation->set_rules($validation);
       if ($this->form_validation->run()) {
-        $repo_rerfo_id = $this->input->post('repo_rerfo_id');
+        $repo_batch_id = $this->input->post('repo_batch_id');
         $expense_id = md5(date('Y-m-d H:m:s'));
-        $upload = $this->file->upload('misc', '/repo/rerfo/'.$repo_rerfo_id.'/', $expense_id.'.jpg');
+        $upload = $this->file->upload('misc', '/repo/batch/'.$repo_batch_id.'/', $expense_id.'.jpg');
 
         if ($upload) {
-          $img_path = '/rms_dir/repo/rerfo/'.$repo_rerfo_id.'/'.$expense_id.'.jpg';
+          $img_path = '/rms_dir/repo/batch/'.$repo_batch_id.'/'.$expense_id.'.jpg';
           $misc_saved = $this->repo->save_expense([
-            "repo_rerfo_id" => $repo_rerfo_id,
+            "repo_batch_id" => $repo_batch_id,
             "data" => [
               $expense_id => [
                 "expense_type" => $expense_type,
@@ -376,13 +375,12 @@ HTML;
         $data['disabled'] = '';
       }
     }
-    $this->template('repo/rerfo/rerfo_misc', $data);
+    $this->template('repo/batch/misc', $data);
   }
 
-  public function rerfo_print($repo_rerfo_id) {
-    $data = $this->repo->print_rerfo($repo_rerfo_id);
-    //echo '<pre>'; var_dump(json_decode($data['rerfo']['misc_expenses'], true)); echo '</pre>'; die();
-    $this->load->view('repo/rerfo/print', $data);
+  public function batch_print($repo_batch_id) {
+    $data = $this->repo->print_batch($repo_batch_id);
+    $this->load->view('repo/batch/print', $data);
   }
 
   public function get_expiration() {
@@ -392,21 +390,21 @@ HTML;
   public function ca() {
     $this->access(1); // Todo add page access
     if ($this->input->post()) {
-      $repo_rerfo_ids = array_keys($this->input->post('rerfos'));
+      $repo_batch_ids = array_keys($this->input->post('batches'));
       $validation = [];
-      foreach ($repo_rerfo_ids as $repo_rerfo_id) {
-        $validation[] = [ 'field' => 'rerfos['.$repo_rerfo_id.']', 'label' => 'Document Number', 'rules' => 'required' ] ;
+      foreach ($repo_batch_ids as $repo_batch_id) {
+        $validation[] = [ 'field' => 'batches['.$repo_batch_id.']', 'label' => 'Document Number', 'rules' => 'required' ] ;
       }
       $this->form_validation->set_rules($validation);
 
       if ($this->form_validation->run()) {
-        $success = $this->repo->save_ca($this->input->post('rerfos'));
+        $success = $this->repo->save_ca($this->input->post('batches'));
         if ($success) {
-          $_SESSION['messages'][] = 'Rerfo added Doc Number successfully.';
+          $_SESSION['messages'][] = 'CA Reference added Document Number successfully.';
         }
       }
     }
-    $this->header_data('title', 'CA Repo');
+    $this->header_data('title', 'Repo CA');
     $this->header_data('nav', 'projected_fund');
     $data['for_cas'] = $this->repo->get_for_ca();
     $this->template('repo/acctg/ca', $data);
@@ -414,11 +412,11 @@ HTML;
 
   public function print_ca() {
     $this->access(1); // Todo add page access
-    if (!$this->input->post('rerfos')) {
+    if (!$this->input->post('batches')) {
       show_404();
     }
     $data['region_company'] = $this->input->post('region_company');
-    $data['prints'] = $this->repo->print_ca(array_keys($this->input->post('rerfos')));
+    $data['prints'] = $this->repo->print_ca(array_keys($this->input->post('batches')));
     $this->template('repo/acctg/print_ca', $data);
   }
 }

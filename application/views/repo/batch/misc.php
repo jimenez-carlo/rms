@@ -2,17 +2,17 @@
   <div class="row-fluid">
     <div class="block">
       <div class="navbar navbar-inner block-header">
-        <div class="pull-left"> Miscellaneous Expense</div>
+        <div class="pull-left">Miscellaneous Expense</div>
       </div>
       <div class="block-content collapse in">
         <form class="form-horizontal" method="post" enctype="multipart/form-data">
           <div class="span6">
             <div class="control-group">
-              <label class="control-label">RERFO#</label>
+              <label class="control-label">Batch#</label>
               <div class="controls">
-                <select name="repo_rerfo_id">
-                  <?php foreach($rerfos AS $rerfo): ?>
-                    <option value="<?php echo $rerfo['repo_rerfo_id']; ?>"><?php echo $rerfo['rerfo_number']; ?></option>
+                <select name="repo_batch_id">
+                  <?php foreach($batches AS $batch): ?>
+                    <option value="<?php echo $batch['repo_batch_id']; ?>"><?php echo $batch['reference']; ?></option>
                   <?php endforeach; ?>
                 </select>
               </div>

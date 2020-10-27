@@ -5,9 +5,9 @@
       <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
     <div class="navbar navbar-inner block-header">
-      <div class="pull-left">Repo Rerfo</div>
+      <div class="pull-left">Repo View CA Batch</div>
     </div>
-    <h2>RERFO# <?php echo $rerfo_number; ?></h2>
+    <h2>Reference# <?php echo $reference; ?></h2>
     <table class="table">
       <thead>
         <tr>
@@ -27,7 +27,7 @@
         </tr>
       </thead>
       <tbody>
-        <?php foreach($rerfo AS $repo): ?>
+        <?php foreach($batch AS $repo): ?>
         <tr>
           <td><?php echo $repo['first_name'].' '.$repo['last_name']; ?></td>
           <td><?php echo $repo['cust_code']; ?></td>
@@ -48,7 +48,7 @@
     </table>
     <hr>
     <h2>Miscellaneous Expense</h2>
-    <?php if(isset($rerfo_misc)): ?>
+    <?php if(isset($batch_misc)): ?>
     <table class="table">
       <thead>
         <tr>
@@ -58,7 +58,7 @@
         </tr>
       </thead>
       <tbody>
-        <?php foreach($rerfo_misc AS $misc): ?>
+        <?php foreach($batch_misc AS $misc): ?>
         <tr>
           <td><?php echo $misc['expense_type']; ?></td>
           <td><?php echo $misc['amount']; ?></td>

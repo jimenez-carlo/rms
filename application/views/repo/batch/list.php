@@ -5,12 +5,12 @@
       <button type="button" class="close" data-dismiss="alert">&times;</button>
     </div>
     <div class="navbar navbar-inner block-header">
-        <div class="pull-left">Repo Inventory</div>
+        <div class="pull-left">Repo Batch</div>
     </div>
     <table class="table">
       <thead>
         <tr>
-          <th>Rerfo#</th>
+          <th>Reference#</th>
           <th>Amount</th>
           <th>Document#</th>
           <th>Debit Memo</th>
@@ -19,17 +19,17 @@
         </tr>
       </thead>
       <tbody>
-        <?php foreach($rerfos AS $rerfo): ?>
+        <?php foreach($batches AS $batch): ?>
         <tr>
-          <td><?php echo $rerfo['rerfo_number']; ?></td>
-          <td><?php echo number_format($rerfo['amount'], 2, '.', ','); ?></td>
-          <td><?php echo $rerfo['doc_no']; ?></td>
-          <td><?php echo $rerfo['debit_memo']; ?></td>
-          <td><?php echo $rerfo['status']; ?></td>
+          <td><?php echo $batch['reference']; ?></td>
+          <td><?php echo number_format($batch['amount'], 2, '.', ','); ?></td>
+          <td><?php echo $batch['doc_no']; ?></td>
+          <td><?php echo $batch['debit_memo']; ?></td>
+          <td><?php echo $batch['status']; ?></td>
           <td>
             <?php
-              echo '<a class="btn btn-primary" href="'.base_url('repo/rerfo_view/'.$rerfo['repo_rerfo_id']).'">View</a>  ';
-              echo '<a class="btn btn-success" href="'.base_url('repo/rerfo_print/'.$rerfo['repo_rerfo_id']).'">Print</a>';
+              echo '<a class="btn btn-primary" href="'.base_url('repo/batch_view/'.$batch['repo_batch_id']).'">View</a>  ';
+              echo '<a class="btn btn-success" href="'.base_url('repo/batch_print/'.$batch['repo_batch_id']).'">Print</a>';
             ?>
           </td>
         </tr>

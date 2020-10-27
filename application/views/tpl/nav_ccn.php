@@ -47,10 +47,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         <a tabindex="-1" href="<?php echo base_url('repo'); ?>">Inventory</a>
                                     </li>
                                     <li>
-                                        <a tabindex="-1" href="<?php echo base_url('repo/rerfo'); ?>">Rerfo</a>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/batch'); ?>">CA Batch</a>
                                     </li>
                                     <li>
-                                        <a tabindex="-1" href="<?php echo base_url('repo/rerfo_misc'); ?>">Misc Expense</a>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/misc_exp'); ?>">Misc Expense</a>
                                     </li>
                                 </ul>
                             </li>

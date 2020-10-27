@@ -20,7 +20,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   echo form_hidden('region_company', $ca['rrt_region'].' '.$ca['company_code']);
                 ?>
                 </th>
-                <th>Rerfo</th>
+                <th>Reference</th>
                 <th>Branch Code</th>
                 <th>Branch Name</th>
                 <th># of Unit</th>
@@ -30,21 +30,21 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               </tr>
             </thead>
             <tbody>
-              <?php $rerfos = json_decode($ca['rerfos'],true); ?>
-              <?php foreach($rerfos AS $rerfo): ?>
+              <?php $batches = json_decode($ca['batches'], true); ?>
+              <?php foreach($batches AS $batch): ?>
               <td>
-                <td><?php echo $rerfo['rerfo']; ?></td>
-                <td><?php echo $rerfo['bcode']; ?></td>
-                <td><?php echo $rerfo['bname']; ?></td>
-                <td><?php echo $rerfo['no_of_rerfo_unit']; ?></td>
+                <td><?php echo $batch['reference']; ?></td>
+                <td><?php echo $batch['bcode']; ?></td>
+                <td><?php echo $batch['bname']; ?></td>
+                <td><?php echo $batch['no_of_unit']; ?></td>
                 <td></td>
-                <td><?php echo number_format($rerfo['rerfo_amount'], 2, '.', ','); ?></td>
+                <td><?php echo number_format($batch['amount'], 2, '.', ','); ?></td>
                 <td>
                   <input
                     type="text"
                     placeholder="Input Document Number"
-                    name="<?php echo 'rerfos'.'['.$rerfo['repo_rerfo_id'].']'; ?>"
-                    value="<?php echo set_value('rerfos'.'['.$rerfo['repo_rerfo_id'].']',''); ?>"
+                    name="<?php echo 'batches'.'['.$batch['repo_batch_id'].']'; ?>"
+                    value="<?php echo set_value('batch'.'['.$batch['repo_batch_id'].']',''); ?>"
                     required="true"
                   >
                 </td>

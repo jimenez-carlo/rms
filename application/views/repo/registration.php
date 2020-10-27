@@ -12,7 +12,7 @@
           <?php echo form_hidden('repo_registration[repo_registration_id]', $repo['repo_registration_id']); ?>
           <fieldset>
             <legend>
-              Rerfo# <?php echo $repo['rerfo_number']; ?>
+              CA Reference# <?php echo $repo['reference']; ?>
             </legend>
             <div class="form-inline row">
               <div class="control-group span2 offset1">

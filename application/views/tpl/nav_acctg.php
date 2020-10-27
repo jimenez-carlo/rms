@@ -31,12 +31,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Projected Funds <i class="caret"></i></a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a tabindex="-1" href="<?php echo base_url('projected_fund'); ?>">Create Bnew CA</a>
+                                <a tabindex="-1" href="<?php echo base_url('projected_fund'); ?>">Create CA Bnew</a>
                                 <a tabindex="-1" href="<?php echo base_url('projected_fund/ca_list'); ?>">CA List</a>
                             </li>
                             <li class="divider"></li>
                             <li>
-                                <a tabindex="-1" href="<?php echo base_url('repo/ca'); ?>">Create Repo CA</a>
+                                <a tabindex="-1" href="<?php echo base_url('repo/ca'); ?>">Create CA Repo</a>
                             </li>
                         </ul>
                     </li>
