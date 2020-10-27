@@ -119,7 +119,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             print '<td colspan="2"><p class="text-right '.$text_color.'">'.$misc->status.'</p></td>';
             print '</tr>';
 
-            if (array('Approved', 'Resolved')) {
+            if (in_array($misc->status, array('Approved', 'Resolved'))) {
               $total_exp += $misc->amount;
             }
         }

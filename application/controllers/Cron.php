@@ -158,11 +158,7 @@ SQL;
 
 		foreach ($result as $row)
 		{
-                        if ($row->region > 10) {
-                          $company = 8; // MDI
-                        } else {
-                          $company = substr($row->branch, 0, 1);
-                        }
+                        $company = substr($row->branch, 0, 1);
 
 			// lto_transmittal
 			$code = 'LT-'.$row->r_code.'-'
@@ -264,26 +260,10 @@ SQL;
 	public function rms_expense()
 	{
 		$start = date("Y-m-d H:i:s");
-		$current_date = date("Y-m-d");
 		$rows = 0;
-
 		$dev_ces2 = $this->load->database('dev_ces2', TRUE);
-
 		$date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-3 days'));
-		$date_yesterday = $this->input->post('date_yesterday') ?? date('Y-m-d', strtotime('-1 days'));
-
-		// Manual update lto pending sales
-		// Just change the date
-		//$result = $this->db->query('
-		//  select sid, engine_no, cust_code,
-		//    left(pending_date, 10) as pending_date, registration,
-		//    left(cr_date, 10) as cr_date
-		//  from tbl_sales s
-		//    inner join tbl_customer c on customer = cid
-		//    inner join tbl_engine e on engine = eid
-		//  where left(pending_date,10) = "2019-03-25"
-		//   or left(registration_date,10) = "2019-03-25"
-		//')->result_object();
+		$date_to = $this->input->post('date_yesterday') ?? date('Y-m-d');
 
 		$query  = "SELECT sid, engine_no, cust_code, ";
 		$query .= "LEFT(pending_date, 10) AS pending_date, registration, ";
@@ -292,12 +272,9 @@ SQL;
 		$query .= "FROM tbl_sales s ";
 		$query .= "INNER JOIN tbl_customer c ON customer=cid ";
 		$query .= "INNER JOIN tbl_engine e ON engine=eid ";
-		$query .= 'WHERE (left(pending_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'") ';
-		$query .= 'OR (left(registration_date,10) BETWEEN "'.$date_from.'" AND "'.$current_date.'")';
+		$query .= 'WHERE (left(pending_date,10) BETWEEN "'.$date_from.'" AND "'.$date_to.'") ';
+		$query .= 'OR (left(registration_date,10) BETWEEN "'.$date_from.'" AND "'.$date_to.'")';
 		$result = $this->db->query($query)->result_object();
-		// FOR DEBUGGING
-		//print_r(array($start, $current_date, $date_yesterday, $date_from, $query, $result));
-		//exit;
 
                 foreach ($result as $row) {
                   $expense = $dev_ces2->query("SELECT rec_no, custcode FROM rms_expense WHERE engine_num = '{$row->engine_no}'")->row();
@@ -329,17 +306,17 @@ SQL;
 
 		$log = new Stdclass();
 		$log->ckey = 2;
-		$log->date = $date_yesterday;
-		$log->start = $start;
-		$log->end = $end;
-		$log->rows = $rows;
-		$this->db->insert('tbl_cron_log', $log);
+		$log->date = date('Y-m-d');
+                $log->start = $start;
+                $log->end = $end;
+                $log->rows = $rows;
+                $this->db->insert('tbl_cron_log', $log);
 
-		$this->login->saveLog('Run Cron: Update rms_expense table for BOBJ Report [rms_expense] Duration: '.$start.' - '.$end);
+                $this->login->saveLog('Run Cron: Update rms_expense table for BOBJ Report [rms_expense] Duration: '.$start.' - '.$end);
 
-		$submit = $this->input->post('submit');
-		if (!empty($submit)) redirect('cron');
-	}
+                $submit = $this->input->post('submit');
+                if (!empty($submit)) redirect('cron');
+        }
 
 	public function ar_amount()
 	{

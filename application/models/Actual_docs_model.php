@@ -4,6 +4,7 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 class Actual_docs_model extends CI_Model {
 
   public function get_batch($param) {
+
     $w_company_1 = (isset($param['company']) && $param['company'] !== 'any') ? 'AND v.company = '.$param['company'] : '';
     $w_company_2 = (isset($param['company']) && $param['company'] !== 'any') ? 'AND lp.company = '.$param['company'] : '';
 
@@ -25,14 +26,15 @@ class Actual_docs_model extends CI_Model {
       }
     }
 
-    $where = 'WHERE batch_date_created >= "2020-01-01"';
+    $company = ($_SESSION['company'] === '8') ? 'AND cid = 8' : 'AND cid != 8';
+    $where = 'WHERE batch_date_created >= "2020-01-01" '.$company;
     switch ($_SESSION['position_name']) {
       case 'Accounts Payable Clerk':
       case 'RRT National Registration Manager':
-        $where .= ' AND transmittal_number IS NOT NULL ';
         $w_region = (isset($param['region']) && $param['region'] !== 'any') ? 'AND region = '.$param['region'] : '';
         break;
       case 'RRT General Clerk':
+      case 'RRT Branch Secretary':
         $w_region = 'AND region = '.$_SESSION['region_id'];
         break;
     }

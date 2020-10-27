@@ -30,16 +30,16 @@ class Projected_fund_model extends CI_Model{
 	public function get_projected_funds() {
           switch ($this->session->company_code) {
             case 'CMC':
-                $company = 'f.company != 8';
+                $company = 'AND f.company != 8';
               break;
             case 'MDI':
-                $company = 'f.company = 8';
+                $company = 'AND f.company = 8';
               break;
           }
 
           $query = <<<SQL
             SELECT
-              fid, fund, cash_on_hand, region,
+              fid, FORMAT(fund, 2) AS fund, FORMAT(cash_on_hand, 2) AS cash_on_hand, region,
               CONCAT('[',
                 GROUP_CONCAT('{
                   "cid" : "', cid, '", "company" : "', company, '",
@@ -60,13 +60,13 @@ class Projected_fund_model extends CI_Model{
               FROM
                   tbl_fund f
                       LEFT JOIN
-                  tbl_sales s ON s.region = f.region AND s.fund = 0 AND registration_type != 'Self Registration'
+                  tbl_sales s ON s.region = f.region AND registration_type != 'Self Registration'
                       LEFT JOIN
                   tbl_company c ON s.company = c.cid
                       LEFT JOIN
                   tbl_region r ON s.region = r.rid
               WHERE
-                  f.company != 8 AND s.payment_method = 'CASH'
+                  s.payment_method = 'CASH' $company
               GROUP BY f.fid , c.cid , c.company_code
               ) AS first_select
               GROUP BY fid, fund, cash_on_hand, region
@@ -83,7 +83,7 @@ SQL;
           $fund = $this->db->query("SELECT * FROM tbl_fund WHERE fid = ".$fid)->row();
 
           $region = $this->reg_code[$fund->region];
-          $company = ($fund->company == 2) ? 6 : $fund->company;
+          $company = $fund->company;
           $fund->reference = 'CA-'.$region.'-'.date('ymd');
 
           $ref_code = $this->db->query("
@@ -147,8 +147,9 @@ SQL;
                   INNER JOIN
                     tbl_customer c on c.cid = s.customer
                   WHERE
-                    s.lto_transmittal in (".$ltid.")
-                    AND s.voucher = 0 AND s.registration_type != 'Self Registration' AND s.payment_method = 'CASH'
+                    s.lto_transmittal in (".$ltid.") AND s.voucher = 0
+                    AND s.registration_type != 'Self Registration'
+                    AND s.payment_method = 'CASH' AND s.status != 1
                   GROUP BY s.bcode, s.bname
                 ")->result_object();
 
@@ -158,7 +159,7 @@ SQL;
 
 	public function save_voucher($voucher, $ltid)
 	{
-                $this->db->simple_query('SET SESSION group_concat_max_len=15000');
+                $this->db->simple_query('SET SESSION group_concat_max_len=4294967295');
                 $batch = $this->db->query("
                   SELECT
                     GROUP_CONCAT(s.sid SEPARATOR ',') AS sids, lt.company
@@ -167,7 +168,8 @@ SQL;
                   INNER JOIN
                     tbl_lto_transmittal lt ON s.lto_transmittal = lt.ltid
                   WHERE
-                    lt.ltid IN (".$ltid.") AND voucher = 0 AND s.registration_type != 'Self Registration' AND s.payment_method = 'CASH'
+                    lt.ltid IN (".$ltid.") AND voucher = 0 AND s.registration_type != 'Self Registration'
+                    AND s.payment_method = 'CASH' AND s.status != 1
                   GROUP BY
                     lt.company
                 ")->row();
@@ -181,12 +183,12 @@ SQL;
 
                 $this->db->query("
                   UPDATE
-                    tbl_sales
+                    tbl_sales s
                   SET
-                    voucher = ".$voucher->vid.",
-                    user = ".$_SESSION['uid']."
+                    s.voucher = ".$voucher->vid.",
+                    s.user = ".$_SESSION['uid']."
                   WHERE
-                    sid IN (".$batch->sids.")
+                    s.sid IN (".$batch->sids.") AND s.status != 1
                 ");
 
                 $fund = $this->db->query("
@@ -208,10 +210,8 @@ SQL;
    * Accounting to view list of Voucher
    */
         public function list_voucher($param) {
-          $status = (is_numeric($param->status))
-            ? ' AND status = '.$param->status : '';
-          $region = (is_numeric($param->region))
-            ? ' AND region = '.$param->region : '';
+          $status = (is_numeric($param->status)) ? ' AND status = '.$param->status : '';
+          $region = (!in_array($param->region, ['_any', NULL])) ? ' AND region = '.$param->region : '';
 
           $company = ($_SESSION['company'] != 8) ? ' AND region < 11' : ' AND region >= 11';
 

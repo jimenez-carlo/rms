@@ -1,5 +1,4 @@
 <?php
-// echo '<pre>'; var_dump($batch); echo '</pre>'; die();
 $list = array();
 $line = array(
   "Counter V_COUNTER", "Document Date BKPF-BLART", "Posting Date BKPF-BUDAT",
@@ -15,19 +14,16 @@ $line = array(
 $list[] = $line;
 
 $ctr = 0;
-foreach ($batch as $sales)
+foreach ($batch AS $key => $sales)
 {
 	$ctr++;
-        $misc_expense = $misc_expenses[$sales['reference_number']] ?? 0;
-        $regn_and_misc_expense = $sales['regn_expense'] + $misc_expense;
-
         switch ($sales['registration_type']) {
           case 'Free Registration':
 	    //debit SI
 	    $line = array(
               $ctr,
               $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','31',$sales['account_key'],'',
-              number_format($regn_and_misc_expense, 2, '.', ''),
+              number_format($sales['regn_expense'], 2, '.', ''),
               '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['reference_number'],$sales['cust_code'],
 	    );
 	    $list[] = $line;
@@ -36,7 +32,7 @@ foreach ($batch as $sales)
 	    $line = array(
 	    	$ctr,
 	    	$sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','40',$sales['sap_code'],'',
-	    	number_format($regn_and_misc_expense, 2, '.', ''),
+	    	number_format($sales['regn_expense'], 2, '.', ''),
                     '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
 	    );
 	    $list[] = $line;
@@ -48,7 +44,7 @@ foreach ($batch as $sales)
 	    $line = array(
               $ctr,
               $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['ar_no'],'','31',$sales['account_key'],'',
-              number_format($regn_and_misc_expense, 2, '.', ''),
+              number_format($sales['regn_expense'], 2, '.', ''),
               '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['reference_number'],$sales['cust_code'],
 	    );
 	    $list[] = $line;
@@ -57,7 +53,7 @@ foreach ($batch as $sales)
 	    $line = array(
 	    	$ctr,
 	    	$sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['ar_no'],'','40',$sales['sap_code'],'',
-	    	number_format($regn_and_misc_expense, 2, '.', ''),
+	    	number_format($sales['regn_expense'], 2, '.', ''),
                     '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
 	    );
 	    $list[] = $line;
@@ -66,11 +62,11 @@ foreach ($batch as $sales)
           case 'With Regn. Subsidy':
             $si_exp = 0;
             $ar_exp = 0;
-            if ($regn_and_misc_expense > $sales['ar_amount']) {
-              $si_exp = $regn_and_misc_expense - $sales['ar_amount'];
+            if ($sales['regn_expense'] > $sales['ar_amount']) {
+              $si_exp = $sales['regn_expense'] - $sales['ar_amount'];
               $ar_exp = $sales['ar_amount'];
-            } elseif ($regn_and_misc_expense <= $sales['ar_amount']) {
-              $ar_exp = $regn_and_misc_expense;
+            } elseif ($sales['regn_expense'] <= $sales['ar_amount']) {
+              $ar_exp = $sales['regn_expense'];
             }
 
 	    //debit SI
@@ -83,12 +79,12 @@ foreach ($batch as $sales)
 	    $list[] = $line;
 
 	    //credit SI
-	    $line = array(
-	    	$ctr,
-	    	$sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','40',$sales['sap_code'],'',
-	    	number_format($si_exp, 2, '.', ''),
-                    '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
-	    );
+            $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','',$sales['si_no'],'','40','215450','',
+              number_format($si_exp, 2, '.', ''),
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$sales['customer_name'],$sales['cust_code'],
+            );
 	    $list[] = $line;
 
             $ctr++;
@@ -110,6 +106,33 @@ foreach ($batch as $sales)
             );
 	    $list[] = $line;
             break;
+        }
+
+        if (!empty($misc_expenses)) {
+          $index = $key+1;
+          if (!isset($batch[$index]['vid']) || $batch[$index]['vid'] !== $misc_expenses[0]['vid']) {
+            $misc_exp = $misc_expenses[0]['misc_expense_amount'];
+            $misc_ca_ref = $misc_expenses[0]['reference'];
+            $column_AA = 'TO LIQ '.$misc_expenses[0]['reference'].' MISCELLANEOUS EXPENSES';
+
+	    $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','','MISC EXPENSES','','31',$sales['account_key'],'',
+              $misc_exp,
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$misc_ca_ref,$column_AA,
+	    );
+	    $list[] = $line;
+
+	    $line = array(
+              $ctr,
+              $sales['post_date'],$sales['post_date'],'KR',$sales['c_code'],'PHP','','MISC EXPENSES','','40',$sales['sap_code'],'',
+              $misc_exp,
+              '','','','','','','','',$sales['branch_code'],$sales['branch_code'],'','',$misc_ca_ref,$column_AA,
+	    );
+	    $list[] = $line;
+	    $ctr++;
+            array_shift($misc_expenses);
+          }
         }
 
 }

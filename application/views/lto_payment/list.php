@@ -25,7 +25,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							<div class="control-label">Region</div>
 							<div class="controls">
 								<?php
-								if(substr($_SESSION['username'],0,5) == 'ACCTG' || substr($_SESSION['username'],0,5) == 'TRSRY'){
+								if($acctg){
                                                                 $region = array_merge(array(0 => '- Any -'), $region);
 								print form_dropdown('region', $region, set_value('region'));
 								}else{
@@ -44,7 +44,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 						<div class="form-actions span5">
 							<input type="submit" class="btn btn-success" value="Search" name="search">
-							<?php if(substr($_SESSION['username'],0,5) != 'ACCTG'): ?>
+							<?php if(!$acctg): ?>
 							<a href="lto_payment/add" target="_blank" class="btn btn-success">Add New Batch</a>
 							<?php endif; ?>
 						</div>

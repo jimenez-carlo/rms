@@ -135,7 +135,7 @@ $(function(){
 		$('#tbl_exp').on('click', 'a.view', function(){
 			var mid = $(this).siblings('input').val();
 		  $.ajax({
-		    url : "expense/view",
+                    url : "<?php echo base_url(); ?>expense/view",
 		    type: "POST",
 		    data: {'mid': mid},
 		    dataType: "JSON",
@@ -152,10 +152,10 @@ $(function(){
 		});
 
 		$('#tbl_exp').on('click', '.edit', function(){
-			$('form').attr('action', 'expense/edit');
+			$('form').attr('action', '<?php echo base_url(); ?>expense/edit');
 		});
 		$('#tbl_exp').on('click', '.approval', function(){
-			$('form').attr('action', 'expense/approve');
+			$('form').attr('action', '<?php echo base_url(); ?>expense/approve');
 		});
 	});
 });

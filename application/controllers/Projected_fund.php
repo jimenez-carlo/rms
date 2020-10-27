@@ -21,8 +21,8 @@ class Projected_fund extends MY_Controller {
     $this->footer_data('script', '<script src="assets/modal/projected_fund.js?v1.0.0"></script>');
 
     $data['position'] = $_SESSION['position'];
-
     $data['table'] = $this->projected_fund->get_projected_funds();
+
     $this->template('projected_fund/list_projected', $data);
   }
 
@@ -119,7 +119,7 @@ class Projected_fund extends MY_Controller {
     $param->date_from = $this->input->post('date_from') ?? date('Y-m-d');
     $param->date_to   = $this->input->post('date_to')   ?? date('Y-m-d');
     $param->status    = $this->input->post('status')    ?? $data['def_stat'];
-    $param->region    = ($this->session->has_userdata('region_id')) ? $this->session->region_id : $this->input->post('region_id');
+    $param->region    = $this->input->post('region_id');
 
     $data['status'] = $this->projected_fund->status;
     $data['table']  = $this->projected_fund->list_voucher($param);

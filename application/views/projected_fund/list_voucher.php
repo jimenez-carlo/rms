@@ -61,7 +61,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               switch ($_SESSION['position']) {
                 case 108: // RRT-SPVSR
                   $set_region = $_SESSION['region_id'];
-                  $bool = array('disabled' => 'false');
+                  $bool = array('readonly' => true);
                   break;
 
                 default: // TRSRY-SPVSR, ACCT-PAYCL, RRT-MGR

@@ -64,9 +64,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   $(function() {
     var ca_chart = [];
     var ca_color = [];
-    var ca_total = $('#tbl_chart tbody tr:eq(0) td:eq(1)').text();
-    var ca_pending = $('#tbl_chart tbody tr:eq(0) td:eq(2)').text();
-    var ca_done = $('#tbl_chart tbody tr:eq(0) td:eq(3)').text();
+    var ca_total = parseFloat($('#tbl_chart tbody tr:eq(0) td:eq(1)').text().replace(/,/g, ''));
+    var ca_pending = parseFloat($('#tbl_chart tbody tr:eq(0) td:eq(2)').text().replace(/,/g, ''));
+    var ca_done = parseFloat($('#tbl_chart tbody tr:eq(0) td:eq(3)').text().replace(/,/g, ''));
 
     if (ca_pending > 0) {
       ca_chart.push({label: 'Pending', value: ca_pending});
@@ -87,9 +87,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     var ts_chart = [];
     var ts_color = [];
-    var ts_total = $('#tbl_chart tbody tr:eq(1) td:eq(1)').text();
-    var ts_pending = $('#tbl_chart tbody tr:eq(1) td:eq(2)').text();
-    var ts_done = $('#tbl_chart tbody tr:eq(1) td:eq(3)').text();
+    var ts_total = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(1)').text().replace(/,/g, ''));
+    var ts_pending = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(2)').text().replace(/,/g, ''));
+    var ts_done = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(3)').text().replace(/,/g, ''));
 
     if (ts_pending > 0) {
       ts_chart.push({label: 'Pending', value: ts_pending});
@@ -110,9 +110,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
     var sap_chart = [];
     var sap_color = [];
-    var sap_total = $('#tbl_chart tbody tr:eq(2) td:eq(1)').text();
-    var sap_pending = $('#tbl_chart tbody tr:eq(2) td:eq(2)').text();
-    var sap_done = $('#tbl_chart tbody tr:eq(2) td:eq(3)').text();
+    var sap_total = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(1)').text().replace(/,/g, ''));
+    var sap_pending = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(2)').text().replace(/,/g, ''));
+    var sap_done = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(3)').text().replace(/,/g, ''));
 
     if (sap_pending > 0) {
       sap_chart.push({label: 'Pending', value: sap_pending});

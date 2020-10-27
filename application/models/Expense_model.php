@@ -100,14 +100,14 @@ class Expense_model extends CI_Model{
 		$this->load->helper('directory');
                 $misc = $this->db->query("
                   SELECT
-                    *
+                    m.*, mxh1.*
                   FROM
                     tbl_misc m
                   JOIN
                     tbl_misc_expense_history mxh1 USING (mid)
-                  INNER JOIN
+                  LEFT JOIN
                     tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
-                  WHERE m.mid = $mid
+                  WHERE m.mid = $mid AND mxh2.id IS NULL
                 ")->row();
 
 		$misc->files = directory_map('./rms_dir/misc/'.$mid.'/', 1);

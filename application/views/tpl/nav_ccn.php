@@ -26,7 +26,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 </ul>
                             </li>
                         </ul>
-                        <?php $orcr = ''; // ($orcr == '0') ? '' : ' <span class="badge badge-warning">'.$orcr.'</span>'; ?>
+
                         <ul class="nav">
                             <li <?php if(isset($nav) && $nav=="sales") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>sales">Customer Status</a>
@@ -51,6 +51,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                     <li>
                                         <a tabindex="-1" href="<?php echo base_url('repo/misc_exp'); ?>">Misc Expense</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Plate <i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('plate/branch_list'); ?>">Plate Transmittal</a>
                                     </li>
                                 </ul>
                             </li>

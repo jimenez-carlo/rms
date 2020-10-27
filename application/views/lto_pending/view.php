@@ -28,6 +28,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
+              switch ($_SESSION['region']) {
+                case 'NCR':
+                case 'Region 6':
+                  $epp = 'EPP';
+                  $cash = false;
+                  break;
+
+                default:
+                  $epp = false;
+                  $cash = 'CASH';
+                  break;
+              }
               $count = 1;
               foreach ($transmittal->sales as $sales)
               {
@@ -36,35 +48,35 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
                 print '<tr>';
                 print '<td>'.$count.'</td>';
+                $count++;
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->registration_type.'</td>';
                 print '<td>'.$sales->transmittal_date.'</td>';
-                $count++;
                 ?>
 
                 <td>
-                  <span>
+                  <label class="radio">
                     <?php
                       print form_radio(
                         'status'.$key,
                         'EPP',
-                        (set_value('status'.$key, 'EPP') == 'EPP')
+                        (set_value('status'.$key, $epp) == 'EPP')
                       );
                     ?> Pending at LTO EPP
-                  </span><br>
-                  <span>
+                  </label><br>
+                  <label class="radio">
                     <?php
                       print form_radio(
                         'status'.$key,
                         'CASH',
-                        (set_value('status'.$key, false) == 'CASH')
+                        (set_value('status'.$key, $cash) == 'CASH')
                       );
                     ?> Pending at LTO CASH
-                  </span><br>
-                  <span>
+                  </label><br>
+                  <label class="radio">
                     <?php
                       print form_radio(
                         'status'.$key,
@@ -74,13 +86,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                           array(1,'REJECT')
                         ))
                       ); ?> Rejected
-                  </span>
+                  </label>
                 </td>
 
                 <?php
                 print '<td>'.form_dropdown('lto_reason'.$key, $reasons, set_value('lto_reason'.$key, $sales->lto_reason)).'</td>';
                 print '</tr>';
-                $count++;
               }
               ?>
             </tbody>

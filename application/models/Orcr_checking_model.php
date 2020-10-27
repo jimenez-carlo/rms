@@ -40,8 +40,10 @@ class Orcr_checking_model extends CI_Model{
                 tbl_voucher v
               INNER JOIN
                 tbl_sales s ON v.vid = s.voucher AND v.vid = s.fund
+              LEFT JOIN
+                tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
               WHERE
-                s.status = 4 $this->andSalesCompany AND v.vid IS NOT NULL
+                s.status = 4 $this->andSalesCompany AND s.da_reason IN (0, 11) AND v.vid IS NOT NULL AND susb.sid IS NULL
               GROUP BY
                 v.vid, s.region
               ORDER BY
@@ -53,14 +55,16 @@ class Orcr_checking_model extends CI_Model{
                 tbl_lto_payment l
               INNER JOIN
                 tbl_sales s ON l.lpid = s.lto_payment
+              LEFT JOIN
+                tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
               WHERE
-                s.status = 4 $this->andSalesCompany AND l.lpid IS NOT NULL
+                s.status = 4 $this->andSalesCompany AND s.da_reason IN (0, 11) AND l.lpid IS NOT NULL AND susb.sid IS NULL
               GROUP BY
                 l.lpid, s.region
               ORDER BY
                 l.lpid DESC )
             ) AS result
-            ORDER BY region
+            ORDER BY region, reference, budget_type
           ")->result_array();
 
         }
@@ -166,10 +170,11 @@ GBY;
               CONCAT(
                 '[',
                   GROUP_CONCAT(
+                    DISTINCT
                     JSON_OBJECT(
                       'sid', s.sid, 'engine_no', e.engine_no,
                       'bcode', s.bcode, 'bname', s.bname,
-                      'date_sold', SUBSTR(s.date_sold, 1, 10), 'sales_type', st.sales_type, 'registration_type', s.registration_type,
+                      'date_sold', DATE_FORMAT(s.date_sold, '%Y-%m-%d'), 'sales_type', st.sales_type, 'registration_type', s.registration_type,
                       'si_no', s.si_no, 'ar_no', s.ar_no, 'amount', s.amount,
                       'insurance', s.insurance, 'registration', s.registration, 'status', ss.status_name,
                       'disapprove',
@@ -186,13 +191,14 @@ GBY;
                   ']'
               ) AS sales
             FROM tbl_sales s
+            LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
             {$table_param}
             LEFT JOIN tbl_status ss ON s.status = ss.status_id AND ss.status_type = 'SALES'
             LEFT JOIN tbl_sap_upload_sales_batch sub ON s.sid = sub.sid
             LEFT JOIN tbl_sales_type st ON s.sales_type = st.stid
             LEFT JOIN tbl_status sts ON s.da_reason = sts.status_id AND sts.status_type = 'DA'
             LEFT JOIN tbl_engine e ON e.eid = s.engine
-            WHERE 1=1 {$where_param}
+            WHERE 1=1 {$where_param} AND susb.sid IS NULL AND s.status = 4  AND s.da_reason IN (0, 11)
             GROUP BY {$groupby_param}
 SQL;
           $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
@@ -237,7 +243,7 @@ SQL;
             LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
             LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
             LEFT JOIN tbl_status sts ON mxh1.status = sts.status_id AND sts.status_type = 'MISC_EXP'
-            WHERE v.vid = {$data['CA']} {$and_misc_expense_id} AND (sts.status_id IN (2, 3, 4, 5, 6) OR m.mid IS NULL) AND mxh2.mid IS NULL
+            WHERE v.vid = {$data['CA']} {$and_misc_expense_id} AND (sts.status_id IN (2, 6) OR m.mid IS NULL) AND mxh2.mid IS NULL
             GROUP BY v.vid
 SQL;
             $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");

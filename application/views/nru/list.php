@@ -23,6 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
+              $company = array(1 => 'MNC', 6 => 'MTI', 3 => 'HPTI', 8 => 'MDI');
               foreach ($table as $row)
               {
                 print "<tr>";
