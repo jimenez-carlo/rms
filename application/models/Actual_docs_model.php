@@ -4,9 +4,18 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 class Actual_docs_model extends CI_Model {
 
   public function get_batch($param) {
-
-    $w_company_1 = (isset($param['company']) && $param['company'] !== 'any') ? 'AND v.company = '.$param['company'] : '';
-    $w_company_2 = (isset($param['company']) && $param['company'] !== 'any') ? 'AND lp.company = '.$param['company'] : '';
+    $w_company_1 = '';
+    $w_company_2 = '';
+    if(isset($param['company']) && $param['company'] !== 'any')  {
+      $w_company_1 = 'AND v.company = '.$param['company'];
+      $w_company_2 = 'AND lp.company = '.$param['company'];
+    }
+    $w_epp_ref  = '';
+    $w_ca_ref  = '';
+    if(isset($param['reference']) && $param['reference'] !== "") {
+      $w_ca_ref = "AND v.reference LIKE '%{$param['reference']}%'";
+      $w_epp_ref = "AND lp.reference LIKE '%{$param['reference']}%'";
+    }
 
     $w_status = '';
     if (isset($param['status'])) {
@@ -63,7 +72,7 @@ class Actual_docs_model extends CI_Model {
         INNER JOIN
           tbl_fund f ON f.fid = v.fund
         WHERE
-          v.transfer_date IS NOT NULL {$w_region} {$w_company_1} ${w_status}
+          v.transfer_date IS NOT NULL {$w_region} {$w_company_1} {$w_status} {$w_ca_ref}
         ORDER BY transfer_date DESC LIMIT 500)
         UNION
         (SELECT
@@ -81,7 +90,7 @@ class Actual_docs_model extends CI_Model {
           tbl_actual_docs ad
             ON ad.voucher_or_lto_payment_id = lp.lpid AND payment_method = "EPP"
         WHERE
-          lp.deposit_date IS NOT NULL {$w_region} {$w_company_2} {$w_status}
+          lp.deposit_date IS NOT NULL {$w_region} {$w_company_2} {$w_status} {$w_epp_ref}
         ORDER BY deposit_date DESC LIMIT 500)
       ) AS batch
       JOIN
@@ -130,6 +139,9 @@ SQL;
   public function update($actual_docs) {
     switch ($actual_docs['deposit_slip']) {
       case 'Not Original':
+      case 'No Deposit Slip':
+      case 'Incomplete Miscellaneous OR':
+      case 'No Miscellaneous OR':
         $actual_docs['date_incomplete'] = date('Y-m-d H:i:s');
         $actual_docs['status'] = 'Incomplete';
         $actual_docs['date_completed'] = NULL;
