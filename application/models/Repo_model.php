@@ -485,7 +485,6 @@ SQL;
 
   public function save_ca(array $batches) {
     $this->db->trans_start();
-    //TODO Add amount matrix.
     foreach ($batches as $repo_batch_id => $doc_no) {
       $this->db->query("
 	UPDATE
@@ -509,8 +508,8 @@ SQL;
 	SET
 	  rb.doc_no = '{$doc_no}',
 	  rb.date_doc_no_encoded = NOW(),
-	  rb.bank_amount = count.no_of_unit * 1700,
-	  rb.amount = count.no_of_unit * (rbgt.repo - 1700),
+	  rb.bank_amount = count.no_of_unit * rbgt.repo_bmi,
+	  rb.amount = count.no_of_unit * rbgt.repo_cmc,
 	  rb.status = 'FOR DEPOSIT'
 	WHERE
 	  rb.repo_batch_id = {$repo_batch_id}

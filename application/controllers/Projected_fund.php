@@ -17,7 +17,6 @@ class Projected_fund extends MY_Controller {
     $this->access(1);
     $this->header_data('title', 'Projected Funds');
     $this->header_data('nav', 'projected_fund');
-    $this->header_data('dir', './');
     $this->footer_data('script', '<script src="assets/modal/projected_fund.js?v1.0.0"></script>');
 
     $data['position'] = $_SESSION['position'];
@@ -27,8 +26,6 @@ class Projected_fund extends MY_Controller {
   }
 
   public function create_voucher() {
-    // $fid = $this->input->get('fid'); //FOR DEBUGGING
-    // $cid = $this->input->get('cid');
     $fid = $this->input->post('fid');
     $cid = $this->input->post('cid');
     $data['fid'] = $fid;
@@ -110,7 +107,7 @@ class Projected_fund extends MY_Controller {
     }
 
     $this->access(16);
-    $this->header_data('title', 'CA List');
+    $this->header_data('title', 'Brand New CA List');
     $this->header_data('nav', $nav);
     $this->header_data('dir', './../');
     $this->footer_data('script', '<script src="./../assets/js/voucher_list.js"></script>');
@@ -125,4 +122,32 @@ class Projected_fund extends MY_Controller {
     $data['table']  = $this->projected_fund->list_voucher($param);
     $this->template('projected_fund/list_voucher', $data);
   }
+
+  public function repo_ca_list() {
+    $this->access(16);
+    $this->header_data('title', 'Repo CA List');
+    $this->header_data('dir', './../');
+
+    $param = new Stdclass;
+    $param->date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-1 day'));
+    $param->date_to   = $this->input->post('date_to') ?? date('Y-m-d');
+    $param->status    = $this->input->post('status');
+    $param->region    = $this->input->post('region_id');
+    $data['region_dropdown'] = json_decode(
+      $this->db
+      ->select("
+        CONCAT('{',
+          '\"0\": \"- Any -\",',
+          GROUP_CONCAT('\"',rid,'\"', ':\"',region,'\"')
+        ,'}') AS regions
+      ")
+      ->get('tbl_region')
+      ->row_array()['regions'],
+      true
+    );
+
+    $data['table']  = $this->projected_fund->repo_ca_list($param);
+    $this->template('projected_fund/repo_ca_list', $data);
+  }
+
 }

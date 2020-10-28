@@ -232,4 +232,29 @@ SQL;
           }
           return $result;
         }
+
+        public function repo_ca_list($param) {
+          $region = "";
+          $status = "";
+          if (!in_array($param->region,[NULL,"0"])) {
+            $region = "AND r.rid = {$param->region}";
+          }
+          if (!in_array($param->status,[NULL,"0"])) {
+            $status = "AND rb.status = '{$param->status}'";
+          }
+
+          return $this->db
+            ->select("
+              rb.reference, rb.doc_no, DATE_FORMAT(rb.date_created, '%Y-%m-%d') AS entry_date,
+              rb.debit_memo, rb.date_deposited, (rb.amount + rb.bank_amount) AS amount,
+              rb.status, r.rid, r.region
+            ")
+            ->from('tbl_repo_batch rb')
+            ->join('tbl_region r', 'r.rid = rb.region_id', 'left')
+            ->where("rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}")
+            ->limit(1000)
+            ->get()
+            ->result_object();
+        }
+
 }
