@@ -29,7 +29,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print "<tr>";
                 print "<td>".$row->code."</td>";
                 print "<td>".$row->date."</td>";
-                print "<td>".$company[$row->company]."</td>";
+                print "<td>".$row->company."</td>";
                 print "<td>".$row->sales."</td>";
                 print "<td>".$row->payment_method."</td>";
                 switch ($row->payment_method) {

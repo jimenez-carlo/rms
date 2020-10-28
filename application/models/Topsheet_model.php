@@ -513,7 +513,7 @@ class Topsheet_model extends CI_Model{
 				where type=2 and receive_date is null")->result_object();
 		else $data['table'] = $this->db->query("select *
 				from tbl_transmittal
-				where branch = ".$_SESSION['branch']."
+				where branch = ".$_SESSION['branch_code']."
 				and receive_date is null")->result_object();
 		return $data['table'];
 	}

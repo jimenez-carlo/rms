@@ -91,7 +91,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <div class="control-group">
               <div class="control-label">Plate #</div>
-              <div class="controls text"><?php print $sales->plate_no; ?></div>
+              <div class="controls text"><?php print $sales->plate_number; ?></div>
             </div>
           </div>
 

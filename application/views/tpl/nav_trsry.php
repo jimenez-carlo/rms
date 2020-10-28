@@ -34,6 +34,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund_transfer">For Process</a>
                                         <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund_transfer/for_deposit">For Deposit</a>
                                     </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('fund_transfer/for_deposit_repo') ?>">Repo For Deposit</a>
+                                    </li>
                                 </ul>
                             </li>
 
@@ -51,8 +55,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="projected_fund") echo 'class="active"'; ?>>
                                 <a href="<?php if(isset($dir)) echo $dir; ?>projected_fund">Projected Funds</a>
                             </li>
-                            <li <?php if(isset($nav) && $nav=="deposited_fund") echo 'class="active"'; ?>>
-                                <a href="<?php if(isset($dir)) echo $dir; ?>projected_fund/ca_list">Deposited Funds</a>
+                            <li class="dropdown <?php if(isset($nav) && $nav=="deposited_fund") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">CA List <i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('projected_fund/ca_list'); ?>">Brand New</a>
+                                        <a tabindex="-1" href="<?php echo base_url('projected_fund/repo_ca_list'); ?>">Repo</a>
+                                    </li>
+                                </ul>
                             </li>
                         </ul>
                     </div>

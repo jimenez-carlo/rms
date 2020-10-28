@@ -217,31 +217,28 @@ class Plate extends MY_Controller {
 		$plateno = $this->input->post('plateno');
 		$sql = "SELECT * FROM tbl_plate WHERE plate_number = '".$plateno."'";
 		$quee = $this->db->query($sql)->result();
-		if (!empty($plateno) ) {
+		if (!empty($plateno)) {
 			if(empty($quee)){
-			$sid = $this->input->post('plateid');
-			$pno = $this->input->post('plateno');
-                        $result = $this->db->query("
-                          SELECT
-			    b.branch as bid,
-			    b.bcode,
-			    b.bname AS branchname
-			  FROM
-			    tbl_sales AS b
-			  WHERE b.sid = '$sid'
-			")->result();
-			$ptn = $result[0]->bcode;
-			$this->addPlateNumber($sid,$plateno,$ptn);
-			$_SESSION['messages'][] = 'Plate number encoded successfully.';
-			redirect('plate/UpdatePlate_BS');
-		}
-		else{
-			echo "<script>
-			alert('There is an existing plate number!');
-				</script>";
-			redirect('plate/UpdatePlate_BS');
-		}
-	}
+                          $sid = $this->input->post('salesid');
+                          $pno = $this->input->post('plateno');
+                          $result = $this->db->query("
+                            SELECT
+                              b.branch as bid,
+                              b.bcode,
+                              b.bname AS branchname
+                            FROM
+                              tbl_sales AS b
+                            WHERE b.sid = '$sid'
+                          ")->result();
+                          $ptn = $result[0]->bcode;
+                          $this->addPlateNumber($sid,$plateno,$ptn);
+                          $_SESSION['messages'][] = 'Plate number encoded successfully.';
+                          redirect('plate/UpdatePlate_BS');
+		        } else {
+			  $_SESSION['warning'][] = 'Plate number already exist!';
+			  redirect('plate/UpdatePlate_BS');
+		        }
+	        }
 
 		$data['branch_def'] = ($_SESSION['position'] == 73 || $_SESSION['position'] == 81) ? $_SESSION['branch'] : 0;
 		$data['branches']   = $this->sales->dd_branches();

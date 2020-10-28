@@ -67,7 +67,7 @@ class Transmittal extends MY_Controller {
 			else redirect('transmittal/branch');
 		}
 
-		$branch = ($_SESSION['position'] == 108) ? 0 : $_SESSION['branch'];
+		$branch = ($_SESSION['position'] == 108) ? 0 : $_SESSION['branch_code'];
 
 		$data['rerfo'] = $this->transmittal->load_rerfo($rid, $branch);
 		$this->template('transmittal/view', $data);
@@ -80,7 +80,7 @@ class Transmittal extends MY_Controller {
 		$this->header_data('nav', 'transmittal');
 		$this->header_data('dir', base_url());
 
-		$data['table'] = $this->transmittal->get_branch_rerfo($_SESSION['branch']);
+		$data['table'] = $this->transmittal->get_branch_rerfo($_SESSION['branch_code']);
 		$this->template('transmittal/branch_list', $data);
 	}
 

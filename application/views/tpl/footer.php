@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
             <footer>
-                <p class="pull-left footer">Registration Monitoring System v2.4.1</p>
+                <p class="pull-left footer">Registration Monitoring System v2.10.0</p>
                 <p class="pull-right footer">&copy; CMC <?php print date('Y'); ?> </p>
             </footer>
         </div>
@@ -44,24 +44,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           });
         }
 
-
         $(document).ready(function(){
-            $('select').select2();
-            $(".datepicker").datepicker({
-                  format: 'yyyy-mm-dd'
-                });
+          $('select').select2();
+          $(".datepicker").datepicker({
+            format: 'yyyy-mm-dd'
+          });
 
-            $(document).ajaxStart(function(){
-                $('.ajax-loader').removeClass('hide');
-            }).ajaxComplete(function(){
-                $('.ajax-loader').addClass('hide');
-            });
+          $(document).ajaxStart(function(){
+            $('.ajax-loader').show();
+          })
+          .ajaxStart(function() {
+            $('.alert').hide();
+          })
+          .ajaxComplete(function(){
+            $('.ajax-loader').hide();
+          });
 
-            $('form').submit(function(){
-                $(this).find('.numeric').each(function(){
-                    $(this).val( toFloat( $(this).val() ) );
-                });
+          $('form').submit(function(){
+            $(this).find('.numeric').each(function(){
+              $(this).val( toFloat( $(this).val() ) );
             });
+          });
         });
         </script>
         <?php if(isset($script)) echo $script; ?>

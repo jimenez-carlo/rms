@@ -1,6 +1,12 @@
 
 <?php
 defined ('BASEPATH') OR exit('No direct script access allowed');
+/*
+ * TODO
+ * - Plate id should be join using tbl_engine table.
+ *
+ *
+ */
 
 class Plate_model extends CI_Model{
 
@@ -83,9 +89,9 @@ class Plate_model extends CI_Model{
 
         public function plate_report($param)
         {
+          $result = '';
           $engine_no = (!empty($param->engine_no))
             ? " AND engine_no LIKE '%".$param->engine_no."%'" : '';
-
 
           if(!empty($param->engine_no)){
             $result = $this->db->query("
@@ -94,7 +100,7 @@ class Plate_model extends CI_Model{
                   FROM
                     tbl_sales
                   INNER JOIN
-                        tbl_status ON status = status_id
+                    tbl_status ON status = status_id
                   INNER JOIN
                     tbl_engine ON engine = eid
                   INNER JOIN
@@ -102,10 +108,11 @@ class Plate_model extends CI_Model{
                   LEFT JOIN
                     tbl_plate AS b ON tbl_sales.sid = b.sid
                   WHERE
-                    1=1 ".$engine_no." AND ".$this->company."AND tbl_status.status_type = 'SALES' AND (tbl_sales.status = 4 OR tbl_sales.status = 5) AND b.plate_number IS NULL
+		    1=1 AND region = {$_SESSION['rrt_region_id']} ".$engine_no."
+		    AND ".$this->company." AND tbl_status.status_type = 'SALES'
+		    AND (tbl_sales.status = 4 OR tbl_sales.status = 5) AND b.plate_number IS NULL
                   ORDER BY tbl_sales.sid DESC LIMIT 1000
                 ")->result_object();
-
 
                 foreach ($result as $key => $sales)
                 {
@@ -119,9 +126,6 @@ class Plate_model extends CI_Model{
                   $result[$key] = $sales;
                 }
 
-          }
-          else{
-                $result = '';
           }
 
                 return $result;
@@ -306,15 +310,30 @@ class Plate_model extends CI_Model{
             plate_id = $pid");
         }
 
-	public function add_platenumber($sid, $pno, $ptn)
+	public function add_platenumber($sid, $plate_number, $branch_code)
         {
-          $trans = 'P-'.$ptn.'-'.date("ymd");
-          $this->db->query("INSERT INTO tbl_plate(plate_number, status_id, date_encoded, sid, plate_trans_no)
-            VALUES ('$pno',
-              '1',
-              NOW(),
-              '$sid',
-              '$trans')");
+	  $plate_id = NULL;
+          $trans = 'P-'.$branch_code.'-'.date("ymd");
+	  $status = $this->db->query("
+	    INSERT INTO
+	      tbl_plate (plate_number, status_id, date_encoded, sid, plate_trans_no)
+              VALUES ('$plate_number', '1', NOW(), '$sid', '$trans')
+	  ");
+
+	  if ($status) {
+	    $plate_id = $this->db->insert_id();
+	    $this->db->query("
+	      UPDATE
+		tbl_engine e,
+		tbl_sales s
+	      SET
+		e.plate_id = {$plate_id}
+	      WHERE
+		e.eid = s.engine AND s.sid = {$sid}
+	    ");
+	  }
+
+	  return $plate_id;
         }
 
 	//Load Branch

@@ -59,12 +59,15 @@ class Login extends CI_Controller {
                                             'ext' => $raw['user_info']->ext,
                                             'branch_id' => $raw['user_info']->bid,
                                             'branch_code' => $raw['user_info']->b_code,
+                                            'branch_name' => $raw['user_info']->branch_name,
                                             'position' => $raw['user_info']->position_id,
                                             'position_name' => $raw['user_info']->position_name,
                                             'dept_id' => $raw['user_info']->dept_id,
                                             'dept_name' => $raw['user_info']->dept_name,
                                             'company' => $raw['user_info']->company_id,
                                             'company_code'=> $raw['user_info']->company_code,
+                                            'rrt_region_id'=> $raw['user_info']->rrt_region_id,
+                                            'rrt_region_name'=> $raw['user_info']->rrt_region_name,
                                             'sys_access'  => $raw['sys_access'],
                                             'page_access' => $raw['page_access']
                                           );
@@ -96,7 +99,6 @@ class Login extends CI_Controller {
 						case 72:
 						case 73:
 						case 81: // if ccn, set branch
-							$user_info['branch'] = substr($user_info['username'], 0, 4);
 							break;
 						case 3:
 						case 34:
@@ -204,7 +206,7 @@ class Login extends CI_Controller {
                     'firstname'   => 'Alma',
                     'middlename'  => '',
                     'ext'         => '',
-                    'branch'      => '9000',
+                    'branch_code' => '9000',
                     'position'    => '-1',
                     'department'  => '0',
                     'company'     => '5',
@@ -224,7 +226,7 @@ class Login extends CI_Controller {
                     'firstname'   => 'Mary Jane',
                     'middlename'  => '',
                     'ext'         => '',
-                    'branch'      => '9000',
+                    'branch_code' => '9000',
                     'position'    => '-2',
                     'department'  => '0',
                     'sys_access'  => array(),
@@ -244,7 +246,7 @@ class Login extends CI_Controller {
                     'firstname'   => 'Maria Rose Pearl',
                     'middlename'  => '',
                     'ext'         => '',
-                    'branch'      => '8000',
+                    'branch_code' => '8000',
                     'position'    => '-2',
                     'department'  => '0',
                     'sys_access'  => array(),

@@ -24,10 +24,10 @@ class Sales extends MY_Controller {
 		$param->branch = $this->input->post('branch');
 
 		if (empty($param->branch) && !is_numeric($param->branch) && ($_SESSION['position'] == 72 || $_SESSION['position'] == 73 || $_SESSION['position'] == 81)) {
-			$param->branch = $_SESSION['branch'];
+			$param->branch = $_SESSION['branch_code'];
 		}
 
-		$data['branch_def'] = ($_SESSION['position'] == 73 || $_SESSION['position'] == 81) ? $_SESSION['branch'] : 0;
+		$data['branch_def'] = ($_SESSION['position'] == 73 || $_SESSION['position'] == 81) ? $_SESSION['branch_code'] : 0;
 		$data['branches']   = $this->sales->dd_branches();
 		$data['status']     = $this->sales->status;
 		$data['table']      = $this->sales->customer_status_report($param);

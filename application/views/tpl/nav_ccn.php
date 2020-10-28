@@ -17,11 +17,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>profile">Profile</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>profile">Profile</a>
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>logout">Logout</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>logout">Logout</a>
                                     </li>
                                 </ul>
                             </li>
@@ -37,15 +37,31 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>disapprove">Disapproved Sales</a>
                             </li>
+                            <li class="dropdown <?php echo (isset($nav) && $nav=="repo-registration") ? 'active' : ''; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Repo<i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/in'); ?>">Repo In</a>
+                                    </li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo'); ?>">Inventory</a>
+                                    </li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/batch'); ?>">CA Batch</a>
+                                    </li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/misc_exp'); ?>">Misc Expense</a>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Plate <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/branch_list">Plate Transmittal</a>
+                                        <a tabindex="-1" href="<?php echo base_url('plate/branch_list'); ?>">Plate Transmittal</a>
                                     </li>
                                 </ul>
                             </li>
-
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

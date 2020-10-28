@@ -65,7 +65,7 @@ class Rms_model extends CI_Model{
 			$branch_clause = "";
 		}
 		else {
-			$branch_clause = " AND branch = " . $_SESSION['branch'];
+			$branch_clause = " AND branch = " . $_SESSION['branch_code'];
 		}
 		$result = $this->db->query("SELECT
 																	a.sid,
@@ -93,7 +93,7 @@ class Rms_model extends CI_Model{
 			$branch_clause = "";
 		}
 		else {
-			$branch_clause = " AND branch = " . $_SESSION['branch'];
+			$branch_clause = " AND branch = " . $_SESSION['branch_code'];
 		}
 		$result = $this->db->query("SELECT
 																	tfid,
