@@ -29,7 +29,14 @@ class Actual_docs extends MY_Controller {
     $data['company'] = $company;
     $search = $this->input->post();
     $data['references'] = $this->actual_docs->get_batch($search);
-    $data['dep_slip_option'] = array(0 => '--Select--', 'Original' => 'Original', 'Not Original' => 'Not Original');
+    $data['dep_slip_option'] = array(
+      0 => '--Select--',
+      'Original' => 'Original',
+      'Not Original' => 'Not Original',
+      'No Deposit Slip' => 'No Deposit Slip',
+      'Incomplete Miscellaneous OR' => 'Incomplete Miscellaneous OR',
+      'No Miscellaneous OR' => 'No Miscellaneous OR'
+    );
 
     $this->template('actual_docs/index.php', $data);
   }

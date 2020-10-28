@@ -19,7 +19,10 @@ $('.save-actual-docs').on('click', function(e){
 $('[name=deposit_slip]').on('change', function(e){
   var that = $(this);
   var actual_docs_id = $(this).closest('tr').prop('id');
-  var dep_slip_values = [ "Original", "Not Original" ];
+  var dep_slip_values = [
+    "Original", "Not Original", 'No Deposit Slip',
+    'Incomplete Miscellaneous OR', 'No Miscellaneous OR'
+  ];
 
   var data_to_send = {
     'actual_docs_id': actual_docs_id,
