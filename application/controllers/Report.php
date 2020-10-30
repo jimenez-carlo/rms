@@ -13,14 +13,14 @@ class Report extends My_Controller {
       switch ($this->input->post('payment_method')) {
         case 'EPP':
           $report_data = $this->report->acctg_epp([
-            "from" => $this->input->post('date_form'),
+            "from" => $this->input->post('date_from'),
             'to' => $this->input->post('date_to')
           ]);
           break;
 
         case 'CASH':
           $report_data = $this->report->acctg_cash([
-            "from" => $this->input->post('date_form'),
+            "from" => $this->input->post('date_from'),
             'to' => $this->input->post('date_to')
           ]);
           break;
