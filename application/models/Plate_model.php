@@ -56,7 +56,7 @@ class Plate_model extends CI_Model{
 
           $result = $this->db->query("
                  SELECT
-                                                *, tbl_sales.sid AS ssid, tbl_sales.mvf_no AS mvff_no
+                                                *, tbl_sales.sid AS ssid, tbl_engine.mvf_no AS mvff_no
                   FROM
                     tbl_sales
                   INNER JOIN
@@ -185,7 +185,7 @@ class Plate_model extends CI_Model{
           }
           $result = $this->db->query("SELECT
             b.branch as bid,
-            b.mvf_no as mvf_no,
+            d.mvf_no as mvf_no,
             a.plate_id AS plate_id,
             b.bname AS branchname,
             b.bcode as bcode,
@@ -217,7 +217,7 @@ class Plate_model extends CI_Model{
           $result = $this->db->query("SELECT
             a.plate_id AS plate_id,
             b.bname AS branchname,
-            b.mvf_no as mvf_no,
+            d.mvf_no as mvf_no,
             CONCAT(c.last_name, ', ', c.first_name) AS name,
             d.engine_no AS engine_no,
             a.plate_number AS plate_number,
@@ -267,7 +267,7 @@ class Plate_model extends CI_Model{
           $result = $this->db->query("SELECT
             a.*,
             b.bname AS branchname,
-            b.mvf_no as mvf_no,
+            d.mvf_no as mvf_no,
             CONCAT(c.last_name, ', ', c.first_name) AS name,
             d.engine_no AS engine_no,
             e.status_name AS status
@@ -368,7 +368,7 @@ class Plate_model extends CI_Model{
               ANY_VALUE(a.received_cust) AS received_cust, ANY_VALUE(a.plate_trans_no) AS plate_trans_no,
               b.branch AS bid,
               ANY_VALUE(b.bcode) AS bcode,
-              ANY_VALUE(b.mvf_no) as mvf_no,
+              ANY_VALUE(d.mvf_no) as mvf_no,
               b.bname AS branchname,
               SUM(CASE WHEN a.status_id = '1' THEN 1 ELSE 0 END) AS forApproval,
               SUM(CASE WHEN a.status_id = '2' THEN 1 ELSE 0 END) AS pending,
@@ -397,7 +397,7 @@ class Plate_model extends CI_Model{
             a.*,
             b.branch as bid,
             b.bname AS branchname,
-            b.mvf_no as mvf_no,
+            d.mvf_no as mvf_no,
             b.bcode as bcode,
             CONCAT(c.last_name, ', ', c.first_name) AS name,
             d.engine_no AS engine_no,
@@ -429,7 +429,7 @@ class Plate_model extends CI_Model{
           }
           $result = $this->db->query("SELECT
             b.branch as bid,
-            b.mvf_no as mvf_no,
+            d.mvf_no as mvf_no,
             a.plate_id AS plate_id,
             a.plate_trans_no AS plate_trans_no,
             b.bname AS branchname,
@@ -468,7 +468,7 @@ class Plate_model extends CI_Model{
           }
           $result = $this->db->query("SELECT
             b.branch as bid,
-            b.mvf_no as mvf_no,
+            d.mvf_no as mvf_no,
             a.plate_id AS plate_id,
             b.bname AS branchname,
             a.plate_trans_no AS plate_trans_no,
