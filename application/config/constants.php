@@ -84,32 +84,11 @@ defined('EXIT_DATABASE')       OR define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
+defined('RMS_VERSION')         OR define('RMS_VERSION', '2.12.2'); // RMS Version
+
 switch(ENVIRONMENT):
 
-  case 'testing':
-
-    defined('BASE_URL')      ? null : define('BASE_URL', 'https://staging.motortrade.com.ph/rms-staging');
-
-    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.4');
-    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'dev');
-    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'root');
-    defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
-
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.17.0.4');
-    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'dev');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'root');
-    defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_db_55');
-
-    # MDI_DEV_CES2
-    defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '172.17.0.4');
-    defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'dev');
-    defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'root');
-    defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'mdi_dev_ces2');
-
-    break;
-
   case 'production':
-
     defined('BASE_URL')      ? null : define('BASE_URL', 'http://192.168.200.2/rms');
 
     # RMS_DB
@@ -147,7 +126,6 @@ switch(ENVIRONMENT):
     defined('MDI_DEV_RMS_DB_USER')      ? null : define('MDI_DEV_RMS_DB_USER', 'admin');
     defined('MDI_DEV_RMS_DB_PASSWORD')  ? null : define('MDI_DEV_RMS_DB_PASSWORD', 'admin');
     defined('MDI_DEV_RMS_DB_NAME')      ? null : define('MDI_DEV_RMS_DB_NAME', 'dev_rms');
-
   break;
 
 endswitch;
