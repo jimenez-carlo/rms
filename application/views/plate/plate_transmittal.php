@@ -37,7 +37,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                      echo form_dropdown('branch', $branches, set_value('branch'), $js);
                      echo '</div></div>';
             }
-                     $status = array(0 => '- Any -', 1 => 'For HO Validation', 2 => 'In-Transit', 3 => 'Branch Received', 4=>'Received by Customer');
+                     $status = array(0 => '- Any -', 1 => 'For Validation', 2 => 'In-Transit', 3 => 'Branch Received', 4=>'Received by Customer');
                      echo '<div class="control-group span5">';
                      echo form_label('Status', 'status', array('class' => 'control-label'));
                      echo '<div class="controls">';
