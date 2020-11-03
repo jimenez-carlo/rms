@@ -71,14 +71,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             </li>
                         </ul>
                     </li>
-                    <li class="dropdown">
+                    <li class="dropdown <?php echo (isset($nav) && $nav === 'disapprove') ? 'active' : ''; ?>">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Disapprove<i class="caret"></i></a>
                         <ul class="dropdown-menu">
                           <li><a href="<?php echo base_url('disapprove/resolve'); ?>">View Resolve</a></li>
                           <li><a href="<?php echo base_url('disapprove'); ?>">View Disapprove</a></li>
                         </ul>
                     </li>
-                    <li><a href="<?php echo base_url('actual_docs'); ?>">Actual Docs</a></li>
+                    <li class="<?php echo (isset($nav) && $nav === 'actual_docs') ? 'active' : ''; ?>"><a href="<?php echo base_url('actual_docs'); ?>">Actual Docs</a></li>
+                    <li class="<?php echo (isset($nav) && $nav === 'acctg_report') ? 'active' : ''; ?>"><a href="<?php echo base_url('report'); ?>">Reports</a></li>
                 </ul>
             </div>
             <!--/.nav-collapse -->
