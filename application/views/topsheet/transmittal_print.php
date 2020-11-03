@@ -138,7 +138,7 @@
         <div class="title">Shipment Description:</div>
         <ul>
             <?php
-            foreach ($row->sales as $sales)
+            foreach (json_decode($row->sales) as $sales)
             {
                 print "<li>";
                 if ($row->sales_type == 0)
@@ -172,6 +172,10 @@
             ?>
         </div>
         <br>
+        <div>
+            <span>Rerfo Number:</span>
+            <span><?php print $row->rerfo_numbers; ?></span>
+        </div>
         <div>
             <span>Tracking No:</span>
             <span><?php print $row->bcode.$row->sales_type.'0'.date('ymd', strtotime($topsheet->date)); ?></span>
