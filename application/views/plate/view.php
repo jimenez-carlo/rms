@@ -52,7 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<tr>';
                                                                 if ($_SESSION['position']=='108'){
 
-                           if ($plate->status=="For HO Validation"){
+                           if ($plate->status=="For Validation"){
                         print '<td><input type="checkbox" name="checkbox['.$plate->plate_id.']" class="delete_checkbox" value="'.$plate->plate_id.'" /></td>';
 
                      }
@@ -75,7 +75,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <?php print form_hidden('plate_id', 0); ?>
                <?php
                                                 if ($_SESSION['position']=='108'){
-                           if ($plate->status=="For HO Validation" &&  $plate->date_encoded >= date('yy-m-d', strtotime('-3 day'))){
+                           if ($plate->status=="For Validation" &&  $plate->date_encoded >= date('yy-m-d', strtotime('-3 day'))){
                              print '<td>'.$plate->received_cust.'</td>';
                             /*  print '<td>
                                        <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal">Edit</a>
@@ -87,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                         <input type="submit" class="btn btn-success" value="Approve" name="submit['.$plate->plate_id.']">
                                     </td>';
                            }
-                           else if($plate->status=="For HO Validation"){
+                           else if($plate->status=="For Validation"){
                             print '<td>'.$plate->received_cust.'</td>';
                              print '<td>
                                        <a class="btn btn-success" disabled>Edit</a>
@@ -104,13 +104,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                            }
                         }
               else if($_SESSION['position']=='109' || $_SESSION['position']=='156'){
-                      if ($plate->status=="For HO Validation"  &&  $plate->date_encoded >= date('yy-m-d', strtotime('-3 day'))){
+                      if ($plate->status=="For Validation"  &&  $plate->date_encoded >= date('yy-m-d', strtotime('-3 day'))){
                              print '<td>'.$plate->received_cust.'</td>';
                               print '<td>
                                        <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal'.$plate->plate_id.'">Edit</a>
                                     </td>';
                            }
-                      else if ($plate->status=="For HO Validation"){
+                      else if ($plate->status=="For Validation"){
                            print '<td>'.$plate->received_cust.'</td>';
                              print '<td>
                                        <a class="btn btn-success" disabled>Edit</a>

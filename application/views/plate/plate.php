@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
-<div class="container-fluid"> 
+<div class="container-fluid">
    <div class="row-fluid">
       <div class="block">
                 <div class="navbar navbar-inner block-header">
@@ -34,7 +34,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                      echo form_dropdown('branch', $branches, set_value('branch'), $js);
                      echo '</div></div>';
 
-                     $status = array(0 => '- Any -', 1 => 'For HO Validation', 2 => 'In-Transit', 3 => 'Branch Received', 4=>'Received by Customer');
+                     $status = array(0 => '- Any -', 1 => 'For Validation', 2 => 'In-Transit', 3 => 'Branch Received', 4=>'Received by Customer');
                      echo '<div class="control-group span5">';
                      echo form_label('Status', 'status', array('class' => 'control-label'));
                      echo '<div class="controls">';
@@ -61,31 +61,31 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 
                </fieldset>
-        
+
                <hr>
                <table class="table" style="margin:0">
                   <div style="float:left">
                    <?php  if ($_SESSION['pid']=='108'){ ?>
-                   
+
             <button type="button" name="delete_all" id="delete_all" class="btn btn-primary btn-sm">Approve Checked</button>
-          
+
              <?php } ?>
              <!--span style="color:white;">---</span-->
           </div>
              <?php if ($_SESSION['position'] == 108){ ?>
-              
+
                <form  method="post" action="<?= base_url()?>plate/plate_transmittal">
                 <div style="float:right">
                  <?php
                      $branches = array('_any' => '- Any -') + $branches;
                      $js = 'id="shirts" style="width: 240px" onChange="some_function();"';
                      echo form_dropdown('btopsheet', $branches, set_value('branch'), $js);
-                    
+
                      ?>
                <span style="color:white;">---</span><input type="submit" name="search" value="Generate Transmittal" class="btn btn-success">
                </div>
             </form>
-                       
+
          <?php } ?>
               <br><br>
                  <form method="post" class="form-horizontal" action="" target="">
@@ -139,12 +139,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                            ? 'Printed on '.$rerfo->print_date : '<i>For printing</i>';  */
 
                         print '<tr>';
-                                                $key 
+                                                $key
                         = '['.$rerfo->plate_id.']';
                         print '<tr>';
                                                 if ($_SESSION['pid']=='108'){
                            print '<td hidden></td>';
-                           if ($rerfo->status=="For HO Validation"){
+                           if ($rerfo->status=="For Validation"){
                         print '<td><input type="checkbox" class="delete_checkbox" value="'.$rerfo->plate_id.'" /></td>';
 
                      }
@@ -162,9 +162,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         print '<td class="td_receivedt">'.$rerfo->received_dt.'</td>';
                         print '<td class="td_receivedt">'.$rerfo->received_cust.'</td>';
 
-                       
+
                                                 if ($_SESSION['pid']=='108'){
-                           if ($rerfo->status=="For HO Validation"){
+                           if ($rerfo->status=="For Validation"){
                               print '<td>
                                        <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal">Edit</a>
                                        <a name="sid" class="btn btn-success" onclick="approvePlateno('.$rerfo->plate_id.')">Approve</a>
@@ -187,7 +187,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   else {
                     print '<input type="submit" name="request'.$key.'" value="Request Reprinting" class="btn btn-success request">';
                   }*/
-                       
+
                         print '</tr>';
                      }
                   }
@@ -206,7 +206,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                               <td></td>
                               <td></td>
                               ';
-                     if ($_SESSION['pid']=='108'){ 
+                     if ($_SESSION['pid']=='108'){
                        print '<td></td><td></td></tr>';
                     }
                     else{
@@ -311,9 +311,9 @@ $(".btn[data-target='#myModal']").click(function() {
    var modalBody = $('<div id="modalContent"></div>');
    var modalForm = $('<form id="form_plateno" role="form" name="modalForm" class="form-horizontal" method="post"></form>');
    var formGroup = $('<div class="control-group"></div>');
-   formGroup.append('<div class="controls"><input name="plateid" class="form-control" id="md_plateid" value="'+columnValues[2]+'" style="visibility: hidden;"/></div>'); 
+   formGroup.append('<div class="controls"><input name="plateid" class="form-control" id="md_plateid" value="'+columnValues[2]+'" style="visibility: hidden;"/></div>');
    formGroup.append('<div class="control-label">Plate #</div>');
-   formGroup.append('<div class="controls"><input name="plateno" class="form-control" id="md_plateno" value="'+columnValues[6]+'" /></div>'); 
+   formGroup.append('<div class="controls"><input name="plateno" class="form-control" id="md_plateno" value="'+columnValues[6]+'" /></div>');
    modalForm.append(formGroup);
    modalBody.append(modalForm);
    $('.modal-body').html(modalBody);
