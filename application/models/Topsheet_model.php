@@ -225,29 +225,58 @@ class Topsheet_model extends CI_Model{
 		return $topsheet;
 	}
 
-	public function transmit_topsheet($tid)
-	{
-		$this->db->query("update tbl_topsheet set transmittal_date = '".date('Y-m-d')."' where tid = ".$tid);
+        public function transmit_topsheet($tid) {
+          $this->db->trans_start();
+          $this->db->query("UPDATE tbl_topsheet SET transmittal_date = '".date('Y-m-d')."' WHERE tid = ".$tid);
+          $query_topsheet = <<<SQL
+            SELECT
+              t.tid, t.user, t.post_date,
+              t.trans_no, t.company, t.date,
+              t.meal, t.photocopy, t.transportation,
+              t.others, t.others_specify, t.status,
+              t.misc_status, t.print, t.transmittal,
+              t.print_date, t.transmittal_date, r.*
+            FROM
+              tbl_topsheet t
+            LEFT JOIN
+              tbl_region r ON r.rid = t.region
+            WHERE
+              t.tid = {$tid}
+SQL;
 
-		$topsheet = $this->db->query("select * from tbl_topsheet
-			where tid = ".$tid)->row();
-		$topsheet->region = $this->region[$topsheet->region];
-		$topsheet->branch = $this->db->query("select bcode, bname, sales_type
-			from tbl_sales
-			inner join tbl_customer on customer = cid
-			where topsheet = ".$tid."
-			group by bcode, bname, sales_type")->result_object();
-		foreach ($topsheet->branch as $key => $branch)
-		{
-			$branch->sales = $this->db->query("select * from tbl_sales
-				inner join tbl_customer on customer = cid
-				where topsheet = ".$tid."
-				and bcode = '".$branch->bcode."'
-				and sales_type = ".$branch->sales_type)->result_object();
-			$topsheet->branch[$key] = $branch;
-		}
-		return $topsheet;
-	}
+          $topsheet = $this->db->query($query_topsheet)->row();
+
+          $this->db->simple_query("SET SESSION group_concat_max_len = 18446744073709551615");
+          $query_topsheet_sales = <<<SQL
+            SELECT
+              s.bcode, s.bname, s.sales_type, GROUP_CONCAT(DISTINCT r.trans_no SEPARATOR ", ") AS rerfo_numbers, sales
+            FROM
+              tbl_sales s
+            INNER JOIN
+              tbl_customer c ON s.customer = c.cid
+            LEFT JOIN
+              tbl_rerfo r ON r.rid = s.rerfo
+            LEFT JOIN (
+              SELECT
+                bcode, sales_type, CONCAT('[',GROUP_CONCAT('{"cr_no": "',cr_no, '", "last_name": "',last_name,'", "first_name": "',first_name,'"}'),']') AS sales
+              FROM
+                tbl_sales
+              INNER JOIN
+                tbl_customer ON customer = cid
+              WHERE
+                topsheet = {$tid}
+              GROUP BY
+                bcode, sales_type
+            ) AS sales ON s.bcode = sales.bcode AND s.sales_type = sales.sales_type
+            WHERE
+              s.topsheet = {$tid}
+            GROUP BY
+              s.bcode, s.bname, s.sales_type, sales
+SQL;
+          $topsheet->branch = $this->db->query($query_topsheet_sales)->result_object();
+          $this->db->trans_complete();
+          return $topsheet;
+        }
 
 	public function view_topsheet($tid)
 	{
