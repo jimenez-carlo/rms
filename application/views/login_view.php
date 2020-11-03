@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <!DOCTYPE html>
 <html class="no-js">
-    
+
     <head>
         <title><?php if(isset($title)) echo $title; else echo 'Registration Monitoring System'; ?></title>
         <link rel="shortcut icon" href="images/favicon.ico"/>
@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <form class="form-signin" method="post">
           <center>
             <img class="signin-logo" src="images/logo-cmc.png">
-            <h4 class="form-signin-heading">Registration Monitoring System v2</h4>
+            <h4 class="form-signin-heading">Registration Monitoring System version 2.12.0</h4>
           </center>
 
             <?php
