@@ -301,7 +301,7 @@ class Sales_model extends CI_Model{
                     s.cr_date = '{$sales->cr_date}',
                     s.cr_no = '{$sales->cr_no}',
                     s.file = {$sales->file},
-                    s.registration_date = '{$sales->registration_date}',
+                    s.registration_date = NOW(),
                     s.user = {$uid},
                     e.mvf_no = '{$sales->mvf_no}'
                   WHERE

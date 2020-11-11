@@ -131,50 +131,6 @@ class Plate_model extends CI_Model{
                 return $result;
         }
 
-	public function register_sales($data)
-	{
-		$this->load->model('Sales_model', 'sales');
-		$transmittal = $this->db->query("select * from tbl_lto_transmittal
-			where ltid = ".$data['ltid'])->row();
-
-		foreach ($data['registration'] as $sid => $registration)
-		{
-			$sales = new Stdclass();
-			$sales->sid = $sid;
-			$sales->registration = $data['registration'][$sid];
-			$sales->tip = $data['tip'][$sid];
-			$sales->cr_date = $data['cr_date'][$sid];
-			$sales->cr_no = $data['cr_no'][$sid];
-			$sales->mvf_no = $data['mvf_no'][$sid];
-			$sales->plate_no = $data['plate_no'][$sid];
-			$sales->status = 4;
-			$sales->registration_date = date('Y-m-d H:i:s');
-			$this->sales->save_registration($sales);
-		}
-
-		if ($data['expense'] != 0)
-		{
-			$fund = $this->db->query("select * from tbl_fund
-				where region = ".$transmittal->region)->row();
-
-			$new_fund = new Stdclass();
-			$new_fund->cash_on_hand = $fund->cash_on_hand + $data['expense'];
-			$this->db->update('tbl_fund', $new_fund, array('fid' => $fund->fid));
-
-			$history = new Stdclass();
-			$history->fund = $fund->fid;
-			$history->in_amount = ($data['expense'] > 0) ? $data['expense'] : 0;
-			$history->out_amount = ($data['expense'] < 0) ? $data['expense'] * 1 : 0;
-			$history->new_fund = $fund->fund;
-			$history->new_hand = $new_fund->cash_on_hand;
-			$history->new_check = $fund->cash_on_check;
-			$history->type = 6;
-			$this->db->insert('tbl_fund_history', $history);
-		}
-
-		$_SESSION['messages'][] = "Transmittal # ".$transmittal->code." updated successfully.";
-	}
-
         public function plate_topsheet($branch)
         {
           if($branch == ''){

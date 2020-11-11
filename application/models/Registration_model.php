@@ -89,7 +89,6 @@ class Registration_model extends CI_Model{
 			$sales->mvf_no = $data['mvf_no'][$sid];
 			$sales->plate_no = $data['plate_no'][$sid];
 			$sales->status = 4;
-			$sales->registration_date = date('Y-m-d H:i:s');
 			$this->sales->save_registration($sales);
 		}
 

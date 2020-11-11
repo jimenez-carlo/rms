@@ -59,7 +59,7 @@ class Attachment extends MY_Controller {
 			foreach ($_FILES['scanFiles']['name'] as $key => $val) {
 				$total_size += $_FILES['scanFiles']['size'][$key];
 			}
-	
+
 			if($total_size > 1000000) {
 				$_SESSION['warning'][] = "The file you are attempting to upload is larger than the permitted size.";
 			}
@@ -138,7 +138,7 @@ class Attachment extends MY_Controller {
 		$new_sales->file = 1;
 		$this->sales->save_registration($new_sales);
 
-  	$this->load->model('Login_model', 'login');
+                $this->load->model('Login_model', 'login');
 		$filenames = implode(',', $files);
 		$this->login->saveLog('saved details for sale ['.$sales->sid.'] with Engine # '.$sales->engine_no.':\r\nFiles - '.$filenames.'\r\nCR # - '.$sales->cr_no.'\r\nMVF # - '.$sales->mvf_no.'\r\nPlate # - '.$sales->plate_no);
 
