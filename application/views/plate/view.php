@@ -125,7 +125,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                            }
               }
               else{
-                if ($_SESSION['branch']==$plate->bcode){
+                if ($_SESSION['branch_code']==$plate->bcode){
                   if ($plate->status_id==2){
                      print '<td>'.$plate->received_cust.'</td>';
 
