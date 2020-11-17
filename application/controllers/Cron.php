@@ -106,7 +106,18 @@ class Cron extends MY_Controller {
 
                 $query = <<<SQL
                   SELECT
-                    c.*, r.*, si_mat_no, regn_status, date_created
+                    c.*, r.*, si_mat_no, regn_status,
+                    date_created, si_email,
+                    DATE_FORMAT(si_birth_date, '%Y-%m-%d') AS si_birth_date,
+                    REPLACE(
+                      IF(
+                        CHAR_LENGTH(si_phone_number) = 10,
+                        CONCAT('0', si_phone_number),
+                        si_phone_number
+                      ),
+                      '-',
+                      ''
+                    ) AS si_phone_number,
                     ,CASE rrt_class
                       WHEN 'NCR' THEN 1
                       WHEN 'REGION 1' THEN 2
@@ -208,6 +219,9 @@ SQL;
 				$customer->last_name = $row->last_name;
 				$customer->cust_code = $row->customer_id;
 				$customer->cust_type = (empty($row->first_name) || empty($row->last_name)) ? 1 : 0;
+				$customer->date_of_birth = $row->si_birth_date;
+				$customer->phone_number = $row->si_phone_number;
+				$customer->email = $row->si_email;
 				$this->db->insert('tbl_customer', $customer);
 				$customer->cid = $this->db->insert_id();
 			}
