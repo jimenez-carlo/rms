@@ -117,7 +117,7 @@ class Cron extends MY_Controller {
                       ),
                       '-',
                       ''
-                    ) AS si_phone_number,
+                    ) AS si_phone_number
                     ,CASE rrt_class
                       WHEN 'NCR' THEN 1
                       WHEN 'REGION 1' THEN 2
