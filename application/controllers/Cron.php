@@ -101,13 +101,13 @@ class Cron extends MY_Controller {
                   $final_format = "'".implode("','", explode(',', $fix_comma))."'";
                   $engine_numbers = "AND engine_no IN ({$final_format})";
                 } else {
-		  $date_created = "AND (left(date_created, 10) BETWEEN '{$date_from}' AND  '{$date_yesterday}')";
+		  $date_created = "AND (DATE_FORMAT(date_created, '%Y-%m-%d') BETWEEN '{$date_from}' AND  '{$date_yesterday}')";
                 }
 
                 $query = <<<SQL
                   SELECT
                     c.*, r.*, si_mat_no, regn_status,
-                    date_created, si_email,
+                    date_created, LOWER(si_email) AS si_email,
                     DATE_FORMAT(si_birth_date, '%Y-%m-%d') AS si_birth_date,
                     REPLACE(
                       IF(
@@ -246,6 +246,7 @@ SQL;
 				$sales->amount = 0;
 				$sales->sales_type = ($row->sale_type == 465) ? 0 : 1;
 				$sales->registration_type = $row->regn_status;
+				$sales->created_date = date('Y-m-d');
 				$sales->transmittal_date = $row->date_created;
 				$sales->lto_transmittal = $transmittal->ltid;
 				$this->db->insert('tbl_sales', $sales);
