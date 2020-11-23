@@ -26,19 +26,18 @@ class Expense_model extends CI_Model{
 
 	public function list_misc($param)
 	{
-		$date_from = (empty($param->date_from)) ? date('Y-m-d') : $param->date_from;
-		$date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
-		$type = (!empty($param->type) && is_numeric($param->type))
-			? ' AND m.type = '.$param->type : '';
-		$status = (is_numeric($param->status))
-			? ' AND mxh1.status = '.$param->status : '';
+		$reference = (!empty($param->reference)) ? "AND v.reference LIKE '%{$param->reference}%'" : '';
+		$type = (!empty($param->type) && is_numeric($param->type)) ? ' AND m.type = '.$param->type : '';
+		$status = (is_numeric($param->status)) ? ' AND mxh1.status = '.$param->status : '';
+                $region = (!empty($param->region)) ? "AND m.region = {$param->region}" : '';
+                $company = ($param->company === "MDI") ? "AND v.company = 8" : "AND v.company != 8";
 
                 $result = $this->db->query("
                   SELECT
                     m.mid, m.region, m.date, m.or_no, SUBSTR(m.or_date, 1, 10) AS or_date,
                     FORMAT(m.amount, 2) AS amount, mt.type, m.other, m.topsheet,
                     m.batch, m.ca_ref, mxh1.id, mxh1.remarks,
-                    s.status_name AS status,
+                    v.reference, s.status_name AS status,
                     CASE
                       WHEN mxh1.status < 2 THEN true
                       WHEN mxh1.status = 5 THEN true
@@ -46,6 +45,8 @@ class Expense_model extends CI_Model{
                     END AS edit
                   FROM
                     tbl_misc m
+                  LEFT JOIN
+                    tbl_voucher v ON v.vid = m.ca_ref
                   LEFT JOIN
                     tbl_misc_type mt ON m.type = mt.mtid
                   JOIN
@@ -55,9 +56,8 @@ class Expense_model extends CI_Model{
                   INNER JOIN
                     tbl_status s ON mxh1.status = s.status_id AND s.status_type = 'MISC_EXP'
                   WHERE
-                    m.region = ".$param->region."
-                    AND LEFT(m.or_date,10) BETWEEN '".$date_from."' AND '".$date_to."' ".$type."
-                    AND mxh2.id IS NULL AND mxh1.status != 90 $status
+                    mxh2.id IS NULL AND mxh1.status != 90
+                    {$company} {$region} {$status} {$reference}
                   ORDER BY or_date DESC LIMIT 1000
                 ")->result_object();
 

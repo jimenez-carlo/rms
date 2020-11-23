@@ -17,21 +17,27 @@ class Expense extends MY_Controller {
         $this->header_data('nav', 'expense');
         $this->header_data('dir', './');
 
-        if ($_SESSION['position'] == 108) { // spvsr
-                $data['add'] = $data['edit'] = 0;
-                $data['default_status'] = 0;
-        }
-        else {
-                $data['add'] = $data['edit'] = 1;
-                $data['default_status'] = 1;
+        switch ($_SESSION['position_name']) {
+          case 'RRT Supervisor':
+          case 'Accounts Payable Clerk':
+            $data['add'] = $data['edit'] = 0;
+            $data['default_status'] = 0;
+            break;
+
+          default:
+            $data['add'] = $data['edit'] = 1;
+            $data['default_status'] = 1;
+            break;
         }
 
         $param = new Stdclass();
-        $param->region = $_SESSION['region_id'];
-        $param->date_from = $this->input->post('date_from');
-        $param->date_to = $this->input->post('date_to');
+        $param->reference = $this->input->post('ca_ref');
+        $param->company = $_SESSION['company_code'];
         $param->type = $this->input->post('type');
         $param->status = (empty($this->input->post('status')) && !is_numeric($this->input->post('status'))) ? $data['default_status'] : $this->input->post('status');
+        if (in_array($_SESSION['position_name'], ['RRT Supervisor','RRT Branch Secretary'])) {
+          $param->region = $_SESSION['region_id'];
+        }
 
         $data['table'] = $this->expense->list_misc($param);
         $data['type'] = $this->expense->type;
@@ -320,7 +326,7 @@ class Expense extends MY_Controller {
     $misc_expense_history = new Stdclass();
     $misc_expense_history->mid = $form['mid'];
     $misc_expense_history->status = 90; // DELETED
-    $misc_expense_history->remarks = 'Deleted';
+    $misc_expense_history->remarks = $form['remarks'];
     $this->db->insert('tbl_misc_expense_history', $misc_expense_history);
 
     $_SESSION['messages'][] = 'Record was deleted successfully.';

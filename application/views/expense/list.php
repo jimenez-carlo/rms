@@ -3,109 +3,100 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
 <div class="container-fluid">
-        <div class="row-fluid">
-                <div class="block">
-                        <div class="navbar navbar-inner block-header">
-                                <div class="pull-left">
-                                        Miscellaneous Expense
-                                </div>
-                        </div>
-                        <div class="block-content collapse in">
-
-                                <form class="form-horizontal" method="post">
-                                        <fieldset>
-                                                <div class="control-group span6">
-              <div class="control-label">OR Date</div>
+  <div class="row-fluid">
+    <div class="block">
+      <div class="navbar navbar-inner block-header">
+        <div class="pull-left">Miscellaneous Expense</div>
+      </div>
+      <div class="block-content collapse in">
+        <form class="form-horizontal" method="post">
+          <fieldset>
+            <div class="control-group span6">
+              <!-- <div class="control-label">OR Date</div> -->
               <div class="controls">
-                <span style="display:inline-block;width:50px">From:</span>
-                <?php print form_input('date_from', set_value('date_from', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
+                <span style="display:inline-block;width:100px">CA Reference:</span>
+                <?php print form_input('ca_ref', set_value('ca_ref', '')); ?>
                 <br>
-                <span style="display:inline-block;width:50px">To:</span>
-                <?php print form_input('date_to', set_value('date_to', date('Y-m-d')), array('class' => 'datepicker', 'autocomplete' => 'off')); ?>
+                <div class="span4"></div>
               </div>
             </div>
+            <?php
+              $type = array('_any' => '- Any -') + $type;
+              echo '<div class="control-group span4">';
+              echo form_label('Type', 'type', array('class' => 'control-label'));
+              echo '<div class="controls">';
+              echo form_dropdown('type', $type, set_value('type'));
+              echo '</div></div>';
 
-                                                <?php
-                                                        $type = array('_any' => '- Any -') + $type;
-                                                        echo '<div class="control-group span4">';
-                                                        echo form_label('Type', 'type', array('class' => 'control-label'));
-                                                        echo '<div class="controls">';
-                                                        echo form_dropdown('type', $type, set_value('type'));
-                                                        echo '</div></div>';
+              $status = array('_any' => '- Any -') + $status;
+              echo '<div class="control-group span4">';
+              echo form_label('Status', 'status', array('class' => 'control-label'));
+              echo '<div class="controls">';
+              echo form_dropdown('status', $status, set_value('status', $default_status));
+              echo '</div></div>';
+            ?>
+            <div class="form-actions span12">
+              <input type="submit" name="search" value="Search" class="btn btn-success" style="margin-right:10px;">
+              <?php if ($add) print '<a href="expense/add" class="btn btn-success"><span class="icon icon-plus"></span> Add New Expense</a>'; ?>
+            </div>
+          </fieldset>
+        </form>
+        <hr>
+        <form class="form-horizontal" method="post">
+          <table id="tbl_exp" class="table">
+            <thead>
+              <tr>
+                <th><p>CA Reference</p></th>
+                <th><p>Reference # (SI/OR)</p></th>
+                <th><p>OR Date</p></th>
+                <th><p>Amount</p></th>
+                <th><p>Type</p></th>
+                <th><p>Status</p></th>
+                <th><p></p></th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              foreach ($table as $misc)
+              {
+                $misc->type = ($misc->type == 'Others') ? '(Others) '.$misc->other : $misc->type;
+                $misc->status = ($misc->status == 'Rejected') ? 'Rejected due to:<br>'.$misc->remarks : $misc->status;
+                $edit_btn = ($edit && $misc->edit) ? '<input type="submit" name="edit['.$misc->mid.']" value="Edit" class="btn btn-success edit">' : '';
 
-                                                        $status = array('_any' => '- Any -') + $status;
-                                                        echo '<div class="control-group span4">';
-                                                        echo form_label('Status', 'status', array('class' => 'control-label'));
-                                                        echo '<div class="controls">';
-                                                        echo form_dropdown('status', $status, set_value('status', $default_status));
-                                                        echo '</div></div>';
-                                                ?>
-
-                  <div class="form-actions span12">
-                        <input type="submit" name="search" value="Search" class="btn btn-success" style="margin-right:10px;">
-
-                        <?php
-                        if ($add) print '<a href="expense/add" class="btn btn-success"><span class="icon icon-plus"></span> Add New Expense</a>';
-                        ?>
-                  </div>
-                                        </fieldset>
-                                </form>
-
-                                <hr>
-                                <form class="form-horizontal" method="post">
-                                        <table id="tbl_exp" class="table">
-                                                <thead>
-                                                        <tr>
-                                                                <th><p>Reference # (SI/OR)</p></th>
-                                                                <th><p>OR Date</p></th>
-                                                                <th><p>Amount</p></th>
-                                                                <th><p>Type</p></th>
-                                                                <th><p>Status</p></th>
-                                                                <th><p></p></th>
-                                                        </tr>
-                                                </thead>
-                                                <tbody>
-                    <?php
-                    foreach ($table as $misc)
-                    {
-                        $misc->type = ($misc->type == 'Others')
-                                ? '(Others) '.$misc->other : $misc->type;
-                        $misc->status = ($misc->status == 'Rejected')
-                                ? 'Rejected due to:<br>'.$misc->remarks : $misc->status;
-                        $edit_btn = ($edit && $misc->edit) ? '<input type="submit" name="edit['.$misc->mid.']" value="Edit" class="btn btn-success edit">' : '';
-
-                      print '<tr>';
-                      print '<td>'.$misc->or_no.'</td>';
-                      print '<td>'.$misc->or_date.'</td>';
-                      print '<td>'.$misc->amount.'</td>';
-                      print '<td>'.$misc->type.'</td>';
-                      print '<td>'.$misc->status.'</td>';
-                      print '<td>
+                print '<tr>';
+                print '<td>'.$misc->reference.'</td>';
+                print '<td>'.$misc->or_no.'</td>';
+                print '<td>'.$misc->or_date.'</td>';
+                print '<td>'.$misc->amount.'</td>';
+                print '<td>'.$misc->type.'</td>';
+                print '<td>'.$misc->status.'</td>';
+                print '<td>
                         '.form_hidden('mid', $misc->mid).'
                         <a class="btn btn-success view">View attachments</a>
                         '.$edit_btn.'
                       </td>';
-                      print '</tr>';
-                    }
+                print '</tr>';
+              }
 
-                    if (empty($table))
-                    {
-                      print '<tr>
-                        <td>No result.</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        </tr>';
-                    }
-                    ?>
-                                                </tbody>
-                                        </table>
-                                </form>
-                        </div>
-                </div>
-        </div>
+              if (empty($table))
+              {
+                print '<tr>
+                  <td>No result.</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  </tr>';
+              }
+              ?>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Bootstrap modal -->
