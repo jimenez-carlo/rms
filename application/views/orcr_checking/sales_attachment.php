@@ -60,7 +60,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
   print '<div class="control-group">';
   print '<div class="control-label">Plate #</div>';
-  print '<div class="controls">'.$sales->plate_no.'</div>';
+  print '<div class="controls">'.$sales->plate_number.'</div>';
   print '</div>';
 
   // disapprove

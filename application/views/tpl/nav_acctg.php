@@ -62,12 +62,13 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     print '<li '.$active.'><a href="'.base_url('sap_upload').'">For SAP Uploading</a></li>';
                     ?>
 
-                    <li class="dropdown <?php if(isset($nav) && ($nav=='liquidation' || $nav=='return_fund')) echo 'active'; ?>">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Liquidation <i class="caret"></i></a>
+                    <li class="dropdown <?php if(isset($nav) && (in_array($nav, ['liquidation', 'return_fund','expense']))) echo 'active'; ?>">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Monitoring <i class="caret"></i></a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a tabindex="-1" href="<?php echo base_url('liquidation'); ?>">Monitoring</a>
+                                <a tabindex="-1" href="<?php echo base_url('liquidation'); ?>">Liquidation</a>
                                 <a tabindex="-1" href="<?php echo base_url('return_fund'); ?>">Return Fund</a>
+                                <a tabindex="-1" href="<?php echo base_url('expense'); ?>">Misc Expense</a>
                             </li>
                         </ul>
                     </li>

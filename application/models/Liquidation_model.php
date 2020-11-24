@@ -3,31 +3,31 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Liquidation_model extends CI_Model{
 
-	public $status = array(
-		0 => 'For Transmittal',
-		1 => 'LTO Rejected',
-		2 => 'LTO Pending',
-		3 => 'LTO Pending',
-		4 => 'Registered',
-		5 => 'Liquidated',
-	);
+        public $status = array(
+                0 => 'For Transmittal',
+                1 => 'LTO Rejected',
+                2 => 'LTO Pending',
+                3 => 'LTO Pending',
+                4 => 'Registered',
+                5 => 'Liquidated',
+        );
 
-	public function __construct()
-	{
-		parent::__construct();
+        public function __construct()
+        {
+                parent::__construct();
                 if ($_SESSION['company'] != 8) {
                   $this->companyQry = ' AND v.company != 8';
                 } else {
                   $this->region = $this->mdi_region;
                   $this->companyQry = ' AND v.company = 8';
                 }
-	}
+        }
 
-	public function load_list($param)
-	{
-		$date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-3 days')) : $param->date_from;
-		$date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
-		$region = (is_numeric($param->region)) ? ' AND f.region = '.$param->region : '';
+        public function load_list($param)
+        {
+                $date_from = (empty($param->date_from)) ? date('Y-m-d', strtotime('-3 days')) : $param->date_from;
+                $date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
+                $region = (is_numeric($param->region)) ? ' AND f.region = '.$param->region : '';
 
                 return $this->db->query("
                   SELECT
@@ -83,29 +83,29 @@ class Liquidation_model extends CI_Model{
                         fund = vid AND liq_date IS NOT NULL
                     ) AS return_liquidated
                   FROM tbl_voucher v
-                  INNER JOIN tbl_fund f ON fid = v.fund
-                  INNER JOIN tbl_sales s ON s.fund = vid
-                  INNER JOIN tbl_company c ON c.cid = s.company
+                  LEFT JOIN tbl_fund f ON fid = v.fund
+                  LEFT JOIN tbl_sales s ON s.fund = vid
+                  LEFT JOIN tbl_company c ON c.cid = s.company
                   WHERE LEFT(transfer_date, 10) BETWEEN '".$date_from."' AND '".$date_to."' ".$region." ".$this->companyQry."
                   GROUP BY v.vid, c.cid
                   ORDER BY transfer_date DESC
                 ")->result_object();
-	}
+        }
 
-	public function load_sales($vid)
-	{
-		$result = $this->db->query("select * from tbl_sales
-			inner join tbl_engine on engine = eid
-			inner join tbl_customer on customer = cid
-			where fund = ".$vid."
-			order by bcode")->result_object();
+        public function load_sales($vid)
+        {
+                $result = $this->db->query("select * from tbl_sales
+                        inner join tbl_engine on engine = eid
+                        inner join tbl_customer on customer = cid
+                        where fund = ".$vid."
+                        order by bcode")->result_object();
 
-		foreach ($result as $key => $sales)
-		{
-			$sales->status = $this->status[$sales->status];
-			$result[$key] = $sales;
-		}
+                foreach ($result as $key => $sales)
+                {
+                        $sales->status = $this->status[$sales->status];
+                        $result[$key] = $sales;
+                }
 
-		return $result;
-	}
+                return $result;
+        }
 }

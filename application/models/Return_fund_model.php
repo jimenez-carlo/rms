@@ -3,20 +3,22 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Return_fund_model extends CI_Model{
 
-	public function __construct()
-	{
-		parent::__construct();
+        public function __construct()
+        {
+                parent::__construct();
                 if ($_SESSION['company'] != 8) {
                   $this->companyQry = 'c.cid != 8';
                 } else {
                   $this->companyQry = 'c.cid = 8';
                 }
-	}
+        }
 
-	public function load_list($param)
-	{
-		$region = (empty($param->region)) ? "" : " AND v.fund = ".$param->region;
-		$reference = (empty($param->reference)) ? "" : " AND v.reference LIKE '%".$param->reference."%'";
+        public function load_list($param)
+        {
+                $company = (empty($param->company)) ? "" : "AND v.company = ".$param->company;
+                $region = (empty($param->region)) ? "" : "AND v.fund = ".$param->region;
+                $status = (empty($param->status)) ? "" : "AND rfh1.status_id = ".$param->status;
+                $reference = (empty($param->reference)) ? "" : " AND v.reference LIKE '%".$param->reference."%'";
                 $rrt = ($_SESSION['dept_name'] === 'Regional Registration') ? "AND r.rid = {$_SESSION['region_id']}" : "";
 
                 $return_fund_list = $this->db->query("
@@ -45,39 +47,39 @@ class Return_fund_model extends CI_Model{
                     tbl_company c ON c.cid = v.company
                   WHERE
                     rfh2.return_fund_history_id IS NULL AND rf.is_deleted = 0 {$rrt}
-                    AND {$this->companyQry} {$region} {$reference}
+                    AND {$this->companyQry} {$company} {$region} {$status} {$reference}
                     AND created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59'
                   ORDER BY created DESC LIMIT 1000
                 ")->result_object();
 
                 return $return_fund_list;
-	}
+        }
 
-	public function load_fund($vid)
-	{
-		return $this->db->query("select * from tbl_voucher where vid = ".$vid)->row();
-	}
+        public function load_fund($vid)
+        {
+                return $this->db->query("select * from tbl_voucher where vid = ".$vid)->row();
+        }
 
-	public function upload_slip()
-	{
-		$this->load->library('upload');
-		$config['allowed_types'] = 'jpg|jpeg';
-		$config['upload_path'] = './rms_dir/temp/';
-		$config['max_size'] = '1024';
-		$this->upload->initialize($config);
+        public function upload_slip()
+        {
+                $this->load->library('upload');
+                $config['allowed_types'] = 'jpg|jpeg';
+                $config['upload_path'] = './rms_dir/temp/';
+                $config['max_size'] = '1024';
+                $this->upload->initialize($config);
 
-		if ($this->upload->do_upload('slip')) return $this->upload->data('file_name');
+                if ($this->upload->do_upload('slip')) return $this->upload->data('file_name');
 
-		$_SESSION['warning'][] = $this->upload->display_errors();
-		return false;
-	}
+                $_SESSION['warning'][] = $this->upload->display_errors();
+                return false;
+        }
 
-	public function save_return($return)
-	{
+        public function save_return($return)
+        {
                 $this->db->trans_start();
                 // Insert New Return Fund
-		$this->db->insert('tbl_return_fund', $return);
-		$return->rfid = $this->db->insert_id();
+                $this->db->insert('tbl_return_fund', $return);
+                $return->rfid = $this->db->insert_id();
 
                 // Update Cash on Hand
                 $update_cash_on_hand = "UPDATE tbl_fund SET cash_on_hand = cash_on_hand - {$return->amount} WHERE fid = {$_SESSION['fund_id']}";
@@ -88,7 +90,7 @@ class Return_fund_model extends CI_Model{
                 $this->db->trans_complete();
 
                 if ($this->db->trans_status()) {
-		  if (!empty($return->slip)) {
+                  if (!empty($return->slip)) {
                     // create folder
                     $folder = './rms_dir/deposit_slip/'.$return->rfid.'/';
                     if (!is_dir($folder)) mkdir($folder, 0777, true);
@@ -97,22 +99,22 @@ class Return_fund_model extends CI_Model{
                     $this->load->helper('directory');
                     $dir_files = directory_map($folder, 1);
                     foreach ($dir_files as $file) {
-                    	if (!empty($file)) unlink($folder.$file);
+                        if (!empty($file)) unlink($folder.$file);
                     }
 
                     rename('./rms_dir/temp/'.$return->slip, $folder.$return->slip);
-		  }
+                  }
 
-		  $_SESSION['messages'][] = 'Transaction saved successfully.';
+                  $_SESSION['messages'][] = 'Transaction saved successfully.';
                   redirect('liquidation');
                 } else {
-		  $_SESSION['warning'][] = 'Something went wrong.';
+                  $_SESSION['warning'][] = 'Something went wrong.';
                   redirect($_SERVER['HTTP_REFERER']);
                 }
-	}
+        }
 
-	public function load_return($rfid)
-	{
+        public function load_return($rfid)
+        {
                 return $this->db->query("
                   SELECT
                     rf.rfid, v.fund AS fund_id, rf.amount, rf.slip,
@@ -131,18 +133,18 @@ class Return_fund_model extends CI_Model{
                   WHERE
                     rfh2.return_fund_history_id IS NULL AND rf.rfid = ".$rfid
                 )->row();
-	}
+        }
 
-	public function liquidate_return($rfid)
-	{
-		$return = new Stdclass();
-		$return->liq_date = date('Y-m-d H:i:s');
-		$this->db->update('tbl_return_fund', $return, array('rfid' => $rfid));
+        public function liquidate_return($rfid)
+        {
+                $return = new Stdclass();
+                $return->liq_date = date('Y-m-d H:i:s');
+                $this->db->update('tbl_return_fund', $return, array('rfid' => $rfid));
 
                 $this->save_return_fund_history($rfid, 30);
-		$_SESSION['messages'][] = 'Transaction updated successfully.';
-		redirect('return_fund/view/'.$rfid);
-	}
+                $_SESSION['messages'][] = 'Transaction updated successfully.';
+                redirect('return_fund/view/'.$rfid);
+        }
 
         public function save_return_fund_history($rfid, $status_id)
         {
