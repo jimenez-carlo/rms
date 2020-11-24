@@ -124,8 +124,11 @@ class Disapprove_model extends CI_Model{
                     tbl_topsheet t ON topsheet = tid
                   INNER JOIN
                     tbl_status ds ON s.da_reason = ds.status_id AND ds.status_type = 'DA'
+                  LEFT JOIN
+                    tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
                   WHERE
-                    s.status = 4 AND s.da_reason = 11 {$this->and_company}
+                    s.status = 4 AND s.da_reason = 11
+                    AND susb.sid IS NULL {$this->and_company}
                   ORDER BY s.bcode
                 ")->result_object();
         }
