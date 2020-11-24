@@ -3,8 +3,8 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Batch_model extends CI_Model{
 
-	public function __construct()
-	{
+        public function __construct()
+        {
           parent::__construct();
           $this->load->model('Cmc_model', 'cmc');
 
@@ -16,9 +16,9 @@ class Batch_model extends CI_Model{
           } else {
             $this->companyQry = ' AND s.company != 8';
           }
-	}
+        }
 
-	public function list_for_upload() {
+        public function list_for_upload() {
           $result = $this->db->query("
             SELECT
               sub.subid,
@@ -63,9 +63,9 @@ class Batch_model extends CI_Model{
           ")->result_object();
 
           return $result;
-	}
+        }
 
-	public function sap_upload($subid) {
+        public function sap_upload($subid) {
           $sql = <<<SQL
             SELECT
               DISTINCT
@@ -94,18 +94,18 @@ class Batch_model extends CI_Model{
               cust.cust_code, CONCAT(IFNULL(cust.last_name,''), ', ', IFNULL(cust.first_name,'')) AS customer_name
             FROM
               tbl_sap_upload_batch sub
-	    JOIN
+            JOIN
               tbl_sap_upload_sales_batch USING (subid)
-	    JOIN
+            JOIN
               tbl_sales s USING (sid)
-	    INNER JOIN
-	      tbl_customer cust ON s.customer = cust.cid
-	    INNER JOIN
-	      tbl_region r ON s.region = r.rid
-	    INNER JOIN
-	      tbl_fund f ON r.rid = f.region
-	    INNER JOIN
-	      tbl_company c ON s.company = c.cid
+            INNER JOIN
+              tbl_customer cust ON s.customer = cust.cid
+            INNER JOIN
+              tbl_region r ON s.region = r.rid
+            INNER JOIN
+              tbl_fund f ON r.rid = f.region
+            INNER JOIN
+              tbl_company c ON s.company = c.cid
             LEFT JOIN
               tbl_lto_payment lp ON s.lto_payment = lp.lpid
             LEFT JOIN
@@ -140,19 +140,19 @@ SQL;
 SQL;
           $misc_expenses = $this->db->query($misc_exp_qry)->result_array();
 
-	  $this->load->model('Login_model', 'login');
-	  $this->login->saveLog('donwnloaded sap template subid: '.$subid.'.');
+          $this->load->model('Login_model', 'login');
+          $this->login->saveLog('donwnloaded sap template subid: '.$subid.'.');
 
-	  return array('batch' => $batch, 'misc_expenses' => $misc_expenses);
-	}
+          return array('batch' => $batch, 'misc_expenses' => $misc_expenses);
+        }
 
-	public function liquidate_batch($batch)
-	{
-		$this->db->update('tbl_sap_upload_batch', $batch, array('subid' => $batch->subid));
-		$batch = $this->db->query("select * from tbl_sap_upload_batch where subid = ".$batch->subid)->row();
+        public function liquidate_batch($batch)
+        {
+                $this->db->update('tbl_sap_upload_batch', $batch, array('subid' => $batch->subid));
+                $batch = $this->db->query("select * from tbl_sap_upload_batch where subid = ".$batch->subid)->row();
 
                 $date = date('Y-m-d');
-		// update sales status
+                // update sales status
                 $update_qry = <<<SQL
                   UPDATE
                     tbl_sales s
@@ -160,23 +160,23 @@ SQL;
                     tbl_sap_upload_sales_batch susb  ON s.sid = susb.sid
                   SET
                     status = 5, close_date = "{$date}"
-		  WHERE susb.subid = $batch->subid
+                  WHERE susb.subid = $batch->subid
 SQL;
-		$this->db->query($update_qry);
+                $this->db->query($update_qry);
 
-		// update topsheet status
+                // update topsheet status
 
-		// $count = $this->db->query("select count(*) as count from tbl_sales
-		// 	where status < 5 and topsheet = ".$batch->topsheet)->row()->count;
-		// if ($count == 0) {
-		// 	$this->db->query("update tbl_topsheet set status = 3 where tid = ".$batch->topsheet);
-		// }
+                // $count = $this->db->query("select count(*) as count from tbl_sales
+                //      where status < 5 and topsheet = ".$batch->topsheet)->row()->count;
+                // if ($count == 0) {
+                //      $this->db->query("update tbl_topsheet set status = 3 where tid = ".$batch->topsheet);
+                // }
 
-		$this->load->model('Login_model', 'login');
-		$this->login->saveLog('saved document number ['.$batch->doc_no.'] for ['.$batch->trans_no.']');
+                $this->load->model('Login_model', 'login');
+                $this->login->saveLog('saved document number ['.$batch->doc_no.'] for ['.$batch->trans_no.']');
 
-		return $batch;
-	}
+                return $batch;
+        }
 
         public function liquidate_misc_exp($misc_exp)
         {
