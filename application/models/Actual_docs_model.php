@@ -79,7 +79,7 @@ class Actual_docs_model extends CI_Model {
           transmittal_number, actual_docs_id,
           DATE_FORMAT(date_incomplete, '%Y-%m-%d') AS date_incomplete,
           DATE_FORMAT(date_completed, '%Y-%m-%d') AS date_completed,
-          CONCAT(lp.lpid,LOWER(REPLACE(lp.reference,'-',''))) AS transmittal_id,
+          CONCAT(lp.lpid,LOWER(REPLACE(lp.reference,'*',''))) AS transmittal_id,
           lp.lpid AS id, lp.reference, DATE_FORMAT(lp.deposit_date, '%Y-%m-%d') AS date_deposited,
           lp.company AS cid, lp.region AS rid, lp.amount, 'EPP' AS payment_type
           ,ad.deposit_slip, DATE_ADD(IFNULL(ad.date_completed, NOW()), INTERVAL 24 HOUR) < NOW() AS disable_deposit_slip
