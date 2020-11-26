@@ -351,27 +351,38 @@ SQL;
 
                 $dev_ces2 = $this->load->database('dev_ces2', TRUE);
 
+                $this->db->simple_query("SET SESSION group_concat_max_len = 18446744073709551615");
                 // select sales with AR and zero amount
-                $result = $this->db->query("
-                  select
-                  sid, bcode, ar_no, cust_code
-                  from tbl_sales s
-                  inner join tbl_customer c on customer = cid
-                  where amount = 0 and not ar_no = 'N/A'
-                  limit 10000
-                ")->result_object();
-                foreach ($result as $row)
+                $customers = $this->db->query("
+                  SELECT
+                    CONCAT(\"'\",GROUP_CONCAT(DISTINCT c.cust_code SEPARATOR \"','\"),\"'\") AS code
+                  FROM tbl_sales s
+                  INNER JOIN tbl_customer c on s.customer = c.cid
+                  WHERE s.amount = 0 OR s.ar_no = 'N/A'
+                ")->row_array();
+
+                $ack_receipts = $dev_ces2->query("
+                  SELECT
+                    a.cust_cd, a.ar_no, a.amount, e.engine_num
+                  FROM
+                    ar_amount_tbl a, ar_engine_tbl e
+                  WHERE
+                    a.cust_cd = e.cust_id AND a.ar_no = e.ar_num
+                    AND a.cust_cd IN ({$customers['code']})
+                ")->result_array();
+
+                foreach ($ack_receipts as $ar)
                 {
-                        $ar = $dev_ces2->query("select amount from ar_amount_tbl
-                                where branch = '".$row->bcode."'
-                                and cust_cd = '".$row->cust_code."'
-                                and ar_no = '".addslashes($row->ar_no)."'")->row();
-
-                        $sales = new Stdclass();
-                        $sales->amount = (!empty($ar)) ? $ar->amount : 0;
-
-                        $this->db->update('tbl_sales', $sales, array('sid' => $row->sid));
-                        $rows++;
+                  $this->db->query("
+                    UPDATE
+                      tbl_sales s, tbl_engine e, tbl_customer c
+                    SET
+                      s.ar_no = '{$ar['ar_no']}',
+                      s.amount = '{$ar['amount']}'
+                    WHERE
+                      e.eid = s.engine AND c.cid = s.customer AND
+                      e.engine_no = '{$ar['engine_num']}' AND c.cust_code = '{$ar['cust_cd']}'
+                  ");
                 }
                 $end = date("Y-m-d H:i:s");
 
@@ -380,7 +391,7 @@ SQL;
                 $log->date = date('Y-m-d');
                 $log->start = $start;
                 $log->end = $end;
-                $log->rows = $rows;
+                $log->rows = count($ack_receipts);
                 $this->db->insert('tbl_cron_log', $log);
 
                 $this->login->saveLog('Run Cron: Update Sales AR Amount from BOBJ [ar_amount] Duration: '.$start.' - '.$end);
