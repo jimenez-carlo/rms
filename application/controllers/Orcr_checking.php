@@ -40,11 +40,6 @@ class Orcr_checking extends MY_Controller {
                 if (!empty($data['EPP']) xor !empty($data['CA'])) {
                   $data['batch_ref'] = $this->orcr_checking->get_sales($data);
                   $data['reference_selected'] = $data['batch_ref']['reference'];
-
-                  if (isset($data['summary']) === (isset($data['summary']) && isset($data['mid']))) {
-                    $data['misc_expense'] = $this->orcr_checking->get_misc_expense($data);
-                  }
-
                   $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/ca_ref';
                   $data['view'] = $this->load->view($view, $data, TRUE);
                 }

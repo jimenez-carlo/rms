@@ -99,51 +99,181 @@ class Orcr_checking_model extends CI_Model{
                 return $result;
         }
 
-        public function get_sales($data)
-        {
+        public function get_sales($data) {
+          $where_sales =  '';
+          if (isset($data['sid'])) {
+            $where_sales .=  ' AND a.sid IN ('.implode(',', $data['sid']).') ';
+          }
 
           if (isset($data['CA'])) {
-            $where_param = " AND vid = {$data['CA']} ";
+            $misc_expense = <<<SQL
+              (SELECT
+                CONCAT(
+                  '[',
+                  GROUP_CONCAT(
+                    DISTINCT
+                    JSON_OBJECT(
+                      'mid', m.mid, 'region', m.region,
+                      'date', m.date, 'or_no', m.or_no,
+                      'or_date', SUBSTR(m.or_date, 1, 10),
+                      'amount', FORMAT(m.amount, 2), 'type', mt.type,
+                      'remarks', mxh1.remarks, 'status', sts.status_name,
+                      'other', m.other, 'topsheet', m.topsheet,
+                      'batch', m.batch, 'ca_ref', m.ca_ref
+                    )
+                    ORDER BY FIELD(mxh1.status, 2, 6, 5, 3, 4)
+                  ),
+                  ']'
+                )
+              FROM tbl_misc m
+              LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
+              LEFT JOIN tbl_fund f ON v.fund = f.fid
+              LEFT JOIN tbl_region r ON f.region = r.rid
+              LEFT JOIN tbl_company c ON v.company = c.cid
+              LEFT JOIN tbl_misc_type mt ON m.type = mt.mtid
+              LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+              LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+              LEFT JOIN tbl_status sts ON mxh1.status = sts.status_id AND sts.status_type = 'MISC_EXP'
+              WHERE v.vid = {$data['CA']}
+SQL;
+            if (isset($data['mid'])) {
+              $misc_expense .=  ' AND m.mid IN ('.implode(',', $data['mid']).') ';
+            }
+
+            $misc_expense .= ' AND sts.status_id NOT IN(90,1,0) AND mxh2.mid IS NULL ) AS misc_expense';
+
+            if (isset($data['summary']) && !isset($data['mid'])) {
+              $misc_expense = 'NULL AS misc_expense';
+            }
+
+            $lto_payment_voucher = "a.voucher = {$data['CA']}";
+            $where_param = " AND v.vid = {$data['CA']} ";
 
             // This condition is for ORCR Checking Preview Summary
-
-            $select_param = <<<SEL
+            $select_param = <<<SQL
               v.vid, v.fund, SUBSTR(v.date, 1, 10) AS date, v.reference,
-              v.voucher_no, v.dm_no, v.amount, v.transfer_date,
-              v.process_date, v.offline, v.status AS voucher_status, v.process_timestamp,
-              v.transfer_timestamp
-SEL;
+              v.voucher_no, v.dm_no, v.amount, v.offline, v.status AS voucher_status,
+              DATE_FORMAT(v.transfer_date, '%Y-%m-%d') AS transfer_date,
+              DATE_FORMAT(v.process_date, '%Y-%m-%d') AS process_date,
+              DATE_FORMAT(v.process_timestamp, '%Y-%m-%d') AS process_timestamp,
+              DATE_FORMAT(v.transfer_timestamp, '%Y-%m-%d') AS transfer_timestamp,
+              SUM(IF(s.status = 5, s.registration+s.tip,0)) + IFNULL(
+                (SELECT SUM(IF(mxh1.status = 4,m.amount,0))
+                FROM tbl_misc m
+                LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
+                LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+                LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+                WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL), 0
+              ) + IFNULL(
+                (SELECT
+                  SUM(IFNULL(amount,0))
+                FROM
+                  tbl_return_fund
+                WHERE fund = {$data['CA']} AND liq_date IS NOT NULL), 0
+              ) AS liquidated,
+              SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0)) + IFNULL(
+                (SELECT SUM(IF(mxh1.status = 3,m.amount,0))
+                FROM tbl_misc m
+                LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
+                LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+                LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+                WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL), 0
+              ) AS checked,
+              MAX(v.amount) - (
+                SUM(IF(s.status = 5, s.registration+s.tip,0)) +
+                SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0)) + IFNULL(
+                  (SELECT SUM(IF(mxh1.status IN (4,3),m.amount,0))
+                  FROM tbl_misc m
+                  LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
+                  LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+                  LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+                  WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL), 0) +
+                  IFNULL((SELECT
+                    SUM(IFNULL(amount,0))
+                  FROM
+                    tbl_return_fund
+                  WHERE fund = {$data['CA']} AND liq_date IS NOT NULL), 0)
+              ) AS balance,
+              {$misc_expense}
+SQL;
             $table_param = <<<TBL
               LEFT JOIN tbl_voucher v ON s.voucher = v.vid
               LEFT JOIN tbl_fund f ON v.fund = f.fid
               LEFT JOIN tbl_region r ON f.region = r.rid
               LEFT JOIN tbl_company c ON v.company = c.cid
 TBL;
-            $groupby_param = <<<GBY
+            $groupby_param = <<<SQL
               v.vid , v.fund, v.date, v.reference, v.voucher_no, v.dm_no,
               v.amount, v.transfer_date, v.process_date, v.offline, v.status,
-              v.process_timestamp, v.transfer_timestamp, r.region, v.company
-GBY;
+              v.process_timestamp, v.transfer_timestamp, r.region, v.company,
+              20, 21
+SQL;
           }
 
           if (isset($data['EPP'])) {
+            $lto_payment_voucher = "a.lto_payment = {$data['EPP']}";
             $where_param = " AND lp.lpid = {$data['EPP']} ";
 
-            $select_param = <<<SEL
-              lp.*, lp.ref_date AS date
-SEL;
+            $select_param = <<<SQL
+              lp.lpid, lp.region, lp.company, lp.reference,
+              lp.ref_date AS date, lp.amount, lp.status,
+              lp.doc_no, lp.dm_no, lp.confirmation,
+              DATE_FORMAT(lp.dm_date, '%Y-%m-%d') AS dm_date,
+              DATE_FORMAT(lp.created, '%Y-%m-%d') AS created,
+              DATE_FORMAT(lp.doc_date, '%Y-%m-%d') AS doc_date,
+              DATE_FORMAT(lp.deposit_date, '%Y-%m-%d') AS deposit_date,
+              DATE_FORMAT(lp.close_date, '%Y-%m-%d') AS close_date,
+              lp.screenshot, lp.receipt,
+              NULL AS misc_expense,
+              SUM(IF(s.status = 5, s.registration+s.tip,0)) AS liquidated,
+              SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0)) AS checked,
+              MAX(lp.amount) - (SUM(IF(s.status = 5, s.registration+s.tip,0)) + SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0))) AS balance
+SQL;
             $table_param = <<<VOC
               LEFT JOIN tbl_lto_payment lp ON s.lto_payment = lp.lpid
               LEFT JOIN tbl_region r ON lp.region = r.rid
               LEFT JOIN tbl_company c ON lp.company = c.cid
 VOC;
             $groupby_param = <<<GBY
-              lp.lpid, r.region, lp.company;
+              lp.lpid, r.region, lp.company, 23, 24
 GBY;
           }
 
-          if (isset($data['sid'])) {
-            $where_param .=  ' AND s.sid IN ('.implode(',', $data['sid']).') ';
+          $sales = <<<SQL
+          (SELECT
+            CONCAT(
+            '[',
+            GROUP_CONCAT(
+             DISTINCT JSON_OBJECT(
+                 'sid', a.sid, 'engine_no', e.engine_no,
+                 'bcode', a.bcode, 'bname', a.bname,
+                 'date_sold', DATE_FORMAT(a.date_sold, '%Y-%m-%d'), 'sales_type', st.sales_type, 'registration_type', a.registration_type,
+                 'si_no', a.si_no, 'ar_no', a.ar_no, 'amount', a.amount,
+                 'insurance', a.insurance, 'registration', a.registration, 'status', ss.status_name,
+                 'disapprove',
+                 CASE
+                   WHEN b.subid IS NOT NULL AND ss.status_name = 'Registered' THEN 'For Sap Uploading'
+                   WHEN ss.status_name = 'Liquidated' THEN 'Done'
+                   ELSE sts.status_name
+                 END,
+                 'selectable', IF(ss.status_name = 'Registered' AND b.subid IS NULL, true,false)
+             )
+             ORDER BY FIELD(a.status, 4, 5, 3, 2, 1, 0), FIELD(a.da_reason, 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+             SEPARATOR ','
+            ),
+            ']'
+            )
+            FROM tbl_sales a
+            LEFT JOIN tbl_engine e ON e.eid = a.engine
+            LEFT JOIN tbl_sap_upload_sales_batch b ON a.sid = b.sid
+            LEFT JOIN tbl_sales_type st ON a.sales_type = st.stid
+            LEFT JOIN tbl_status ss ON a.status = ss.status_id AND ss.status_type = 'SALES'
+            LEFT JOIN tbl_status sts ON a.da_reason = sts.status_id AND sts.status_type = 'DA'
+            WHERE {$lto_payment_voucher} {$where_sales} AND b.sid IS NULL AND a.status = 4 AND a.da_reason IN (0, 11)
+          ) AS sales
+SQL;
+          if (isset($data['summary']) && !isset($data['sid'])) {
+            $sales = 'NULL AS sales';
           }
 
           $sql = <<<SQL
@@ -166,39 +296,12 @@ GBY;
                 WHEN 14 THEN 'XII'
                 WHEN 15 THEN 'XIII'
               END AS region_initial,
-              r.region, c.company_code AS company,
-              CONCAT(
-                '[',
-                  GROUP_CONCAT(
-                    DISTINCT
-                    JSON_OBJECT(
-                      'sid', s.sid, 'engine_no', e.engine_no,
-                      'bcode', s.bcode, 'bname', s.bname,
-                      'date_sold', DATE_FORMAT(s.date_sold, '%Y-%m-%d'), 'sales_type', st.sales_type, 'registration_type', s.registration_type,
-                      'si_no', s.si_no, 'ar_no', s.ar_no, 'amount', s.amount,
-                      'insurance', s.insurance, 'registration', s.registration, 'status', ss.status_name,
-                      'disapprove',
-                      CASE
-                        WHEN sub.subid IS NOT NULL AND ss.status_name = 'Registered' THEN 'For Sap Uploading'
-                        WHEN ss.status_name = 'Liquidated' THEN 'Done'
-                        ELSE sts.status_name
-                      END,
-                      'selectable', IF(ss.status_name = 'Registered' AND sub.subid IS NULL, true,false)
-                    )
-                    ORDER BY FIELD(s.status, 4, 5, 3, 2, 1, 0), FIELD(s.da_reason, 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                    SEPARATOR ','
-                  ),
-                  ']'
-              ) AS sales
+              r.region, c.company_code AS company
+              , {$sales}
             FROM tbl_sales s
             LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
             {$table_param}
-            LEFT JOIN tbl_status ss ON s.status = ss.status_id AND ss.status_type = 'SALES'
-            LEFT JOIN tbl_sap_upload_sales_batch sub ON s.sid = sub.sid
-            LEFT JOIN tbl_sales_type st ON s.sales_type = st.stid
-            LEFT JOIN tbl_status sts ON s.da_reason = sts.status_id AND sts.status_type = 'DA'
-            LEFT JOIN tbl_engine e ON e.eid = s.engine
-            WHERE 1=1 {$where_param} AND susb.sid IS NULL AND s.status = 4  AND s.da_reason IN (0, 11)
+            WHERE 1=1 {$where_param}
             GROUP BY {$groupby_param}
 SQL;
           $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
@@ -207,6 +310,7 @@ SQL;
           return $sales_result;
         }
 
+        // FOR DELETE
         public function get_misc_expense($data)
         {
           $misc_exp = NULL;

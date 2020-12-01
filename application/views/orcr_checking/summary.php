@@ -25,6 +25,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
   <hr>
   <table class="table tbl-sales" style="margin:0;">
+    <?php $total_exp = 0; ?>
+    <?php if (isset($batch_ref['sales'])): ?>
     <thead>
       <tr>
         <th><p>#</p></th>
@@ -43,7 +45,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     <tbody>
       <?php
       $total_amt = 0;
-      $total_exp = 0;
       $row_count = 1;
 
       foreach (json_decode($batch_ref['sales']) as $sales)
@@ -69,27 +70,30 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         $total_amt += $sales->amount;
         $total_exp += $sales->registration;
       }
-
+      ?>
+    <?php endif; ?>
+      <?php
       // Miscellaneous
       print '<tr style="border-top: double">';
       print '<th colspan="2"><p>#</p></th>';
       print '<th colspan="2"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
-      print '<th colspan="2"><p class="text-right">Expense</p></th>';
+      print '<th colspan="3"><p class="text-right">Expense</p></th>';
       print '</tr>';
 
-      if (empty($misc_expense)) {
+      if (empty($batch_ref['misc_expense'])) {
         print '<tr>';
         print '<td colspan="2"></td>';
-        print '<td colspan="2"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
+        print '<td colspan="2"><p style="color:red"><b>No miscellaneous expense included.</b></p></td>';
         print '<td colspan="2"></td>';
         print '<td colspan="2"></td>';
-        print '<td colspan="2"></td>';
+        print '<td colspan="3"></td>';
         print '</tr>';
       } else {
+        $misc_expenses = json_decode($batch_ref['misc_expense']);
         $exp_row_count = 1;
-        foreach (json_decode($misc_expense) as $misc)
+        foreach ($misc_expenses as $misc)
         {
           print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
           print '<td colspan="2">'.$exp_row_count.'</td>';
@@ -100,7 +104,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
           print '<td colspan="2">'.$misc->or_date.'</td>';
           print '<td colspan="2"><p class="text-right">'.$misc->type.'</p></td>';
-          print '<td colspan="2"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
+          print '<td colspan="3"><p class="text-right misc-exp">'.$misc->amount.'</p></td>';
           print '</tr>';
           $exp_row_count++;
           $total_exp += $misc->amount;
@@ -110,24 +114,26 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </tbody>
     <tfoot style="border-top: dotted gray; font-size: 16px">
       <tr>
-        <th colspan="8"></th>
-        <th><p class="text-right">Total Amount</p></th>
-        <th><p class="text-right">&#x20b1 <?php print number_format($total_amt, 2, ".", ","); ?></p></th>
+        <th colspan="10"></th>
+        <th><p>Total Amount</p></th>
       </tr>
       <tr>
-        <th colspan="8">
-          <p>Please make sure all information are correct before proceeding.</p>
-        </th>
-        <th><p class="text-right">Total Expense</p></th>
-        <th><p class="text-right">&#x20b1 <?php print number_format($total_exp, 2, ".", ","); ?></p></th>
+        <th colspan="9"></th>
+        <th><p class="text-right">Batch</p></th>
+        <th><p class="text-right tot-amt">&#x20b1 <?php print number_format($batch_ref['amount'], 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="8">
+        <th colspan="9"><p>Please make sure all information are correct before proceeding.</p></th>
+        <th><p class="text-right">Expense</p></th>
+        <th><p class="text-right tot-amt">&#x20b1 <?php print number_format($total_exp, 2, ".", ","); ?></p></th>
+      </tr>
+      <tr>
+        <th colspan="9">
           <input type="submit" name="submit_all" value="Submit" class="btn btn-success">
           <input type="submit" name="back" value="Back" class="btn btn-success">
         </th>
         <th><p class="text-right">Balance</p></th>
-        <th><p class="text-right">&#x20b1 <?php print number_format($total_amt - $total_exp, 2, ".", ","); ?></p></th>
+        <th><p id="balance" class="text-right tot-bal">&#x20b1 <?php print number_format($batch_ref['amount'] - ($total_exp + $batch_ref['liquidated'] + $batch_ref['checked']), 2, ".", ","); ?></p></th>
       </tr>
     </tfoot>
   </table>
