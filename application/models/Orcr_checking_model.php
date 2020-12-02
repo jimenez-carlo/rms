@@ -106,6 +106,42 @@ class Orcr_checking_model extends CI_Model{
           }
 
           if (isset($data['CA'])) {
+            $liq_regn_exp = 0;
+            $checked_regn_exp = 0;
+            $qry_liquidated = "SELECT SUM(IFNULL(s.registration,0)+IFNULL(s.tip,0)) AS liquidated FROM tbl_sales s WHERE s.status = 5 AND ";
+            $qry_checked = <<<SQL
+              SELECT IFNULL(SUM(IFNULL(s.registration,0)+IFNULL(s.tip,0)),0) AS checked
+              FROM tbl_sales s
+              LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
+              WHERE s.status = 4 AND susb.sid IS NOT NULL
+SQL;
+            //LIQUIDATED
+            $liq_regn_exp += $this->db->query($qry_liquidated." s.voucher = {$data['CA']}")->row('liquidated');
+            $liq_misc_exp = $this->db->query("
+              SELECT IFNULL(SUM(IF(mxh1.status = 4,m.amount,0)),0) AS liq_misc_exp
+              FROM tbl_misc m
+              LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
+              LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+              LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+              WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL
+            ")->row('liq_misc_exp');
+            $liq_rf = $this->db->query("
+              SELECT IFNULL(SUM(amount),0) AS liq_rf
+              FROM tbl_return_fund
+              WHERE fund = {$data['CA']} AND liq_date IS NOT NULL
+            ")->row('liq_rf');
+
+            //CHECKED
+            $checked_regn_exp += $this->db->query($qry_checked." AND s.voucher = {$data['CA']}")->row('checked');
+            $checked_misc_exp = $this->db->query("
+              SELECT IFNULL(SUM(m.amount),0) AS checked_misc_exp
+              FROM tbl_misc m
+              LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
+              LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
+              LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+              WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL AND mxh1.status = 3
+            ")->row('checked_misc_exp');
+
             $misc_expense = <<<SQL
               (SELECT
                 CONCAT(
@@ -149,7 +185,6 @@ SQL;
             $lto_payment_voucher = "a.voucher = {$data['CA']}";
             $where_param = " AND v.vid = {$data['CA']} ";
 
-            // This condition is for ORCR Checking Preview Summary
             $select_param = <<<SQL
               v.vid, v.fund, SUBSTR(v.date, 1, 10) AS date, v.reference,
               v.voucher_no, v.dm_no, v.amount, v.offline, v.status AS voucher_status,
@@ -157,47 +192,13 @@ SQL;
               DATE_FORMAT(v.process_date, '%Y-%m-%d') AS process_date,
               DATE_FORMAT(v.process_timestamp, '%Y-%m-%d') AS process_timestamp,
               DATE_FORMAT(v.transfer_timestamp, '%Y-%m-%d') AS transfer_timestamp,
-              SUM(IF(s.status = 5, s.registration+s.tip,0)) + IFNULL(
-                (SELECT SUM(IF(mxh1.status = 4,m.amount,0))
-                FROM tbl_misc m
-                LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
-                LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
-                LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
-                WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL), 0
-              ) + IFNULL(
-                (SELECT
-                  SUM(IFNULL(amount,0))
-                FROM
-                  tbl_return_fund
-                WHERE fund = {$data['CA']} AND liq_date IS NOT NULL), 0
-              ) AS liquidated,
-              SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0)) + IFNULL(
-                (SELECT SUM(IF(mxh1.status = 3,m.amount,0))
-                FROM tbl_misc m
-                LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
-                LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
-                LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
-                WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL), 0
-              ) AS checked,
-              MAX(v.amount) - (
-                SUM(IF(s.status = 5, s.registration+s.tip,0)) +
-                SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0)) + IFNULL(
-                  (SELECT SUM(IF(mxh1.status IN (4,3),m.amount,0))
-                  FROM tbl_misc m
-                  LEFT JOIN tbl_voucher v ON v.vid = m.ca_ref
-                  LEFT JOIN tbl_misc_expense_history mxh1 ON mxh1.mid = m.mid
-                  LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
-                  WHERE v.vid = {$data['CA']} AND mxh2.mid IS NULL), 0) +
-                  IFNULL((SELECT
-                    SUM(IFNULL(amount,0))
-                  FROM
-                    tbl_return_fund
-                  WHERE fund = {$data['CA']} AND liq_date IS NOT NULL), 0)
-              ) AS balance,
+              {$liq_regn_exp} + {$liq_misc_exp} + {$liq_rf} AS liquidated,
+              ${checked_regn_exp} + {$checked_misc_exp} AS checked,
+              MAX(v.amount) - (${liq_regn_exp} + ${liq_misc_exp} + {$liq_rf} + ${checked_misc_exp} + $checked_misc_exp) AS balance,
               {$misc_expense}
 SQL;
             $table_param = <<<TBL
-              LEFT JOIN tbl_voucher v ON s.voucher = v.vid
+              FROM tbl_voucher v
               LEFT JOIN tbl_fund f ON v.fund = f.fid
               LEFT JOIN tbl_region r ON f.region = r.rid
               LEFT JOIN tbl_company c ON v.company = c.cid
@@ -230,6 +231,8 @@ SQL;
               MAX(lp.amount) - (SUM(IF(s.status = 5, s.registration+s.tip,0)) + SUM(IF(s.status = 4 AND susb.sid IS NOT NULL, s.registration+s.tip,0))) AS balance
 SQL;
             $table_param = <<<VOC
+              FROM tbl_sales s
+              LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
               LEFT JOIN tbl_lto_payment lp ON s.lto_payment = lp.lpid
               LEFT JOIN tbl_region r ON lp.region = r.rid
               LEFT JOIN tbl_company c ON lp.company = c.cid
@@ -298,8 +301,6 @@ SQL;
               END AS region_initial,
               r.region, c.company_code AS company
               , {$sales}
-            FROM tbl_sales s
-            LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
             {$table_param}
             WHERE 1=1 {$where_param}
             GROUP BY {$groupby_param}
