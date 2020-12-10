@@ -66,7 +66,18 @@ class Expense extends MY_Controller {
         }
 
         $reference = array('0' => '- select a reference -');
-        $result = $this->db->query("SELECT vid, reference FROM tbl_voucher WHERE fund = ".$_SESSION['region_id']." ORDER BY vid DESC")->result_object();
+        $result = $this->db->query("
+          SELECT
+            DISTINCT v.vid, v.reference
+          FROM tbl_voucher v
+          LEFT JOIN tbl_sales s ON s.voucher = v.vid
+          LEFT JOIN tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
+          WHERE 1=1
+            AND s.region = ".$_SESSION['region_id']."
+            AND s.status <= 4 AND s.da_reason IN (0, 11) AND susb.sid IS NULL
+          ORDER BY v.vid DESC
+        ")->result_object();
+
         foreach ($result as $row) {
                 $reference[$row->vid] = $row->reference;
         }
