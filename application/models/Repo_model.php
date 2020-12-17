@@ -7,7 +7,7 @@ class Repo_model extends CI_Model {
     parent::__construct();
   }
 
-  public function all() {
+  public function inventory() {
     $select = [
       'ri.repo_inventory_id',
       'ri.bcode', 'ri.bname',
@@ -145,6 +145,7 @@ SQL;
         ->join('tbl_engine e','e.eid=s.engine','left')
         ->join('tbl_customer c','s.customer=c.cid','left')
         ->join('tbl_region r', 's.region=r.rid', 'left')
+        ->order_by('s.sid', 'desc')
         ->get_where('tbl_sales s','e.eid='.$engine_id)
         ->row_array()
       );
@@ -317,10 +318,11 @@ SQL;
   }
 
   public function generate_batch() {
+    $repo_batch_ref = 'REPO-'.$_SESSION['branch_code'].'-'.date('Ymd');
     $repo_batch = $this->db->get_where(
       'tbl_repo_batch rb',
       [
-        'rb.reference' => $_SESSION['branch_code'].'-'.date('Ymd'),
+        'rb.reference' => $repo_batch_ref,
         'rb.bcode' => $_SESSION['branch_code']
       ]
     )->row_array();
@@ -329,7 +331,7 @@ SQL;
       $this->db->insert(
         'tbl_repo_batch',
         [
-          'reference' => $_SESSION['branch_code'].'-'.date('Ymd'),
+          'reference' => $repo_batch_ref,
           'bcode' => $_SESSION['branch_code'],
           'bname' => $_SESSION['branch_name'],
           'type' => 'CASH ADVANCE',

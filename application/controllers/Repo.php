@@ -20,8 +20,8 @@ class Repo extends MY_Controller {
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     $repo_inventory = [];
-    $repo_all = $this->repo->all();
-    foreach ($repo_all as $repo) {
+    $inventory = $this->repo->inventory();
+    foreach ($inventory as $repo) {
       $expiry = $this->repo->expiration($repo['date_registered']);
       $repo['status'] = $expiry['status'];
       $repo['message'] = $expiry['message'];
@@ -38,11 +38,8 @@ class Repo extends MY_Controller {
     $this->template('repo/in', []);
   }
 
-  public function sales($repo_inventory_id) {
+  public function sale($repo_inventory_id) {
     $this->access(17);
-    $this->header_data('title', 'Repo Sales');
-    $this->header_data('nav', 'repo-sales');
-    $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     if ($this->input->post('save')) {
       $validation = [
@@ -83,12 +80,17 @@ class Repo extends MY_Controller {
     }
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'NEW');
+    $this->check_mc_branch($data['repo']['bcode']);
     $date = (!$this->input->post('save')) ? $data['repo']['date_registered'] : $this->input->post('repo_registration')['date_registered'];
     $expire = $this->repo->expiration($date);
 
     $data['repo']['expire_status'] = $expire['status'];
     $data['repo']['expire_message'] = $expire['message'];
     $data['disable'] = 'disabled';
+
+    $this->header_data('title', 'Repo Sales');
+    $this->header_data('nav', 'repo-sales');
+    $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
     $this->template('repo/sales', $data);
   }
 
@@ -137,11 +139,15 @@ class Repo extends MY_Controller {
     $this->template('repo/registration', $data);
   }
 
-  public function view($repo_inventory_id) {
-    $this->header_data('title', 'Repo View');
-    $this->header_data('nav', 'repo-view');
+  public function view($repo_inventory_id = NULL) {
+    if (!isset($repo_inventory_id)) {
+      show_404();
+    }
+    $this->access(17);
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, NULL);
+    $this->check_mc_branch($data['repo']['bcode']);
+
     $data['histories'] = $this->repo->get_history($repo_inventory_id);
     if (isset($data['repo']['attachment'])) {
       $data['attachment'] = true;
@@ -155,6 +161,9 @@ class Repo extends MY_Controller {
     $expire = $this->repo->expiration($data['repo']['date_registered']);
     $data['repo']['expire_status'] = $expire['status'];
     $data['repo']['expire_message'] = $expire['message'];
+
+    $this->header_data('title', 'Repo View');
+    $this->header_data('nav', 'repo-view');
     $this->template('repo/view.php', $data);
   }
 
@@ -271,7 +280,7 @@ SQL;
                 </div>
 
                 <div class="row">
-                  <button class="btn btn-success offset1" type="submit" name="save" value="true">Save</button>
+                  <button class="btn btn-success offset1" type="submit" name="repo-in" value="true">Repo In</button>
                 </div>
             </fieldset>
           </form>
@@ -285,7 +294,7 @@ HTML;
 
   public function claim() {
     $this->access(17);
-    if ($this->input->post('save')) {
+    if ($this->input->post('repo-in')) {
       $this->repo->claim($this->input->post('engine_id'));
     }
 

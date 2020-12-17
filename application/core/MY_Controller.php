@@ -83,6 +83,12 @@ class MY_Controller extends CI_Controller {
 		self::$footer[$key] = $data;
 	}
 
+        public function check_mc_branch($bcode) {
+          if ($bcode !== $_SESSION['branch_code']) {
+            show_404();
+          }
+        }
+
 	public function access($page)
 	{
 		// no credentials

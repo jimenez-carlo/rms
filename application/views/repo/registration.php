@@ -28,7 +28,7 @@
                 </div>
               </div>
               <div class="control-group span4 <?php echo (form_error('attachments[registration_or][]')) ? 'error' : ''; ?>" style="margin-left:8rem;">
-                <label class="control-label" for="or">Registration OR:</label>
+                <label class="control-label" for="or">Registration OR</label>
                 <div class="controls">
                   <input type="file" id="or" name="attachments[registration_or][]" accept="image/jpeg">
                 </div>
@@ -49,16 +49,12 @@
                 </div>
               </div>
               <div class="control-group span4 <?php echo (form_error('attachments[pnp_clearance][]')) ? 'error' : ''; ?>" style="margin-left:8rem;">
-                <label class="control-label" for="pnp-clearance">PNP Clearance:</label>
+                <label class="control-label" for="pnp-clearance">PNP Clearance OR</label>
                 <div class="controls">
                   <input type="file" id="pnp-clearance" name="attachments[pnp_clearance][]" accept="image/jpeg">
                 </div>
               </div>
             </div>
-            <br>
-            <div class="row">
-            </div>
-
             <div class="form-inline row">
               <div class="control-group span2 offset1">
                 <label class="control-label" for="rsf">RSF#</label>
@@ -73,7 +69,7 @@
                 </div>
               </div>
               <div class="control-group span4 <?php echo (form_error('attachments[insurance_or][]')) ? 'error' : ''; ?>" style="margin-left:8rem;">
-                <label class="control-label" for="insurance-or">Insurance OR:</label>
+                <label class="control-label" for="insurance-or">Insurance OR</label>
                 <div class="controls">
                   <input type="file" id="insurance-or" name="attachments[insurance_or][]" accept="image/jpeg">
                 </div>
@@ -88,7 +84,7 @@
                 </div>
               </div>
               <div class="control-group span4 <?php echo (form_error('attachments[emission_or][]')) ? 'error' : ''; ?>" style="margin-left:7.4rem;">
-                <label class="control-label" for="emission-or">Emission OR:</label>
+                <label class="control-label" for="emission-or">Emission OR</label>
                 <div class="controls">
                   <input type="file" id="emission-or" name="attachments[emission_or][]" accept="image/jpeg">
                 </div>
@@ -109,7 +105,7 @@
                 </div>
               </div>
               <div class="control-group span4 <?php echo (form_error('attachments[macro_etching][]')) ? 'error' : ''; ?>" style="margin-left:7.9rem;">
-                <label class="control-label" for="macro-etching">Macro Etching:</label>
+                <label class="control-label" for="macro-etching">Macro Etching OR</label>
                 <div class="controls">
                   <input type="file" id="macro-etching" name="attachments[macro_etching][]" accept="image/jpeg">
                 </div>
@@ -132,30 +128,30 @@
             </div>
 
             <div class="form-inline row">
-              <div id="regn-status" class="control-group span2 offset1 <?php echo $repo['expire_status']; ?>">
+              <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[registration_amt]')) ? 'error' : ''; ?>">
+                <label class="control-label" for="regn-amount">Registration Amt.</label>
+                <div class="controls">
+                  <input id="regn-amount" type="text" name="repo_registration[registration_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[registration_amt]', ''); ?>" required>
+                </div>
+              </div>
+              <div id="regn-status" class="control-group span2 <?php echo $repo['expire_status']; ?>" style="margin-left:2rem;">
                 <label class="control-label" for="date-regn">Date Registered</label>
                 <div class="controls">
                   <input id="date-regn" class="datepicker" type="text" name="repo_registration[date_registered]" value="<?php echo set_value('repo_registration[date_registered]', $repo['date_registered']); ?>" autocomplete="off">
-                  <span id="status-message" class="help-inline"><?php echo $repo['expire_message']; ?></span>
-                </div>
-              </div>
-              <div class="control-group span2<?php echo (form_error('repo_registration[registration_amt]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
-                <label class="control-label" for="regn-amount">Registration</label>
-                <div class="controls">
-                  <input id="regn-amount" type="text" name="repo_registration[registration_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[registration_amt]', ''); ?>" required>
+                  <small><span id="status-message" class="help-inline"><?php echo $repo['expire_message']; ?></span></small>
                 </div>
               </div>
             </div>
 
             <div class="form-inline row">
               <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[pnp_clearance_amt]')) ? 'error' : ''; ?>">
-                <label class="control-label" for="pnp-amount">PNP Clearance</label>
+                <label class="control-label" for="pnp-amount">PNP Clearance Amt.</label>
                 <div class="controls">
                   <input id="pnp-amount" type="text" name="repo_registration[pnp_clearance_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[pnp_clearance_amt]', ''); ?>" required>
                 </div>
               </div>
               <div class="control-group span2 <?php echo (form_error('repo_registration[insurance_amt]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
-                <label class="control-label" for="insurance-amount">Insurance</label>
+                <label class="control-label" for="insurance-amount">Insurance Amt.</label>
                 <div class="controls">
                   <input id="insurance-amount" type="text" name="repo_registration[insurance_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[insurance_amt]', ''); ?>" required>
                 </div>
@@ -163,36 +159,59 @@
             </div>
             <div class="form-inline row">
               <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[emission_amt]')) ? 'error' : ''; ?>">
-                <label class="control-label" for="emission-amount">Emission</label>
+                <label class="control-label" for="emission-amount">Emission Amt.</label>
                 <div class="controls">
                   <input id="emission-amount" type="text" name="repo_registration[emission_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[emission_amt]', ''); ?>" required>
                 </div>
               </div>
 
               <div class="control-group span2 <?php echo (form_error('repo_registration[macro_etching_amt]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
-                <label class="control-label" for="macro-etching-amount">Macro Etching</label>
+                <label class="control-label" for="macro-etching-amount">Macro Etching Amt.</label>
                 <div class="controls">
                   <input id="macro-etching-amount" type="text" name="repo_registration[macro_etching_amt]" placeholder="0.00" value="<?php echo set_value('repo_registration[macro_etching_amt]', ''); ?>" required>
                 </div>
               </div>
             </div>
-
+            <br>
             <div class="form-inline row">
-              <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[or_tip]')) ? 'error' : ''; ?>">
-                <label class="control-label" for="or-tip">OR Tip</label>
+              <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[renewal_tip]')) ? 'error' : ''; ?>">
+                <label class="control-label" for="renewal-tip">Renewal Tip</label>
                 <div class="controls">
-                  <input id="or-tip" type="text" name="repo_registration[or_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[or_tip]', ''); ?>" required>
+                  <input id="renewal-tip" type="text" name="repo_registration[renewal_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[renewal_tip]', ''); ?>" required>
                 </div>
               </div>
 
-              <div class="control-group span2 <?php echo (form_error('repo_registration[macro_etching_amt]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
-                <label class="control-label" for="pnp-tip">PNP Tip</label>
+              <div class="control-group span2 <?php echo (form_error('repo_registration[transfer_tip]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
+                <label class="control-label" for="transfer-tip">Transfer Tip</label>
                 <div class="controls">
-                  <input id="pnp-tip" type="text" name="repo_registration[pnp_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[pnp_tip]', ''); ?>" required>
+                  <input id="transfer-tip" type="text" name="repo_registration[transfer_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[transfer_tip]', ''); ?>" required>
                 </div>
               </div>
             </div>
 
+            <div class="form-inline row">
+              <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[pnp_hpg_tip]')) ? 'error' : ''; ?>">
+                <label class="control-label" for="pnp-hpg-tip">PNP/HPG Tip</label>
+                <div class="controls">
+                  <input id="pnp-hpg-tip" type="text" name="repo_registration[pnp_hpg_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[pnp_hpg_tip]', ''); ?>" required>
+                </div>
+              </div>
+
+              <div class="control-group span2 <?php echo (form_error('repo_registration[insurance_amt]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
+                <label class="control-label" for="insurance-tip">Insurance Tip</label>
+                <div class="controls">
+                  <input id="insurance-tip" type="text" name="repo_registration[insurance_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[insurance_tip]', ''); ?>" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-inline row">
+              <div class="control-group span2 offset1 <?php echo (form_error('repo_registration[macro_etching_tip]')) ? 'error' : ''; ?>">
+                <label class="control-label" for="macro-etching-tip">Macro Etching Tip</label>
+                <div class="controls">
+                  <input id="macro-etching-tip" type="text" name="repo_registration[macro_etching_tip]" placeholder="0.00" value="<?php echo set_value('repo_registration[macro_etching_tip]', ''); ?>" required>
+                </div>
+              </div>
+            </div>
             <div class="row">
               <button id="save" class="btn btn-success offset1" type="submit" name="save" value="true">Save</button>
             </div>

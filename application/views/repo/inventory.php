@@ -48,7 +48,7 @@
               $sale_url = '#';
               $sale_disabled = 'disabled="disabled"';
               if (!isset($repo['sale_disabled'])) {
-                $sale_url = base_url('repo/sales/'.$repo['repo_inventory_id']);
+                $sale_url = base_url('repo/sale/'.$repo['repo_inventory_id']);
                 $sale_disabled = '';
               }
               echo '<a class="btn btn-warning" style="margin: 0 3px 0 3px;" href="'.$sale_url.'" '.$sale_disabled.'>Sales</a>';

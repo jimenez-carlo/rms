@@ -5,14 +5,14 @@
     <!-- block -->
     <div class="block">
       <div class="navbar navbar-inner block-header">
-          <div class="pull-left">Repo Sales</div>
+          <div class="pull-left">Repo Encode Sale</div>
       </div>
       <div class="block-content collapse in">
         <?php echo form_open('', ["class" => "form-inline", "onsubmit" => "return confirm('Are you sure?');"]); ?>
           <fieldset>
             <legend>
               <p class="offset4" style="margin-top:0;margin-bottom:0;">
-                CA Reference# <?php echo $_SESSION['branch_code'].'-'.date('Ymd'); ?>
+                CA Reference# <?php echo 'REPO-'.$_SESSION['branch_code'].'-'.date('Ymd'); ?>
               </p>
             </legend>
             <div class="form-inline row">
