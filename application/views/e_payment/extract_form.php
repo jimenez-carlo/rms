@@ -5,10 +5,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="row-fluid">
                 <div class="block">
                         <div class="navbar navbar-inner block-header">
-                                <div class="pull-left">LTO Payment</div>
+                                <div class="pull-left">E-Payment Extract</div>
                         </div>
                         <div class="block-content collapse in">
-                                <form class="form-horizontal" method="post" action="<?php echo base_url(); ?>lto_payment/csv" target="_blank">
+                                <form class="form-horizontal" method="post" action="<?php echo base_url('electronic_payment/csv'); ?>" target="_blank">
                                         <fieldset>
                                                 <div class="control-group span5">
                                                   <div class="control-label">Pending Date</div>

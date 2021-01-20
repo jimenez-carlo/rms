@@ -43,7 +43,7 @@
               <input type="submit" class="btn btn-success" value="Search" name="search">
             </div>
           </fieldset>
-      </form>
+        </form>
       <div>
         <table class="table">
           <thead>

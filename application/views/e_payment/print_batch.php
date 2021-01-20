@@ -74,7 +74,7 @@
 <h3>Registration Monitoring System</h3>
 <hr>
 <h3 style="display: block; float: right; margin: 0">Reference #: <?php print $payment->reference; ?></h3>
-<h3>LTO Payment for <?php print $payment->region.' '.$payment->company; ?></h3>
+<h3>E-Payment for <?php print $payment->region.' '.$payment->company; ?></h3>
 
 <table>
   <thead>
@@ -108,7 +108,7 @@
   </tbody>
   <tfoot>
     <tr>
-      <th colspan="5">Amount for Payment</th>
+      <th colspan="6">Amount for Payment</th>
       <th style="text-align:right; font-size: 20px;">&#x20b1 <?php print number_format($payment->amount, 2, '.', ','); ?></th>
     </tr>
   </tfoot>

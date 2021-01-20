@@ -40,6 +40,11 @@
           echo '</div></div>';
 
           echo '<div class="control-group">';
+          echo form_label('DA Reason', '', array('class' => 'control-label'));
+          echo '<div class="controls text">'.$misc->da_reason.'</div>';
+          echo '</div>';
+
+          echo '<div class="control-group">';
           echo form_label('Remarks', '', array('class' => 'control-label'));
           echo '<div class="controls text">';
           echo '<textarea disabled>'.$misc->remarks.'</textarea>';

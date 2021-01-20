@@ -3,34 +3,34 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Registration extends MY_Controller {
 
-	public function __construct() {
-		parent::__construct();
-		$this->load->helper('url');
-		$this->load->model('Registration_model', 'registration');
-		$this->load->model('Sales_model', 'sales');
-		$this->load->model('File_model', 'file');
-	}
+        public function __construct() {
+                parent::__construct();
+                $this->load->helper('url');
+                $this->load->model('Registration_model', 'registration');
+                $this->load->model('Sales_model', 'sales');
+                $this->load->model('File_model', 'file');
+        }
 
-	public function index()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Registration');
-		$this->header_data('nav', 'registration');
-		$this->header_data('dir', './');
+        public function index()
+        {
+                $this->access(1);
+                $this->header_data('title', 'Registration');
+                $this->header_data('nav', 'registration');
+                $this->header_data('dir', './');
 
-		$data['sid'] = $this->input->post('sid');
+                $data['sid'] = $this->input->post('sid');
 
-		// on upload
-		$data['temp'] = array();
-		$upload = $this->input->post('upload');
-		if (!empty($upload)) {
-			$data['temp'] = $this->upload();
-		}
+                // on upload
+                $data['temp'] = array();
+                $upload = $this->input->post('upload');
+                if (!empty($upload)) {
+                        $data['temp'] = $this->upload();
+                }
 
-		// on save
-		$submit = $this->input->post('submit');
-		if (!empty($submit)) {
-			$sid = $this->input->post('sid');
+                // on save
+                $submit = $this->input->post('submit');
+                if (!empty($submit)) {
+                        $sid = $this->input->post('sid');
                         $sales = $this->db->query("
                           SELECT
                             s.*, e.*, c.*, p.plate_number
@@ -45,82 +45,82 @@ class Registration extends MY_Controller {
                           WHERE
                             s.sid = ".$sid
                         )->row();
-			$this->submit_validate($sales);
-		}
+                        $this->submit_validate($sales);
+                }
 
-		// on search
-		$engine_no = $this->input->post('engine_no');
-		if (!empty($engine_no)) {
-			$data['sid'] = $this->sales->search_engine($engine_no);
-			if (empty($data['sid'])) $_SESSION['warning'][] = 'Engine # '.$engine_no.' is invalid.';
-		}
+                // on search
+                $engine_no = $this->input->post('engine_no');
+                if (!empty($engine_no)) {
+                        $data['sid'] = $this->sales->search_engine($engine_no);
+                        if (empty($data['sid'])) $_SESSION['warning'][] = 'Engine # '.$engine_no.' is invalid.';
+                }
 
-		$da_resolve = 0;
-		if (!empty($data['sid'])) {
-			$data['sales']  = $this->sales->load_sales($data['sid']);
+                $da_resolve = 0;
+                if (!empty($data['sid'])) {
+                        $data['sales']  = $this->sales->load_sales($data['sid']);
                         if ($data['sales']->da_reason === '11') {
                           return show_404();
                         }
 
-			$da_resolve = ($data['sales']->da_reason > 0);
-		}
+                        $da_resolve = ($data['sales']->da_reason > 0);
+                }
 
-		return ($da_resolve) ? $this->template('registration/da_resolve', $data) : $this->template('registration/view', $data);
-	}
+                return ($da_resolve) ? $this->template('registration/da_resolve', $data) : $this->template('registration/view', $data);
+        }
 
-	public function pending_list()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Registration');
-		$this->header_data('nav', 'registration');
-		$this->header_data('dir', './../');
+        public function pending_list()
+        {
+                $this->access(1);
+                $this->header_data('title', 'Registration');
+                $this->header_data('nav', 'registration');
+                $this->header_data('dir', './../');
 
-		$data['region'] = $_SESSION['region_id'];
-		$data['table'] = $this->registration->list_sales($data);
-		$this->template('registration/sales', $data);
-	}
+                $data['region'] = $_SESSION['region_id'];
+                $data['table'] = $this->registration->list_sales($data);
+                $this->template('registration/sales', $data);
+        }
 
-	public function upload()
-	{
-		$temp = array();
-		$total_size = 0;
-		$content = '';
+        public function upload()
+        {
+                $temp = array();
+                $total_size = 0;
+                $content = '';
 
-		if (isset($_FILES['scanFiles']))
-		{
-			array_multisort($_FILES['scanFiles']['name'], SORT_ASC, SORT_STRING);
-			foreach ($_FILES['scanFiles']['name'] as $key => $val) {
-				$total_size += $_FILES['scanFiles']['size'][$key];
-			}
+                if (isset($_FILES['scanFiles']))
+                {
+                        array_multisort($_FILES['scanFiles']['name'], SORT_ASC, SORT_STRING);
+                        foreach ($_FILES['scanFiles']['name'] as $key => $val) {
+                                $total_size += $_FILES['scanFiles']['size'][$key];
+                        }
 
-			if($total_size > 1000000) {
-				$_SESSION['warning'][] = "The file you are attempting to upload is larger than the permitted size.";
-			}
-			else {
-				$files = $this->file->upload_multiple();
-				if (!empty($files)) {
-					foreach ($files as $file) {
-						$temp[] = $file->filename;
-						$content .= '
-							<div class="attachment temp" style="position:relative">
-								'.form_hidden('temp[]', $file->filename).'
-								<img src="'.$file->path.'" style="margin:5px; border:solid">
-								<a style="background:#BDBDBD; color:black; padding:0.5em; position:absolute; top: 5px">X</a>
-							</div>';
-					}
-				}
-			}
-		}
-		return $temp;
-	}
+                        if($total_size > 1000000) {
+                                $_SESSION['warning'][] = "The file you are attempting to upload is larger than the permitted size.";
+                        }
+                        else {
+                                $files = $this->file->upload_multiple();
+                                if (!empty($files)) {
+                                        foreach ($files as $file) {
+                                                $temp[] = $file->filename;
+                                                $content .= '
+                                                        <div class="attachment temp" style="position:relative">
+                                                                '.form_hidden('temp[]', $file->filename).'
+                                                                <img src="'.$file->path.'" style="margin:5px; border:solid">
+                                                                <a style="background:#BDBDBD; color:black; padding:0.5em; position:absolute; top: 5px">X</a>
+                                                        </div>';
+                                        }
+                                }
+                        }
+                }
+                return $temp;
+        }
 
-	public function delete()
-	{
-		$file = '/temp/'.$this->input->post('filename');
-		$this->file->delete($file);
-	}
+        public function delete()
+        {
+                $file = '/temp/'.$this->input->post('filename');
+                $this->file->delete($file);
+        }
 
-	public function submit_validate($sales)
+        public function submit_validate($sales)
         {
           $err_msg = array();
           $files = $this->input->post('files');
@@ -155,12 +155,13 @@ class Registration extends MY_Controller {
             default: // not da, normal registration
               $this->form_validation->set_rules('registration', 'Registration', 'required|is_numeric|non_zero');
               $this->form_validation->set_rules('tip', 'Tip', 'required|is_numeric');
-              $this->form_validation->set_rules('cr_date', 'Registration Date', 'required');
-              $this->form_validation->set_rules('cr_no', 'CR #', 'required');
+              $this->form_validation->set_rules('cr_date', 'OR Registration', 'required|callback_valid_date');
+              $this->form_validation->set_rules('cr_no', 'CR #', 'required|exact_length[9]');
               $this->form_validation->set_rules('mvf_no', 'MVF #', 'required');
+          }
 
-              $cr_no = $this->input->post('cr_no');
-              if (strlen($cr_no) != 9) $err_msg[] = 'CR # must be 9 digits.';
+          if ($this->input->post('is_penalty_for_ric') === 'true') {
+            $this->form_validation->set_rules('penalty', 'Request for Issuance of Check for penalty', 'required|is_numeric|non_zero');
           }
 
           if (!isset($form_valid)) $form_valid = $this->form_validation->run();
@@ -168,7 +169,7 @@ class Registration extends MY_Controller {
           return ($form_valid && empty($err_msg)) ? $this->submit_save($sales) : $_SESSION['warning'] = $err_msg;
         }
 
-	public function submit_save($sales)
+        public function submit_save($sales)
         {
           $files = $this->input->post('files');
           $files = (!empty($files)) ? $files : array();
@@ -179,76 +180,79 @@ class Registration extends MY_Controller {
           // prepare save
           $new_sales = new Stdclass();
 
-          switch ($sales->da_reason)
-          {
-          case 1: // wrong amount
-            // Update Registration Amount
-            $new_sales->registration = $this->input->post('registration');
-            $new_sales->da_reason = 11;
-            $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
+          switch ($sales->da_reason) {
+            case 1: // wrong amount
+              // Update Registration Amount
+              $new_sales->registration = $this->input->post('registration');
+              $new_sales->penalty = $this->input->post('penalty');
+              $new_sales->is_penalty_for_ric = $this->input->post('is_penalty_for_ric');
+              $new_sales->da_reason = 11;
+              $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
 
-            // Insert History
-            $new_da_history = array(
-              'sales_id' => $sales->sid,
-              'da_status_id' => 11,
-              'uid' => $_SESSION['uid']
-            );
-            $this->db->insert('tbl_da_history', $new_da_history);
+              // Insert History
+              $new_da_history = array(
+                'sales_id' => $sales->sid,
+                'da_status_id' => 11,
+                'uid' => $_SESSION['uid']
+              );
+              $this->db->insert('tbl_da_history', $new_da_history);
 
-            // Update Cash on Hand
-            if ($this->input->post('payment_method') === 'CASH') {
-              $this->db->query("
-                UPDATE
-                  tbl_fund f, tbl_voucher v, tbl_sales s
-                SET
-                  f.cash_on_hand = f.cash_on_hand - s.registration
-                WHERE
-                  f.fid = v.fund AND s.voucher = v.vid
-                AND
-                  s.sid = {$sales->sid}
-              ");
-            }
-            break;
+              // Update Cash on Hand
+              if ($this->input->post('payment_method') === 'CASH') {
+                $this->db->query("
+                  UPDATE
+                    tbl_fund f, tbl_voucher v, tbl_sales s
+                  SET
+                    f.cash_on_hand = f.cash_on_hand - s.registration
+                  WHERE
+                    f.fid = v.fund AND s.voucher = v.vid
+                  AND
+                    s.sid = {$sales->sid}
+                ");
+              }
+              break;
 
-          case 2: // no si/ar
-          case 3: // invalid si/ar
-            $new_sales->si_no = $this->input->post('si_no');
-            $new_sales->ar_no = $this->input->post('ar_no');
-            $new_sales->da_reason = 11;
-            $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
-            break;
+            case 2: // no si/ar
+            case 3: // invalid si/ar
+              $new_sales->si_no = $this->input->post('si_no');
+              $new_sales->ar_no = $this->input->post('ar_no');
+              $new_sales->da_reason = 11;
+              $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
+              break;
 
-          case 4:  // unreadable attachment
-          case 5:  // missing or
-          case 6:  // mismatch cust name
-          case 7:  // mismatch engine
-          case 10: // wrong regn type
-            $new_sales->da_reason = 11;
-            $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
-            break;
+            case 4:  // unreadable attachment
+            case 5:  // missing or
+            case 6:  // mismatch cust name
+            case 7:  // mismatch engine
+            case 10: // wrong regn type
+              $new_sales->da_reason = 11;
+              $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
+              break;
 
-          case 8: // mismatch cr
-            $new_sales->cr_no = $this->input->post('cr_no');
-            $new_sales->da_reason = 11;
-            $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
-            break;
+            case 8: // mismatch cr
+              $new_sales->cr_no = $this->input->post('cr_no');
+              $new_sales->da_reason = 11;
+              $this->db->update('tbl_sales', $new_sales, array('sid' => $sales->sid));
+              break;
 
-          default: // not da, normal registration
-            $new_sales->sid = $sales->sid;
-            $new_sales->bcode = $sales->bcode;
-            $new_sales->registration = $this->input->post('registration');
-            $new_sales->tip = $this->input->post('tip');
-            $new_sales->cr_date = $this->input->post('cr_date');
-            $new_sales->cr_no = $this->input->post('cr_no');
-            $new_sales->mvf_no = $this->input->post('mvf_no');
-            $new_sales->plate_no = $this->input->post('plate_no');
-            $new_sales->status = 4;
-            $new_sales->file = 1;
-            $new_sales->registration_date = date('Y-m-d H:i:s');
-            $this->sales->save_registration($new_sales);
+            default: // not da, normal registration
+              $new_sales->sid = $sales->sid;
+              $new_sales->bcode = $sales->bcode;
+              $new_sales->registration = $this->input->post('registration');
+              $new_sales->penalty = $this->input->post('penalty');
+              $new_sales->is_penalty_for_ric = ($this->input->post('is_penalty_for_ric') === 'true') ? 1 : 0;
+              $new_sales->tip = $this->input->post('tip');
+              $new_sales->cr_date = $this->input->post('cr_date');
+              $new_sales->cr_no = $this->input->post('cr_no');
+              $new_sales->mvf_no = $this->input->post('mvf_no');
+              $new_sales->plate_no = $this->input->post('plate_no');
+              $new_sales->status = 4;
+              $new_sales->file = 1;
+              $new_sales->registration_date = date('Y-m-d H:i:s');
+              $this->sales->save_registration($new_sales);
 
-            // for fund update
-            $expense = ($sales->registration - $new_sales->registration) + ($sales->tip - $new_sales->tip);
+              // for fund update
+              $expense = ($sales->registration - $new_sales->registration) + ($sales->tip - $new_sales->tip);
           }
 
           // update fund
@@ -280,68 +284,69 @@ class Registration extends MY_Controller {
           redirect('sales/view/'.$sales->sid);
         }
 
-	public function registration()
-	{
-		$this->access(1);
-		$this->header_data('title', 'Registration');
-		$this->header_data('nav', 'registration');
-		$this->header_data('dir', './');
+        public function registration()
+        {
+                $this->access(1);
+                $this->header_data('title', 'Registration');
+                $this->header_data('nav', 'registration');
+                $this->header_data('dir', './');
 
-		$data['region'] = $_SESSION['region_id'];
-		$data['ltid'] = $this->input->post('ltid');
-		$data['registration'] = $this->input->post('registration');
-		$data['tip'] = $this->input->post('tip');
-		$data['cr_date'] = $this->input->post('cr_date');
-		$data['cr_no'] = $this->input->post('cr_no');
-		$data['mvf_no'] = $this->input->post('mvf_no');
-		$data['plate_no'] = $this->input->post('plate_no');
-		$data['expense'] = $this->input->post('expense');
-		$data['submit_all'] = $this->input->post('submit_all');
-		$data['back'] = $this->input->post('back');
+                $data['region'] = $_SESSION['region_id'];
+                $data['ltid'] = $this->input->post('ltid');
+                $data['registration'] = $this->input->post('registration');
+                $data['penalty'] = $this->input->post('penalty');
+                $data['tip'] = $this->input->post('tip');
+                $data['cr_date'] = $this->input->post('cr_date');
+                $data['cr_no'] = $this->input->post('cr_no');
+                $data['mvf_no'] = $this->input->post('mvf_no');
+                $data['plate_no'] = $this->input->post('plate_no');
+                $data['expense'] = $this->input->post('expense');
+                $data['submit_all'] = $this->input->post('submit_all');
+                $data['back'] = $this->input->post('back');
 
-		if (!empty($data['submit_all'])) {
-			$this->registration->register_sales($data);
-			redirect('registration');
-		}
+                if (!empty($data['submit_all'])) {
+                        $this->registration->register_sales($data);
+                        redirect('registration');
+                }
 
-		if (empty($data['ltid'])) {
-			$data['table'] = $this->registration->load_list($data);
-			$this->template('registration/list', $data);
-		}
-		else {
-	 		if (is_array($data['ltid'])) {
-	 			$data['ltid'] = current(array_keys($data['ltid']));
-	 		}
+                if (empty($data['ltid'])) {
+                        $data['table'] = $this->registration->load_list($data);
+                        $this->template('registration/list', $data);
+                }
+                else {
+                        if (is_array($data['ltid'])) {
+                                $data['ltid'] = current(array_keys($data['ltid']));
+                        }
 
-			if (!empty($data['registration'])) {
-				foreach ($data['registration'] as $sid => $registration)
-				{
-					if (empty($data['registration'][$sid])
-						|| empty($data['cr_date'][$sid])
-						|| empty($data['cr_no'][$sid])
-						|| empty($data['mvf_no'][$sid])) {
-							unset($data['registration'][$sid]);
-							unset($data['tip'][$sid]);
-							unset($data['cr_date'][$sid]);
-							unset($data['cr_no'][$sid]);
-							unset($data['mvf_no'][$sid]);
-							unset($data['plate_no'][$sid]);
-						}
-				}
+                        if (!empty($data['registration'])) {
+                                foreach ($data['registration'] as $sid => $registration)
+                                {
+                                        if (empty($data['registration'][$sid])
+                                                || empty($data['cr_date'][$sid])
+                                                || empty($data['cr_no'][$sid])
+                                                || empty($data['mvf_no'][$sid])) {
+                                                        unset($data['registration'][$sid]);
+                                                        unset($data['tip'][$sid]);
+                                                        unset($data['cr_date'][$sid]);
+                                                        unset($data['cr_no'][$sid]);
+                                                        unset($data['mvf_no'][$sid]);
+                                                        unset($data['plate_no'][$sid]);
+                                                }
+                                }
 
-				if (empty($data['registration'])) {
-					$_SESSION['warning'][] = 'No records to update.';
-				}
-			}
+                                if (empty($data['registration'])) {
+                                        $_SESSION['warning'][] = 'No records to update.';
+                                }
+                        }
 
-			if (empty($data['registration']) || !empty($data['back'])) {
-				$data['table'] = $this->registration->list_sales($data);
-				$this->template('registration/sales', $data);
-			}
-			else {
-				$data['transmittal'] = $this->registration->load_sales($data);
-				$this->template('registration/summary', $data);
-			}
-		}
-	}
+                        if (empty($data['registration']) || !empty($data['back'])) {
+                                $data['table'] = $this->registration->list_sales($data);
+                                $this->template('registration/sales', $data);
+                        }
+                        else {
+                                $data['transmittal'] = $this->registration->load_sales($data);
+                                $this->template('registration/summary', $data);
+                        }
+                }
+        }
 }

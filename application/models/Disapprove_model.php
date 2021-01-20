@@ -3,9 +3,9 @@ defined ('BASEPATH') OR exit('No direct script access allowed');
 
 class Disapprove_model extends CI_Model{
 
-	public function __construct()
-	{
-		parent::__construct();
+        public function __construct()
+        {
+                parent::__construct();
                 $this->load->model('Caching_model', 'caching');
                 switch ($_SESSION['company']) {
                   case 8:
@@ -16,7 +16,7 @@ class Disapprove_model extends CI_Model{
                     $this->and_company = " AND s.company != 8";
                     break;
                 }
-	}
+        }
 
         public function da_reason()
         {
@@ -35,8 +35,8 @@ class Disapprove_model extends CI_Model{
                 return $status;
         }
 
-	public function branch_list($param)
-	{
+        public function branch_list($param)
+        {
                 switch ($this->session->position_name) {
                   case 'Accounts Payable Clerk':
                   case 'RRT National Registration Manager':
@@ -61,17 +61,17 @@ class Disapprove_model extends CI_Model{
                   ORDER BY bcode
                 ")->result_object();
 
-		$branches = array();
-		foreach($result as $row) {
-			$branches[$row->bcode] = $row->bcode.' '.$row->bname;
-		}
+                $branches = array();
+                foreach($result as $row) {
+                        $branches[$row->bcode] = $row->bcode.' '.$row->bname;
+                }
 
-		return $branches;
-	}
+                return $branches;
+        }
 
-	public function load_list($param)
-	{
-		$branch = (empty($param->branch))  ? "" : " AND s.bcode = '$param->branch'";
+        public function load_list($param)
+        {
+                $branch = (empty($param->branch))  ? "" : " AND s.bcode = '$param->branch'";
                 $da_status = 'AND s.da_reason > 0 AND s.da_reason != 11';
 
                 switch ($this->session->position_name) {
@@ -103,10 +103,10 @@ class Disapprove_model extends CI_Model{
                     tbl_topsheet t ON topsheet = tid
                   WHERE
                     {$condition} {$branch} {$da_status}
-		  ORDER BY s.bcode")->result_object();
+                  ORDER BY s.bcode")->result_object();
 
                 return $result;
-	}
+        }
 
         public function get_da_resolve()
         {
@@ -133,15 +133,15 @@ class Disapprove_model extends CI_Model{
                 ")->result_object();
         }
 
-	public function load_sales($sid)
-	{
-		$sales = $this->db->query("select * from tbl_sales
-			inner join tbl_engine on engine = eid
-			inner join tbl_customer on customer = cid
-			where sid = ".$sid)->row();
-		$sales->da_reason = $da_reason[$sales->da_reason];
-		return $sales;
-	}
+        public function load_sales($sid)
+        {
+                $sales = $this->db->query("select * from tbl_sales
+                        inner join tbl_engine on engine = eid
+                        inner join tbl_customer on customer = cid
+                        where sid = ".$sid)->row();
+                $sales->da_reason = $da_reason[$sales->da_reason];
+                return $sales;
+        }
 
         public function da_status_history($sale_id)
         {
@@ -154,6 +154,7 @@ class Disapprove_model extends CI_Model{
 
         public function da_misc_expense($misc)
         {
+          $this->db->trans_start();
           //Return Cash On Hand
           $this->db->query("
             UPDATE
@@ -164,10 +165,23 @@ class Disapprove_model extends CI_Model{
               m.region = f.region AND m.mid = {$misc['mid']}
           ");
 
+          $this->db->update(
+            'tbl_misc',
+            ['da_reason'=>$misc['da_reason']],
+            ['mid'=>$misc['mid']]
+          );
+
           // Insert history
-          $misc['status'] = 5;
-          $misc['uid'] = $_SESSION['uid'];
-          return $this->db->insert('tbl_misc_expense_history', $misc);
+          $misc_history = [
+            'mid' => $misc['mid'],
+            'remarks' => $misc['remarks'],
+            'uid' => $_SESSION['uid'],
+            'status' => 5
+          ];
+          $this->db->insert('tbl_misc_expense_history', $misc_history);
+
+          $this->db->trans_complete();
+          return $this->db->trans_status();
         }
 
 }

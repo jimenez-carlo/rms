@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">
-				<div class="pull-left">Liquidation LTO Payment</div>
+				<div class="pull-left">Pending E-Payment</div>
 			</div>
 			<div class="block-content collapse in">
 				<form class="form-horizontal" method="post">
@@ -22,12 +22,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								<th><p>Payment Reference #</p></th>
 								<th><p>Region</p></th>
 								<th><p>Amount</p></th>
+								<th><p>Addt'l Amount</p></th>
 								<th><p>Document #</p></th>
-								<th><p>Debit Memo #</p></th>
-								<th><p>Payment Confirmation #</p></th>
-								<th><p>Encoded Registration</p></th>
-								<th><p>Balance</p></th>
-								<th><p>Liquidated</p></th>
+								<th><p></p></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -36,17 +33,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							{
 								print '<tr>';
 								print '<td>'.$row->ref_date.'</td>';
-								print '<td><a href="view/'.$row->lpid.'" target="_blank">'.$row->reference.'</a></td>';
-
+								print '<td><a href="view/'.$row->epid.'" target="_blank">'.$row->reference.'</a></td>';
 								print '<td>'.$region[$row->region].' '.$company[$row->company].'</td>';
 								print '<td>'.$row->amount.'</td>';
-
-								print '<td>'.$row->doc_no.'</td>';
-								print '<td>'.$row->dm_no.'</td>';
-								print '<td>'.$row->confirmation.'</td>';
-								print '<td>'.$row->sales.'</td>';
-								print '<td>'.($row->amount - $row->sales).'</td>';
-								print '<td><input type="checkbox" name="liquidated[]" value="'.$row->lpid.'"></td>';
+								print '<td>'.$row->addtl_amt.'</td>';
+								print '<td>'.form_input('doc_no['.$row->epid.']', set_value('doc_no['.$row->epid.']',$row->doc_no)).'</td>';
+								print '<td><a href="'.base_url().'electronic_payment/print_batch/'.$row->epid.'" target="_blank" class="btn btn-success">Print</a></td>';
 								print '</tr>';
 							}
 
@@ -54,10 +46,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 							{
 								print '<tr>';
 								print '<td>No result.</td>';
-								print '<td></td>';
-								print '<td></td>';
-								print '<td></td>';
-								print '<td></td>';
 								print '<td></td>';
 								print '<td></td>';
 								print '<td></td>';

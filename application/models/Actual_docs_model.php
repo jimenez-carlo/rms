@@ -8,13 +8,13 @@ class Actual_docs_model extends CI_Model {
     $w_company_2 = '';
     if(isset($param['company']) && $param['company'] !== 'any')  {
       $w_company_1 = 'AND v.company = '.$param['company'];
-      $w_company_2 = 'AND lp.company = '.$param['company'];
+      $w_company_2 = 'AND ep.company = '.$param['company'];
     }
     $w_epp_ref  = '';
     $w_ca_ref  = '';
     if(isset($param['reference']) && $param['reference'] !== "") {
       $w_ca_ref = "AND v.reference LIKE '%{$param['reference']}%'";
-      $w_epp_ref = "AND lp.reference LIKE '%{$param['reference']}%'";
+      $w_epp_ref = "AND ep.reference LIKE '%{$param['reference']}%'";
     }
 
     $w_status = '';
@@ -68,7 +68,7 @@ class Actual_docs_model extends CI_Model {
           tbl_voucher v
         LEFT JOIN
           tbl_actual_docs ad
-            ON ad.voucher_or_lto_payment_id = v.vid AND payment_method = "CA"
+            ON ad.voucher_or_electronic_payment_id = v.vid AND payment_method = "CA"
         INNER JOIN
           tbl_fund f ON f.fid = v.fund
         WHERE
@@ -79,18 +79,18 @@ class Actual_docs_model extends CI_Model {
           transmittal_number, actual_docs_id,
           DATE_FORMAT(date_incomplete, '%Y-%m-%d') AS date_incomplete,
           DATE_FORMAT(date_completed, '%Y-%m-%d') AS date_completed,
-          CONCAT(lp.lpid,LOWER(REPLACE(lp.reference,'*',''))) AS transmittal_id,
-          lp.lpid AS id, lp.reference, DATE_FORMAT(lp.deposit_date, '%Y-%m-%d') AS date_deposited,
-          lp.company AS cid, lp.region AS rid, lp.amount, 'EPP' AS payment_type
+          CONCAT(ep.epid,LOWER(REPLACE(ep.reference,'*',''))) AS transmittal_id,
+          ep.epid AS id, ep.reference, DATE_FORMAT(ep.deposit_date, '%Y-%m-%d') AS date_deposited,
+          ep.company AS cid, ep.region AS rid, ep.amount, 'EPP' AS payment_type
           ,ad.deposit_slip, DATE_ADD(IFNULL(ad.date_completed, NOW()), INTERVAL 24 HOUR) < NOW() AS disable_deposit_slip
-          ,lp.created AS batch_date_created, IFNULL(ad.status, 'New') AS status
+          ,ep.created AS batch_date_created, IFNULL(ad.status, 'New') AS status
         FROM
-          tbl_lto_payment lp
+          tbl_electronic_payment ep
         LEFT JOIN
           tbl_actual_docs ad
-            ON ad.voucher_or_lto_payment_id = lp.lpid AND payment_method = "EPP"
+            ON ad.voucher_or_electronic_payment_id = ep.epid AND payment_method = "EPP"
         WHERE
-          lp.deposit_date IS NOT NULL {$w_region} {$w_company_2} {$w_status} {$w_epp_ref}
+          ep.deposit_date IS NOT NULL {$w_region} {$w_company_2} {$w_status} {$w_epp_ref}
         ORDER BY deposit_date DESC LIMIT 500)
       ) AS batch
       JOIN

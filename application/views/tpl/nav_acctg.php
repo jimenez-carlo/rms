@@ -42,13 +42,23 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         </ul>
                     </li>
 
-                    <li class="dropdown <?php if(isset($nav) && $nav=="lto_payment") echo 'active'; ?>">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">LTO Payment <i class="caret"></i></a>
+                    <li class="dropdown <?php if(isset($nav) && $nav=="e_payment") echo 'active'; ?>">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">E-Payment <i class="caret"></i></a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a tabindex="-1" href="<?php echo base_url('lto_payment'); ?>">Overview</a>
-                                <a tabindex="-1" href="<?php echo base_url('lto_payment/pending'); ?>">Pending List</a>
-                                <a tabindex="-1" href="<?php echo base_url('lto_payment/liquidation'); ?>">Liquidation</a>
+                                <a tabindex="-1" href="<?php echo base_url('electronic_payment'); ?>">Overview</a>
+                                <a tabindex="-1" href="<?php echo base_url('electronic_payment/pending'); ?>">Pending List</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="dropdown <?php if(isset($nav) && (in_array($nav, ['liquidation', 'return_fund','expense']))) echo 'active'; ?>">
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">CA Monitoring <i class="caret"></i></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a tabindex="-1" href="<?php echo base_url('liquidation'); ?>">Liquidation</a>
+                                <a tabindex="-1" href="<?php echo base_url('return_fund'); ?>">Return Fund</a>
+                                <a tabindex="-1" href="<?php echo base_url('expense'); ?>">Misc Expense</a>
                             </li>
                         </ul>
                     </li>
@@ -61,17 +71,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     $active = (isset($nav) && $nav=="sap_upload") ? 'class="active"' : '';
                     print '<li '.$active.'><a href="'.base_url('sap_upload').'">For SAP Uploading</a></li>';
                     ?>
-
-                    <li class="dropdown <?php if(isset($nav) && (in_array($nav, ['liquidation', 'return_fund','expense']))) echo 'active'; ?>">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Monitoring <i class="caret"></i></a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                <a tabindex="-1" href="<?php echo base_url('liquidation'); ?>">Liquidation</a>
-                                <a tabindex="-1" href="<?php echo base_url('return_fund'); ?>">Return Fund</a>
-                                <a tabindex="-1" href="<?php echo base_url('expense'); ?>">Misc Expense</a>
-                            </li>
-                        </ul>
-                    </li>
+                    <li class="<?php echo (isset($nav) && $nav === 'ric') ? 'active' : ''; ?>"><a href="<?php echo base_url('ric/monitoring'); ?>">RIC</a></li>
                     <li class="dropdown <?php echo (isset($nav) && $nav === 'disapprove') ? 'active' : ''; ?>">
                         <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Disapprove<i class="caret"></i></a>
                         <ul class="dropdown-menu">

@@ -50,19 +50,19 @@ class Orcr_checking_model extends CI_Model{
                 v.reference DESC )
               UNION
               (SELECT
-                l.lpid AS id, l.reference, s.region, 'EPP' as budget_type
+                l.epid AS id, l.reference, s.region, 'EPP' as budget_type
               FROM
-                tbl_lto_payment l
+                tbl_electronic_payment l
               INNER JOIN
-                tbl_sales s ON l.lpid = s.lto_payment
+                tbl_sales s ON l.epid = s.electronic_payment
               LEFT JOIN
                 tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
               WHERE
-                s.status = 4 $this->andSalesCompany AND s.da_reason IN (0, 11) AND l.lpid IS NOT NULL AND susb.sid IS NULL
+                s.status = 4 $this->andSalesCompany AND s.da_reason IN (0, 11) AND l.epid IS NOT NULL AND susb.sid IS NULL
               GROUP BY
-                l.lpid, s.region
+                l.epid, s.region
               ORDER BY
-                l.lpid DESC )
+                l.epid DESC )
             ) AS result
             ORDER BY region, reference, budget_type
           ")->result_array();
@@ -182,7 +182,7 @@ SQL;
               $misc_expense = 'NULL AS misc_expense';
             }
 
-            $lto_payment_voucher = "a.voucher = {$data['CA']}";
+            $electronic_payment_voucher = "a.voucher = {$data['CA']}";
             $where_param = " AND v.vid = {$data['CA']} ";
 
             $select_param = <<<SQL
@@ -212,11 +212,11 @@ SQL;
           }
 
           if (isset($data['EPP'])) {
-            $lto_payment_voucher = "a.lto_payment = {$data['EPP']}";
-            $where_param = " AND lp.lpid = {$data['EPP']} ";
+            $electronic_payment_voucher = "a.electronic_payment = {$data['EPP']}";
+            $where_param = " AND lp.epid = {$data['EPP']} ";
 
             $select_param = <<<SQL
-              lp.lpid, lp.region, lp.company, lp.reference,
+              lp.epid, lp.region, lp.company, lp.reference,
               lp.ref_date AS date, lp.amount, lp.status,
               lp.doc_no, lp.dm_no, lp.confirmation,
               DATE_FORMAT(lp.dm_date, '%Y-%m-%d') AS dm_date,
@@ -233,12 +233,12 @@ SQL;
             $table_param = <<<VOC
               FROM tbl_sales s
               LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
-              LEFT JOIN tbl_lto_payment lp ON s.lto_payment = lp.lpid
+              LEFT JOIN tbl_electronic_payment lp ON s.electronic_payment = lp.epid
               LEFT JOIN tbl_region r ON lp.region = r.rid
               LEFT JOIN tbl_company c ON lp.company = c.cid
 VOC;
             $groupby_param = <<<GBY
-              lp.lpid, r.region, lp.company, 23, 24
+              lp.epid, r.region, lp.company, 23, 24
 GBY;
           }
 
@@ -248,18 +248,17 @@ GBY;
             '[',
             GROUP_CONCAT(
              DISTINCT JSON_OBJECT(
-                 'sid', a.sid, 'engine_no', e.engine_no,
-                 'bcode', a.bcode, 'bname', a.bname,
-                 'date_sold', DATE_FORMAT(a.date_sold, '%Y-%m-%d'), 'sales_type', st.sales_type, 'registration_type', a.registration_type,
-                 'si_no', a.si_no, 'ar_no', a.ar_no, 'amount', a.amount,
-                 'insurance', a.insurance, 'registration', a.registration, 'status', ss.status_name,
-                 'disapprove',
-                 CASE
-                   WHEN b.subid IS NOT NULL AND ss.status_name = 'Registered' THEN 'For Sap Uploading'
-                   WHEN ss.status_name = 'Liquidated' THEN 'Done'
-                   ELSE sts.status_name
-                 END,
-                 'selectable', IF(ss.status_name = 'Registered' AND b.subid IS NULL, true,false)
+               'sid', a.sid, 'engine_no', e.engine_no, 'bcode', a.bcode,
+               'bname', a.bname, 'date_sold', DATE_FORMAT(a.date_sold, '%Y-%m-%d'),
+                'sales_type', st.sales_type, 'registration_type', a.registration_type,
+               'si_no', a.si_no, 'ar_no', a.ar_no, 'amount', a.amount,
+               'insurance', a.insurance, 'registration', a.registration,
+               'penalty', a.penalty, 'is_penalty_for_ric', a.is_penalty_for_ric,
+               'disapprove', CASE
+                 WHEN b.subid IS NOT NULL AND ss.status_name = 'Registered' THEN 'For Sap Uploading'
+                 WHEN ss.status_name = 'Liquidated' THEN 'Done'
+                 ELSE sts.status_name END, 'status', ss.status_name,
+               'selectable', IF(ss.status_name = 'Registered' AND b.subid IS NULL, true,false)
              )
              ORDER BY FIELD(a.status, 4, 5, 3, 2, 1, 0), FIELD(a.da_reason, 0, 11, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
              SEPARATOR ','
@@ -272,7 +271,7 @@ GBY;
             LEFT JOIN tbl_sales_type st ON a.sales_type = st.stid
             LEFT JOIN tbl_status ss ON a.status = ss.status_id AND ss.status_type = 'SALES'
             LEFT JOIN tbl_status sts ON a.da_reason = sts.status_id AND sts.status_type = 'DA'
-            WHERE {$lto_payment_voucher} {$where_sales} AND b.sid IS NULL AND a.status = 4 AND a.da_reason IN (0, 11)
+            WHERE {$electronic_payment_voucher} {$where_sales} AND b.sid IS NULL AND a.status = 4 AND a.da_reason IN (0, 11)
           ) AS sales
 SQL;
           if (isset($data['summary']) && !isset($data['sid'])) {
@@ -282,23 +281,7 @@ SQL;
           $sql = <<<SQL
             SELECT
               {$select_param},
-              CASE r.rid
-                WHEN 1  THEN 'NCR'
-                WHEN 2  THEN 'R1'
-                WHEN 3  THEN 'R2'
-                WHEN 4  THEN 'R3'
-                WHEN 5  THEN 'R4A'
-                WHEN 6  THEN 'R4B'
-                WHEN 7  THEN 'R5'
-                WHEN 8  THEN 'R6'
-                WHEN 9  THEN 'R7'
-                WHEN 10 THEN 'R8'
-                WHEN 11 THEN 'IX'
-                WHEN 12 THEN 'X'
-                WHEN 13 THEN 'XI'
-                WHEN 14 THEN 'XII'
-                WHEN 15 THEN 'XIII'
-              END AS region_initial,
+              r.r_code AS region_initial,
               r.region, c.company_code AS company
               , {$sales}
             {$table_param}
@@ -541,9 +524,11 @@ SQL;
         {
                 $misc = $this->db->query("
                   SELECT
-                    m.mid, m.region, m.date, m.or_no, m.or_date,
-                    FORMAT(m.amount, 2) AS amount, m.offline, m.other, m.topsheet, m.batch,
-                    m.ca_ref, mxh1.*, mt.type, v.reference
+                    m.mid, m.region, m.date, m.or_no,
+                    m.or_date, m.da_reason, m.offline,
+                    FORMAT(m.amount, 2) AS amount, m.other,
+                    m.topsheet, m.batch, m.ca_ref, mxh1.*,
+                    mt.type, v.reference
                   FROM
                     tbl_misc m
                   INNER JOIN

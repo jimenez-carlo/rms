@@ -20,6 +20,7 @@ class Nru extends MY_Controller {
                 $data['ltid'] = $this->input->post('ltid');
                 $data['company'] = $this->input->post('company');
                 $data['registration'] = $this->input->post('registration');
+                $data['change_payment_method'] = $this->input->post('change_payment_method');
                 $data['fund'] = $this->input->post('fund');
                 $data['total_mc'] = $this->input->post('total_mc');
                 $data['total_regn'] = $this->input->post('total_regn');
@@ -37,11 +38,20 @@ class Nru extends MY_Controller {
                 } else {
                         $data['ltid'] = (is_array($data['ltid'])) ? current(array_keys($data['ltid'])) : $data['ltid'];
                         if (empty($data['registration']) || $back_key == 1) {
-                                $data['action'] = current($this->input->post('ltid'));
-                                $data['transmittal'] = $this->nru->load_sales($data);
-                                $this->template('nru/registration', $data);
-                        }
-                        else {
+                          if (!empty($data['change_payment_method'])) {
+                            $this->nru->update_payment_method($data['change_payment_method']);
+                            $data['action'] = 'View';
+                          } else {
+                            $data['action'] = current($this->input->post('ltid'));
+                          }
+
+                          $data['transmittal'] = $this->nru->load_sales($data);
+                          if (empty($data['transmittal'])) {
+                            redirect('nru');
+                          }
+
+                          $this->template('nru/registration', $data);
+                        } else {
                                 $data['total_mc'] = 0;
                                 $data['total_regn'] = 0;
                                 foreach ($data['registration'] as $sid => $registration)

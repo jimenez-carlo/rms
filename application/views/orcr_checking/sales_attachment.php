@@ -49,6 +49,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   print '</div>';
 
   print '<div class="control-group">';
+  print '<div class="control-label">Penalty</div>';
+  print '<div class="controls">'.$sales->penalty.'</div>';
+  print '</div>';
+
+  $ric = ($sales->is_penalty_for_ric === '1') ? 'Yes' : 'No';
+  print '<div class="control-group">';
+  print '<div class="control-label">Penalty for RIC?</div>';
+  print '<div class="controls">'.$ric.'</div>';
+  print '</div>';
+
+  print '<div class="control-group">';
   print '<div class="control-label">CR #</div>';
   print '<div class="controls">'.$sales->cr_no.'</div>';
   print '</div>';
