@@ -2,18 +2,18 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <div class="container-fluid form-horizontal">
-	<div class="row-fluid">
+        <div class="row-fluid">
     <div class="block">
       <div class="navbar navbar-inner block-header">
-        <div class="pull-left">LTO Payment # <?php print $payment->lpid; ?></div>
+        <div class="pull-left">E-Payment # <?php print $payment->epid; ?></div>
       </div>
       <div class="block-content collapse in">
         <div class="row-fluid">
-          <div class="span5">
+          <div class="span3">
             <?php if ($payment->status == 'Pending') { ?>
             <div class="control-group">
               <div class="control-label"></div>
-              <div class="controls text"><a href=<?php print base_url()."lto_payment/edit/".$payment->lpid; ?> class="btn btn-success">Update details</a></div>
+              <div class="controls text"><a href=<?php print base_url()."electronic_payment/edit/".$payment->epid; ?> class="btn btn-success">Update details</a></div>
             </div>
             <?php } ?>
             <div class="control-group">
@@ -55,24 +55,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
           </div>
 
-          <div class="span7">
-            <!-- <div class="control-group">
-              <div class="control-label">Screenshot</div>
-              <div class="controls text"><?php print (empty($payment->screenshot)) ? '-' : '<a href="/rms_dir/lto_screenshot/'.$payment->lpid.'/'.$payment->screenshot.'" target="_blank">'.$payment->screenshot.'</a>'; ?></div>
-            </div> -->
+          <div class="span9">
             <div class="control-group">
               <div class="control-label">Receipt</div>
-              <div class="controls text"><?php print (empty($payment->receipt)) ? '-' : '<a href="'.base_url().'rms_dir/lto_receipt/'.$payment->lpid.'/'.$payment->receipt.'" target="_blank">'.$payment->receipt.'</a>'; ?></div>
+              <div class="controls text"><?php print (empty($payment->receipt)) ? '-' : '<a href="'.base_url().'rms_dir/lto_receipt/'.$payment->epid.'/'.$payment->receipt.'" target="_blank">'.$payment->receipt.'</a>'; ?></div>
             </div>
 
             <hr>
 
             <div class="control-group">
               <div class="control-label"></div>
-              <div class="controls text"><a href="<?php print base_url().'lto_payment/print_batch/'.$payment->lpid?>" target="_blank" class="btn btn-success">Print</a></div>
+              <div class="controls text"><a href="<?php print base_url().'electronic_payment/print_batch/'.$payment->epid?>" target="_blank" class="btn btn-success">Print</a></div>
             </div>
 
-            <table class="table">
+            <table class="table table-condensed">
               <thead>
                 <tr>
                   <th><p>#</p></th>
@@ -81,6 +77,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <th><p>Customer Code</p></th>
                   <th><p>Engine #</p></th>
                   <th><p>Chassis #</p></th>
+                  <th><p>Registration</p></th>
+                  <th><p>Penalty</p></th>
+                  <th><p>Status</p></th>
                 </tr>
               </thead>
               <tbody>
@@ -95,15 +94,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   print '<td>'.$sales->cust_code.'</td>';
                   print '<td><a href="'.base_url().'sales/view/'.$sales->sid.'" target="_blank">'.$sales->engine_no.'</a></td>';
                   print '<td>'.$sales->chassis_no.'</td>';
+                  print '<td>'.$sales->registration.'</td>';
+                  print '<td>'.$sales->penalty.'</td>';
+                  print '<td>'.$sales->status_name.'</td>';
                   print '</tr>';
                 }
                 ?>
               </tbody>
             </table>
           </div>
-
         </div>
-			</div>
-		</div>
-	</div>
+      </div>
+    </div>
+  </div>
 </div>

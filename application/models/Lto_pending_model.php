@@ -33,7 +33,7 @@ class Lto_pending_model extends CI_Model{
                 tbl_company c ON c.cid = s.company
 	    WHERE
 	        t.region = ".$region." AND registration_type != 'Self Registration'
-	        AND status < 2 AND voucher = 0 AND lto_payment = 0
+	        AND status < 2 AND voucher = 0 AND electronic_payment = 0
 	    GROUP BY ltid, c.cid
 	    ORDER BY t.date DESC
           ")->result_object();
@@ -47,7 +47,7 @@ class Lto_pending_model extends CI_Model{
 			where ltid = ".$ltid)->row();
                 $transmittal->sales = $this->db->query("
                   select
-                    sid, branch, bcode, bname, region, company,
+                    sid, bcode, bname, region, company,
                     DATE_FORMAT(date_sold, '%Y-%m-%d') AS date_sold,
                     registration_type, status, acct_status,
                     DATE_FORMAT(transmittal_date, '%Y-%m-%d') AS transmittal_date,

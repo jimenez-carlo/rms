@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <div class="container-fluid form-horizontal">
-	<div class="row-fluid">
+        <div class="row-fluid">
     <div class="block">
       <div class="navbar navbar-inner block-header">
         <div class="pull-left">Customer Sales # <?php print $sales->sid; ?></div>
@@ -66,16 +66,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="controls text"><?php print $sales->registration_type; ?></div>
             </div>
             <div class="control-group">
-              <div class="control-label">Insurance</div>
-              <div class="controls text"><?php print $sales->insurance; ?></div>
+              <div class="control-label">Registration</div>
+              <div class="controls text"><?php print $sales->registration; ?></div>
+            </div>
+            <div class="control-group form-inline">
+              <div class="control-label">Penalty</div>
+              <div class="controls text"><?php print $sales->penalty; ?>
+                <?php if(in_array($_SESSION['dept_name'], ['Regional Registration', 'Accounting', 'Treasury'])): ?>
+                <label>| RIC <?php print ($sales->is_penalty_for_ric === '1') ? 'Yes' : 'No'; ?></label>
+                <?php endif; ?>
+              </div>
             </div>
             <div class="control-group">
               <div class="control-label">Tip</div>
               <div class="controls text"><?php print $sales->tip; ?></div>
             </div>
             <div class="control-group">
-              <div class="control-label">Registration</div>
-              <div class="controls text"><?php print $sales->registration; ?></div>
+              <div class="control-label">Insurance</div>
+              <div class="controls text"><?php print $sales->insurance; ?></div>
             </div>
             <div class="control-group">
               <div class="control-label">Registered Date</div>
@@ -133,14 +141,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             }
             else
             {
-            	print '<div class="control-group"><div class="controls text">No attachments.</div></div>';
+                print '<div class="control-group"><div class="controls text">No attachments.</div></div>';
             }
             ?>
           </div>
         </div>
-			</div>
-		</div>
-	</div>
+                        </div>
+                </div>
+        </div>
 </div>
 
 <script type="text/javascript">

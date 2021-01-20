@@ -9,7 +9,7 @@ header('Pragma:public');
 header('Expires: 0');
 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 header('Content-Type: text/csv; charset=utf-8');
-header('Content-Disposition: attachment; filename=lto_batch_'.$lpid.'_'.date('ymd').'.csv');
+header('Content-Disposition: attachment; filename=lto_batch_'.$epid.'_'.date('ymd').'.csv');
 
 // start generate csv
 ob_end_clean();

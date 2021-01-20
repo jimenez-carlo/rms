@@ -41,3 +41,6 @@ rms-clone.tgz
 *.sublime-workspace
 *.sublime-project
 application/config/constants.php
+
+## Nodejs
+node_modules/

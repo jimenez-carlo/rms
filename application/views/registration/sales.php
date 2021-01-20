@@ -28,13 +28,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th><p>Customer Name</p></th>
                 <th><p>Engine #</p></th>
                 <th><p>Sales Type</p></th>
+                <th><p>Payment Method</p></th>
                 <th><p></p></th>
-                <!-- <th><p>Tip</p></th>
-                <th><p>Registration</p></th>
-                <th><p>Registered Date</p></th>
-                <th><p>CR #</p></th>
-                <th><p>MV File #</p></th>
-                <th><p>Plate #</p></th> -->
               </tr>
             </thead>
             <tbody>
@@ -46,25 +41,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
+                print '<td>'.$sales->payment_method.'</td>';
                 print '<td>'.$sales->sales_type.'</td>';
-                // print '<td>'.form_submit('update['.$sales->sid.']', 'Update', array('class' => 'btn btn-success')).'</td>';
                 print '<td><a name="update" class="btn btn-success" onclick="update('.$sales->sid.')">Update</a></td>';
 
-                // print '<td>'.form_input('tip'.$key, set_value('tip'.$key, $sales->tip), array('class' => 'numeric')).'</td>';
-                // print '<td>'.form_input('registration'.$key, set_value('registration'.$key, $sales->registration), array('class' => 'numeric')).'</td>';
-                // print '<td>'.form_input('cr_date'.$key, set_value('cr_date'.$key, $sales->cr_date), array('class' => 'datepicker')).'</td>';
-                // print '<td>'.form_input('cr_no'.$key, set_value('cr_no'.$key, $sales->cr_no)).'</td>';
-                // print '<td>'.form_input('mvf_no'.$key, set_value('mvf_no'.$key, $sales->mvf_no)).'</td>';
-                // print '<td>'.form_input('plate_no'.$key, set_value('plate_no'.$key, $sales->plate_no)).'</td>';
                 print '</tr>';
               }
               ?>
             </tbody>
           </table>
-
-          <!-- <div class="form-actions">
-            <input type="submit" value="Preview Summary" class="btn btn-success">
-          </div> -->
         </form>
       </div>
     </div>

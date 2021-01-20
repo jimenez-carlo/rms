@@ -11,22 +11,22 @@ class Report_model extends CI_Model {
     $company = '';
     switch ($_SESSION['company']) {
       case '8':
-        $company = "AND lp.company = 8";
+        $company = "AND ep.company = 8";
         break;
 
       default:
-        $company = "AND lp.company != 8";
+        $company = "AND ep.company != 8";
     }
 
     $sql = <<<SQL
       SELECT
-        lp.reference AS Reference,
-        IFNULL(lp.doc_no, '') AS 'Document No',
-        IFNULL(DATE_FORMAT(lp.ref_date, '%Y-%m-%d'), '') AS 'Date Entry LTO Ref',
-        IFNULL(DATE_FORMAT(lp.deposit_date, '%Y-%m-%d'),'') AS 'Date Deposited',
+        ep.reference AS Reference,
+        IFNULL(ep.doc_no, '') AS 'Document No',
+        IFNULL(DATE_FORMAT(ep.ref_date, '%Y-%m-%d'), '') AS 'Date Entry LTO Ref',
+        IFNULL(DATE_FORMAT(ep.deposit_date, '%Y-%m-%d'),'') AS 'Date Deposited',
         '' AS 'Expected Date Complete Liquidation',
         '' AS 'Days Late upon TAT', s.company_code AS Company,
-        s.region AS Region, unit_count AS '# of Units', lp.amount AS 'LTO Ref Amount',
+        s.region AS Region, unit_count AS '# of Units', ep.amount AS 'LTO Ref Amount',
         lrsa AS 'Liquidated Registration',
         '0.00'  AS 'Liquidated Misc Expense',
         '0.00'  AS 'Liquidated Return Fund',
@@ -39,9 +39,9 @@ class Report_model extends CI_Model {
         DATE_FORMAT(ad.date_created, '%Y-%m-%d') AS 'Updated By RRT',
         DATE_FORMAT(IFNULL(ad.date_completed, ad.date_incomplete), '%Y-%m-%d') AS 'Updated By Accounting'
       FROM
-        tbl_lto_payment lp
+        tbl_electronic_payment ep
         LEFT JOIN
-        tbl_actual_docs ad ON lp.lpid = ad.voucher_or_lto_payment_id AND ad.payment_method = 'EPP'
+        tbl_actual_docs ad ON ep.epid = ad.voucher_or_electronic_payment_id AND ad.payment_method = 'EPP'
         LEFT JOIN (
           SELECT
             COUNT(DISTINCT s.sid) AS unit_count,
@@ -49,7 +49,7 @@ class Report_model extends CI_Model {
             SUM(IF(s.status = 4, s.registration+tip, 0)) AS flsra,
             SUM(IF(s.status = 3, registration+tip, 0)) AS ltopsra,
             SUM(IF(s.status != 1, registration+tip, 0)) AS srpa,
-            c.*,r.*, s.lto_payment
+            c.*,r.*, s.electronic_payment
           FROM
             tbl_sales s
           LEFT JOIN
@@ -57,13 +57,13 @@ class Report_model extends CI_Model {
           LEFT JOIN
             tbl_company c ON c.cid = s.company
           WHERE s.company != 8
-          GROUP BY c.cid, r.rid, s.lto_payment
-        ) AS s ON lp.lpid = s.lto_payment
+          GROUP BY c.cid, r.rid, s.electronic_payment
+        ) AS s ON ep.epid = s.electronic_payment
       WHERE
-        DATE_FORMAT(lp.deposit_date, '%Y-%m-%d') BETWEEN '{$date['from']}' AND '{$date['to']}' {$company}
+        DATE_FORMAT(ep.deposit_date, '%Y-%m-%d') BETWEEN '{$date['from']}' AND '{$date['to']}' {$company}
       GROUP BY
-        lp.lpid, 7, 8, 9, 11, 13, 14, 16, 17, 18, 19, 20, 21
-      ORDER BY lp.lpid;
+        ep.epid, 7, 8, 9, 11, 13, 14, 16, 17, 18, 19, 20, 21
+      ORDER BY ep.epid;
 SQL;
 
     $query_data = $this->db->query($sql);
@@ -107,7 +107,7 @@ SQL;
       LEFT JOIN
         tbl_company c ON c.cid = v.company
       LEFT JOIN
-        tbl_actual_docs ad ON v.vid = ad.voucher_or_lto_payment_id AND payment_method = 'CA'
+        tbl_actual_docs ad ON v.vid = ad.voucher_or_electronic_payment_id AND payment_method = 'CA'
       LEFT JOIN (
         SELECT
           COUNT(DISTINCT s.sid) AS unit_count,

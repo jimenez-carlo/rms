@@ -1,6 +1,5 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-//echo '<pre>'; var_dump($misc); echo '</pre>'; die();
 ?>
 
 <div class="container-fluid">
@@ -54,10 +53,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo '</div></div>';
 
               echo '<div class="control-group">';
+              echo form_label('DA Reason', 'da-reason',array('class' => 'control-label'));
+              echo '<div class="controls">';
+              echo '<p>'.$misc->da_reason.'</p>';
+              echo  $emphasis;
+              echo '</div></div>';
+
+              echo '<div class="control-group">';
               echo form_label('Accounting Remarks', 'acctg-rmks', array('class' => 'control-label'));
               echo '<div class="controls">';
-              echo '<p class="muted">'.$misc->remarks.'</p>';
-              echo  $emphasis;
+              echo '<p>'.$misc->remarks.'</p>';
               echo '</div></div>';
 
               echo '<div class="control-group">';

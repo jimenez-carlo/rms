@@ -73,7 +73,7 @@ class Expense_model extends CI_Model{
                     SUBSTR(m.or_date, 1, 10) AS or_date,
                     m.amount, mt.type, m.other, m.topsheet,
                     m.batch, m.ca_ref, s.status_name AS status,
-                    v.reference as ca_ref, mxh1.remarks,
+                    v.reference as ca_ref, mxh1.remarks, m.da_reason,
                     CASE WHEN mxh1.status = 0 THEN true ELSE false END AS approval
                   FROM
                     tbl_misc m

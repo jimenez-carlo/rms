@@ -33,6 +33,7 @@ input[type="text"] {
                 <th></th>
                 <th></th>
                 <th></th>
+                <th></th>
                 <?php if ($action !== 'View'): ?>
                 <th class="pull-right"><a class="btn btn-success">Apply to all</a></th>
                 <th><?php print form_input('registration_all', set_value('registration_all', '0.00'), array('class' => 'registration_all numeric', 'style' => 'width:100px')); ?></th>
@@ -48,14 +49,15 @@ input[type="text"] {
                 <th><p>Payment Method</p></th>
                 <?php if ($action !== 'View'): ?>
                 <th><p>Registration Expense</p></th>
+                <?php else: ?>
+                <th><p>Change Payment Method</p></th>
                 <?php endif; ?>
               </tr>
             </thead>
             <tbody>
               <?php
               $count = 1;
-              foreach($transmittal->sales as $sales)
-              {
+              foreach($transmittal->sales as $sales) {
                 $key = "[".$sales->sid."]";
                 $sales->fund = 1;
 
@@ -71,9 +73,18 @@ input[type="text"] {
                   print '<td>';
                   print form_input('registration'.$key, set_value('registration'.$key, $sales->registration), array('class' => 'registration numeric', 'style' => 'width:100px'));
                   print '</td>';
+                } else {
+                  print '<td>'.form_button([
+                    'name'=>'change_payment_method',
+                    'value'=>$sales->sid,
+                    'type'=>'submit',
+                    'class'=>'btn btn-primary',
+                    'content'=>'Change',
+                    'onclick'=>"return confirm('Are you sure you want to change the payment method to CASH?');"
+                  ]).'</td>';
                 }
                 print '</tr>';
-               $count++;
+                $count++;
               }
               ?>
             </tbody>
@@ -89,13 +100,10 @@ $(function(){
   $(document).ready(function() {
     $("th a").click(function(){
       var registration = toFloat($(".registration_all").val());
-      // var fund = $("input[name=fund_all]:checked").val();
 
       if (!registration) registration = "0.00";
       $(".registration_all").val(registration).change();
       $(".registration").val(registration).change();
-      // $('.fund').removeAttr('checked');
-      // $('.fund'+fund).click();
     });
 
     $('.registration').change(function(){
@@ -106,9 +114,6 @@ $(function(){
       if (exp > 0) $('.submit').removeClass('disabled').removeAttr('disabled');
       else $('.submit').addClass('disabled').attr('disabled', '');
     });
-
-    // $('.fund_all.default').click();
-    // $('.fund1').click();
     $('.registration:last-child').change();
   });
 });
