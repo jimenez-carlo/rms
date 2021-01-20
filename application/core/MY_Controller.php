@@ -11,7 +11,8 @@ class MY_Controller extends CI_Controller {
     $dont_restrict_cron = !in_array(current_url(), array(
       base_url('cron/rms_create'),
       base_url('cron/rms_expense'),
-      base_url('cron/ar_amount')
+      base_url('cron/ar_amount'),
+      base_url('cron/diy')
     ));
 
     if (!isset($_SESSION['uid']) AND $dont_restrict_cron) {
