@@ -2,57 +2,55 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <div class="container-fluid">
-	<div class="row-fluid">
-		<div class="block">
-			<div class="navbar navbar-inner block-header">
-				<div class="pull-left">Customer Status</div>
-			</div>
-			<div class="block-content collapse in">
+        <div class="row-fluid">
+                <div class="block">
+                        <div class="navbar navbar-inner block-header">
+                                <div class="pull-left">Customer Status</div>
+                        </div>
+                        <div class="block-content collapse in">
 
-				<form class="form-horizontal" method="post">
-					<fieldset>
-						<?php
-								echo '<div class="control-group span5">';
-								echo form_label('Engine #', 'engine_no', array('class' => 'control-label'));
-								echo '<div class="controls">';
-								echo form_input('engine_no', set_value('engine_no'));
-								echo '</div></div>';
-
-						?>
-						<div class="form-actions span12">
-							<input type="submit" class="btn btn-success" value="Search" name="submit">
-						</div>
-					</fieldset>
+                                <form class="form-horizontal" method="post">
+                                        <fieldset>
+                                                <?php
+                                                   echo '<div class="control-group span5">';
+                                                   echo form_label('Engine #', 'engine_no', array('class' => 'control-label'));
+                                                   echo '<div class="controls">';
+                                                   echo form_input('engine_no', set_value('engine_no'));
+                                                   echo '</div></div>';
+                                                ?>
+                                                <div class="form-actions span12">
+                                                        <input type="submit" class="btn btn-success" value="Search" name="submit">
+                                                </div>
+                                        </fieldset>
                                 </form>
-				<hr>
-				<?php
-				  if(!empty($table)){
-				    foreach ($table as $sales)
-				    {
+                                <hr>
+                                <?php
+                                  if(!empty($table)){
+                                    foreach ($table as $sales)
+                                    {
 
                                       echo '<form id="form_plateno" role="form" name="modalForm" class="form-horizontal" method="post">';
+                                        print '<table class="table"><tbody>';
+                                        print '<tr><td style="color:gray">Branch:</td><td>'.$sales->bcode.' '.$sales->bname.'</td></tr>';
+                                        print '<tr><td style="color:gray">Engine Number:</td><td>'.$sales->engine_no.'</td></tr>';
+                                        print '<tr><td style="color:gray">Customer Name:</td><td>'.$sales->first_name.' '.$sales->last_name.'</td></tr>';
+                                        print '<tr><td style="color:gray">MV File:</td><td>'.$sales->mvf_no.'</td></tr>';
+                                        print '<tr><td style="color:gray">Status:</td><td>'.$sales->status_name.'</td></tr>';
+                                        print '<tr><td style="color:gray">Plate Number:</td><td><input name="plateno" class="form-control" id="md_plateno" value="" maxlength="10" /><input name="salesid" class="form-control" id="md_sid" value="'.$sales->ssid.'" style="visibility: hidden;"/></td></tr>';
+                                        print '</tbody></table>';
+                                        print '<input id="save-pnumber" type="submit" class="btn btn-success" value="Save Changes" name="submit">';
+                                      echo '</form>';
+                                    }
+                                  }
 
-				    	print '<table class="table"><tbody>';
-				    	print '<tr><td style="color:gray">Branch:</td><td>'.$sales->bcode.' '.$sales->bname.'</td></tr>';
-				    	print '<tr><td style="color:gray">Engine Number:</td><td>'.$sales->engine_no.'</td></tr>';
-				    	print '<tr><td style="color:gray">Customer Name:</td><td>'.$sales->first_name.' '.$sales->last_name.'</td></tr>';
-				    	print '<tr><td style="color:gray">MV File:</td><td>'.$sales->mvf_no.'</td></tr>';
-				    	print '<tr><td style="color:gray">Status:</td><td>'.$sales->status_name.'</td></tr>';
-				    	print '<tr><td style="color:gray">Plate Number:</td><td><input name="plateno" class="form-control" id="md_plateno" value="" maxlength="10" /><input name="salesid" class="form-control" id="md_sid" value="'.$sales->ssid.'" style="visibility: hidden;"/></td></tr>';
-				    	print '</tbody></table>';
-				    	print '<input type="submit" class="btn btn-success" value="Save Changes" name="submit">';
-				      echo '</form>';
-				    }
-				  }
-
-				  if (empty($table))
-				  {
-				  	print '<p>No result.</p>';
-				  }
-				?>
-			</div>
-		</div>
-	</div>
+                                  if (empty($table))
+                                  {
+                                        print '<p>No result.</p>';
+                                  }
+                                ?>
+                        </div>
+                </div>
+        </div>
 </div>
 <!-- Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -78,20 +76,29 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <script type="text/javascript">
 $(function(){
-	$(document).ready(function(){
-		$(".table").dataTable({
-			"sDom": "<\'row\'<\'span6\'l><\'span6\'f>r>t<\'row\'<\'span6\'i><\'span6\'p>>",
-			"sPaginationType": "bootstrap",
-			"oLanguage": {
-				"sLengthMenu": "_MENU_ records per page"
-			},
-			"bFilter": false,
-			"bSort": false,
-			"iDisplayLength": 5,
-			"aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
-		});
+        $(document).ready(function(){
+                $(".table").dataTable({
+                        "sDom": "<\'row\'<\'span6\'l><\'span6\'f>r>t<\'row\'<\'span6\'i><\'span6\'p>>",
+                        "sPaginationType": "bootstrap",
+                        "oLanguage": {
+                                "sLengthMenu": "_MENU_ records per page"
+                        },
+                        "bFilter": false,
+                        "bSort": false,
+                        "iDisplayLength": 5,
+                        "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                });
 
 
-	});
+        });
+});
+
+$("#save-pnumber").on("click", function(e) {
+      var action=confirm('Are you sure you want to save?');
+      if(action){
+        $('#form_plateno').submit();
+      } else {
+        e.preventDefault();
+      }
 });
 </script>
