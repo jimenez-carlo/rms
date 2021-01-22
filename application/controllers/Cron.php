@@ -114,7 +114,7 @@ class Cron extends MY_Controller {
 SQL;
 
     $result = $this->db->query($sql)->result_array();
-    $number_of_records = 0;
+    $rows = 0;
     foreach ($result as $row) {
 
       $transmittal = $this->db->query("SELECT * FROM tbl_lto_transmittal WHERE code = '".$row['transmittal']."'")->row_array();
