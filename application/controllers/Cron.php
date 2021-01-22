@@ -84,122 +84,110 @@ class Cron extends MY_Controller {
     }
   }
 
-  public function rms_create()
-  {
-    $rows = 0;
+  public function rms_create() {
     $start = date("Y-m-d H:i:s");
-    //$date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-7 days'));
-    //$date_yesterday = $this->input->post('date_yesterday') ?? date('Y-m-d', strtotime('-1 days'));
-    $engine_numbers = '';
-    $date_created = '';
+    # Order by date_sold
+    $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
+    $sql = <<<SQL
+      SELECT
+        CONCAT('LT-',r.r_code,'-',SUBSTR(tbs.si_bcode,1,1),'0',DATE_FORMAT(NOW(), '%y'),DATE_FORMAT(NOW(), '%m'),DATE_FORMAT(NOW(), '%d')) AS transmittal,
+        LEFT(si_bcode, 1) AS company_id, r.rid, r.region, COUNT(*) AS count,
+        CONCAT('[',GROUP_CONCAT(DISTINCT '{
+          "si_bcode":"',si_bcode,'", "si_bname":"',si_bname,'", "si_sino":"',si_sino,'",
+          "si_dsold":"',si_dsold,'", "si_custname":"',si_custname,'", "si_cust_type":"',IF(si_firstname IS NULL OR si_lastname IS NULL, 1, 0),'",
+          "si_firstname":"',IF(si_lastname IS NULL, CONCAT(TRIM(si_firstname)," ", TRIM(si_middlename)), IFNULL(TRIM(si_firstname),"")),'",
+          "si_middlename":"',IF(si_lastname IS NULL, "", si_middlename),'", "si_lastname":"',IFNULL(si_lastname,""),'", "si_suffix":"',IFNULL(si_suffix,""),'",
+          "si_birth_date":"',si_birth_date,'", "si_email":"',LOWER(si_email),'", "si_engin_no":"',si_engin_no,'",
+          "si_chassisno":"',si_chassisno,'", "si_custcode":"',si_custcode,'", "company_id":"',LEFT(si_bcode, 1),'",
+          "si_mat_no":"',si_mat_no,'", "regn_status":"',regn_status,'", "ar_no":"',IFNULL(ar_no,'N/A'),'",
+          "ar_amount":"',ar_amount,'", "region_id":"',r.rid,'", "date_inserted":"',date_inserted,'"
+          "si_phone_number":"',REPLACE(IF( CHAR_LENGTH(si_phone_number) = 10, CONCAT("0", si_phone_number), si_phone_number), "-", ""),'",
+          "si_sales_type":"',CASE WHEN si_sales_type = "ZMCC" THEN 0 WHEN si_sales_type = "ZMCF" THEN 1 END,'",
+        }' ORDER BY si_dsold ASC, si_bcode ASC),']') AS sales
+      FROM tbl_bobj_sales tbs
+      LEFT JOIN tbl_engine e ON e.engine_no = tbs.si_engin_no
+      INNER JOIN tbl_region r ON r.rid = tbs.rrt_region
+      WHERE e.eid IS NULL
+      GROUP BY transmittal, company_id, r.rid
+      ORDER BY r.rid
+      LIMIT 10
+SQL;
 
-    if ($this->input->post('engine_nums')) {
-      $trimmed = trim($this->input->post('engine_nums'), ' \t\n\r\0\"\,\.');
-      $remove_qoute = str_replace(array("'",'"'), '', $trimmed);
-      $fix_comma = str_replace(array(', ', ' ,'), ',', $remove_qoute);
-      $final_format = "'".implode("','", explode(',', $fix_comma))."'";
-      $engine_numbers = "AND engine_no IN ({$final_format})";
-    }
+    $result = $this->db->query($sql)->result_array();
+    $number_of_records = 0;
+    foreach ($result as $row) {
 
-    $result = $this->db
-      ->select([
-        'si_bcode', 'si_bname', 'si_sino', 'si_dsold', 'si_custname',
-        'si_firstname', 'si_middlename', 'si_lastname', 'si_suffix',
-        'si_birth_date', 'LOWER(si_email) AS si_email', 'si_engin_no',
-        'si_chassisno', 'si_custcode', 'LEFT(si_bcode, 1) AS company_id',
-        'si_mat_no', 'regn_status', 'ar_no', 'r.rid AS region_id', 'r.r_code',
-        'DATE_FORMAT(date_inserted,"%Y-%m-%d") AS date_inserted',
-        'CASE
-        WHEN si_sales_type = "ZMCC" THEN 0
-        WHEN si_sales_type = "ZMCF" THEN 1
-        END AS si_sales_type',
-        'REPLACE(
-          IF( CHAR_LENGTH(si_phone_number) = 10, CONCAT("0", si_phone_number), si_phone_number),
-          "-", ""
-        ) AS si_phone_number'
-      ], false)
-      ->where('regn_status != "Self Registration"')
-      ->where("DATE_FORMAT(date_inserted,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')")
-      ->join('tbl_region r', 'r.rid = tbs.rrt_region','inner')
-      ->get('tbl_bobj_sales tbs')
-      ->result_object();
-
-    foreach ($result as $row)
-    {
-      // lto_transmittal
-      $code = 'LT-'.$row->r_code.'-'
-              .substr($row->si_bcode, 0, 1).'0'
-              .substr($row->date_inserted, 2, 2)
-              .substr($row->date_inserted, 5, 2)
-              .substr($row->date_inserted, 8, 2);
-
-      $transmittal = $this->db->query("SELECT * FROM tbl_lto_transmittal WHERE code = '".$code."'")->row();
-
-      if (empty($transmittal))
-      {
-        $transmittal = new Stdclass();
-        $transmittal->date = $row->date_inserted;
-        $transmittal->code = $code;
-        $transmittal->region = $row->region_id;
-        $transmittal->company = $row->company_id;
+      $transmittal = $this->db->query("SELECT * FROM tbl_lto_transmittal WHERE code = '".$row['transmittal']."'")->row_array();
+      if (empty($transmittal)) {
+        $transmittal = [
+          'date' => date('Y-m-d'),
+          'code' => $row['transmittal'],
+          'region' => $row['rid'],
+          'company' => $row['company_id']
+        ];
         $this->db->insert('tbl_lto_transmittal', $transmittal);
-        $transmittal->ltid = $this->db->insert_id();
+        $transmittal['ltid'] = $this->db->insert_id();
       }
 
-      $engine = $this->db->query("SELECT * FROM tbl_engine WHERE engine_no = '".$row->si_engin_no."'")->row();
-      if (empty($engine))
-      {
-        $engine = new Stdclass();
-        $engine->engine_no = $row->si_engin_no;
-        $engine->chassis_no = $row->si_chassisno;
-        $engine->mat_no = $row->si_mat_no;
-        $this->db->insert('tbl_engine', $engine);
-        $engine->eid = $this->db->insert_id();
-      }
+      foreach (json_decode($row['sales'], 1) as $sale) {
+        $engine = $this->db->query("SELECT * FROM tbl_engine WHERE engine_no = '".$sale['si_engin_no']."'")->row_array();
+        if (empty($engine)) {
+          // engine
+          $engine = [
+            'engine_no' => $sale['si_engin_no'],
+            'chassis_no' => $sale['si_chassisno'],
+            'mat_no' => $sale['si_mat_no']
+          ];
+          $this->db->insert('tbl_engine', $engine);
+          $engine['eid'] = $this->db->insert_id();
 
-      // customer
-      $customer = $this->db->query("SELECT * FROM tbl_customer WHERE cust_code = '".$row->si_custcode."'")->row();
-      if (empty($customer))
-      {
-        $customer = new Stdclass();
-        $customer->first_name = $row->si_firstname;
-        $customer->last_name = $row->si_lastname;
-        $customer->cust_code = $row->si_custcode;
-        $customer->cust_type = (empty($row->si_lastname) || empty($row->si_lastname)) ? 1 : 0;
-        $customer->date_of_birth = $row->si_birth_date;
-        $customer->phone_number = $row->si_phone_number;
-        $customer->email = $row->si_email;
-        $this->db->insert('tbl_customer', $customer);
-        $customer->cid = $this->db->insert_id();
-      }
+          // customer
+          $customer = $this->db->query("SELECT * FROM tbl_customer WHERE cust_code = '".$sale['si_custcode']."'")->row_array();
+          if (empty($customer)) {
+            $customer = [
+              'first_name' => $sale['si_firstname'],
+              'middle_name' => $sale['si_middlename'],
+              'last_name' => $sale['si_lastname'],
+              'cust_code' => $sale['si_custcode'],
+              'cust_type' => $sale['si_cust_type'],
+              'date_of_birth' => $sale['si_birth_date'],
+              'phone_number' => $sale['si_phone_number'],
+              'email' => $sale['si_email']
+            ];
+            $this->db->insert('tbl_customer', $customer);
+            $customer['cid'] = $this->db->insert_id();
+          }
 
-      // sales
-      $sales = $this->db->query("SELECT * FROM tbl_sales WHERE engine = ".$engine->eid." AND customer = ".$customer->cid)->row();
-      if (empty($sales))
-      {
-        $sales = new Stdclass();
-        $sales->engine = $engine->eid;
-        $sales->customer = $customer->cid;
-        $sales->bcode = $row->si_bcode;
-        $sales->bname = $row->si_bname;
-        $sales->region = $row->region_id;
-        $sales->company = $row->company_id;
-        $sales->date_sold = $row->si_dsold;
-        $sales->si_no = $row->si_sino;
-        $sales->ar_no = $row->ar_no;
-        $sales->amount = 0;
-        $sales->sales_type = $row->si_sales_type;
-        $sales->registration_type = $row->regn_status;
-        $sales->created_date = date('Y-m-d');
-        $sales->transmittal_date = $row->date_inserted;
-        $sales->lto_transmittal = $transmittal->ltid;
-        $this->db->insert('tbl_sales', $sales);
-        $rows++;
+          // sales
+          $sales = $this->db->query("SELECT * FROM tbl_sales WHERE engine = ".$engine['eid'])->row_array();
+          if (empty($sales)) {
+            $sales = [
+              'engine' => $engine['eid'],
+              'customer' => $customer['cid'],
+              'bcode' => $sale['si_bcode'],
+              'bname' => $sale['si_bname'],
+              'region' => $sale['region_id'],
+              'company' => $sale['company_id'],
+              'date_sold' => $sale['si_dsold'],
+              'si_no' => $sale['si_sino'],
+              'ar_no' => $sale['ar_no'],
+              'ar_amount' => $sale['ar_amount'],
+              'sales_type' => $sale['si_sales_type'],
+              'registration_type' => $sale['regn_status'],
+              'created_date' => date('Y-m-d'),
+              'transmittal_date' => $sale['date_inserted'],
+              'lto_transmittal' => $transmittal['ltid']
+            ];
+            $status = $this->db->insert('tbl_sales', $sales);
+            if ($status) {
+              $rows++;
+            }
+          }
+        }
       }
     }
 
     $end = date("Y-m-d H:i:s");
-
     $log = new Stdclass();
     $log->ckey = 1;
     $log->date = $date_yesterday;
@@ -208,7 +196,7 @@ class Cron extends MY_Controller {
     $log->rows = $rows;
     $this->db->insert('tbl_cron_log', $log);
 
-    $this->login->saveLog('Run Cron: Create RMS data based on data from LTO Transmittal System [rms_create] Duration: '.$start.' - '.$end);
+    $this->login->saveLog('Run Cron: Create RMS data based on data from LTO Transmittal System [rms_create] Count: '.$rows.', Duration: '.$start.' - '.$end);
 
     $submit = $this->input->post('submit');
     if (empty($submit)) redirect('cron');
@@ -372,9 +360,10 @@ class Cron extends MY_Controller {
          ->from('tbl_sales s')
          ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
          ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
-         ->where('s.registration_type <> "Self Registration" AND s.created_date = "2021-01-20" -- DATE_FORMAT(NOW(), "%Y-%m-%d")')
+         ->where('s.registration_type <> "Self Registration" AND s.created_date = DATE_FORMAT(NOW(), "%Y-%m-%d")')
          ->get()
          ->result_array();
+
     $this->dev_rms->insert_batch('diy_tbl', $diy);
     $end = date("Y-m-d H:i:s");
     $this->login->saveLog('Run Cron: Inserted DIY: '.$start.' - '.$end);
