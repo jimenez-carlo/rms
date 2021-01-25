@@ -101,7 +101,7 @@ class Cron extends MY_Controller {
           "si_mat_no":"',si_mat_no,'", "regn_status":"',regn_status,'", "ar_no":"',IFNULL(ar_no,'N/A'),'",
           "ar_amount":"',IFNULL(ar_amount,0),'", "region_id":"',r.rid,'", "date_inserted":"',date_inserted,'"
           "si_phone_number":"',REPLACE(IF( CHAR_LENGTH(si_phone_number) = 10, CONCAT("0", si_phone_number), si_phone_number), "-", ""),'",
-          "si_sales_type":"',CASE WHEN si_sales_type = "ZMCC" THEN 0 WHEN si_sales_type = "ZMCF" THEN 1 END,'",
+          "si_sales_type":"',CASE WHEN si_sales_type = "ZMCC" THEN 0 WHEN si_sales_type = "ZMCF" THEN 1 END,'"
         }' ORDER BY si_dsold ASC, si_bcode ASC),']') AS sales
       FROM tbl_bobj_sales tbs
       LEFT JOIN tbl_engine e ON e.engine_no = tbs.si_engin_no
