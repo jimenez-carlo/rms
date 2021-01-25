@@ -130,6 +130,7 @@ SQL;
       foreach (json_decode($row['sales'], 1) as $sale) {
         $engine = $this->db->query("SELECT * FROM tbl_engine WHERE engine_no = '".$sale['si_engin_no']."'")->row_array();
         if (empty($engine)) {
+          $this->db->trans_start();
           // engine
           $engine = [
             'engine_no' => $sale['si_engin_no'],
@@ -176,10 +177,11 @@ SQL;
               'transmittal_date' => $sale['date_inserted'],
               'lto_transmittal' => $transmittal['ltid']
             ];
-            $status = $this->db->insert('tbl_sales', $sales);
-            if ($status) {
-              $rows++;
-            }
+            $this->db->insert('tbl_sales', $sales);
+          }
+          $this->db->trans_complete();
+          if ($this->db->trans_status()) {
+            $rows++;
           }
         }
       }
