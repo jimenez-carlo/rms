@@ -86,7 +86,6 @@ class Cron extends MY_Controller {
 
   public function rms_create() {
     $start = date("Y-m-d H:i:s");
-    # Order by date_sold
     $this->db->simple_query("SET SESSION group_concat_max_len=18446744073709551615");
     $sql = <<<SQL
       SELECT
@@ -100,7 +99,7 @@ class Cron extends MY_Controller {
           "si_birth_date":"',si_birth_date,'", "si_email":"',LOWER(si_email),'", "si_engin_no":"',si_engin_no,'",
           "si_chassisno":"',si_chassisno,'", "si_custcode":"',si_custcode,'", "company_id":"',LEFT(si_bcode, 1),'",
           "si_mat_no":"',si_mat_no,'", "regn_status":"',regn_status,'", "ar_no":"',IFNULL(ar_no,'N/A'),'",
-          "ar_amount":"',ar_amount,'", "region_id":"',r.rid,'", "date_inserted":"',date_inserted,'"
+          "ar_amount":"',IFNULL(ar_amount,0),'", "region_id":"',r.rid,'", "date_inserted":"',date_inserted,'"
           "si_phone_number":"',REPLACE(IF( CHAR_LENGTH(si_phone_number) = 10, CONCAT("0", si_phone_number), si_phone_number), "-", ""),'",
           "si_sales_type":"',CASE WHEN si_sales_type = "ZMCC" THEN 0 WHEN si_sales_type = "ZMCF" THEN 1 END,'",
         }' ORDER BY si_dsold ASC, si_bcode ASC),']') AS sales
@@ -110,7 +109,6 @@ class Cron extends MY_Controller {
       WHERE e.eid IS NULL
       GROUP BY transmittal, company_id, r.rid
       ORDER BY r.rid
-      LIMIT 10
 SQL;
 
     $result = $this->db->query($sql)->result_array();
