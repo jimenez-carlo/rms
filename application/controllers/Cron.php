@@ -169,7 +169,7 @@ SQL;
               'date_sold' => $sale['si_dsold'],
               'si_no' => $sale['si_sino'],
               'ar_no' => $sale['ar_no'],
-              'ar_amount' => $sale['ar_amount'],
+              'amount' => $sale['ar_amount'],
               'sales_type' => $sale['si_sales_type'],
               'registration_type' => $sale['regn_status'],
               'created_date' => date('Y-m-d'),
