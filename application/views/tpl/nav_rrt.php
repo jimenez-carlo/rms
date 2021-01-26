@@ -36,7 +36,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">SI <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li><a tabindex="-1" href="<?php echo base_url(); ?>si/printing">Printing</a></li>
-                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>si/reprint">Re-print</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>si/transmittal">Transmittal</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>si/self_regn">Self Registration</a></li>
                                 </ul>
                             </li>
                             <li <?php if(isset($nav) && $nav=="pending") echo 'class="active"'; ?>>
