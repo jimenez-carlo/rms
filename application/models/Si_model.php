@@ -3,6 +3,10 @@
 class Si_model extends CI_Model {
   function __construct() {
     parent::__construct();
+    $this->is_printed = 'is_printed';
+    $this->date_printed = 'date_printed';
+    $this->pnp_status = 'pnp_status';
+    $this->date_pnp_tag = 'date_pnp_tag';
   }
 
   public function get_rrt_class($branch_code = "") {
@@ -14,8 +18,10 @@ class Si_model extends CI_Model {
     return $this->db
       ->select('bobj.bobj_sales_id, bobj.si_custname, bobj.si_engin_no, bobj.si_dsold')
       ->from('tbl_bobj_sales bobj')
+      ->join('tbl_engine e', 'bobj.si_engin_no = e.engine_no', 'inner')
+      ->join('tbl_si si', 'si.eid = e.eid', 'left')
       ->join('tbl_region r', 'r.rid = bobj.rrt_region', 'left')
-      ->where('is_si_printed = 0')
+      ->where('(si.is_printed = 0 OR si.eid IS NULL) AND regn_status <> "Self Registration"')
       ->where("bobj.si_bcode = '{$b_code}' AND r.region = '{$_SESSION['rrt_region_name']}'")
       ->get()
       ->result_array();
@@ -25,8 +31,8 @@ class Si_model extends CI_Model {
     if (isset($bobj_sales_ids)) {
       $bobj_sales_id_array = array_keys($bobj_sales_ids);
       $select = array(
-        'bobj_sales_id', 'si_bcode', 'si_bname', 'si_vatregtin',
-        'si_baddress', 'si_sino', 'si_custname',
+        'e.eid', 'bobj_sales_id', 'si_bcode', 'si_bname',
+        'si_vatregtin', 'si_baddress', 'si_sino', 'si_custname',
         'DATE_FORMAT(si_dsold, "%b %d, %Y") AS si_dsold',
         'si_cust_tin', 'si_cust_add', 'si_brand', 'si_app_id',
         'si_birpermitno', 'si_billing_no', 'si_drno',
@@ -39,60 +45,94 @@ class Si_model extends CI_Model {
       );
       return $this->db
         ->select($select)
-        ->from('tbl_bobj_sales')
+        ->from('tbl_bobj_sales bobj')
+        ->join('tbl_engine e', 'e.engine_no = bobj.si_engin_no', 'inner')
+        ->join('tbl_si si', 'e.eid = si.eid', 'left')
         ->where_in('bobj_sales_id', $bobj_sales_id_array)
         ->get()->result_array();
     }
   }
+
+  public function reprint($ltid, $bcode) {
+      return $this->db
+        ->select('lt.code, s.bcode, bobj.bobj_sales_id, bobj.si_custname, bobj.si_engin_no, bobj.si_dsold')
+        ->from('tbl_lto_transmittal lt')
+        ->join('tbl_sales s', 's.lto_transmittal = lt.ltid', 'inner')
+        ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
+        ->join('tbl_bobj_sales bobj', 'bobj.si_engin_no = e.engine_no', 'inner')
+        ->where('regn_status <> "Self Registration"')
+        ->where('lt.ltid', $ltid)
+        ->where('s.bcode', $bcode)
+        ->get()->result_array();
+  }
+
 
   public function tag_data($engine_no){
     $result =$this->db->query("UPDATE customer_tbl SET si_date_received = CURDATE() WHERE engine_no = '$engine_no'");
     return $result;
   }
 
-  public function tag_si_printed($bobj_sales_id){
-    return $this->db->update(
-      'tbl_bobj_sales',
-      ['is_si_printed' => 1, 'date_printed' => date('Y-m-d')],
-      'bobj_sales_id='.$bobj_sales_id
-    );
-  }
+  public function update_si($si){
+    if (isset($si['eid'])) {
+      $eid = $si['eid'];
+      $is_printed = $si['is_printed'] ?? $this->is_printed;
+      $date_printed = $si['date_printed'] ?? $this->date_printed;
+      $pnp_status = $si['pnp_status'] ?? $this->pnp_status;
+      $date_pnp_tag = $si['date_pnp_tag'] ?? $this->date_pnp_tag;
 
-  public function get_reprint($transmittal_id) {
-    if (isset($transmittal_id)) {
-      $select = array(
-        'stp.si_bcode', 'stp.si_bname', 'stp.si_vatregtin',
-        'stp.si_baddress', 'stp.si_sino', 'stp.si_custname',
-        'DATE_FORMAT(stp.si_dsold, "%b %d, %Y") AS si_dsold',
-        'stp.si_cust_tin', 'stp.si_cust_add', 'stp.si_brand', 'stp.si_app_id',
-        'stp.si_birpermitno', 'stp.si_billing_no', 'stp.si_drno',
-        'stp.si_modelcode', 'stp.si_engin_no', 'stp.si_chassisno',
-        'stp.si_color', 'stp.si_fidocno', 'stp.si_sono', 'stp.si_custcode',
-        'FORMAT(stp.si_discount, 2) AS si_discount',
-        'FORMAT(stp.si_price, 2) AS si_price', 'FORMAT(stp.si_vatsale, 2) AS si_vatsale',
-        'FORMAT(stp.si_vatexp, 2) AS si_vatexp', 'FORMAT(stp.si_vatzero, 2) AS si_vatzero',
-        'FORMAT(stp.si_val_val, 2) AS si_val_val','FORMAT(stp.si_totalamt, 2) AS si_totalamt'
-      );
-      return $this->db
-        ->select($select)
-        ->from('si_tbl_print stp')
-        ->join('customer_tbl ct', 'ct.engine_no = stp.si_engin_no AND ct.customer_id AND stp.si_custcode', 'left')
-        ->join('transmittal_tbl tt', 'tt.transmittal_code = ct.transmittal_no', 'left')
-        ->where('tt.transmittal_id', $transmittal_id)
-        ->get()->result_array();
+      return $this->db->query("
+        REPLACE INTO tbl_si
+        SELECT e.eid, IFNULL({$is_printed}, 0), {$date_printed}, IFNULL({$pnp_status},0), {$date_pnp_tag}
+        FROM tbl_engine e
+        LEFT JOIN tbl_si si ON e.eid = si.eid
+        WHERE e.eid = {$eid}
+      ");
     }
   }
 
-  public function get_transmittal_no($transmittal_no, $rrt_class = ""){
-    $result = $this->db->query("
-      SELECT DISTINCT t.transmittal_id, a.transmittal_no
-      FROM `dev_rms`.`customer_tbl` a
-      LEFT JOIN `dev_rms`.`transmittal_tbl` t ON t.transmittal_code = a.transmittal_no
-      LEFT JOIN `dev_rms`.`rrt_reg_tbl` e ON a.`branch` = e.`branch_code`
-      WHERE rrt_class = '".$rrt_class."' AND a.transmittal_no LIKE '%".$transmittal_no."%'
-      ORDER BY a.`transmittal_no` DESC LIMIT 100
-    ");
+  public function get_transmittal($filter){
+    $company = ($_SESSION['company'] != 8) ? "lt.company <> 8" : "lt.company = 8" ;
+    $branch_code = (!empty($filter['bcode'])) ? "s.bcode = {$filter['bcode']}" : "s.bcode <> 0";
+    $transmittal_date = (!empty($filter['date_from']) && !empty($filter['date_to']))
+      ? "lt.date BETWEEN '{$filter['date_from']} 00:00:00' AND '{$filter['date_to']} 23:59:59'"
+      : 'lt.date BETWEEN DATE_FORMAT(NOW()-INTERVAL 3 DAY, "%Y-%m-%d 00:00:00") AND NOW()';
 
-    return $result->result_object();
+    return $this->db
+      ->select("
+        DATE_FORMAT(lt.date, '%Y-%m-%d') AS 'Date Transmittal', lt.code AS 'Transmittal#',
+        CONCAT(s.bcode, ' ', ANY_VALUE(s.bname)) AS Branch, COUNT(*) AS 'Engine Count',
+        CONCAT('<a class=\"btn btn-success\" href=\"".base_url('si/reprint/')."',lt.ltid,'/',s.bcode,'\" target=\"_blank\">Reprint</a>') AS '',
+
+      ")
+      ->from('tbl_lto_transmittal lt')
+      ->join('tbl_sales s', 'lt.ltid = s.lto_transmittal','inner')
+      ->where('s.registration_type <> "Self Registration"')
+      ->where($company)
+      ->where($branch_code)
+      ->where($transmittal_date)
+      ->where('s.date_sold >= "2021-01-01 00:00:00"')
+      ->group_by(['lt.ltid','s.bcode'])
+      ->order_by('lt.date desc, s.bcode ASC')
+      ->get();
   }
+
+  public function self_regn() {
+    return $this->db
+      ->select('
+        CONCAT("<input type=checkbox name=engine_ids[] value=",e.eid,">") AS "", c.cust_code AS "Customer Code",
+        CONCAT(IFNULL(c.last_name,""), ", ", IFNULL(c.first_name,""), IFNULL(c.middle_name,"")) AS "Customer Name",
+        e.engine_no AS "Engine#", DATE_FORMAT(s.date_sold, "%Y-%m-%d") AS "Date Sold",
+        s.registration_type AS "Registration Type"'
+      )
+      ->from('tbl_sales s')
+      ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
+      ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
+      ->join('tbl_si si', 'e.eid = si.eid', 'left')
+      ->where('s.date_sold >= "2021-01-01 00:00:00"')
+      ->where('s.registration_type = "Self Registration"')
+      ->where('(si.eid IS NULL OR si.pnp_status = 0)')
+      ->order_by('s.date_sold ASC, c.last_name ASC')
+      ->get();
+  }
+
 }

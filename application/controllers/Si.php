@@ -20,19 +20,74 @@ class Si extends MY_Controller {
     $this->template('si/printing',$data);
   }
 
-  public function print_now() {
+  public function reprint($ltid, $bcode) {
+    $this->header_data('title', 'SI Reprint');
+    $data["data"] = $this->si->reprint($ltid, $bcode);
+    $this->header_data('title', 'SI Reprint');
+    $this->header_data('nav', 'si');
+    $this->template('si/reprint',$data);
+  }
 
+  public function transmittal() {
+    $filter['bcode'] = $this->input->post('bcode');
+    $filter['date_from'] = $this->input->post('date_from');
+    $filter['date_to'] = $this->input->post('date_to');
+    $transmittal = $this->si->get_transmittal($filter);
+    $template = array(
+      'table_open' => '<table class="table table-striped table-bordered">'
+    );
+    $this->table->set_template($template);
+    $data['table'] = $this->table->generate($transmittal);
+    $this->header_data('title', 'Transmittal');
+    $this->header_data('nav', 'si');
+    $this->template('si/transmittal', $data);
+  }
+
+  public function self_regn() {
+    if ($this->input->post('engine_ids')) {
+      $engine_ids = $this->input->post('engine_ids');
+      $this->db->trans_start();
+      foreach($engine_ids AS $eid) {
+        $this->si->update_si([
+          'eid' => $eid,
+          'pnp_status' => 1,
+          'date_pnp_tag' => 'NOW()'
+        ]);
+      }
+      $this->db->trans_complete();
+      if ($this->db->trans_status()) {
+        $_SESSION['messages'][] = 'Engine/s Tagged PNP Successfully!';
+      } else {
+        $_SESSION['warning'][] = 'Transaction not saved. Something wen\'t wrong!';
+      }
+
+      redirect($_SERVER['HTTP_REFERER']);
+    }
+
+    $self_regn = $this->si->self_regn();
+    $template = array(
+      'table_open' => '<table class="table table-striped table-bordered">'
+    );
+    $this->table->set_template($template);
+    $data['table'] = $this->table->generate($self_regn);
+    $this->header_data('title', 'Self Registration');
+    $this->header_data('nav', 'si');
+    $this->template('si/self_regn', $data);
+  }
+
+  public function print_now() {
     $status = false;
     if ($this->input->post('bobj_sales_ids')) {
       $data['si_prints'] = $this->si->si_print_data($this->input->post('bobj_sales_ids'));
       $this->db->trans_start();
       foreach($data['si_prints'] as $si) {
-        $this->si->tag_si_printed($si['bobj_sales_id']);
+        $this->si->update_si([
+          'eid' => $si['eid'],
+          'is_printed' => 1,
+          'date_printed' => 'NOW()'
+        ]);
       }
       $status = $this->db->trans_complete();
-    } elseif ($this->input->post('transmittal_id')) {
-      $data['si_prints'] = $this->si->get_reprint($this->input->post('transmittal_id'));
-      $status = true;
     }
 
     if ($status !== false) {
@@ -54,19 +109,6 @@ class Si extends MY_Controller {
     } else {
       redirect($_SERVER['HTTP_REFERER']);
     }
-  }
-
-  public function reprint() {
-    $data['title'] = "SI Re-Print";
-    $data['si_print_active'] = true;
-    $data['transmittal_no'] = $this->input->post('transmittal_no');
-    $this->load->view('tpl/header',$data);//header
-    if(isset($_POST['search'])){
-      $rrt = $this->si->get_rrt_class($_SESSION['b_code']);
-      $data["data"] = $this->si->get_transmittal_no($this->input->post('transmittal_no'),$rrt->rrt_class);
-    }
-    $this->load->view('printing/si_reprint',$data);
-    $this->load->view('tpl/footer');//footer
   }
 
 }
