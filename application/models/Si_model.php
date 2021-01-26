@@ -91,7 +91,6 @@ class Si_model extends CI_Model {
   }
 
   public function get_transmittal($filter){
-    $company = ($_SESSION['company'] != 8) ? "lt.company <> 8" : "lt.company = 8" ;
     $branch_code = (!empty($filter['bcode'])) ? "s.bcode = {$filter['bcode']}" : "s.bcode <> 0";
     $transmittal_date = (!empty($filter['date_from']) && !empty($filter['date_to']))
       ? "lt.date BETWEEN '{$filter['date_from']} 00:00:00' AND '{$filter['date_to']} 23:59:59'"
@@ -107,9 +106,9 @@ class Si_model extends CI_Model {
       ->from('tbl_lto_transmittal lt')
       ->join('tbl_sales s', 'lt.ltid = s.lto_transmittal','inner')
       ->where('s.registration_type <> "Self Registration"')
-      ->where($company)
       ->where($branch_code)
       ->where($transmittal_date)
+      ->where('lt.region', $_SESSION['rrt_region_id'])
       ->where('s.date_sold >= "2021-01-01 00:00:00"')
       ->group_by(['lt.ltid','s.bcode'])
       ->order_by('lt.date desc, s.bcode ASC')
@@ -128,6 +127,7 @@ class Si_model extends CI_Model {
       ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
       ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
       ->join('tbl_si si', 'e.eid = si.eid', 'left')
+      ->where('s.region', $_SESSION['rrt_region_id'])
       ->where('s.date_sold >= "2021-01-01 00:00:00"')
       ->where('s.registration_type = "Self Registration"')
       ->where('(si.eid IS NULL OR si.pnp_status = 0)')
