@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <div class="container-fluid form-horizontal">
-	<div class="row-fluid">
+        <div class="row-fluid">
     <div class="block">
       <div class="navbar navbar-inner block-header">
         <div class="pull-left">Customer Sales # <?php print $sales->sid; ?></div>
@@ -30,10 +30,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="control-label">Type of Sales</div>
               <div class="controls">
 
-		<select id="sales_type" name="sales_type">
-		<option value="0" <?php if($sales->sales_type == 'Brand New (Cash)') echo 'selected'; ?>>Brand New (Cash)</option>
-		<option value="1" <?php if($sales->sales_type == 'Brand New (Installment)') echo 'selected'; ?>>Brand New (Installment)</option>
-		</select>
+                <select id="sales_type" name="sales_type">
+                <option value="0" <?php if($sales->sales_type == 'Brand New (Cash)') echo 'selected'; ?>>Brand New (Cash)</option>
+                <option value="1" <?php if($sales->sales_type == 'Brand New (Installment)') echo 'selected'; ?>>Brand New (Installment)</option>
+                </select>
               </div>
 
             </div>
@@ -135,7 +135,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <div class="control-group">
               <div class="control-label">Plate #</div>
-              <div class="controls text"><?php print $sales->plate_no; ?></div>
+              <div class="controls text"><?php print $sales->plate_number; ?></div>
             </div>
           </div>
 
@@ -169,7 +169,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             {
               foreach ($sales->files as $file)
               {
-    					  $path = '/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
+                                          $path = '/rms_dir/scan_docs/'.$sales->sid.'_'.$sales->engine_no.'/'.$file;
                 print '<div class="attachment" style="position:relative">';
                 print '<img src="'.$path.'" style="margin:1em; border:solid">';
                 print '</div>';
@@ -177,16 +177,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             }
             else
             {
-            	print '<div class="control-group"><div class="controls text">No attachments.</div></div>';
+                print '<div class="control-group"><div class="controls text">No attachments.</div></div>';
             }
             ?>
           </div>
         </div>
-          </form>
-
-			</div>
-		</div>
-	</div>
+      </form>
+    </div>
+  </div>
+</div>
 </div>
 
 <script type="text/javascript">
