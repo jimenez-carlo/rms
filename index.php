@@ -63,7 +63,7 @@
  * Different environments will require different levels of error reporting.
  * By default development will show errors but testing and live will hide them.
  */
-defined('RMS_VERSION')         OR define('RMS_VERSION', '2.14.0'); // RMS Version
+defined('RMS_VERSION')         OR define('RMS_VERSION', '2.14.1'); // RMS Version
 switch (ENVIRONMENT)
 {
 	case 'development':
