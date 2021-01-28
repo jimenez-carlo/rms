@@ -207,16 +207,11 @@ class Sales_model extends CI_Model{
                         ? " AND engine_no LIKE '%".$param->engine_no."%'" : '';
 
                 $result = $this->db->query("
-                  SELECT
-                    *
-                  FROM
-                    tbl_sales
-                  INNER JOIN
-                    tbl_engine ON engine = eid
-                  INNER JOIN
-                    tbl_customer ON customer = cid
-                  WHERE
-                    1=1 ".$branch.$status.$name.$engine_no." AND ".$this->company."
+                  SELECT *
+                  FROM tbl_sales
+                  INNER JOIN tbl_engine ON engine = eid
+                  INNER JOIN tbl_customer ON customer = cid
+                  WHERE 1=1 ".$branch.$status.$name.$engine_no." AND ".$this->company."
                   ORDER BY sid DESC LIMIT 1000
                 ")->result_object();
 

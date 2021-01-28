@@ -28,25 +28,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </thead>
             <tbody>
               <?php
-              switch ($_SESSION['region']) {
-                case 'NCR':
-                case 'Region 6':
-                  $epp = 'EPP';
-                  $cash = false;
-                  break;
-
-                default:
-                  $epp = false;
-                  $cash = 'CASH';
-                  break;
-              }
               $count = 1;
-              foreach ($transmittal->sales as $sales)
+              foreach ($transmittal->sales AS $key => $sales)
               {
-                $key = '['.$sales->sid.']';
+                $default_no_si  = ($sales->lto_reason == "0") ? true : false;
+                $default_reject = ($sales->lto_reason != "0") ? true : false;
                 $sales->status = ($sales->status == 1) ? 1 : 2;
-
-                print '<tr>';
+                $error = (form_error('sales['.$key.'][lto_reason]')) ? ' class="warning"' : '';
+                print '<tr'.$error.'>';
                 print '<td>'.$count.'</td>';
                 $count++;
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
@@ -55,44 +44,49 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->registration_type.'</td>';
                 print '<td>'.$sales->transmittal_date.'</td>';
-                ?>
-
+              ?>
                 <td>
+                  <?php echo form_hidden('sales['.$key.'][sid]', $sales->sid); ?>
                   <label class="radio">
                     <?php
                       print form_radio(
-                        'status'.$key,
+                        'sales['.$key.'][action]',
+                        'NO_SI',
+                         set_radio('sales['.$key.'][action]', 'NO_SI', $default_no_si)
+                      ); ?> Unsubmitted SI
+                  </label>
+                  <label class="radio">
+                    <?php
+                      print form_radio(
+                        'sales['.$key.'][action]',
                         'EPP',
-                        (set_value('status'.$key, $epp) == 'EPP')
+                         set_radio('sales['.$key.'][action]', 'EPP', false)
                       );
                     ?> Pending at LTO EPP
                   </label><br>
                   <label class="radio">
                     <?php
                       print form_radio(
-                        'status'.$key,
+                        'sales['.$key.'][action]',
                         'CASH',
-                        (set_value('status'.$key, $cash) == 'CASH')
+                        set_radio('sales['.$key.'][action]', 'CASH', false)
                       );
                     ?> Pending at LTO CASH
                   </label><br>
                   <label class="radio">
                     <?php
                       print form_radio(
-                        'status'.$key,
+                        'sales['.$key.'][action]',
                         'REJECT',
-                        (in_array(
-                          set_value('status'.$key, $sales->status),
-                          array(1,'REJECT')
-                        ))
-                      ); ?> Rejected
+                        set_radio('sales['.$key.'][action]', 'REJECT', $default_reject)
+                      );
+                    ?> Rejected
                   </label>
                 </td>
-
-                <?php
-                print '<td>'.form_dropdown('lto_reason'.$key, $reasons, set_value('lto_reason'.$key, $sales->lto_reason)).'</td>';
+              <?php
+                print '<td>'.form_dropdown('sales['.$key.'][lto_reason]', $reasons, set_value('sales['.$key.'][lto_reason]', $sales->lto_reason)).'</td>';
                 print '</tr>';
-              }
+                }
               ?>
             </tbody>
           </table>
@@ -107,7 +101,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </form>
       </div>
     </div>
-	</div>
+  </div>
 </div>
 
 <script type="text/javascript">
