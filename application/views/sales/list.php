@@ -1,14 +1,14 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
-<div class="container-fluid">	
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">
 				<div class="pull-left">Customer Status</div>
 			</div>
 			<div class="block-content collapse in">
-			
+
 				<form class="form-horizontal" method="post">
 					<?php print form_hidden('sid', 0); ?>
 
@@ -92,7 +92,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
 								print '<td>'.$sales->date_sold.'</td>';
 								print '<td>'.$sales->engine_no.'</td>';
-								print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
+								print '<td>'.$sales->first_name.' '.$sales->middle_name.' '.$sales->last_name.'</td>';
 								print '<td>'.$status.'</td>';
 
 								print '<td>';
@@ -100,11 +100,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 								$disabled = ($sales->file) ? '' : 'disabled';
 								print '<input type="submit" name="print_orcr" value="Print ORCR" class="btn btn-success '.$disabled.'" data-value="'.$sales->sid.'" '.$disabled.'> ';
-
-								// if ($sales->edit) {
-								// 	print '<a href="sales/edit/'.$sales->sid.'" class="btn btn-success">Edit</a> ';
-								// }
-
 								print '</td>';
 								print '</tr>';
 							}

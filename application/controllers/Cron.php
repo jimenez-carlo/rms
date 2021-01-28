@@ -364,11 +364,13 @@ SQL;
 
     $this->dev_rms->truncate('diy_tbl');
     $diy = $this->db
-         ->select('c.cust_code AS cust_id, e.engine_no, s.created_date AS trans_date')
+         ->select('c.cust_code AS cust_id, e.engine_no, DATE_FORMAT(s.transmittal_date, "%Y-%m-%d") AS trans_date')
          ->from('tbl_sales s')
+         ->join('tbl_status st', 's.lto_reason = st.status_id AND st.status_type = "LTO_REASON"', 'inner')
          ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
          ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
-         ->where('s.registration_type <> "Self Registration" AND s.created_date = DATE_FORMAT(NOW(), "%Y-%m-%d")')
+         ->where('s.registration_type <> "Self Registration"')
+         ->where('(s.created_date = DATE_FORMAT(NOW(), "%Y-%m-%d") OR st.status_name = "No DIY Received")')
          ->get()
          ->result_array();
 
