@@ -97,7 +97,7 @@ class Cron extends MY_Controller {
           "si_firstname":"',REPLACE(IF(si_lastname IS NULL, CONCAT(TRIM(si_firstname)," ", TRIM(si_middlename)), IFNULL(TRIM(si_firstname),"")),'"','\\\"'),'",
           "si_middlename":"',REPLACE(IF(si_lastname IS NULL, "", si_middlename),'"','\\\"'),'", "si_lastname":"',REPLACE(IFNULL(si_lastname,""),'"','\\\"'),'",
           "si_suffix":"',REPLACE(IFNULL(si_suffix,""),'"','\\\"'),'", "si_birth_date":"',si_birth_date,'",
-          "si_email":"',LOWER(si_email),'", "si_engin_no":"',si_engin_no,'", "si_chassisno":"',si_chassisno,'",
+          "si_email":"',REPLACE(LOWER(si_email),'\\\',''),'", "si_engin_no":"',si_engin_no,'", "si_chassisno":"',si_chassisno,'",
           "si_custcode":"',si_custcode,'", "company_id":"',LEFT(si_bcode, 1),'", "si_mat_no":"',si_mat_no,'",
           "regn_status":"',regn_status,'", "ar_no":"',IFNULL(bobj.ar_no,'N/A'),'", "ar_amount":"',IFNULL(ar_amount,0),'",
           "si_phone_number":"',REPLACE(IF( CHAR_LENGTH(si_phone_number) = 10, CONCAT("0", si_phone_number), si_phone_number), "-", ""),'",
