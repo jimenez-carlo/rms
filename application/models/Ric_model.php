@@ -121,8 +121,10 @@ class Ric_model extends CI_Model {
         ->join('tbl_sales s', 's.electronic_payment = ep.epid', 'left')
         ->join('tbl_customer cust', 'cust.cid = s.customer', 'left')
         ->where('s.is_penalty_for_ric = 1')
+        ->where('ric.ric_id='.$ric_id)
         ->get()
-        ->result_array()
+        ->result_array(),
+      $this->db->last_query()
     ];
   }
 
@@ -132,9 +134,11 @@ class Ric_model extends CI_Model {
       "table_open" => "<table class='table table-bordered' cellpadding='4' cellspacing='0'>"
     ]);
     $title = $this->db->select('reference_num')->where('ric_id = '.$ric_id)->get('tbl_ric')->row()->reference_num;
+    $this->db->simple_query('SET @rownum = 0');
     $table = $this->table->generate(
       $this->db
         ->select([
+          '@rownum := (IFNULL(@rownum, 0) + 1) AS "#"',
           'CONCAT(s.bcode, " ", s.bname) AS "Branch"',
           'CONCAT(c.last_name, " ", c.first_name) AS "Customer Name"',
           'c.cust_code AS "Cust Code"', 'e.engine_no AS "Engine#"', 'e.chassis_no AS "Chassis#"',
