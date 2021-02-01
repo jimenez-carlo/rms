@@ -201,7 +201,7 @@ $('.view-ric-customer').on('click', function(e) {
     type: "post",
     dataType: "json",
     success: function(data) {
-      $('#modal-title').empty().append(data.title);
+      $('#modal-title').empty().append("RIC Reference# "+data.title);
       $('.modal-body').empty().append(data.table);
       $('#ric-list').modal('show');
     }
