@@ -93,15 +93,16 @@ class Cron extends MY_Controller {
         LEFT(si_bcode, 1) AS company_id, r.rid, r.region, COUNT(*) AS count,
         CONCAT('[',GROUP_CONCAT(DISTINCT '{
           "si_bcode":"',si_bcode,'", "si_bname":"',si_bname,'", "si_sino":"',si_sino,'",
-          "si_dsold":"',si_dsold,'", "si_custname":"',si_custname,'", "si_cust_type":"',IF(si_firstname IS NULL OR si_lastname IS NULL, 1, 0),'",
-          "si_firstname":"',IF(si_lastname IS NULL, CONCAT(TRIM(si_firstname)," ", TRIM(si_middlename)), IFNULL(TRIM(si_firstname),"")),'",
-          "si_middlename":"',IF(si_lastname IS NULL, "", si_middlename),'", "si_lastname":"',IFNULL(si_lastname,""),'", "si_suffix":"',IFNULL(si_suffix,""),'",
-          "si_birth_date":"',si_birth_date,'", "si_email":"',LOWER(si_email),'", "si_engin_no":"',si_engin_no,'",
-          "si_chassisno":"',si_chassisno,'", "si_custcode":"',si_custcode,'", "company_id":"',LEFT(si_bcode, 1),'",
-          "si_mat_no":"',si_mat_no,'", "regn_status":"',regn_status,'", "ar_no":"',IFNULL(bobj.ar_no,'N/A'),'",
-          "ar_amount":"',IFNULL(ar_amount,0),'", "region_id":"',r.rid,'", "date_inserted":"',date_inserted,'",
+          "si_dsold":"',si_dsold,'", "si_custname":"',REPLACE(si_custname,'"','\\\"'),'", "si_cust_type":"',IF(si_firstname IS NULL OR si_lastname IS NULL, 1, 0),'",
+          "si_firstname":"',REPLACE(IF(si_lastname IS NULL, CONCAT(TRIM(si_firstname)," ", TRIM(si_middlename)), IFNULL(TRIM(si_firstname),"")),'"','\\\"'),'",
+          "si_middlename":"',REPLACE(IF(si_lastname IS NULL, "", si_middlename),'"','\\\"'),'", "si_lastname":"',REPLACE(IFNULL(si_lastname,""),'"','\\\"'),'",
+          "si_suffix":"',REPLACE(IFNULL(si_suffix,""),'"','\\\"'),'", "si_birth_date":"',si_birth_date,'",
+          "si_email":"',LOWER(si_email),'", "si_engin_no":"',si_engin_no,'", "si_chassisno":"',si_chassisno,'",
+          "si_custcode":"',si_custcode,'", "company_id":"',LEFT(si_bcode, 1),'", "si_mat_no":"',si_mat_no,'",
+          "regn_status":"',regn_status,'", "ar_no":"',IFNULL(bobj.ar_no,'N/A'),'", "ar_amount":"',IFNULL(ar_amount,0),'",
           "si_phone_number":"',REPLACE(IF( CHAR_LENGTH(si_phone_number) = 10, CONCAT("0", si_phone_number), si_phone_number), "-", ""),'",
-          "si_sales_type":"',CASE WHEN si_sales_type = "ZMCC" THEN 0 WHEN si_sales_type = "ZMCF" THEN 1 END,'"
+          "si_sales_type":"',CASE WHEN si_sales_type = "ZMCC" THEN 0 WHEN si_sales_type = "ZMCF" THEN 1 END,'",
+          "region_id":"',r.rid,'", "date_inserted":"',date_inserted,'"
         }' ORDER BY si_dsold ASC, si_bcode ASC),']') AS sales
       FROM tbl_bobj_sales bobj
       LEFT JOIN tbl_engine e ON e.engine_no = bobj.si_engin_no
