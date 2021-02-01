@@ -83,6 +83,7 @@ class Ric_model extends CI_Model {
     }
 
     return $this->db
+      ->distinct()
       ->select('ric.*, r.region AS region_name, c.company_code AS company')
       ->from('tbl_ric ric')
       ->join('tbl_electronic_payment ep', 'ep.ric_id = ric.ric_id', 'inner')
