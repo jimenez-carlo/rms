@@ -279,7 +279,8 @@ SQL;
         CONCAT(\"'\",GROUP_CONCAT(DISTINCT c.cust_code SEPARATOR \"','\"),\"'\") AS code
       FROM tbl_sales s
       INNER JOIN tbl_customer c on s.customer = c.cid
-      WHERE s.amount = 0 OR s.ar_no = 'N/A'
+      WHERE (s.amount = 0 OR s.ar_no = 'N/A')
+      AND s.registration_type NOT IN ('Self Registration', 'Free Registration')
     ")->row_array();
 
     $ack_receipts = $dev_ces2->query("
