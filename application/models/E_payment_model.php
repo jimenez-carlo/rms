@@ -36,33 +36,12 @@ class E_payment_model extends CI_Model{
               ep.dm_date, ep.doc_date, ep.deposit_date,
               ep.close_date, ep.screenshot, ep.receipt,
               ep.ric_id, c.company_code AS company, r.region,
-              FORMAT(
-                (ep.amount+ep.addtl_amt+IFNULL(ric.amount,0))
-                -SUM(IFNULL((s.registration+s.penalty+s.tip),0)
-              ),2) AS pending_amt,
-              FORMAT(SUM(
-                IF(
-                  (susb.sid IS NULL OR sub.doc_no IS NULL),
-                  s.registration+s.tip+IF(ric.debit_memo IS NULL, s.penalty,0),
-                  0
-                )
-              ),2) AS for_liq,
-              FORMAT(SUM(
-                IF(
-                  sub.doc_no IS NOT NULL,
-                  s.registration+s.tip+IF(
-                    (s.is_penalty_for_ric=0) OR (s.is_penalty_for_ric=1 AND ric.debit_memo IS NOT NULL),
-                    s.penalty,
-                    0
-                  ),
-                  0
-                )
-              ),2) AS liquidated,
+              FORMAT((ep.amount+ep.addtl_amt)-SUM(s.registration+IF(s.is_penalty_for_ric=0,s.penalty,0)+s.tip),2) AS pending_amt,
+              FORMAT(SUM(IF(s.status=4, s.registration+IF(s.is_penalty_for_ric=0,s.penalty,0)+s.tip, 0)),2) AS for_liq,
+              FORMAT(SUM(IF(s.status=5, s.registration+IF(s.is_penalty_for_ric=0,s.penalty,0)+s.tip, 0)),2) AS liquidated,
               ric.reference_num,
             FORMAT(SUM(IF(s.is_penalty_for_ric=1,s.penalty,0)),2) ric_penalty_amount
             FROM tbl_sales s
-            LEFT JOIN tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
-            LEFT JOIN tbl_sap_upload_batch sub ON sub.subid = susb.subid
             INNER JOIN tbl_electronic_payment ep ON s.electronic_payment = ep.epid
             LEFT JOIN tbl_ric ric ON ric.ric_id = ep.ric_id
             INNER JOIN tbl_company c ON c.cid = ep.company

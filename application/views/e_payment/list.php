@@ -66,8 +66,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                                 <th><p>Region</p></th>
                                                                 <th><p>E-Payment Reference #</p></th>
                                                                 <th><p>Amount</p></th>
-                                                                <th><p>RIC Reference #</p></th>
-                                                                <th><p>RIC Amount</p></th>
                                                                 <th><p>Pending Amount</p></th>
                                                                 <th><p>For Liquidation</p></th>
                                                                 <th><p>Liquidated</p></th>
@@ -75,6 +73,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                                 <th><p>Document #</p></th>
                                                                 <th><p>Debit Memo #</p></th>
                                                                 <?php endif; ?>
+                                                                <th><p>RIC Reference #</p></th>
+                                                                <th><p>RIC Amount</p></th>
                                                                 <th><p>Payment Status</p></th>
                                                         </tr>
                                                 </thead>
@@ -87,8 +87,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                                 print '<td>'.$row->region.' '.$row->company.'</td>';
                                                                 print '<td><a href="electronic_payment/view/'.$row->epid.'" target="_blank">'.$row->reference.'</a></td>';
                                                                 print '<td>'.number_format($row->ttl_amt, 2, '.', ',').'</td>';
-                                                                print '<td>'.$row->reference_num.'</td>';
-                                                                print '<td>'.$row->ric_penalty_amount.'</td>';
                                                                 print '<td>'.$row->pending_amt.'</td>';
                                                                 print '<td>'.$row->for_liq.'</td>';
                                                                 print '<td>'.$row->liquidated.'</td>';
@@ -98,6 +96,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                                                   if (empty($row->dm_no)) print '<td>-</td>';
                                                                   else print '<td>'.$row->dm_no.'<br><i>on '.$row->dm_date.'</i></td>';
                                                                 }
+                                                                print '<td>'.$row->reference_num.'</td>';
+                                                                print '<td>'.$row->ric_penalty_amount.'</td>';
                                                                 print '<td>'.$status[$row->status].'</td>';
                                                                 print '</tr>';
                                                         }
