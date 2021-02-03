@@ -19,30 +19,37 @@ class Plate_model extends CI_Model{
         public function plate_report_bak($param)
         {
           $branch = (!empty($param->branch) && is_numeric($param->branch))
-            ? " AND bcode = '".$param->branch."'" : ''; //'region = '.$param->region;
+            ? " AND s.bcode = '".$param->branch."'" : ''; //'region = '.$param->region;
           $status = (!empty($param->status) && is_numeric($param->status))
-            ? ' AND status = '.$param->status : '';
+            ? ' AND s.status = '.$param->status : '';
           $name = (!empty($param->name))
-            ? " AND concat(first_name, ' ', last_name) LIKE '%".$param->name."%'" : '';
+            ? " AND CONCAT(c.first_name, ' ', c.last_name) LIKE '%".$param->name."%'" : '';
           $engine_no = (!empty($param->engine_no))
-            ? " AND engine_no LIKE '%".$param->engine_no."%'" : '';
+            ? " AND e.engine_no LIKE '%".$param->engine_no."%'" : '';
 
           $result = $this->db->query("
                  SELECT
-                    *, tbl_sales.sid AS ssid, tbl_engine.mvf_no AS mvff_no
+                    *, s.sid AS ssid, e.mvf_no AS mvff_no,
+                    CONCAT(
+                      IFNULL(c.first_name,''), ' ',
+                      IFNULL(c.middle_name,''), ' ',
+                      IFNULL(c.last_name,'')
+                    ) AS customer_name
                   FROM
-                    tbl_sales
+                    tbl_sales s
                   INNER JOIN
-                        tbl_status ON status = status_id
+                    tbl_status st ON s.status = st.status_id AND st.status_type = 'SALES'
                   INNER JOIN
-                    tbl_engine ON engine = eid
+                    tbl_engine e ON s.engine = e.eid
                   INNER JOIN
-                    tbl_customer ON customer = cid
+                    tbl_customer c ON s.customer = c.cid
                   LEFT JOIN
-                    tbl_plate AS b ON tbl_sales.sid = b.sid
+                    tbl_plate AS b ON s.sid = b.sid
                   WHERE
-                    1=1 ".$branch.$status.$name.$engine_no."AND tbl_status.status_type = 'SALES' AND (tbl_sales.status = 4 OR tbl_sales.status = 5)AND ".$this->company." AND b.plate_number IS NULL
-                  ORDER BY tbl_sales.sid DESC LIMIT 1000
+                    1=1 ".$branch.$status.$name.$engine_no."
+                    AND s.status IN (4, 5)
+                    AND ".$this->company." AND b.plate_number IS NULL
+                  ORDER BY s.sid DESC LIMIT 1000
                 ")->result_object();
 
                 foreach ($result as $key => $sales)
