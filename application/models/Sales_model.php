@@ -181,6 +181,11 @@ class Sales_model extends CI_Model{
                 $sales = $this->db->query("
                   SELECT
                     s.*, e.*, c.*, p.plate_number,
+                    CONCAT(
+                      IFNULL(c.first_name,''), ' ',
+                      IFNULL(c.middle_name,''), ' ',
+                      IFNULL(c.last_name,'')
+                    ) AS customer_name,
                     DATE_FORMAT(s.date_sold, '%Y-%m-%d') as date_sold
                   FROM tbl_sales s
                   INNER JOIN tbl_engine e ON s.engine = e.eid

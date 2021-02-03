@@ -60,13 +60,19 @@ SQL;
 
                 // SHOW 404 THIS CODE IS FOR MANUAL DELETION OF tbl_electronic_payment REF
                 if($payment->status == 0){
-                        show_404();
-                        exit;
+                  show_404();
+                  exit;
                 }
 
                 $payment->status = $this->status[$payment->status];
                 $payment->sales = $this->db->query("
-                  SELECT *
+                  SELECT
+                    *,
+                    CONCAT(
+                      IFNULL(c.first_name,''), ' ',
+                      IFNULL(c.middle_name,''), ' ',
+                      IFNULL(c.last_name,'')
+                    ) AS customer_name
                   FROM tbl_sales s
                   INNER JOIN tbl_engine e ON s.engine = e.eid
                   INNER JOIN tbl_customer c ON s.customer = c.cid

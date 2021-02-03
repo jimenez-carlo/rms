@@ -60,8 +60,7 @@ class Nru_model extends CI_Model{
                 JSON_OBJECT(
                   'sid', s.sid, 'branch', CONCAT(s.bcode, ' ', s.bname), 'registration', s.registration,
                   'pending_date', SUBSTR(s.pending_date, 1, 10), 'date_sold', SUBSTR(s.date_sold, 1, 10),
-                  'engine_no', e.engine_no , 'customer_name', CONCAT(c.first_name, ' ',c.last_name
-                )
+                  'engine_no', e.engine_no , 'customer_name', CONCAT(IFNULL(c.first_name,''), IFNULL(c.middle_name,''), ' ',IFNULL(c.last_name,''))
               )
               ORDER BY s.bcode
               SEPARATOR ','
