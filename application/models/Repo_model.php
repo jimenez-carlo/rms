@@ -447,24 +447,24 @@ SQL;
           '}'),
         ']') AS batches
       FROM (
-      	SELECT
+        SELECT
           rb.*
           ,c.*
           ,r.rid, r.region AS rrt_region
           ,COUNT(*) AS no_of_unit
-      	FROM
-      	  tbl_repo_batch rb
-      	LEFT JOIN
-      	  tbl_company c ON c.cid = rb.company_id
-      	LEFT JOIN
-      	  tbl_region r ON r.rid = rb.region_id
-      	LEFT JOIN
-      	  tbl_repo_sales rs ON rs.repo_batch_id = rb.repo_batch_id
-      	LEFT JOIN
+        FROM
+          tbl_repo_batch rb
+        LEFT JOIN
+          tbl_company c ON c.cid = rb.company_id
+        LEFT JOIN
+          tbl_region r ON r.rid = rb.region_id
+        LEFT JOIN
+          tbl_repo_sales rs ON rs.repo_batch_id = rb.repo_batch_id
+        LEFT JOIN
           tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
         WHERE
-      	  rb.status = 'FOR CA' AND DATE_FORMAT(rb.date_created, '%Y-%m-%d') <= DATE_FORMAT(NOW() - INTERVAL 1 DAY, '%Y-%m-%d')
-      	GROUP BY rb.repo_batch_id
+          rb.status = 'FOR CA' AND DATE_FORMAT(rb.date_created, '%Y-%m-%d') <= DATE_FORMAT(NOW() - INTERVAL 1 DAY, '%Y-%m-%d')
+        GROUP BY rb.repo_batch_id
       ) AS first_qry
       GROUP BY company_code, rid, company_id
       ORDER BY rid, company_id
@@ -489,32 +489,32 @@ SQL;
     $this->db->trans_start();
     foreach ($batches as $repo_batch_id => $doc_no) {
       $this->db->query("
-	UPDATE
-	  tbl_repo_batch rb
-	INNER JOIN
-	  tbl_region_budget rbgt ON rbgt.region_id = rb.region_id
-	INNER JOIN (
-	  SELECT
-	    rb.repo_batch_id, COUNT(*) AS no_of_unit
-	  FROM
-	    tbl_repo_batch rb
-	  LEFT JOIN
-	    tbl_repo_sales rs ON rs.repo_batch_id = rb.repo_batch_id
-	  LEFT JOIN
-	    tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
-	  WHERE
-	    rb.repo_batch_id = {$repo_batch_id}
-	  GROUP BY
-	    rb.repo_batch_id
-	) AS count ON count.repo_batch_id = rb.repo_batch_id
-	SET
-	  rb.doc_no = '{$doc_no}',
-	  rb.date_doc_no_encoded = NOW(),
-	  rb.bank_amount = count.no_of_unit * rbgt.repo_bmi,
-	  rb.amount = count.no_of_unit * rbgt.repo_cmc,
-	  rb.status = 'FOR DEPOSIT'
-	WHERE
-	  rb.repo_batch_id = {$repo_batch_id}
+        UPDATE
+          tbl_repo_batch rb
+        INNER JOIN
+          tbl_region_budget rbgt ON rbgt.region_id = rb.region_id
+        INNER JOIN (
+          SELECT
+            rb.repo_batch_id, COUNT(*) AS no_of_unit
+          FROM
+            tbl_repo_batch rb
+          LEFT JOIN
+            tbl_repo_sales rs ON rs.repo_batch_id = rb.repo_batch_id
+          LEFT JOIN
+            tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
+          WHERE
+            rb.repo_batch_id = {$repo_batch_id}
+          GROUP BY
+            rb.repo_batch_id
+        ) AS count ON count.repo_batch_id = rb.repo_batch_id
+        SET
+          rb.doc_no = '{$doc_no}',
+          rb.date_doc_no_encoded = NOW(),
+          rb.bank_amount = count.no_of_unit * rbgt.repo_bmi,
+          rb.amount = count.no_of_unit * rbgt.repo_cmc,
+          rb.status = 'FOR DEPOSIT'
+        WHERE
+          rb.repo_batch_id = {$repo_batch_id}
       ");
     }
     $this->db->trans_complete();
