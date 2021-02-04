@@ -181,6 +181,11 @@ class Sales_model extends CI_Model{
                 $sales = $this->db->query("
                   SELECT
                     s.*, e.*, c.*, p.plate_number,
+                    CONCAT(
+                      IFNULL(c.first_name,''), ' ',
+                      IFNULL(c.middle_name,''), ' ',
+                      IFNULL(c.last_name,'')
+                    ) AS customer_name,
                     DATE_FORMAT(s.date_sold, '%Y-%m-%d') as date_sold
                   FROM tbl_sales s
                   INNER JOIN tbl_engine e ON s.engine = e.eid
@@ -204,28 +209,20 @@ class Sales_model extends CI_Model{
                 $name = (!empty($param->name))
                         ? " AND concat(first_name, ' ', last_name) LIKE '%".$param->name."%'" : '';
                 $engine_no = (!empty($param->engine_no))
-                        ? " AND engine_no LIKE '%".$param->engine_no."%'" : '';
+                        ? " AND engine_no REGEXP '".$param->engine_no."'" : '';
 
                 $result = $this->db->query("
-                  SELECT *
-                  FROM tbl_sales
-                  INNER JOIN tbl_engine ON engine = eid
-                  INNER JOIN tbl_customer ON customer = cid
+                  SELECT
+                    s.sid, s.bcode, s.bname, s.file, DATE_FORMAT(s.date_sold, '%Y-%m-%d') AS date_sold,
+                    e.*, c.*, st.status_name AS status, reject.status_name AS lto_reason
+                  FROM tbl_sales s
+                  INNER JOIN tbl_engine e ON s.engine = e.eid
+                  INNER JOIN tbl_customer c ON s.customer = c.cid
+                  INNER JOIN tbl_status st ON st.status_id = s.status AND st.status_type = 'SALES'
+                  INNER JOIN tbl_status reject ON reject.status_id = s.lto_reason AND reject.status_type = 'LTO_REASON'
                   WHERE 1=1 ".$branch.$status.$name.$engine_no." AND ".$this->company."
                   ORDER BY sid DESC LIMIT 1000
                 ")->result_object();
-
-                foreach ($result as $key => $sales)
-                {
-                        $sales->date_sold = substr($sales->date_sold, 0, 10);
-                        $sales->status = $this->status[$sales->status];
-                        $sales->lto_reason = $this->lto_reason[$sales->lto_reason];
-
-                        $sales->edit = ($_SESSION['position'] == 108
-                                && $sales->status == 3
-                                && substr($sales->registration_date, 0, 10) == date('Y-m-d'));
-                        $result[$key] = $sales;
-                }
 
                 return $result;
         }

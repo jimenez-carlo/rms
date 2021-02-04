@@ -35,7 +35,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
             <div class="control-group">
               <div class="control-label">Customer Name</div>
-              <div class="controls text"><?php print $sales->first_name.' '.$sales->last_name; ?></div>
+              <div class="controls text"><?php print $sales->customer_name; ?></div>
             </div>
             <div class="control-group">
               <div class="control-label">Customer Code</div>

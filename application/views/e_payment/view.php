@@ -90,7 +90,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   print '<tr>';
                   print '<td>'.$ctr.'</td>';
                   print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
-                  print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
+                  print '<td>'.$sales->customer_name.'</td>';
                   print '<td>'.$sales->cust_code.'</td>';
                   print '<td><a href="'.base_url().'sales/view/'.$sales->sid.'" target="_blank">'.$sales->engine_no.'</a></td>';
                   print '<td>'.$sales->chassis_no.'</td>';

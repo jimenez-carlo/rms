@@ -51,7 +51,7 @@ class Lto_pending_model extends CI_Model{
         registration_type, status, acct_status,
         DATE_FORMAT(transmittal_date, '%Y-%m-%d') AS transmittal_date,
         lto_transmittal, lto_reason, engine_no,
-        first_name, middle_name, last_name
+        CONCAT(IFNULL(first_name,''), ' ', IFNULL(middle_name,''), ' ', IFNULL(last_name,'')) AS customer_name
       FROM tbl_sales
       INNER JOIN tbl_engine on engine = eid
       INNER JOIN tbl_customer on customer = cid

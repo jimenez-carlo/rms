@@ -41,8 +41,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
-                print '<td>'.$sales->payment_method.'</td>';
                 print '<td>'.$sales->sales_type.'</td>';
+                print '<td>'.$sales->payment_method.'</td>';
                 print '<td><a name="update" class="btn btn-success" onclick="update('.$sales->sid.')">Update</a></td>';
 
                 print '</tr>';

@@ -60,7 +60,6 @@ class Electronic_payment extends MY_Controller {
 
   public function view($epid) {
     $payment = $this->e_payment->load_payment($epid);
-
     $this->access(1);
     $this->header_data('title', $payment->reference);
     $this->header_data('nav', 'e_payment');

@@ -41,7 +41,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$sales->bcode.' '.$sales->bname.'</td>';
                 print '<td>'.$sales->date_sold.'</td>';
                 print '<td>'.$sales->engine_no.'</td>';
-                print '<td>'.$sales->first_name.' '.$sales->last_name.'</td>';
+                print '<td>'.$sales->customer_name.'</td>';
                 print '<td>'.$sales->registration_type.'</td>';
                 print '<td>'.$sales->transmittal_date.'</td>';
               ?>
