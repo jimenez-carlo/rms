@@ -32,7 +32,7 @@ class Lto_pending extends MY_Controller {
 
   public function view($ltid)
   {
-    if ($this->input->post('submit')) {
+    if ($this->input->post('ltid')) {
       $sales = $this->input->post('sales');
       $no_error = true;
       foreach ($sales AS $key => $sale)

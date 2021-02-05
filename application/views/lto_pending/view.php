@@ -9,9 +9,34 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="pull-left">LTO Pending</div>
       </div>
       <div class="block-content collapse in">
+        <div class="row">
+          <div class="span6 offset1">
+            <input id="save" type="button" name="submit" class="btn btn-success" value="Submit">
+          </div>
+          <div class="span5">
+            <fieldset style="padding:4.9px 10.5px 8.75px 10.5px;border:solid 1px black;">
+              <legend style="width:auto;font-size:14px;margin:0;line-height:normal;border:0;">Apply To All</legend>
+              <?php echo form_radio(['id' =>'no-si-all', 'class'=>'apply-all', 'name'=>'apply-all', 'value'=>'.no-si']); ?>
+              <label class="radio" for="no-si-all">
+                Unsubmitted SI
+              </label>
+              <?php echo form_radio(['id' =>'epp-all', 'class'=>'apply-all', 'name'=>'apply-all', 'value'=>'.epp']); ?>
+              <label class="radio" for="epp-all">
+                Pending at LTO EPP
+              </label>
+              <?php echo form_radio(['id' =>'cash-all', 'class'=>'apply-all', 'name'=>'apply-all', 'value'=>'.cash']); ?>
+              <label class="radio" for="cash-all">
+                Pending at LTO CASH
+              </label>
+              <?php echo form_radio(['id' =>'reject-all', 'class'=>'apply-all', 'name'=>'apply-all', 'value'=>'.reject']); ?>
+              <label class="radio" for="reject-all">
+                Rejected
+              </label>
+            </fieldset>
+          </div>
+        </div>
         <form method="post" class="form-horizontal" onsubmit="return confirm('Items tagged as Pending at LTO will proceed to the next process. Continue?');">
           <?php print form_hidden('ltid', $transmittal->ltid); ?>
-
           <table class="table">
             <thead>
               <tr>
@@ -52,7 +77,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       print form_radio(
                         'sales['.$key.'][action]',
                         'NO_SI',
-                         set_radio('sales['.$key.'][action]', 'NO_SI', $default_no_si)
+                        set_radio('sales['.$key.'][action]', 'NO_SI', $default_no_si),
+                        ['class'=>'no-si']
                       ); ?> Unsubmitted SI
                   </label>
                   <label class="radio">
@@ -60,7 +86,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       print form_radio(
                         'sales['.$key.'][action]',
                         'EPP',
-                         set_radio('sales['.$key.'][action]', 'EPP', false)
+                         set_radio('sales['.$key.'][action]', 'EPP', false),
+                        ['class'=>'epp']
                       );
                     ?> Pending at LTO EPP
                   </label><br>
@@ -69,7 +96,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       print form_radio(
                         'sales['.$key.'][action]',
                         'CASH',
-                        set_radio('sales['.$key.'][action]', 'CASH', false)
+                        set_radio('sales['.$key.'][action]', 'CASH', false),
+                        ['class'=>'cash']
                       );
                     ?> Pending at LTO CASH
                   </label><br>
@@ -78,7 +106,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       print form_radio(
                         'sales['.$key.'][action]',
                         'REJECT',
-                        set_radio('sales['.$key.'][action]', 'REJECT', $default_reject)
+                        set_radio('sales['.$key.'][action]', 'REJECT', $default_reject),
+                        ['class'=>'reject']
                       );
                     ?> Rejected
                   </label>
@@ -90,14 +119,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               ?>
             </tbody>
           </table>
-
-          <fieldset>
-            <div class="control-group span5">
-              <div class="control-label">
-                <input type="submit" name="submit" class="btn btn-success" value="Submit">
-              </div>
-            </div>
-          </fieldset>
         </form>
       </div>
     </div>
@@ -118,5 +139,17 @@ $(function(){
     });
     $(":checked").change();
   });
+});
+
+$(".apply-all").on("click", function() {
+  var radioClass = $(this).val();
+  $(radioClass).prop("checked", true);
+  $("select").select2("val", "0");
+  reasonEnDis = (radioClass == '.reject') ? "enable" : "disable";
+  $("select").select2(reasonEnDis, true);
+});
+
+$("#save").on("click", function() {
+  $("form").submit();
 });
 </script>
