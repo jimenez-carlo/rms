@@ -29,67 +29,96 @@ class Liquidation_model extends CI_Model{
                 $date_to = (empty($param->date_to)) ? date('Y-m-d') : $param->date_to;
                 $region = (is_numeric($param->region)) ? ' AND f.region = '.$param->region : '';
 
-                return $this->db->query("
+                $sql = <<<SQL
                   SELECT
-                    v.*, f.region,
-                    c.company_code AS companyname,
-                    COUNT(DISTINCT s.sid) AS sales_count,
-                    IFNULL(SUM(CASE WHEN s.status < 3 THEN 1200 ELSE 0 END), 0) AS rrt_pending,
-                    IFNULL(SUM(CASE WHEN s.status = 3 THEN registration ELSE 0 END), 0) AS lto_pending,
-                    IFNULL(SUM(CASE WHEN s.status = 4 THEN registration+tip ELSE 0 END), 0) AS for_liquidation,
-                    IFNULL(SUM(CASE WHEN s.status = 5 THEN registration+tip ELSE 0 END), 0) AS liquidated,
-                    (SELECT
-                      SUM(amount)
-                    FROM
-                      tbl_misc m
-                    LEFT JOIN
-                      tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
-                    LEFT JOIN
-                      tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
-                    WHERE
-                      ca_ref = vid AND mxh2.id IS NULL AND mxh1.status > 1 AND mxh1.status < 4
-                    ) AS misc_for_liq,
-                    (SELECT
-                      SUM(amount)
-                    FROM
-                      tbl_misc m
-                    LEFT JOIN
-                      tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
-                    LEFT JOIN
-                      tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
-                    WHERE
-                      ca_ref = vid AND mxh2.id IS NULL AND mxh1.status = 4
-                    ) AS misc_liquidated,
-                    (
-                      SELECT
-                        SUM(rf.amount)
-                      FROM
-                        tbl_return_fund rf
-                      JOIN
-                        tbl_return_fund_history rfh_1 USING(rfid)
-                      LEFT JOIN
-                        tbl_status st ON rfh_1.status_id = st.status_id AND status_type = 'RETURN_FUND'
-                      LEFT JOIN
-                        tbl_return_fund_history rfh_2 ON rfh_2.rfid = rfh_1.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
-                      WHERE
-                        rf.liq_date IS NULL AND rf.fund = v.vid AND rfh_2.return_fund_history_id IS NULL AND st.status_name = 'For Liquidation'
-                    ) AS return_for_liq,
-                    (
-                      SELECT
-                        SUM(amount)
-                      FROM
-                        tbl_return_fund
-                      WHERE
-                        fund = vid AND liq_date IS NOT NULL
-                    ) AS return_liquidated
+                    CONCAT('<a class="vid" data-vid="',v.vid,'" href="#">',v.reference,'</a>') AS 'Reference #',
+                    v.dm_no AS 'Document #',
+                    DATE_FORMAT(v.transfer_date, '%Y-%m-%d') AS 'Date Deposited',
+                    CONCAT(c.company_code, ' ',r.region) AS 'Company/Region',
+                    FORMAT(sales_count,0) AS '# of Units',
+                    FORMAT(v.amount,2) AS 'CA Amount',
+                    FORMAT(
+                      v.amount - (
+                        IFNULL(sales_for_checking,0) + IFNULL(misc_exp_for_checking,0) +
+                        IFNULL(return_fund_for_checking,0) + IFNULL(sales_sap_upload,0) +
+                        IFNULL(misc_exp_sap_upload,0) + IFNULL(sales_liquidated,0) +
+                        IFNULL(misc_exp_liquidated,0) + IFNULL(return_fund_liquidated,0) +
+                        IFNULL(lto_pending,0)
+                      ), 2
+                    ) AS 'Pending Amount',
+                    FORMAT(lto_pending, 2) AS 'LTO Pending',
+                    CONCAT(
+                      'Registration: ', FORMAT(IFNULL(sales_for_checking, 0),2),
+                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_for_checking,0),2),
+                      '<br>Return Fund: ', FORMAT(IFNULL(return_fund_for_checking, 0),2)
+                    ) AS 'For Checking',
+                    CONCAT(
+                      'Registration: ', FORMAT(IFNULL(sales_da, 0),2),
+                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_da,0),2),
+                      '<br>Return Fund: ', FORMAT(IFNULL(return_fund_da, 0),2)
+                    ) AS 'Disapproved',
+                    CONCAT(
+                      'Registration: ', FORMAT(IFNULL(sales_sap_upload, 0),2),
+                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_sap_upload, 0),2)
+                    ) AS 'SAP Uploading',
+                    CONCAT(
+                      'Registration: ', FORMAT(IFNULL(sales_liquidated, 0),2),
+                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_liquidated,0),2),
+                      '<br>Return Fund: ', FORMAT(IFNULL(return_fund_liquidated, 0),2)
+                    ) AS 'Liquidated'
                   FROM tbl_voucher v
-                  LEFT JOIN tbl_fund f ON fid = v.fund
-                  LEFT JOIN tbl_sales s ON s.fund = vid
-                  LEFT JOIN tbl_company c ON c.cid = s.company
-                  WHERE LEFT(transfer_date, 10) BETWEEN '".$date_from."' AND '".$date_to."' ".$region." ".$this->companyQry."
-                  GROUP BY v.vid, c.cid
-                  ORDER BY transfer_date DESC
-                ")->result_object();
+                  INNER JOIN tbl_fund f ON fid = v.fund
+                  INNER JOIN (
+                    SELECT
+                      s.voucher,
+                      COUNT(*) AS sales_count,
+                      IFNULL(SUM(IF(st.status_id < 3, 900, 0)), 0) AS rrt_pending,
+                      IFNULL(SUM(IF(st.status_name = 'NRU Paid' , s.registration+s.penalty+s.tip, 0)), 0) AS lto_pending,
+                      IFNULL(SUM(IF(st.status_name = 'Registered' AND susb.sid IS NULL AND s.da_reason NOT IN (0, 11), s.registration+s.penalty+s.tip, 0)), 0) AS sales_da,
+                      IFNULL(SUM(IF(st.status_name = 'Registered' AND susb.sid IS NULL AND s.da_reason IN (0, 11), s.registration+s.penalty+s.tip, 0)), 0) AS sales_for_checking,
+                      IFNULL(SUM(IF(st.status_name = 'Registered' AND susb.sid IS NOT NULL, s.registration+s.penalty+s.tip, 0)), 0) AS sales_sap_upload,
+                      IFNULL(SUM(IF(st.status_name = 'Liquidated', s.registration+s.penalty+s.tip, 0)), 0) AS sales_liquidated
+                    FROM tbl_sales s
+                    LEFT JOIN tbl_sap_upload_sales_batch susb ON susb.sid = s.sid
+                    INNER JOIN tbl_status st ON st.status_id = s.status AND st.status_type = 'SALES'
+                    GROUP BY s.voucher
+                  ) AS sales ON sales.voucher = v.vid
+                  LEFT JOIN (
+                    SELECT
+                      m.ca_ref,
+                      IFNULL(SUM(IF(st.status_name IN ('Approved', 'Resolved'), m.amount ,0)), 0) AS misc_exp_for_checking,
+                      IFNULL(SUM(IF(st.status_name = 'For Liquidation', m.amount ,0)), 0) AS misc_exp_sap_upload,
+                      IFNULL(SUM(IF(st.status_name = 'Liquidated', m.amount ,0)), 0) AS misc_exp_liquidated,
+                      IFNULL(SUM(IF(st.status_name = 'Disapproved', m.amount ,0)), 0) AS misc_exp_da
+                    FROM tbl_misc m
+                    INNER JOIN tbl_misc_expense_history mxh1 ON m.mid = mxh1.mid
+                    INNER JOIN tbl_status st ON st.status_id = mxh1.status AND st.status_type = 'MISC_EXP'
+                    LEFT JOIN tbl_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+                    WHERE mxh2.id IS NULL GROUP BY m.ca_ref
+                  ) AS misc ON misc.ca_ref = v.vid
+                  LEFT JOIN (
+                    SELECT
+                      rf.fund,
+                      IFNULL(SUM(IF(st.status_name = 'For Liquidation', rf.amount ,0)), 0) AS return_fund_for_checking,
+                      IFNULL(SUM(IF(st.status_name = 'Liquidated', rf.amount ,0)), 0) AS return_fund_liquidated,
+                      IFNULL(SUM(IF(st.status_name NOT IN('For Liquidation', 'Liquidated', 'Deleted'), rf.amount ,0)), 0) AS return_fund_da
+                    FROM tbl_return_fund rf
+                    JOIN tbl_return_fund_history rfh_1 USING(rfid)
+                    LEFT JOIN tbl_status st ON rfh_1.status_id = st.status_id AND status_type = 'RETURN_FUND'
+                    LEFT JOIN tbl_return_fund_history rfh_2 ON rfh_2.rfid = rfh_1.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
+                    WHERE rfh_2.return_fund_history_id IS NULL
+                    GROUP BY rf.fund
+                  ) AS return_fund ON return_fund.fund = v.vid
+                  INNER JOIN tbl_company c ON c.cid = v.company
+                  INNER JOIN tbl_region r ON r.rid = f.region
+                  WHERE v.transfer_date BETWEEN '{$date_from} 00:00:00' AND '{$date_to} 23:59:59' {$region} {$this->companyQry}
+                  ORDER BY v.transfer_date ASC, v.vid ASC
+SQL;
+                $this->table->set_template([
+                  "table_open" => "<table id='table_liq' class='table'>"
+                ]);
+
+                return $this->table->generate($this->db->query($sql));
         }
 
         public function load_sales($vid)
