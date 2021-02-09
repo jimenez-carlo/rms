@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <form class="form-signin" method="post">
           <center>
             <img class="signin-logo" src="images/logo-cmc.png">
-            <h4 class="form-signin-heading">Registration Monitoring System Version <?php echo RMS_VERSION; ?></h4>
+            <h4 class="form-signin-heading">REGISTRATION MONITORING SYSTEM <small>v<?php echo RMS_VERSION; ?></small></h4>
           </center>
 
             <?php

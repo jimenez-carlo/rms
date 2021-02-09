@@ -41,78 +41,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </form>
 
         <hr>
-        <table id="table_liq" class="table">
-          <thead>
-            <tr>
-              <th><p>Reference #</p></th>
-              <th><p>Document #</p></th>
-              <!-- <th><p>Debit Memo #</p></th> -->
-              <th><p>Date Deposited</p></th>
-		<th><p>Company</p></th>
-              <th><p>Region</p></th>
-              <th><p># of Units</p></th>
-              <th><p style="text-align:right">CA Amount</p></th>
-              <th colspan="2"><p style="text-align:center">Liquidated Amount</p></th>
-              <th colspan="2"><p style="text-align:center">For Liquidation</p></th>
-              <th><p style="text-align:right">LTO Pending</p></th>
-              <th><p style="text-align:right">Pending Amount</p></th>
-            </tr>
-          </thead>
-          <tbody>
-          <?php
-          foreach ($table as $row)
-          {
-            $balance = $row->amount - ($row->liquidated + $row->misc_liquidated + $row->return_liquidated + $row->for_liquidation + $row->misc_for_liq  + $row->return_for_liq + $row->lto_pending);
-            print '<tr>';
-            print '<td><a data-vid="'.$row->vid.'" class="vid">'.$row->reference.'</a></td>';
-            print '<td>'.$row->voucher_no.'</td>';
-            // print '<td>'.$row->dm_no.'</td>';
-            print '<td>'.substr($row->transfer_date, 0,10).'</td>';
-            print '<td>'.$row->companyname.'</td>';
-            print '<td>'.$region[$row->region].'</td>';
-            print '<td>'.$row->sales_count.'</td>';
-            print '<td style="text-align:right">'.number_format($row->amount,2,'.',',').'</td>';
-
-            print '<td>Registration: <br>Miscellaneous: <br>Return Fund:</td>';
-            print '<td style="text-align:right">
-              '.number_format($row->liquidated,2,'.',',').'<br>
-              '.number_format($row->misc_liquidated,2,'.',',').'<br>
-              '.number_format($row->return_liquidated,2,'.',',').'
-              </td>';
-            print '<td>Registration: <br>Miscellaneous: <br>Return Fund:</td>';
-            print '<td style="text-align:right">
-              '.number_format($row->for_liquidation,2,'.',',').'<br>
-              '.number_format($row->misc_for_liq,2,'.',',').'<br>
-              '.number_format($row->return_for_liq,2,'.',',').'
-            </td>';
-
-            print '<td style="text-align:right">'.number_format($row->lto_pending,2,'.',',').'</td>';
-            print '<td style="text-align:right">'.number_format($balance,2,'.',',').'</td>';
-            print '</tr>';
-          }
-
-          if (empty($table))
-          {
-            print '<tr>
-              <td>No result.</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-            </tr>';
-          }
-          ?>
-          </tbody>
-        </table>
-
+        <?php echo (!empty($table)) ? $table : 'Not Found!'; ?>
       </div>
     </div>
   </div>
