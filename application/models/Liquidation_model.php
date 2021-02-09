@@ -48,23 +48,23 @@ class Liquidation_model extends CI_Model{
                     ) AS 'Pending Amount',
                     FORMAT(lto_pending, 2) AS 'LTO Pending',
                     CONCAT(
-                      'Registration: ', FORMAT(IFNULL(sales_for_checking, 0),2),
-                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_for_checking,0),2),
-                      '<br>Return Fund: ', FORMAT(IFNULL(return_fund_for_checking, 0),2)
+                      'Registration: ', '<span style="float:right">', FORMAT(IFNULL(sales_for_checking, 0),2), '</span>',
+                      '<br>Miscellaneous: ', '<span style="float:right">', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
+                      '<br>Return Fund: ', '<span style="float:right">', FORMAT(IFNULL(return_fund_for_checking, 0),2), '</span>'
                     ) AS 'For Checking',
                     CONCAT(
-                      'Registration: ', FORMAT(IFNULL(sales_da, 0),2),
-                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_da,0),2),
-                      '<br>Return Fund: ', FORMAT(IFNULL(return_fund_da, 0),2)
+                      'Registration: ', '<span style="float:right">', FORMAT(IFNULL(sales_da, 0),2), '</span>',
+                      '<br>Miscellaneous: ', '<span style="float:right">', FORMAT(IFNULL(misc_exp_da,0),2), '</span>',
+                      '<br>Return Fund: ', '<span style="float:right">', FORMAT(IFNULL(return_fund_da, 0),2), '</span>'
                     ) AS 'Disapproved',
                     CONCAT(
-                      'Registration: ', FORMAT(IFNULL(sales_sap_upload, 0),2),
-                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_sap_upload, 0),2)
+                      'Registration: ', '<span style="float:right">', FORMAT(IFNULL(sales_sap_upload, 0),2), '</span>',
+                      '<br>Miscellaneous: ', '<span style="float:right">', FORMAT(IFNULL(misc_exp_sap_upload, 0),2), '</span>'
                     ) AS 'SAP Uploading',
                     CONCAT(
-                      'Registration: ', FORMAT(IFNULL(sales_liquidated, 0),2),
-                      '<br>Miscellaneous: ', FORMAT(IFNULL(misc_exp_liquidated,0),2),
-                      '<br>Return Fund: ', FORMAT(IFNULL(return_fund_liquidated, 0),2)
+                      'Registration: ', '<span style="float:right">', FORMAT(IFNULL(sales_liquidated, 0),2), '</span>',
+                      '<br>Miscellaneous: ', '<span style="float:right">', FORMAT(IFNULL(misc_exp_liquidated,0),2), '</span>',
+                      '<br>Return Fund: ', '<span style="float:right">', FORMAT(IFNULL(return_fund_liquidated, 0),2), '</span>'
                     ) AS 'Liquidated'
                   FROM tbl_voucher v
                   INNER JOIN tbl_fund f ON fid = v.fund
