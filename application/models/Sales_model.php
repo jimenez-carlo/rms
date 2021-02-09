@@ -209,7 +209,7 @@ class Sales_model extends CI_Model{
                 $name = (!empty($param->name))
                         ? " AND CONCAT(c.first_name, c.middle_name, c.last_name) LIKE '%".$param->name."%'" : '';
                 $engine_no = (!empty($param->engine_no))
-                        ? " AND e.engine_no REGEXP '".$param->engine_no."'" : '';
+                        ? " AND e.engine_no LIKE '%".$param->engine_no."%'" : '';
 
                 $result = $this->db->query("
                   SELECT
