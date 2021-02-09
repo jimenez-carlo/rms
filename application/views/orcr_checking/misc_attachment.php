@@ -40,14 +40,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   print '<div class="control-label">Reason</div>';
   print '<div class="controls">
           <select id="misc_da_reason" name="da_reason" required>
-            <option>WRONG COMPANY INFO</option>
-            <option>WRONG AMOUNT</option>
             <option>ADVANCE DATE OF EXPENSE VS CA EXPENSE</option>
             <option>DUPLICATE ATTACHMENT</option>
-            <option>NOT FOR REGISTRATION EXPENSE</option>
-            <option>WRONG ATTACHED OR</option>
-            <option>WRONG OR#</option>
+            <option>EXCEED APPROVED EXPENSE</option>
+            <option>EXPIRED OR</option>
+            <option>NO COMPANY INFO</option>
+            <option>NO OR ATTACHED</option>
             <option>NO VOUCHER FOR ITINERARY</option>
+            <option>NOT FOR REGISTRATION EXPENSE</option>
+            <option>WRONG AMOUNT</option>
+            <option>WRONG ATTACHED OR</option>
+            <option>WRONG COMPANY INFO</option>
+            <option>WRONG OR#</option>
           </select>
         </div>';
   print '</div>';
