@@ -359,7 +359,10 @@ SQL;
     $start = date("Y-m-d H:i:s");
     $this->db->query("
       UPDATE tbl_sales s, tbl_engine e, tbl_bobj_sales bobj
-      SET s.registration_type = bobj.regn_status, s.created_date = DATE_FORMAT(NOW(), '%Y-%m-%d')
+      SET
+        s.registration_type = bobj.regn_status,
+        s.ar_no = bobj.ar_no, s.amount = bobj.ar_amount,
+        s.created_date = DATE_FORMAT(NOW(), '%Y-%m-%d')
       WHERE s.engine = e.eid AND e.engine_no = bobj.si_engin_no
       AND s.registration_type <> bobj.regn_status AND s.registration_type = 'Self Registration'
     ");
