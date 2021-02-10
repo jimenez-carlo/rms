@@ -5,12 +5,13 @@ class Cron extends MY_Controller {
 
   public function __construct() {
     parent::__construct();
+    $this->count = 0;
     $this->load->helper('url');
     $this->load->helper('directory');
     $this->load->model('Login_model', 'login');
-    $this->global  = $this->load->database('global', TRUE);
-    $this->dev_rms = $this->load->database('dev_rms', TRUE);
-    $this->mdi_dev_rms = $this->load->database('mdi_dev_rms', TRUE);
+    $this->global   = $this->load->database('global', TRUE);
+    $this->dev_rms  = $this->load->database('dev_rms', TRUE);
+    $this->dev_ces2 = $this->load->database('dev_ces2', TRUE);
   }
 
   public function index()
@@ -114,7 +115,6 @@ class Cron extends MY_Controller {
 SQL;
 
     $result = $this->db->query($sql)->result_array();
-    $rows = 0;
     foreach ($result as $row) {
       $transmittal = $this->db->query("SELECT * FROM tbl_lto_transmittal WHERE code = '".$row['transmittal']."'")->row_array();
       if (empty($transmittal)) {
@@ -183,7 +183,7 @@ SQL;
 
           $this->db->trans_complete();
           if ($this->db->trans_status()) {
-            $rows++;
+            $this->count++;
           }
         }
       }
@@ -195,10 +195,10 @@ SQL;
     $log->date = $date_yesterday;
     $log->start = $start;
     $log->end = $end;
-    $log->rows = $rows;
+    $log->rows = $this->count;
     $this->db->insert('tbl_cron_log', $log);
 
-    $this->login->saveLog('Run Cron: Create RMS data based on data from LTO Transmittal System [rms_create]; Count: '.$rows.'; Duration: '.$start.' - '.$end);
+    $this->login->saveLog('Run Cron: Create RMS data based on data from LTO Transmittal System [rms_create]; Count: '.$this->count.'; Duration: '.$start.' - '.$end);
 
     $submit = $this->input->post('submit');
     if (empty($submit)) redirect('cron');
@@ -207,8 +207,6 @@ SQL;
   public function rms_expense()
   {
     $start = date("Y-m-d H:i:s");
-    $rows = 0;
-    $dev_ces2 = $this->load->database('dev_ces2', TRUE);
     $date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-3 days'));
     $date_to = $this->input->post('date_yesterday') ?? date('Y-m-d');
 
@@ -224,7 +222,7 @@ SQL;
     $result = $this->db->query($query)->result_object();
 
     foreach ($result as $row) {
-      $expense = $dev_ces2->query("SELECT rec_no, custcode FROM rms_expense WHERE engine_num = '{$row->engine_no}'")->row();
+      $expense = $this->dev_ces2->query("SELECT rec_no, custcode FROM rms_expense WHERE engine_num = '{$row->engine_no}'")->row();
       if (empty($expense)) {
         $expense = new Stdclass();
         $expense->nid = 0;
@@ -235,7 +233,7 @@ SQL;
         $expense->regn_upload_d = $row->regn_upload_d;
         if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
         if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
-        $dev_ces2->insert('rms_expense', $expense);
+        $this->dev_ces2->insert('rms_expense', $expense);
 
       } else {
         $expense->tip_conf = 0;
@@ -244,9 +242,9 @@ SQL;
         if ($expense->custcode !== $row->cust_code) $expense->custcode = $row->cust_code; // Update dev_ces2.rms_expense custcode if data is not equal in RMS cust_code.
         if (!empty($row->cr_date)) $expense->regn_exp = $row->registration;
         if (!empty($row->cr_date)) $expense->regn_exp_d = $row->cr_date;
-        $dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
+        $this->dev_ces2->update('rms_expense', $expense, array('rec_no' => $expense->rec_no));
       }
-      $rows++;
+      $this->count++;
     }
 
     $end = date("Y-m-d H:i:s");
@@ -256,7 +254,7 @@ SQL;
     $log->date = date('Y-m-d');
     $log->start = $start;
     $log->end = $end;
-    $log->rows = $rows;
+    $log->rows = $this->count;
     $this->db->insert('tbl_cron_log', $log);
 
     $this->login->saveLog('Run Cron: Update rms_expense table for BOBJ Report [rms_expense] Duration: '.$start.' - '.$end);
@@ -268,10 +266,6 @@ SQL;
   public function ar_amount()
   {
     $start = date("Y-m-d H:i:s");
-    $rows = 0;
-
-    $dev_ces2 = $this->load->database('dev_ces2', TRUE);
-
     $this->db->simple_query("SET SESSION group_concat_max_len = 18446744073709551615");
     // select sales with AR and zero amount
     $customers = $this->db->query("
@@ -325,8 +319,6 @@ SQL;
   public function empty_temp()
   {
     $start = date("Y-m-d H:i:s");
-    $rows = 0;
-
     $folder = './rms_dir/temp/';
     $this->load->helper('directory');
     $dir_files = directory_map($folder, 1);
@@ -335,7 +327,7 @@ SQL;
     foreach ($dir_files as $file) {
       if (!empty($file)) {
         unlink($folder.$file);
-        $rows++;
+        $this->count++;
       }
     }
 
@@ -346,7 +338,7 @@ SQL;
     $log->date = date('Y-m-d');
     $log->start = $start;
     $log->end = $end;
-    $log->rows = $rows;
+    $log->rows = $this->count;
     $this->db->insert('tbl_cron_log', $log);
 
     $this->login->saveLog('Run Cron: Delete files from rms_dir/temp [empty_temp] Duration: '.$start.' - '.$end);
@@ -367,22 +359,24 @@ SQL;
       AND s.registration_type <> bobj.regn_status AND s.registration_type = 'Self Registration'
     ");
 
-    $this->dev_rms->truncate('diy_tbl');
     $diy = $this->db
-         ->select('c.cust_code AS cust_id, e.engine_no, DATE_FORMAT(s.transmittal_date, "%Y-%m-%d") AS trans_date')
-         ->from('tbl_sales s')
-         ->join('tbl_status st', 's.lto_reason = st.status_id AND st.status_type = "LTO_REASON"', 'inner')
-         ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
-         ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
-         ->where('s.registration_type <> "Self Registration"')
-         ->where('(s.created_date = DATE_FORMAT(NOW(), "%Y-%m-%d") OR st.status_name = "No DIY Received")')
-         ->get()
-         ->result_array();
+      ->select('c.cust_code AS cust_id, e.engine_no, DATE_FORMAT(s.transmittal_date, "%Y-%m-%d") AS trans_date')
+      ->from('tbl_sales s')
+      ->join('tbl_status st', 's.lto_reason = st.status_id AND st.status_type = "LTO_REASON"', 'inner')
+      ->join('tbl_customer c', 'c.cid = s.customer', 'inner')
+      ->join('tbl_engine e', 'e.eid = s.engine', 'inner')
+      ->where('s.registration_type <> "Self Registration"')
+      ->where('(s.created_date = DATE_FORMAT(NOW(), "%Y-%m-%d") OR st.status_name = "No DIY Received")')
+      ->get()
+      ->result_array();
 
-    $this->dev_rms->insert_batch('diy_tbl', $diy);
-    $count = $this->db->affected_rows();
+    if (!empty($diy)) {
+      $this->dev_rms->truncate('diy_tbl');
+      $this->dev_rms->insert_batch('diy_tbl', $diy);
+      $this->count = $this->db->affected_rows();
+    }
     $end = date("Y-m-d H:i:s");
-    $this->login->saveLog('Run Cron: Inserted DIY; Count: '.$count.'; Duration: '.$start.' - '.$end);
+    $this->login->saveLog('Run Cron: Inserted DIY; Count: '.$this->count.'; Duration: '.$start.' - '.$end);
   }
 
 }

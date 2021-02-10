@@ -182,25 +182,3 @@ $db['dev_rms'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
-
-$db['mdi_dev_rms'] = array(
-	'dsn'	=> '',
-	'hostname' => MDI_DEV_RMS_DB_HOST,
-	'username' => MDI_DEV_RMS_DB_USER,
-	'password' => MDI_DEV_RMS_DB_PASSWORD,
-	'database' => MDI_DEV_RMS_DB_NAME,
-	'dbdriver' => 'mysqli',
-	'dbprefix' => '',
-	'pconnect' => FALSE,
-	'db_debug' => (ENVIRONMENT !== 'production'),
-	'cache_on' => FALSE,
-	'cachedir' => '',
-	'char_set' => 'utf8',
-	'dbcollat' => 'utf8_general_ci',
-	'swap_pre' => '',
-	'encrypt' => FALSE,
-	'compress' => FALSE,
-	'stricton' => FALSE,
-	'failover' => array(),
-	'save_queries' => TRUE
-);
