@@ -35,7 +35,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             ?>
 
             <div class="form-actions span12">
-              <input type="submit" value="Search" class="btn btn-success" name="search">
+              <input class="btn btn-success" type="submit" name="search" value="Search">
+              <input class="btn btn-warning" type="submit" name="download" value="Download">
             </div>
           </fieldset>
         </form>
