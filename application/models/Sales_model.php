@@ -214,12 +214,11 @@ class Sales_model extends CI_Model{
                 $result = $this->db->query("
                   SELECT
                     s.sid, s.bcode, s.bname, s.file, DATE_FORMAT(s.date_sold, '%Y-%m-%d') AS date_sold,
-                    e.*, c.*, st.status_name AS status, reject.status_name AS lto_reason
+                    e.*, c.*, st.status_name AS status
                   FROM tbl_sales s
                   INNER JOIN tbl_engine e ON s.engine = e.eid
                   INNER JOIN tbl_customer c ON s.customer = c.cid
                   INNER JOIN tbl_status st ON st.status_id = s.status AND st.status_type = 'SALES'
-                  INNER JOIN tbl_status reject ON reject.status_id = s.lto_reason AND reject.status_type = 'LTO_REASON'
                   WHERE 1=1 ".$branch.$status.$name.$engine_no." AND ".$this->company."
                   ORDER BY sid DESC LIMIT 1000
                 ")->result_object();
