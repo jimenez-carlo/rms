@@ -6,8 +6,6 @@ class Dashboard extends MY_Controller {
   public function __construct() {
     parent::__construct();
     $this->load->model('Cmc_model', 'cmc');
-    $this->load->library('table');
-
     switch ($_SESSION['position']) {
       case 81:
       case 73: $this->ccn(); break; // CCN
@@ -39,9 +37,11 @@ class Dashboard extends MY_Controller {
     $this->header_data('title', 'Unprocessed');
     $this->header_data('nav', 'report');
     $this->header_data('dir', './../');
-    $this->header_data('link',
+    $this->header_data(
+      'link',
       '<link rel="stylesheet" href="../vendors/morris/morris.css">
-      <link href="../vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">');
+       <link href="../vendors/easypiechart/jquery.easy-pie-chart.css" rel="stylesheet" media="screen">'
+    );
 
     // UNPROCESSED
     $global = $this->load->database('global', TRUE);
@@ -344,21 +344,23 @@ class Dashboard extends MY_Controller {
             $rerfo_data = '{label: "No Data", value: 0 },';
     }
 
-    $this->footer_data('script',
-            '<script src="vendors/raphael-min.js"></script>
-            <script src="vendors/morris/morris.min.js"></script>
-    <script src="assets/scripts.js"></script>
-    <script>
-    $(function() {
-            // Morris Donut Chart
-            Morris.Donut({
-                element: "rerfo",
-                data: ['.$rerfo_data.'],
-                colors: ['.$rerfo_color.'],
-                formatter: function (y) { return Math.round(y*'.$rerfo_total.'/100) + " (" + y + "%)" }
-            });
-    });
-    </script>');
+    $this->footer_data(
+      'script',
+      '<script src="vendors/raphael-min.js"></script>
+       <script src="vendors/morris/morris.min.js"></script>
+       <script src="assets/scripts.js"></script>
+       <script>
+         $(function() {
+         // Morris Donut Chart
+           Morris.Donut({
+             element: "rerfo",
+             data: ['.$rerfo_data.'],
+             colors: ['.$rerfo_color.'],
+             formatter: function (y) { return Math.round(y*'.$rerfo_total.'/100) + " (" + y + "%)" }
+           });
+         });
+       </script>'
+    );
 
     $this->template('dashboard/rrt', $data);
   }
@@ -586,8 +588,6 @@ class Dashboard extends MY_Controller {
   }
 
   private function acct($data = array()) {
-    $company = ($_SESSION['company'] != 8) ? 'AND company != 8' : 'AND company = 8';
-
     $result = $this->db->query("
       SELECT
         'Cash Advance' AS '',
@@ -596,10 +596,10 @@ class Dashboard extends MY_Controller {
       FROM (
         SELECT
           FORMAT(COUNT(*),0) AS total,
-          FORMAT(IFNULL(SUM(CASE WHEN voucher = 0 THEN 1 ELSE 0 END), 0),0) AS pending,
-          FORMAT(IFNULL(SUM(CASE WHEN voucher > 0 THEN 1 ELSE 0 END), 0), 0) AS done
-        FROM tbl_sales
-        WHERE payment_method = 'CASH' {$company}
+          FORMAT(IFNULL(SUM(CASE WHEN v.voucher_no IS NULL THEN 1 ELSE 0 END), 0),0) AS pending,
+          FORMAT(IFNULL(SUM(CASE WHEN v.voucher_no IS NOT NULL THEN 1 ELSE 0 END), 0), 0) AS done
+        FROM tbl_sales s, tbl_voucher v
+        WHERE v.vid = s.voucher AND s.payment_method = 'CASH' AND s.company {$this->cc} 8
       ) AS ca
 
       UNION
@@ -611,10 +611,10 @@ class Dashboard extends MY_Controller {
       FROM (
         SELECT
           FORMAT(COUNT(*),0) AS total,
-          FORMAT(IFNULL(SUM(CASE WHEN electronic_payment = 0 THEN 1 ELSE 0 END), 0),0) AS pending,
-          FORMAT(IFNULL(SUM(CASE WHEN electronic_payment > 0 THEN 1 ELSE 0 END), 0), 0) AS done
-        FROM tbl_sales
-        WHERE payment_method = 'EPP' {$company}
+          FORMAT(IFNULL(SUM(IF(ep.doc_no IS NULL, 1, 0)), 0),0) AS pending,
+          FORMAT(IFNULL(SUM(IF(ep.doc_no IS NOT NULL, 1, 0)), 0), 0) AS done
+        FROM tbl_sales s, tbl_electronic_payment ep
+        WHERE s.electronic_payment = ep.epid AND s.payment_method = 'EPP' AND s.company {$this->cc} 8
       ) AS epat
 
       UNION
@@ -631,7 +631,7 @@ class Dashboard extends MY_Controller {
         FROM tbl_sales s
         LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
         LEFT JOIN tbl_sap_upload_batch sub ON susb.subid = sub.subid
-        WHERE s.date_sold >= '2018-08-01' AND s.status >= 4 {$company}
+        WHERE s.date_sold >= '2018-08-01' AND s.status >= 4 AND s.company {$this->cc} 8
       ) AS checking
 
       UNION
@@ -648,7 +648,7 @@ class Dashboard extends MY_Controller {
         FROM tbl_sales s
         LEFT JOIN tbl_sap_upload_sales_batch susb ON s.sid = susb.sid
         LEFT JOIN tbl_sap_upload_batch sub ON susb.subid = sub.subid
-        WHERE s.status >= 4 {$company}
+        WHERE s.status >= 4 AND s.company {$this->cc} 8
       ) AS sap
 
       UNION
@@ -667,7 +667,7 @@ class Dashboard extends MY_Controller {
         INNER JOIN tbl_return_fund_history rfh1 ON rfh1.rfid = rf.rfid
         LEFT JOIN tbl_return_fund_history rfh2 ON rfh1.rfid = rfh2.rfid AND rfh1.return_fund_history_id < rfh2.return_fund_history_id
         INNER JOIN tbl_status st ON st.status_id = rfh1.status_id AND st.status_type = 'RETURN_FUND'
-        WHERE rfh2.return_fund_history_id IS NULL AND rf.is_deleted = 0 {$company}
+        WHERE rfh2.return_fund_history_id IS NULL AND rf.is_deleted = 0 AND v.company {$this->cc} 8
       ) AS return_fund
 
       UNION
@@ -686,7 +686,7 @@ class Dashboard extends MY_Controller {
         LEFT JOIN tbl_misc_expense_history mxh2 ON mxh1.mid = mxh2.mid AND mxh1.id < mxh2.id
         INNER JOIN tbl_status st ON mxh1.status = st.status_id AND st.status_type = 'MISC_EXP'
         INNER JOIN tbl_voucher v ON m.ca_ref = v.vid
-        WHERE 1=1 {$company}
+        WHERE 1=1 AND v.company {$this->cc} 8
       ) AS misc_exp
     ");
     $this->table->set_template([

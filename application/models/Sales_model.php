@@ -207,23 +207,34 @@ class Sales_model extends CI_Model{
                 $status = (is_numeric($param->status))
                         ? ' AND s.status = '.$param->status : '';
                 $name = (!empty($param->name))
-                        ? " AND CONCAT(c.first_name, c.middle_name, c.last_name) LIKE '%".$param->name."%'" : '';
+                        ? " AND CONCAT(IFNULL(c.first_name,''), IFNULL(c.middle_name,''), IFNULL(c.last_name,'')) LIKE '%".$param->name."%'" : '';
                 $engine_no = (!empty($param->engine_no))
                         ? " AND e.engine_no LIKE '%".$param->engine_no."%'" : '';
+                $plate_number = (!empty($param->plate_number))
+                        ? " AND p.plate_number = '{$param->plate_number}'" : '';
 
                 $result = $this->db->query("
                   SELECT
-                    s.sid, s.bcode, s.bname, s.file, DATE_FORMAT(s.date_sold, '%Y-%m-%d') AS date_sold,
-                    e.*, c.*, st.status_name AS status
+                    CONCAT(s.bcode, ' ', s.bname) AS 'Branch', DATE_FORMAT(s.date_sold, '%Y-%m-%d') AS 'Date Sold',
+                    CONCAT(IFNULL(c.first_name,''), ' ', IFNULL(c.middle_name,''), ' ', IFNULL(c.last_name,'')) AS 'Customer Name',
+                    e.engine_no AS 'Engine #', p.plate_number AS 'Plate #',
+                    IF(st.status_name = 'LTO Rejected', CONCAT(st.status_name, ' due to <br>', reject.status_name), st.status_name) AS 'Status',
+                    CONCAT(
+                      '<input type=\"submit\" name=\"view[',s.sid,']\" value=\"View\" class=\"btn btn-success view\">   '
+                      '<input type=\"submit\" name=\"print_orcr\" value=\"Print ORCR\" class=\"btn btn-success',IF(s.file = 1, '', ' disabled'),'\" data-value=\"',s.sid,'\">'
+                    ) AS ''
                   FROM tbl_sales s
                   INNER JOIN tbl_engine e ON s.engine = e.eid
+                  LEFT JOIN tbl_plate p ON p.plate_id = e.plate_id
                   INNER JOIN tbl_customer c ON s.customer = c.cid
                   INNER JOIN tbl_status st ON st.status_id = s.status AND st.status_type = 'SALES'
-                  WHERE 1=1 ".$branch.$status.$name.$engine_no." AND ".$this->company."
-                  ORDER BY sid DESC LIMIT 1000
-                ")->result_object();
+                  INNER JOIN tbl_status reject ON reject.status_id = s.lto_reason AND reject.status_type = 'LTO_REASON'
+                  WHERE 1=1 ".$branch.$status.$name.$engine_no.$plate_number." AND ".$this->company."
+                  ORDER BY s.sid DESC LIMIT 1000
+                ");
 
-                return $result;
+                $this->table->set_template(["table_open" => "<table class='table'>"]);
+                return $this->table->generate($result);
         }
 
         public function load_sales_by_engine($engine_no)

@@ -129,7 +129,6 @@ class Ric_model extends CI_Model {
   }
 
   public function data_in_ric($ric_id) {
-    $this->load->library('table');
     $this->table->set_template([
       "table_open" => "<table class='table table-bordered' cellpadding='4' cellspacing='0'>"
     ]);
