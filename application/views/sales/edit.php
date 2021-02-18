@@ -22,7 +22,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <?php
                   switch ($sales->voucher === "0" && $sales->electronic_payment === "0") {
                     case true:
-                      print form_dropdown('branch', $branch, $sales->bcode);
+                      print form_dropdown('branch', $branch, $sales->bcode.','.$sales->bname);
                       break;
                     default:
                       print $sales->bcode.' '.$sales->bname;
