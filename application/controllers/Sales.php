@@ -8,6 +8,7 @@ class Sales extends MY_Controller {
                 $this->load->helper('url');
                 $this->load->helper('directory');
                 $this->load->model('Sales_model', 'sales');
+                $this->load->model('Form_model', 'form');
         }
 
         public function index()
@@ -21,6 +22,7 @@ class Sales extends MY_Controller {
                 $param->status = $this->input->post('status');
                 $param->name = $this->input->post('name');
                 $param->engine_no = $this->input->post('engine_no');
+                $param->plate_number = $this->input->post('plate_number');
                 $param->branch = $this->input->post('branch');
 
                 if (empty($param->branch) && !is_numeric($param->branch) && ($_SESSION['position'] == 72 || $_SESSION['position'] == 73 || $_SESSION['position'] == 81)) {
@@ -36,11 +38,10 @@ class Sales extends MY_Controller {
 
         public function view($sid = null)
         {
-                $dir = (empty($sid)) ? './../' : './../../';
                 $this->access(1);
                 $this->header_data('title', 'Sales');
                 $this->header_data('nav', 'sales');
-                $this->header_data('dir', $dir);
+                $this->header_data('dir', base_url());
 
                 $view = $this->input->post('view');
                 $sid = (empty($view)) ? $sid : current(array_keys($view));
@@ -52,8 +53,8 @@ class Sales extends MY_Controller {
 
         public function edit()
         {
-                $sid = 0;
 
+                $sid = 0;
                 $save = $this->input->post('save');
                 if (!empty($save)) {
                         $sid = current(array_keys($save));
@@ -65,6 +66,7 @@ class Sales extends MY_Controller {
                         {
                                 $customer = new Stdclass();
                                 $customer->first_name = $this->input->post('first_name');
+                                $customer->middle_name = $this->input->post('middle_name');
                                 $customer->last_name = $this->input->post('last_name');
                                 $customer->cust_code = $this->input->post('cust_code');
                                 $customer->cust_type = (empty($customer->first_name) || empty($customer->last_name)) ? 1 : 0;
@@ -98,6 +100,12 @@ class Sales extends MY_Controller {
                         $sales->customer = $customer->cid;
                         $sales->engine = $engine->eid;
                         $sales->sales_type = $this->input->post('sales_type');
+                        if ($date_sold = $this->input->post('date_sold')) {
+                          $sales->date_sold = $date_sold.' 00:00:00';
+                        }
+                        if ($branch = $this->input->post('branch')) {
+                          list($sales->bcode, $sales->bname) = explode(',', $branch);
+                        }
                         $sales->si_no = $this->input->post('si_no');
                         $sales->ar_no = $this->input->post('ar_no');
                         $sales->amount = $this->input->post('amount');
@@ -114,8 +122,9 @@ class Sales extends MY_Controller {
                 $this->access(1);
                 $this->header_data('title', 'Sales');
                 $this->header_data('nav', 'sales');
-                $this->header_data('dir', './../');
+                $this->header_data('dir', base_url());
 
+                $data['branch'] = $this->form->branch_input_drop_down();
                 $data['sales'] = $this->sales->load_sales($sid);
                 $this->template('sales/edit', $data);
         }

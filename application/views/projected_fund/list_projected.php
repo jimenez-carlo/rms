@@ -8,52 +8,25 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <div class="navbar navbar-inner block-header">
         <div class="pull-left">Projected Funds</div>
       </div>
-      <div class="block-content collapse in">
-        <table class="table">
-          <thead>
-            <tr>
-              <th><p>Region</p></th>
-              <th><p>Company</p></th>
-              <th style="text-align:right;padding-right:10px;"><p>Cash in Bank</p></th>
-              <th style="text-align:right;padding-right:10px;"><p>Cash on Hand</p></th>
-              <th style="text-align:center" colspan="2"><p>Total Projected Cost</p></th>
-              <?php if ($position == 3) print '<th><p></p></th>'; ?>
-            </tr>
-            <tr>
-              <th colspan="4"></th>
-              <th style="text-align:right;padding-right:10px;"><p>For CA</p></th>
-              <th style="text-align:right;padding-right:10px;"><p>For Deposit</p></th>
-              <?php if ($position == 3) print '<th><p></p></th>'; ?>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            foreach ($table as $row)
-            {
-              $company_ca_amount = json_decode($row->company_ca_amount);
-              foreach ($company_ca_amount as $ca) {
-                print '<tr>';
-                print (in_array($ca->cid, ['1', '8'])) ? '<td>'.$row->region.'</td>' : '<td></td>';
-                print '<td>'.$ca->company.'</td>';
-                print (in_array($ca->cid, ['1', '8'])) ? '<td style="text-align:right;padding-right:10px;">'.$row->fund.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
-                print (in_array($ca->cid, ['1', '8'])) ? '<td style="text-align:right;padding-right:10px;">'.$row->cash_on_hand.'</td>' : '<td style="text-align:right;padding-right:10px;">-</td>';
-                print '<td style="text-align:right;padding-right:10px;">'.number_format($ca->for_ca,2,'.',',').'</td>';
-                print '<td style="text-align:right;padding-right:10px;">'.number_format($ca->for_deposit,2,'.',',').'</td>';
-                if ($position === "3") {
-                  $disabled = ($ca->for_ca > 0) ? '' : 'disabled';
-                  print '<td style="text-align:center"><button class="btn btn-success '.$disabled.'" onclick="create_voucher('.$row->fid.', '.$ca->cid.')" '.$disabled.'>Create CA</button></td>';
-                }
-                print '</tr>';
-              }
-            }
+      <div class="row">
+        <div class="offset4 span4 offset4">
 
-            if (empty($table))
-            {
-              print '<tr><td colspan=20>No result.</td></tr>';
-            }
-            ?>
-          </tbody>
-        </table>
+          <?php echo form_open("projected_fund/ca_template", ["target"=>"_blank", "class"=>"form-inline"]); ?>
+            <fieldset>
+              <legend style="font-size:14px; margin-bottom:0;">Download CA Template</legend>
+              <div class="control-group" style="margin-top:10px;">
+                <?php echo form_label("CA Date", "ca_date", ["class"=>"control-label"]); ?>
+                <div class="controls">
+                  <?php echo form_input(["id"=>"ca-date", "class"=>"datepicker text-center", "name"=>"date", "value"=>date('Y-m-d') ]); ?>
+                  <?php echo form_button([ "class"=> "btn btn-warning", "type"=>"submit", "content" => "Download" ]); ?>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+      <div class="block-content collapse in">
+        <?php echo $table; ?>
       </div>
     </div>
   </div>
@@ -67,17 +40,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h3 class="modal-title">Create CA</h3>
       </div>
+      <div id="alert-status" class="alert">
+        <button class="close" data-dismiss="alert">&times;</button>
+        <div class="error"></div>
+      </div>
       <div class="modal-body form">
-        <div class="alert alert-error hide">
-          <button class="close" data-dismiss="alert">&times;</button>
-          <div class="error"></div>
-        </div>
         <div class="form-body">
           <!-- see create_voucher.php -->
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" id="btnSave" onclick="save_voucher()" class="btn btn-success">Save CA</button>
         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
       </div>
     </div><!-- /.modal-content -->

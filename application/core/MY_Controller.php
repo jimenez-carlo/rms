@@ -7,7 +7,7 @@ class MY_Controller extends CI_Controller {
     parent::__construct();
     $this->load->helper(array('form', 'url'));
     $this->load->library('form_validation');
-
+    $this->cc = ($_SESSION['company'] === "8") ? "=" : "<>"; // Company Comparison
     $dont_restrict_cron = !in_array(current_url(), array(
       base_url('cron/rms_create'),
       base_url('cron/rms_expense'),
@@ -18,7 +18,6 @@ class MY_Controller extends CI_Controller {
     if (!isset($_SESSION['uid']) AND $dont_restrict_cron) {
       redirect('login');
     }
-
   }
 
   public $region = array(

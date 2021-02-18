@@ -35,7 +35,7 @@ class Lto_pending_model extends CI_Model{
           t.region = ".$region." AND registration_type != 'Self Registration'
           AND status < 2 AND voucher = 0 AND electronic_payment = 0
       GROUP BY ltid, c.cid
-      ORDER BY t.date DESC
+      ORDER BY t.date DESC, c.cid ASC
     ")->result_object();
 
     return $result;

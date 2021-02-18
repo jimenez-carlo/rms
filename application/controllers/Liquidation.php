@@ -64,7 +64,7 @@ class Liquidation extends MY_Controller {
 
     if(!empty($search))
     {
-            $data['table'] = $this->liquidation->load($_SESSION['region_id'], $date_transferred);
+      $data['table'] = $this->liquidation->load($_SESSION['region_id'], $date_transferred);
     }
     $data['company'][1] = 'MNC';
     $data['company'][3] = 'HPTI';
@@ -79,7 +79,6 @@ class Liquidation extends MY_Controller {
     $this->header_data('title', 'Liquidated Topsheets');
     $this->header_data('nav', 'liquidation');
     $this->header_data('dir', './../');
-    $this->footer_data('script', '');
     $this->header_data(
       'link',
       '<link href="./../assets/DT_bootstrap.css" rel="stylesheet" media="screen">'
