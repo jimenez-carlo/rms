@@ -75,6 +75,7 @@ class Sales extends MY_Controller {
                         }
                         else {
                                 $customer->first_name = $this->input->post('first_name');
+                                $customer->middle_name = $this->input->post('middle_name');
                                 $customer->last_name = $this->input->post('last_name');
                                 $this->db->update('tbl_customer', $customer, array('cid' => $customer->cid));
                         }
