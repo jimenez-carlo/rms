@@ -94,14 +94,16 @@ SQL;
   public function print_projected($vid)
   {
      $ca = $this->db->query("
-       SELECT v.reference, r.region,
-              c.company_code AS company
-       FROM tbl_voucher v, tbl_fund f,
-            tbl_region r, tbl_company c
-       WHERE f.fid = v.fund AND r.rid
-       AND c.cid = v.company AND f.region
-       AND v.vid = {$vid}
+       SELECT
+         v.reference, r.region,
+         c.company_code AS company
+       FROM tbl_voucher v
+       INNER JOIN tbl_fund f ON f.fid = v.fund
+       INNER JOIN tbl_region r ON r.rid = f.region
+       INNER JOIN tbl_company c ON c.cid = v.company
+       WHERE v.vid = {$vid}
      ")->row();
+
      $ca->sales = $this->db->query("
        SELECT s.bcode, s.bname, count(*) as units
        FROM tbl_sales s
