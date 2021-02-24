@@ -277,27 +277,20 @@ SQL;
       AND s.registration_type NOT IN ('Self Registration', 'Free Registration')
     ")->row_array();
 
-    $ack_receipts = $dev_ces2->query("
-      SELECT
-        a.cust_cd, a.ar_no, a.amount, e.engine_num
-      FROM
-        ar_amount_tbl a, ar_engine_tbl e
-      WHERE
-        a.cust_cd = e.cust_id AND a.ar_no = e.ar_num
-        AND a.cust_cd IN ({$customers['code']})
+    $ack_receipts = $this->dev_ces2->query("
+      SELECT a.cust_cd, a.ar_no, a.amount, e.engine_num
+      FROM ar_amount_tbl a, ar_engine_tbl e
+      WHERE a.cust_cd = e.cust_id AND a.ar_no = e.ar_num
+      AND a.cust_cd IN ({$customers['code']})
     ")->result_array();
 
     foreach ($ack_receipts as $ar)
     {
       $this->db->query("
-        UPDATE
-          tbl_sales s, tbl_engine e, tbl_customer c
-        SET
-          s.ar_no = '{$ar['ar_no']}',
-          s.amount = '{$ar['amount']}'
-        WHERE
-          e.eid = s.engine AND c.cid = s.customer AND
-          e.engine_no = '{$ar['engine_num']}' AND c.cust_code = '{$ar['cust_cd']}'
+        UPDATE tbl_sales s, tbl_engine e, tbl_customer c
+        SET s.ar_no = '{$ar['ar_no']}', s.amount = '{$ar['amount']}'
+        WHERE e.eid = s.engine AND c.cid = s.customer
+        AND e.engine_no = '{$ar['engine_num']}' AND c.cust_code = '{$ar['cust_cd']}'
       ");
     }
     $end = date("Y-m-d H:i:s");
