@@ -17,11 +17,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>profile">Profile</a>
+                                        <a tabindex="-1" href="<?php echo base_url('profile'); ?>">Profile</a>
                                     </li>
                                     <li class="divider"></li>
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>logout">Logout</a>
+                                        <a tabindex="-1" href="<?php echo base_url('logout'); ?>">Logout</a>
                                     </li>
                                 </ul>
                             </li>
@@ -31,8 +31,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Fund Transfer <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund_transfer">For Process</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>fund_transfer/for_deposit">For Deposit</a>
+                                        <a tabindex="-1" href="<?php echo base_url('fund_transfer'); ?>">For Process</a>
+                                        <a tabindex="-1" href="<?php echo base_url('fund_transfer/for_deposit'); ?>">For Deposit</a>
                                     </li>
                                     <li class="divider"></li>
                                     <li>
@@ -41,14 +41,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 </ul>
                             </li>
 
-                            <li class="dropdown <?php if(isset($nav) && $nav=="lto_payment") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">LTO Payment <i class="caret"></i></a>
+                            <li class="dropdown <?php if(isset($nav) && $nav=="e_payment") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">E-Payment <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>lto_payment">Overview</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>lto_payment/processing">For Process</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>lto_payment/for_deposit">For Deposit</a>
-                                    </li>
+                                    <li><a tabindex="-1" href="<?php echo base_url('electronic_payment'); ?>">Overview</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url('electronic_payment/processing'); ?>">For Process</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url('electronic_payment/for_deposit'); ?>">For Deposit</a></li>
                                 </ul>
                             </li>
 
@@ -64,6 +62,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     </li>
                                 </ul>
                             </li>
+                            <li class="<?php echo (isset($nav) && $nav === 'ric') ? 'active' : ''; ?>"><a href="<?php echo base_url('ric/monitoring'); ?>">RIC</a></li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

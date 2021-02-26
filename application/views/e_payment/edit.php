@@ -56,7 +56,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <!-- <div class="control-group">
               <div class="control-label">Screenshot</div>
               <div class="controls">
-                <a href="<?php print '/rms_dir/lto_screenshot/'.$payment->lpid.'/'.$payment->screenshot; ?>" target="_blank"><?php print set_value('screenshot', $payment->screenshot); ?></a><br>
+                <a href="<?php print '/rms_dir/lto_screenshot/'.$payment->epid.'/'.$payment->screenshot; ?>" target="_blank"><?php print set_value('screenshot', $payment->screenshot); ?></a><br>
                 <input type="file" name="screenshot" class="input-file uniform_on">
                 <br><b>Required file format: PDF</b>
                 <br><b>File must not exceed 1MB</b>
@@ -104,7 +104,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 <script type="text/javascript">
   var count = 0;
-  var LPID = <?php echo $lpid; ?>;
+  var epid = <?php echo $epid; ?>;
   $(function(){
     $('a.add_more').click(function(){
       var tfoot = $(this).closest('tfoot');
@@ -134,7 +134,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             success: function(result) {
               var sales = JSON.parse(result);
               sales.forEach(function(sale) {
-                if (sale.lto_payment == LPID) {
+                if (sale.electronic_payment == epid) {
                   console.log('Engine# '+sales[0].engine_no+' is already exist.');
                 } else if(sale.status_name != engine_status) {
                   console.log('Engine# '+sales[0].engine_no+' status is not '+engine_status+'.');

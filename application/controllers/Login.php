@@ -8,26 +8,26 @@ class Login extends CI_Controller {
      $this->load->helper('url');
   }
 
-	public function index() {
-		// prevent login when logged in
-		if ($this->session->has_userdata('username')) redirect('home');
+        public function index() {
+                // prevent login when logged in
+                if ($this->session->has_userdata('username')) redirect('home');
 
-		if (isset($_POST['login'])) {
-			$username = $this->input->post('username');
-			$password = $this->input->post('password');
+                if (isset($_POST['login'])) {
+                        $username = $this->input->post('username');
+                        $password = $this->input->post('password');
 
-			// validate 1
-			if (empty($username)) {
-				$data['error'] = "Please enter your username.";
-			} else if (empty($password)) {
-				$data['error'] = "Please enter your password.";
-			} else {
-				$this->load->model('Login_model','login');
+                        // validate 1
+                        if (empty($username)) {
+                                $data['error'] = "Please enter your username.";
+                        } else if (empty($password)) {
+                                $data['error'] = "Please enter your password.";
+                        } else {
+                                $this->load->model('Login_model','login');
 
-				// special usernames
-				$user_info = $this->custom_login($username, $password);
+                                // special usernames
+                                $user_info = $this->custom_login($username, $password);
 
-				// global login
+                                // global login
                                 if (empty($user_info)) {
                                   $raw['user_info'] = $this->login->get_user_info($username);
                                   $raw['sys_access'] = $this->login->get_system_access(33);
@@ -77,101 +77,101 @@ class Login extends CI_Controller {
                                   }
                                 }
 
-				// still? invalid or empty login credential
-				if (empty($user_info)) {
-					if (!isset($data['error'])) $data['error'] = "Your account does not have access to this system.";
-				} else {
+                                // still? invalid or empty login credential
+                                if (empty($user_info)) {
+                                        if (!isset($data['error'])) $data['error'] = "Your account does not have access to this system.";
+                                } else {
 
-					// set variables based on position
-					switch ($user_info['position']) {
-						case 156:
-						case 109:
-						case 108: // if rrt, set region
+                                        // set variables based on position
+                                        switch ($user_info['position']) {
+                                                case 156:
+                                                case 109:
+                                                case 108: // if rrt, set region
                                                         $region_and_fund =  $this->login->get_region_and_fund($user_info['uid']);
 
                                                         $user_info['fund_id'] = $region_and_fund['fund_id'];
                                                         $user_info['region_id'] = $region_and_fund['region_id'];
                                                         $user_info['region'] = $region_and_fund['region'];
 
-							$this->load->model('Cmc_model', 'cmc');
-							$user_info['branches'] = $this->cmc->get_region_branches($user_info['region_id']);
-							break;
-						case 72:
-						case 73:
-						case 81: // if ccn, set branch
-							break;
-						case 3:
-						case 34:
-						case 53:
-						case 98: // if acct-trsry, set tasks
-							switch ($user_info['username'])
-							{
-								case 'ACCTG-PAYCL-001':
-									$user_info['task'] = 'For ORCR Checking';
-									$user_info['task_regions'] = '(1)';
-									break;
-								case 'ACCTG-PAYCL-002':
-									$user_info['task'] = 'For ORCR Checking';
-									$user_info['task_regions'] = '(2,3,4,5,6)';
-									break;
-								case 'ACCTG-PAYCL-003':
-									$user_info['task'] = 'For ORCR Checking';
-									$user_info['task_regions'] = '(7,8,9,10)';
-									break;
-								case 'ACCTG-PAYCL-004':
-									$user_info['task'] = 'For SAP Uploading';
-									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
-									break;
-								case 'ACCTG-PAYCL-005':
-									$user_info['task'] = 'For Voucher';
-									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
-									break;
-								case 'ACCTG-PAYCL-013':
-									break;
-								case 'ACCTG-AMGR':
-									$user_info['task'] = 'For Manager Approval';
-									$user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
-									break;
-								case 'TRSRY-ASST-001':
-									$user_info['task'] = 'For Check Issuance';
-									break;
-								case 'TRSRY-ASST-002':
-									$user_info['task'] = 'For Check Deposit';
-									break;
-								case 'CMC-CCO':
-									$user_info['task'] = 'For Management Approval';
+                                                        $this->load->model('Cmc_model', 'cmc');
+                                                        $user_info['branches'] = $this->cmc->get_region_branches($user_info['region_id']);
+                                                        break;
+                                                case 72:
+                                                case 73:
+                                                case 81: // if ccn, set branch
+                                                        break;
+                                                case 3:
+                                                case 34:
+                                                case 53:
+                                                case 98: // if acct-trsry, set tasks
+                                                        switch ($user_info['username'])
+                                                        {
+                                                                case 'ACCTG-PAYCL-001':
+                                                                        $user_info['task'] = 'For ORCR Checking';
+                                                                        $user_info['task_regions'] = '(1)';
+                                                                        break;
+                                                                case 'ACCTG-PAYCL-002':
+                                                                        $user_info['task'] = 'For ORCR Checking';
+                                                                        $user_info['task_regions'] = '(2,3,4,5,6)';
+                                                                        break;
+                                                                case 'ACCTG-PAYCL-003':
+                                                                        $user_info['task'] = 'For ORCR Checking';
+                                                                        $user_info['task_regions'] = '(7,8,9,10)';
+                                                                        break;
+                                                                case 'ACCTG-PAYCL-004':
+                                                                        $user_info['task'] = 'For SAP Uploading';
+                                                                        $user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
+                                                                        break;
+                                                                case 'ACCTG-PAYCL-005':
+                                                                        $user_info['task'] = 'For Voucher';
+                                                                        $user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
+                                                                        break;
+                                                                case 'ACCTG-PAYCL-013':
+                                                                        break;
+                                                                case 'ACCTG-AMGR':
+                                                                        $user_info['task'] = 'For Manager Approval';
+                                                                        $user_info['task_regions'] = '(1,2,3,4,5,6,7,8,9,10)';
+                                                                        break;
+                                                                case 'TRSRY-ASST-001':
+                                                                        $user_info['task'] = 'For Check Issuance';
+                                                                        break;
+                                                                case 'TRSRY-ASST-002':
+                                                                        $user_info['task'] = 'For Check Deposit';
+                                                                        break;
+                                                                case 'CMC-CCO':
+                                                                        $user_info['task'] = 'For Management Approval';
 
                                                                 //FOR MDI USERS
                                                                 case 'ACCTG-PAYCL-030':
-									break;
-								case 'ACCTG-PAYCL-031':
-									$user_info['task'] = 'For ORCR Checking';
-									$user_info['task_regions'] = '(2,3,4,5,6)';
-									break;
-								case 'TRSRY-ASST-010':
-									$user_info['task'] = 'For Check Issuance';
                                                                         break;
-							}
-							break;
-					}
+                                                                case 'ACCTG-PAYCL-031':
+                                                                        $user_info['task'] = 'For ORCR Checking';
+                                                                        $user_info['task_regions'] = '(2,3,4,5,6)';
+                                                                        break;
+                                                                case 'TRSRY-ASST-010':
+                                                                        $user_info['task'] = 'For Check Issuance';
+                                                                        break;
+                                                        }
+                                                        break;
+                                        }
 
-					// session set
-					$this->session->set_userdata($user_info);
-					$this->login->saveLog("User [" . $_SESSION['uid'] . "] " . $_SESSION['username'] . " logged in.");
+                                        // session set
+                                        $this->session->set_userdata($user_info);
+                                        $this->login->saveLog("User [" . $_SESSION['uid'] . "] " . $_SESSION['username'] . " logged in.");
 
-					redirect('home');
-				}
-			}
-		} // clean end
+                                        redirect('home');
+                                }
+                        }
+                } // clean end
 
-		// login form
-		$data['title'] = "Login | Registration Monitoring System";
-		$this->load->view('login_view', $data);
-	}
+                // login form
+                $data['title'] = "Login | Registration Monitoring System";
+                $this->load->view('login_view', $data);
+        }
 
-	private function custom_login($username, $password)
-	{
-		if ($username == 'BMI' && $password === 'Bmi00001') {
+        private function custom_login($username, $password)
+        {
+                if ($username == 'BMI' && $password === 'Bmi00001') {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
 
@@ -191,9 +191,9 @@ class Login extends CI_Controller {
                     'sys_access'  => array(),
                     'page_access' => array(),
                   );
-		}
+                }
 
-		if ($username == 'marketing' && $password == 'marketing') {
+                if ($username == 'marketing' && $password == 'marketing') {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
 
@@ -213,13 +213,13 @@ class Login extends CI_Controller {
                     'sys_access'  => array(),
                     'page_access' => array(),
                   );
-		}
+                }
 
                 if ($username == 'siteadmin' && $password == 'siteadmin') {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
                   return array(
-                    'ulid'	  => $log->ulid,
+                    'ulid'        => $log->ulid,
                     'uid'         => 0,
                     'username'    => $username,
                     'lastname'    => 'De Vera',
@@ -229,6 +229,7 @@ class Login extends CI_Controller {
                     'branch_code' => '9000',
                     'position'    => '-2',
                     'department'  => '0',
+                    'dept_name'   => 'CSOD',
                     'sys_access'  => array(),
                     'page_access' => array(),
                     'company'     => '5'
@@ -239,7 +240,7 @@ class Login extends CI_Controller {
                   // for marketing, orcr extract
                   $log = $this->login->add_user_custom_log($username);
                   return array(
-                    'ulid'	  => $log->ulid,
+                    'ulid'        => $log->ulid,
                     'uid'         => 0,
                     'username'    => $username,
                     'lastname'    => 'Husain',
@@ -255,6 +256,6 @@ class Login extends CI_Controller {
                   );
                 }
 
-		return null;
-	}
+                return null;
+        }
 }

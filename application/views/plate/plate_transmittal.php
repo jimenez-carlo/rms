@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
 <div class="container-fluid">
-	<div class="row-fluid">
+        <div class="row-fluid">
     <div class="block">
       <div class="navbar navbar-inner block-header">
         <div class="pull-left">Plate Transmittal</div>
@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             <fieldset>
             <div class="control-group span5">
-              <div class="control-label">Registration Date</div>
+              <div class="control-label">Transmittal Date</div>
               <div class="controls">
                 <span style="display:inline-block;width:50px">From:</span>
                 <?php print form_input('date_from', set_value('date_from', date('Y-m-d', strtotime('-3 days'))), array('class' => 'datepicker')); ?>
@@ -74,7 +74,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <?php
               foreach ($table as $row)
               {
-                // $branch = $row->branchname;
                 print '<tr>';
                 if ($_SESSION['position']=='108' || $_SESSION['position']=='109' || $_SESSION['position']=='156'){
                 print '<td>'.$row->plate_trans_no.'</td>';
@@ -86,9 +85,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$row->receivedcust.'</td>';
                 print '<td hidden>'.form_input('vstatus', set_value('status')).'</td>';
                 print '<td hidden>'.form_input('vdate['.$row->plate_id.']', $row->date_encoded).'</td>';
-                print '<td>'.form_submit('view_tr['.$row->plate_id.']', 'View', array('class' => 'btn btn-success')).''.form_submit('view_te['.$row->plate_id.']', 'Print', array('class' => 'btn btn-success')).'</td>';
+                print '<td>'.form_submit('view_tr['.$row->plate_id.']', 'View', array('class' => 'btn btn-success')).''.form_submit('view_te['.$row->plate_trans_no.']', 'Print', array('class' => 'btn btn-success')).'</td>';
                 }
-                else if ($_SESSION['branch_id'] == $row->bid){
+                else if ($_SESSION['branch_code'] == $row->bcode){
                    print '<td>P-'.$row->bcode.'-'.date("ymd", strtotime($row->date_encoded)).'</td>';
                 print '<td hidden></td>';
                 print '<td>'.$row->branchname.'</td>';
@@ -99,7 +98,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 print '<td>'.$row->receivedcust.'</td>';
                  print '<td hidden>'.form_input('vstatus', set_value('status')).'</td>';
                 print '<td hidden>'.form_input('vdate['.$row->plate_id.']', $row->date_encoded).'</td>';
-                print '<td>'.form_submit('view_tr['.$row->plate_id.']', 'View', array('class' => 'btn btn-success')).''.form_submit('view_te['.$row->plate_id.']', 'Print', array('class' => 'btn btn-success')).'</td>';
+                print '<td>'.form_submit('view_tr['.$row->plate_id.']', 'View', array('class' => 'btn btn-success')).''.form_submit('view_te['.$row->plate_trans_no.']', 'Print', array('class' => 'btn btn-success')).'</td>';
               }
                 print '</tr>';
               }
@@ -121,8 +120,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </tbody>
           </table>
         </form>
-			</div>
-		</div>
+      </div>
+    </div>
   </div>
 </div>
 <script type="text/javascript">

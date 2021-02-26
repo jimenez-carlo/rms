@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <div class="block-content collapse in">
             <form id="form_plate" class="form-horizontal" method="post" action="view">
                         <div style="float:left">
-            <a href="branch_list" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-log-out">Back</span></a>
+                        <a href="<?php echo base_url('plate/transmittal'); ?>" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-log-out">Back</span></a>
 
                    <?php  if ($_SESSION['position']=='108'){ ?>
 
@@ -27,10 +27,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
             <thead>
               <?php  if ($_SESSION['position']=='108'){ ?>
-                        <th width = "1%"></th>
-                    <?php } ?>
-                <th hidden><p>pid</p></th>
-                <th><p>Plate Transaction #</p></th>
+              <th width = "1%"></th>
+              <?php } ?>
+              <th hidden><p>pid</p></th>
+              <th><p>Plate Transaction #</p></th>
               <th><p>Branch</p></th>
               <th><p>Customer Name</p></th>
               <th><p>Engine #</p></th>
@@ -61,7 +61,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                      }
                   }
                 print '<td class="td_bname" hidden>'.$plate->plate_id.'</td>';
-                 print '<td>'.$plate->plate_trans_no.'</td>';
+                print '<td>'.$plate->plate_trans_no.'</td>';
                 print '<td>'.$plate->branchname.'</td>';
                 print '<td>'.$plate->name.'</td>';
                 print '<td>'.$plate->engine_no.'</td>';
@@ -74,56 +74,52 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <form id="form_plate" class="form-horizontal" method="post" action="view">
           <?php print form_hidden('plate_id', 0); ?>
                <?php
-                                                if ($_SESSION['position']=='108'){
-                           if ($plate->status=="For Validation" &&  $plate->date_encoded >= date('yy-m-d', strtotime('-3 day'))){
-                             print '<td>'.$plate->received_cust.'</td>';
-                            /*  print '<td>
-                                       <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal">Edit</a>
-                                       <a name="sid" class="btn btn-success" onclick="approvePlateno('.$plate->plate_id.')">Approve</a>
-                                    </td>'; */
-                                    print '<td>
-                                       <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal'.$plate->plate_id.'">Edit</a>
-                                       <input type="hidden" name="plate_id" value="'.$plate->plate_id.'">
-                                        <input type="submit" class="btn btn-success" value="Approve" name="submit['.$plate->plate_id.']">
-                                    </td>';
-                           }
-                           else if($plate->status=="For Validation"){
-                            print '<td>'.$plate->received_cust.'</td>';
-                             print '<td>
-                                       <a class="btn btn-success" disabled>Edit</a>
-                                       <input type="hidden" name="plate_id" value="'.$plate->plate_id.'">
-                                        <input type="submit" class="btn btn-success" value="Approve" name="submit['.$plate->plate_id.']">
-                                    </td>';
-                           }
-                           else{
-                             print '<td>'.$plate->received_cust.'</td>';
-                              print '<td>
-                                       <a class="btn btn-success" disabled>Edit</a>
-                                       <a class="btn btn-success" disabled>Approve</a>
-                                    </td>';
-                           }
-                        }
-              else if($_SESSION['position']=='109' || $_SESSION['position']=='156'){
-                      if ($plate->status=="For Validation"  &&  $plate->date_encoded >= date('yy-m-d', strtotime('-3 day'))){
-                             print '<td>'.$plate->received_cust.'</td>';
-                              print '<td>
-                                       <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal'.$plate->plate_id.'">Edit</a>
-                                    </td>';
-                           }
-                      else if ($plate->status=="For Validation"){
-                           print '<td>'.$plate->received_cust.'</td>';
-                             print '<td>
-                                       <a class="btn btn-success" disabled>Edit</a>
-                                       <input type="hidden" name="plate_id" value="'.$plate->plate_id.'">
-                                    </td>';
-                      }
-                           else{
-                             print '<td>'.$plate->received_cust.'</td>';
-                              print '<td>
-                                       <a class="btn btn-success" disabled>Edit</a>
-                                    </td>';
-                           }
-              }
+                if ($_SESSION['position']=='108'){
+                  if ($plate->status=="For Validation" &&  $plate->date_encoded >= date('Y-m-d', strtotime('-3 day'))){
+                    print '<td>'.$plate->received_cust.'</td>';
+                    print '<td>
+                      <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal'.$plate->plate_id.'">Edit</a>
+                      <input type="hidden" name="plate_id" value="'.$plate->plate_id.'">
+                      <input type="submit" class="btn btn-success" value="Approve" name="submit['.$plate->plate_id.']">
+                      </td>';
+                  }
+                  else if($plate->status=="For Validation"){
+                    print '<td>'.$plate->received_cust.'</td>';
+                    print '<td>
+                      <a class="btn btn-success" disabled>Edit</a>
+                      <input type="hidden" name="plate_id" value="'.$plate->plate_id.'">
+                      <input type="submit" class="btn btn-success" value="Approve" name="submit['.$plate->plate_id.']">
+                      </td>';
+                  }
+                  else{
+                    print '<td>'.$plate->received_cust.'</td>';
+                    print '<td>
+                      <a class="btn btn-success" disabled>Edit</a>
+                      <a class="btn btn-success" disabled>Approve</a>
+                      </td>';
+                  }
+                }
+                else if($_SESSION['position']=='109' || $_SESSION['position']=='156'){
+                  if ($plate->status=="For Validation"  &&  $plate->date_encoded >= date('Y-m-d', strtotime('-3 day'))){
+                    print '<td>'.$plate->received_cust.'</td>';
+                    print '<td>
+                      <a id="pid" class="btn btn-success" data-toggle="modal" data-target="#myModal'.$plate->plate_id.'">Edit</a>
+                      </td>';
+                  }
+                  else if ($plate->status=="For Validation"){
+                    print '<td>'.$plate->received_cust.'</td>';
+                    print '<td>
+                      <a class="btn btn-success" disabled>Edit</a>
+                      <input type="hidden" name="plate_id" value="'.$plate->plate_id.'">
+                      </td>';
+                  }
+                  else{
+                    print '<td>'.$plate->received_cust.'</td>';
+                    print '<td>
+                      <a class="btn btn-success" disabled>Edit</a>
+                      </td>';
+                  }
+                }
               else{
                 if ($_SESSION['branch_code']==$plate->bcode){
                   if ($plate->status_id==2){
@@ -175,7 +171,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <input type="submit" class="btn btn-success" value="Save Changes" name="edit[<?= $plate->plate_id ?>]"></td>
+            <input type="submit" class="btn btn-success" value="Save Change" name="edit[<?= $plate->plate_id ?>]"></td>
          </div>
       </div>
    </div>

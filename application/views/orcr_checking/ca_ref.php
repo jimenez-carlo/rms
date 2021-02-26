@@ -7,7 +7,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       print form_hidden('CA', $batch_ref['vid']);
     }
     if (isset($EPP)) {
-      print form_hidden('EPP', $batch_ref['lpid']);
+      print form_hidden('EPP', $batch_ref['epid']);
     }
     print form_hidden('summary', 1);
   ?>
@@ -40,6 +40,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p>Reference #</p></th>
         <th><p class="text-right">Amount Given</p></th>
         <th><p class="text-right">LTO Registration</p></th>
+        <th><p class="text-right">Penalty</p></th>
         <th><p class="text-right">Total Expense</p></th>
         <th><p class="text-right">Balance</p></th>
         <th><p>Status</p></th>
@@ -53,7 +54,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
       foreach (json_decode($batch_ref['sales']) as $sales)
       {
-        //$sales->amount = ($sales->registration_type == 'Free Registration' || stripos($sales->registration_type, 'subsidy') !== false) ? 1500 : $sales->amount;
         $clickable = ($sales->selectable) ? 'onclick="attachment('.$sales->sid.', 1)"' : '';
         if ($sales->disapprove === null) {
           $disapprove = '<td class="text-success">Ok</td>';
@@ -77,6 +77,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         print '<td>'.$sales->ar_no.'</td>';
         print '<td><p class="text-right sales-amt">'.number_format($sales->amount, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
+        $text = ($sales->is_penalty_for_ric == '1') ? 'text-error' : '';
+        print '<td><p class="text-right '.$text.'">'.number_format($sales->penalty, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right sales-exp">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->amount - $sales->registration, 2, ".", ",").'</p></td>';
         print '<td>'.$sales->status.'</td>';
@@ -92,7 +94,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       // Miscellaneous
       print '<tr style="border-top: double">';
       print '<th colspan="2"><p>#</p></th>';
-      print '<th colspan="2"><p>OR #</p></th>';
+      print '<th colspan="3"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
       print '<th colspan="2"><p class="text-right">Expense</p></th>';
@@ -107,7 +109,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             $text_color = (in_array($misc->status, array('Approved', 'Resolved', 'For Liquidation', 'Liquidated'))) ? 'text-success' : 'text-error';
             print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
             print '<td colspan="2">'.$exp_count.'</td>';
-            print '<td colspan="2">';
+            print '<td colspan="3">';
             print '<input type="hidden" name="mid[]" value="'.$misc->mid.'" disabled>';
             print $misc->or_no;
             print '</td>';
@@ -125,7 +127,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       } else {
         print '<tr>';
         print '<td colspan="3"><p style="color:red"><b>No included miscellaneous expense.</b></p></td>';
-        print '<td colspan="2"></td>';
+        print '<td colspan="3"></td>';
         print '<td colspan="4"></td>';
         print '<td colspan="4"></td>';
         print '</tr>';
@@ -135,27 +137,27 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     </tbody>
     <tfoot style="border-top: dotted gray; font-size: 16px">
       <tr>
-        <th colspan="11"></th>
+        <th colspan="12"></th>
         <th><p></p></th>
         <th><p>Total Amount</p></th>
       </tr>
       <tr>
-        <th colspan="11"></th>
+        <th colspan="12"></th>
         <th><p class="text-right">Batch</p></th>
         <th><p class="text-right tot-amt">&#x20b1 <?php print number_format($batch_ref['amount'], 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="11"></th>
+        <th colspan="12"></th>
         <th><p class="text-right">Liquidated</p></th>
         <th><p class="text-right tot-amt">&#x20b1 <?php print number_format($batch_ref['liquidated'], 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="11"></th>
+        <th colspan="12"></th>
         <th><p class="text-right">Checked</p></th>
         <th><p class="text-right tot-amt">&#x20b1 <?php print number_format($batch_ref['checked'], 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="11">
+        <th colspan="12">
           <p class="form-msg msg1" style="color:red">Balance for upload must not be negative.</p>
           <p class="form-msg msg3" style="color:red">Remaining amount will not be able to accomodate remaining expenses.</p>
           <p class="form-msg msg4">Please make sure all information are correct before proceeding.</p>
@@ -164,7 +166,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p id="balance" class="text-right tot-bal">&#x20b1 <?php print number_format($batch_ref['balance'], 2, ".", ","); ?></p></th>
       </tr>
       <tr>
-        <th colspan="11">
+        <th colspan="12">
           <input type="submit" name="submit" value="Preview Summary" class="btn btn-success">
         </th>
         <th><p class="text-right">Expense</p></th>

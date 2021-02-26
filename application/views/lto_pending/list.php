@@ -9,47 +9,45 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           <div class="pull-left">LTO Pending</div>
       </div>
       <div class="block-content collapse in">
-        <form method="post" class="form-horizontal" style="margin:0">
-          <table class="table" style="margin:0">
-            <thead>
-              <tr>
-                <th><p>Transmittal #</p></th>
-                <th><p>Transmittal Date</p></th>
-                <th><p>Company</p></th>
-                <th><p># of Units</p></th>
-                <th><p></p></th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              foreach ($table as $row)
-              {
-                print "<tr>";
-                print "<td>".$row->code."</td>";
-                print "<td>".$row->date."</td>";
-                print "<td>".$row->company."</td>";
-                print "<td>".$row->sales."</td>";
-                print "<td>".form_submit('view['.$row->ltid.']', 'Update', array('class' => 'btn btn-success'))."</td>";
-                print "</tr>";
-              }
+        <table class="table" style="margin:0">
+          <thead>
+            <tr>
+              <th><p>Transmittal #</p></th>
+              <th><p>Transmittal Date</p></th>
+              <th><p>Company</p></th>
+              <th><p># of Units</p></th>
+              <th><p></p></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            foreach ($table as $row)
+            {
+              print "<tr>";
+              print "<td>".$row->code."</td>";
+              print "<td>".$row->date."</td>";
+              print "<td>".$row->company."</td>";
+              print "<td>".$row->sales."</td>";
+              print "<td><a class='btn btn-success' href='".base_url('lto_pending/view/'.$row->ltid)."'>Update</a></td>";
+              print "</tr>";
+            }
 
-              if (empty($table))
-              {
-                print '<tr>
-                  <td>No result.</td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>';
-              }
-              ?>
-            </tbody>
-          </table>
-        </form>
+            if (empty($table))
+            {
+              print '<tr>
+                <td>No result.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>';
+            }
+            ?>
+          </tbody>
+        </table>
       </div>
     </div>
-	</div>
+        </div>
 </div>
 
 <script type="text/javascript">

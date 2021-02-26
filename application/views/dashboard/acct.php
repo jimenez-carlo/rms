@@ -9,49 +9,42 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <div class="pull-left">Dashboard</div>
       </div>
       <div class="block-content collapse in">
-        <div class="span4">
-          <div id="ca_chart" style="height: 250px;"></div>
+        <div class="row-fluid">
+          <div class="span4">
+            <label>Cash Advance</label>
+            <div id="ca_chart" style="height: 250px;"></div>
+          </div>
+
+          <div class="span4">
+            <label>EPAT</label>
+            <div id="epat_chart" style="height: 250px;"></div>
+          </div>
+
+          <div class="span4">
+            <label>For Checking</label>
+            <div id="ts_chart" style="height: 250px;"></div>
+          </div>
         </div>
 
-        <div class="span4">
-          <div id="ts_chart" style="height: 250px;"></div>
+        <div class="row-fluid">
+          <div class="span4">
+            <label>SAP Uploading</label>
+            <div id="sap_chart" style="height: 250px;"></div>
+          </div>
+
+          <div class="span4">
+            <label>Return Fund</label>
+            <div id="rf_chart" style="height: 250px;"></div>
+          </div>
+
+          <div class="span4">
+            <label>Misc Expenses</label>
+            <div id="misc_chart" style="height: 250px;"></div>
+          </div>
         </div>
-
-        <div class="span4">
-          <div id="sap_chart" style="height: 250px;"></div>
-        </div>
-
-        <table id="tbl_chart" class="table">
-          <thead>
-            <tr>
-              <th><p></p></th>
-              <th><p>Total</p></th>
-              <th><p>Pending</p></th>
-              <th><p>Done</p></th>
-              <th><p>Rate</p></th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            foreach ($table as $row) {
-              //OLD CODE
-              //$rate = round(($row->done / $row->total) * 100, 2);
-
-              $rate = ($row->done != 0 || $row->total != 0 )
-                ? round(($row->done / $row->total) * 100, 2)
-                : 0;
-
-              print '<tr>';
-              print '<td>'.$row->label.'</td>';
-              print '<td>'.$row->total.'</td>';
-              print '<td>'.$row->pending.'</td>';
-              print '<td>'.$row->done.'</td>';
-              print '<td>'.$rate.'%</td>';
-              print '</tr>';
-            }
-            ?>
-          </tbody>
-        </table>
+        <?php if(isset($table)): ?>
+          <?php echo $table; ?>
+        <?php endif; ?>
       </div>
     </div>
   </div>
@@ -61,7 +54,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <script src="vendors/morris/morris.min.js"></script>
 
 <script type="text/javascript">
-  $(function() {
+$(function() {
     var ca_chart = [];
     var ca_color = [];
     var ca_total = parseFloat($('#tbl_chart tbody tr:eq(0) td:eq(1)').text().replace(/,/g, ''));
@@ -81,15 +74,36 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       element: 'ca_chart',
       data: ca_chart,
       colors: ca_color,
-      formatter: function (value) { return value + ' (' + (value / ca_total * 100).toFixed(2) + '%)'; },
+      formatter: function (value) { return value.toLocaleString() + ' (' + (value / ca_total * 100).toFixed(2) + '%)'; },
     });
 
+    var epat_chart = [];
+    var epat_color = [];
+    var epat_total = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(1)').text().replace(/,/g, ''));
+    var epat_pending = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(2)').text().replace(/,/g, ''));
+    var epat_done = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(3)').text().replace(/,/g, ''));
+
+    if (epat_pending > 0) {
+      epat_chart.push({label: 'Pending', value: epat_pending});
+      epat_color.push('#A11717');
+    }
+    if (epat_done > 0) {
+      epat_chart.push({label: 'Done', value: epat_done});
+      epat_color.push('#3DA117');
+    }
+
+    Morris.Donut({
+      element: 'epat_chart',
+      data: epat_chart,
+      colors: epat_color,
+      formatter: function (value) { return value.toLocaleString() + ' (' + (value / epat_total * 100).toFixed(2) + '%)'; },
+    });
 
     var ts_chart = [];
     var ts_color = [];
-    var ts_total = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(1)').text().replace(/,/g, ''));
-    var ts_pending = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(2)').text().replace(/,/g, ''));
-    var ts_done = parseFloat($('#tbl_chart tbody tr:eq(1) td:eq(3)').text().replace(/,/g, ''));
+    var ts_total = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(1)').text().replace(/,/g, ''));
+    var ts_pending = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(2)').text().replace(/,/g, ''));
+    var ts_done = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(3)').text().replace(/,/g, ''));
 
     if (ts_pending > 0) {
       ts_chart.push({label: 'Pending', value: ts_pending});
@@ -104,15 +118,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       element: 'ts_chart',
       data: ts_chart,
       colors: ts_color,
-      formatter: function (value) { return value + ' (' + (value / ts_total * 100).toFixed(2) + '%)'; },
+      formatter: function (value) { return value.toLocaleString() + ' (' + (value / ts_total * 100).toFixed(2) + '%)'; },
     });
 
 
     var sap_chart = [];
     var sap_color = [];
-    var sap_total = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(1)').text().replace(/,/g, ''));
-    var sap_pending = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(2)').text().replace(/,/g, ''));
-    var sap_done = parseFloat($('#tbl_chart tbody tr:eq(2) td:eq(3)').text().replace(/,/g, ''));
+    var sap_total = parseFloat($('#tbl_chart tbody tr:eq(3) td:eq(1)').text().replace(/,/g, ''));
+    var sap_pending = parseFloat($('#tbl_chart tbody tr:eq(3) td:eq(2)').text().replace(/,/g, ''));
+    var sap_done = parseFloat($('#tbl_chart tbody tr:eq(3) td:eq(3)').text().replace(/,/g, ''));
 
     if (sap_pending > 0) {
       sap_chart.push({label: 'Pending', value: sap_pending});
@@ -127,7 +141,51 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       element: 'sap_chart',
       data: sap_chart,
       colors: sap_color,
-      formatter: function (value) { return value + ' (' + (value / sap_total * 100).toFixed(2) + '%)'; },
+      formatter: function (value) { return value.toLocaleString() + ' (' + (value / sap_total * 100).toFixed(2) + '%)'; },
+    });
+
+    var rf_chart = [];
+    var rf_color = [];
+    var rf_total = parseFloat($('#tbl_chart tbody tr:eq(4) td:eq(1)').text().replace(/,/g, ''));
+    var rf_pending = parseFloat($('#tbl_chart tbody tr:eq(4) td:eq(2)').text().replace(/,/g, ''));
+    var rf_done = parseFloat($('#tbl_chart tbody tr:eq(4) td:eq(3)').text().replace(/,/g, ''));
+
+    if (rf_pending > 0) {
+      rf_chart.push({label: 'Pending', value: rf_pending});
+      rf_color.push('#A11717');
+    }
+    if (rf_done > 0) {
+      rf_chart.push({label: 'Done', value: rf_done});
+      rf_color.push('#3DA117');
+    }
+
+    Morris.Donut({
+      element: 'rf_chart',
+      data: rf_chart,
+      colors: rf_color,
+      formatter: function (value) { return value.toLocaleString() + ' (' + (value / rf_total * 100).toFixed(2) + '%)'; },
+    });
+
+    var misc_chart = [];
+    var misc_color = [];
+    var misc_total = parseFloat($('#tbl_chart tbody tr:eq(5) td:eq(1)').text().replace(/,/g, ''));
+    var misc_pending = parseFloat($('#tbl_chart tbody tr:eq(5) td:eq(2)').text().replace(/,/g, ''));
+    var misc_done = parseFloat($('#tbl_chart tbody tr:eq(5) td:eq(3)').text().replace(/,/g, ''));
+
+    if (misc_pending > 0) {
+      misc_chart.push({label: 'Pending', value: misc_pending});
+      misc_color.push('#A11717');
+    }
+    if (misc_done > 0) {
+      misc_chart.push({label: 'Done', value: misc_done});
+      misc_color.push('#3DA117');
+    }
+
+    Morris.Donut({
+      element: 'misc_chart',
+      data: misc_chart,
+      colors: misc_color,
+      formatter: function (value) { return value.toLocaleString() + ' (' + (value / misc_total * 100).toFixed(2) + '%)'; },
     });
   });
 </script>

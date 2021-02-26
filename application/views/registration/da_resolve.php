@@ -43,6 +43,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   print '<div class="control-label">Registration</div>';
                   print '<div class="controls">'.form_input('registration', set_value('registration', $sales->registration)).'</div>';
                   print '</div>';
+                  print '<div class="control-group form-inline">';
+                  print '<div class="control-label">Penalty</div>';
+                  print '<div class="controls">'.form_input('penalty', set_value('penalty', $sales->penalty));
+                  print '<label data-toggle="tooltip" data-placement="top" title="Select Yes if the penalty is for RIC.">
+                          RIC?
+                          Yes '.form_radio(['name'=>'is_penalty_for_ric', 'value'=>'1', 'checked'=> set_value('is_penalty_for_ric', ($sales->is_penalty_for_ric === '1')), 'style'=>'margin-top:0']).
+                          'No '.form_radio(['name'=>'is_penalty_for_ric', 'value'=>'0', 'checked'=> set_value('is_penalty_for_ric', ($sales->is_penalty_for_ric === '0')), 'style'=>'margin-top:0']).
+                        '</label></div>';
+                  print '</div>';
+
                   break;
 
                 case 2: // no si/ar

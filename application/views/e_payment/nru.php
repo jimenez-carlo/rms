@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
-<div class="container-fluid">	
+<div class="container-fluid">
 	<div class="row-fluid">
 		<div class="block">
 			<div class="navbar navbar-inner block-header">
-				<div class="pull-left">LTO Payment</div>
+				<div class="pull-left">E-Payment</div>
 			</div>
 			<div class="block-content collapse in">
 				<form class="form-horizontal" method="post">
@@ -95,7 +95,7 @@ $(function(){
 			"aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
 		});
     $(".table").on('click', 'a.receipt', function(){
-      $('#modal_form .modal-body img').attr('src', '/rms_dir/lto_receipt/<?php print $payment->lpid.'/'.$payment->receipt; ?>');
+      $('#modal_form .modal-body img').attr('src', '/rms_dir/lto_receipt/<?php print $payment->epid.'/'.$payment->receipt; ?>');
       $('#modal_form').modal('show');
     });
 	});

@@ -38,6 +38,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <th><p>AR #</p></th>
         <th><p class="text-right">Amount Given</p></th>
         <th><p class="text-right">LTO Registration</p></th>
+        <th><p class="text-right">Penalty</p></th>
         <th><p class="text-right">Total Expense</p></th>
         <th><p class="text-right">Balance</p></th>
       </tr>
@@ -64,7 +65,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         print '<td>'.$sales->ar_no.'</td>';
         print '<td><p class="text-right sales-amt">'.number_format($sales->amount, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
-        print '<td><p class="text-right sales-exp">'.number_format($sales->registration, 2, ".", ",").'</p></td>';
+        print '<td><p class="text-right">'.number_format($sales->penalty, 2, ".", ",").'</p></td>';
+        print '<td><p class="text-right sales-exp">'.number_format($sales->registration+$sales->penalty, 2, ".", ",").'</p></td>';
         print '<td><p class="text-right">'.number_format($sales->amount - $sales->registration, 2, ".", ",").'</p></td>';
         print '</tr>';
         $total_amt += $sales->amount;
@@ -76,7 +78,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       // Miscellaneous
       print '<tr style="border-top: double">';
       print '<th colspan="2"><p>#</p></th>';
-      print '<th colspan="2"><p>OR #</p></th>';
+      print '<th colspan="3"><p>OR #</p></th>';
       print '<th colspan="2"><p>OR Date</p></th>';
       print '<th colspan="2"><p class="text-right">Type</p></th>';
       print '<th colspan="3"><p class="text-right">Expense</p></th>';
@@ -85,7 +87,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       if (empty($batch_ref['misc_expense'])) {
         print '<tr>';
         print '<td colspan="2"></td>';
-        print '<td colspan="2"><p style="color:red"><b>No miscellaneous expense included.</b></p></td>';
+        print '<td colspan="3"><p style="color:red"><b>No miscellaneous expense included.</b></p></td>';
         print '<td colspan="2"></td>';
         print '<td colspan="2"></td>';
         print '<td colspan="3"></td>';
@@ -97,7 +99,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         {
           print '<tr class="misc-'.$misc->mid.'" onclick="attachment('.$misc->mid.', 2)">';
           print '<td colspan="2">'.$exp_row_count.'</td>';
-          print '<td colspan="2">';
+          print '<td colspan="3">';
           print '<input type="hidden" name="mid[]" value="'.$misc->mid.'">';
           print $misc->or_no;
           print '</td>';

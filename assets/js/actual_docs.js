@@ -69,7 +69,7 @@ function save_transmittal_no(temp_id, actual_docs_id) {
     var confirmed = confirm('This action cannot be undone: Transmittal Number. Continue?');
 
     if (confirmed) {
-      var voucher_or_lto_payment_id = $('#id-'+temp_id).val();
+      var voucher_or_electronic_payment_id = $('#id-'+temp_id).val();
       var transmittal_number = $('#tn-'+temp_id).val();
       var payment_method = $('#pt-'+temp_id).val();
 
@@ -79,7 +79,7 @@ function save_transmittal_no(temp_id, actual_docs_id) {
 
       var dataToSend = {
         'actual_docs_id': actual_docs_id,
-        'voucher_or_lto_payment_id': voucher_or_lto_payment_id,
+        'voucher_or_electronic_payment_id': voucher_or_electronic_payment_id,
         'transmittal_number': transmittal_number,
         'payment_method': payment_method,
       }

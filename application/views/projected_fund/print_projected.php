@@ -73,8 +73,8 @@
 <p style="display: block; float: right; margin: 0"><?php print date('F j, Y H:i:s'); ?></p>
 <h3>Registration Monitoring System</h3>
 <hr>
-<p style="display: block; float: right; margin: 0">Reference #: <?php print $fund->reference; ?></p>
-<h3>Projected Funds for <?php print $fund->region.' '.$fund->company; ?></h3>
+<p style="display: block; float: right; margin: 0">Reference #: <?php print $ca_batch->reference; ?></p>
+<h3>Projected Funds for <?php print $ca_batch->region.' '.$ca_batch->company; ?></h3>
 
 <table>
   <thead>
@@ -91,7 +91,7 @@
     $total_unit = 0;
     $budget = ((int) ($_SESSION['company']) == 8) ? 1200 : 900;
 
-    foreach ($fund->sales as $sales)
+    foreach ($ca_batch->sales as $sales)
     {
       $amount = $budget * $sales->units;
       print '<tr>';

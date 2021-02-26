@@ -22,17 +22,37 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
               print '<div class="control-group">';
               print '<div class="control-label">Branch</div>';
-              print '<div class="controls">'.$sales->bcode.' '.$sales->bname.'</div>';
+              print '<div class="controls"><input type="text" value="'.$sales->bcode.' '.$sales->bname.'" readonly></div>';
               print '</div>';
 
               print '<div class="control-group">';
               print '<div class="control-label">Customer</div>';
-              print '<div class="controls">'.$sales->first_name.' '.$sales->last_name.'</div>';
+              print '<div class="controls"><input type="text" value="'.$sales->first_name.' '.$sales->last_name.'" readonly></div>';
               print '</div>';
 
               print '<div class="control-group">';
               print '<div class="control-label">Engine #</div>';
-              print '<div class="controls">'.$sales->engine_no.'</div>';
+              print '<div class="controls"><input type="text" value="'.$sales->engine_no.'" readonly></div>';
+              print '</div>';
+
+              print '<div class="control-group">';
+              print '<div class="control-label">Payment Method</div>';
+              print '<div class="controls"><input type="text" value="'.$sales->payment_method.'" readonly></div>';
+              print '</div>';
+
+              $regn_error = (form_error('registration')) ? 'error' : '';
+              print '<div class="control-group '.$regn_error.'">';
+              print '<div class="control-label">Registration</div>';
+              print '<div class="controls">'.form_input('registration', set_value('registration', $sales->registration)).'</div>';
+              print '</div>';
+
+              $penalty_error = (form_error('penalty')) ? 'error' : '';
+              print '<div class="control-group form-inline '.$penalty_error.'">';
+              print '<div class="control-label">Penalty</div>';
+              print '<div class="controls">'.form_input('penalty', set_value('penalty', $sales->penalty));
+              print '<label class="checkbox" data-toggle="tooltip" data-placement="top" title="Tick the box if the penalty is for RIC.">
+                      RIC?'.form_checkbox(['name'=>'is_penalty_for_ric', 'value'=>'true', 'checked'=> set_value('is_penalty_for_ric', $sales->is_penalty_for_ric), 'style'=>'margin-top:0']).
+                    '</label></div>';
               print '</div>';
 
               print '<div class="control-group">';
@@ -40,27 +60,26 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<div class="controls">'.form_input('tip', set_value('tip', $sales->tip)).'</div>';
               print '</div>';
 
-              print '<div class="control-group">';
-              print '<div class="control-label">Registration</div>';
-              print '<div class="controls">'.form_input('registration', set_value('registration', $sales->registration)).'</div>';
-              print '</div>';
-
-              print '<div class="control-group">';
+              $cr_date_error = (form_error('cr_date')) ? 'error' : '';
+              print '<div class="control-group '.$cr_date_error.'">';
               print '<div class="control-label">OR Date</div>';
               print '<div class="controls">'.form_input('cr_date', set_value('cr_date', substr($sales->cr_date, 0, 10)), array('class' => 'datepicker')).'</div>';
               print '</div>';
 
-              print '<div class="control-group">';
+              $cr_no_error = (form_error('cr_no')) ? 'error' : '';
+              print '<div class="control-group '.$cr_no_error.'">';
               print '<div class="control-label">CR #</div>';
               print '<div class="controls">'.form_input('cr_no', set_value('cr_no', $sales->cr_no)).'</div>';
               print '</div>';
 
-              print '<div class="control-group">';
+              $mvf_no_error = (form_error('mvf_no')) ? 'error' : '';
+              print '<div class="control-group '.$mvf_no_error.'">';
               print '<div class="control-label">MV File #</div>';
               print '<div class="controls">'.form_input('mvf_no', set_value('mvf_no', $sales->mvf_no)).'</div>';
               print '</div>';
 
-              print '<div class="control-group">';
+              $plate_no_error = (form_error('plate_no')) ? 'error' : '';
+              print '<div class="control-group '.$plate_no_error.'">';
               print '<div class="control-label">Plate #</div>';
               print '<div class="controls">'.form_input('plate_no', set_value('plate_no', $sales->plate_number)).'</div>';
               print '</div>';

@@ -32,37 +32,55 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="sales") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>sales">Customer Status</a>
                             </li>
+                            <li class="dropdown <?php if(isset($nav) && $nav=="si") echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">SI <i class="caret"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>si/printing">Printing</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>si/transmittal">Transmittal</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>si/self_regn">Self Registration</a></li>
+                                </ul>
+                            </li>
                             <li <?php if(isset($nav) && $nav=="pending") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>lto_pending">LTO</a>
                             </li>
                             <li <?php if(isset($nav) && $nav=="nru") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>nru">NRU</a>
                             </li>
-                            <li class="dropdown <?php if(isset($nav) && $nav=="registration") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Registration <i class="caret"></i></a>
+                            <li class="dropdown <?php if(isset($nav) && in_array($nav,["registration","expense", "ric"])) echo 'active'; ?>">
+                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Expenses <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php echo base_url(); ?>registration">Engine Search</a>
-                                        <a tabindex="-1" href="<?php echo base_url(); ?>registration/pending_list">Pending List</a>
-                                    </li>
+                                  <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Registration</a>
+                                    <ul class="dropdown-menu">
+                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>registration">Engine Search</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>registration/pending_list">Pending List</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>disapprove">Disapproved</a></li>
+                                    </ul>
+                                  </li>
+                                  <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">Miscellaneous</a>
+                                    <ul class="dropdown-menu">
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>expense/add">Add</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>expense">List</a></li>
+                                    <li><a tabindex="-1" href="<?php echo base_url(); ?>expense/ca_ref">CA Reference Update (Temporary)</a></li>
+                                    </ul>
+                                  </li>
+                                  <li class="dropdown-submenu">
+                                    <a tabindex="-1" href="#">RIC</a>
+                                    <ul class="dropdown-menu">
+                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>ric/penalty">Create RIC for Penalty </a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>ric/monitoring">RIC Monitoring </a></li>
+                                    </ul>
+                                  </li>
                                 </ul>
                             </li>
                             <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">
                                 <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Plate <i class="caret"></i></a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/UpdatePlate_BS">Update Plate</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/branch_list">Plate Transmittal</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>plate/pending_list">Pending List</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="dropdown <?php if(isset($nav) && $nav=="expense") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Miscellaneous <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php echo base_url(); ?>expense">List</a>
-                                        <a tabindex="-1" href="<?php echo base_url(); ?>expense/ca_ref">CA Reference Update (Temporary)</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>plate/encode_pnumber">Update Plate</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>plate/transmittal">Plate Transmittal</a>
+                                        <a tabindex="-1" href="<?php echo base_url(); ?>plate/pending_list">Pending List</a>
                                     </li>
                                 </ul>
                             </li>
@@ -75,21 +93,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="transmittal") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url(); ?>transmittal">Transmittal</a>
                             </li>
-                            <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
-                                <a href="<?php echo base_url(); ?>disapprove">Disapprove</a>
-                            </li>
                             <li <?php if(isset($nav) && $nav=="actual_docs") echo 'class="active"'; ?>>
                               <a href="<?php echo base_url(); ?>actual_docs">Actual Docs</a>
                             </li>
-                            <!-- <li class="dropdown <?php if(isset($nav) && $nav=="attachment") echo 'active'; ?>">
-                                <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Attachment <i class="caret"></i></a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>attachment">By Engine</a>
-                                        <a tabindex="-1" href="<?php if(isset($dir)) echo $dir; ?>attachment/pending_list">Pending List</a>
-                                    </li>
-                                </ul>
-                            </li> -->
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

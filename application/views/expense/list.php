@@ -37,7 +37,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             ?>
             <div class="form-actions span12">
               <input type="submit" name="search" value="Search" class="btn btn-success" style="margin-right:10px;">
-              <?php if ($add) print '<a href="expense/add" class="btn btn-success"><span class="icon icon-plus"></span> Add New Expense</a>'; ?>
             </div>
           </fieldset>
         </form>

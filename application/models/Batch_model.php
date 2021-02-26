@@ -88,9 +88,9 @@ class Batch_model extends CI_Model{
               END AS sap_code,
               s.si_no, s.ar_no, s.amount AS ar_amount,
               s.registration_type, f.acct_number AS account_key,
-              s.registration + s.tip AS regn_expense, -- NEED TO ADD misc expenses
+              s.registration + s.tip + s.penalty AS regn_expense,
               CONCAT(s.bcode, '000') AS branch_code,
-              IFNULL(lp.reference, v.reference) AS reference_number,
+              IFNULL(ep.reference, v.reference) AS reference_number,
               cust.cust_code, CONCAT(IFNULL(cust.last_name,''), ', ', IFNULL(cust.first_name,'')) AS customer_name
             FROM
               tbl_sap_upload_batch sub
@@ -107,7 +107,7 @@ class Batch_model extends CI_Model{
             INNER JOIN
               tbl_company c ON s.company = c.cid
             LEFT JOIN
-              tbl_lto_payment lp ON s.lto_payment = lp.lpid
+              tbl_electronic_payment ep ON s.electronic_payment = ep.epid
             LEFT JOIN
               tbl_voucher v ON s.voucher = v.vid
             WHERE

@@ -5,22 +5,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <div class="span4 details">
   <?php
   print '<div class="control-group">';
-  print '<div class="control-label">CA Ref#</div>';
+  print '<div class="control-label" style="padding:0">CA Ref#</div>';
   print '<div class="controls">'.$misc->reference.'</div>';
   print '</div>';
 
   print '<div class="control-group">';
-  print '<div class="control-label">OR #</div>';
+  print '<div class="control-label" style="padding:0">OR #</div>';
   print '<div class="controls">'.$misc->or_no.'</div>';
   print '</div>';
 
   print '<div class="control-group">';
-  print '<div class="control-label">OR Date</div>';
+  print '<div class="control-label" style="padding:0">OR Date</div>';
   print '<div class="controls">'.$misc->or_date.'</div>';
   print '</div>';
 
   print '<div class="control-group">';
-  print '<div class="control-label">Type</div>';
+  print '<div class="control-label" style="padding:0">Type</div>';
   print '<div class="controls" style="padding:0">'.$misc->type.'</div>';
   print '</div>';
 
@@ -31,7 +31,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
   if ($misc->status !== "5") {
     print '<div class="control-group">';
-    print '<div class="control-label">Remarks</div>';
+    print '<div class="control-label" style="padding:0">Remarks</div>';
     print '<div class="controls">'.$misc->remarks.'</div>';
     print '</div>';
   }
@@ -39,16 +39,26 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   print '<div class="control-group misc-da-remarks hide">';
   print '<div class="control-label">Reason</div>';
   print '<div class="controls">
-          <select id="misc_da_remarks" name="remarks" required>
-            <option>WRONG COMPANY INFO</option>
-            <option>WRONG AMOUNT</option>
+          <select id="misc_da_reason" name="da_reason" required>
             <option>ADVANCE DATE OF EXPENSE VS CA EXPENSE</option>
             <option>DUPLICATE ATTACHMENT</option>
-            <option>NOT FOR REGISTRATION EXPENSE</option>
-            <option>WRONG ATTACHED OR</option>
-            <option>WRONG OR#</option>
+            <option>EXCEED APPROVED EXPENSE</option>
+            <option>EXPIRED OR</option>
+            <option>NO COMPANY INFO</option>
+            <option>NO OR ATTACHED</option>
             <option>NO VOUCHER FOR ITINERARY</option>
+            <option>NOT FOR REGISTRATION EXPENSE</option>
+            <option>WRONG AMOUNT</option>
+            <option>WRONG ATTACHED OR</option>
+            <option>WRONG COMPANY INFO</option>
+            <option>WRONG OR#</option>
           </select>
+        </div>';
+  print '</div>';
+  print '<div class="control-group misc-da-remarks hide">';
+  print '<div class="control-label">Remarks</div>';
+  print '<div class="controls">
+          <textarea name="remarks"></textarea>
         </div>';
   print '</div>';
 
@@ -56,7 +66,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
     case '3':
     case '5':
       print '<div class="control-group">';
-      print '<div class="control-label" style="padding:0">Disapproved Reason</div>';
+      print '<div class="control-label" style="padding:0">DA Reason</div>';
+      print '<div class="controls">'.$misc->da_reason.'</div>';
+      print '</div>';
+
+      print '<div class="control-group">';
+      print '<div class="control-label" style="padding:0">Remarks</div>';
       print '<div class="controls">'.$misc->remarks.'</div>';
       print '</div>';
       break;
@@ -117,8 +132,9 @@ $('#da_misc').on('click', function(){
 });
 
 $('.save').on('click', function(){
-  var misc_da_remarks = $('#misc_da_remarks');
-  var remarks_length = misc_da_remarks.val().length;
+  var misc_da_reason = $('#misc_da_reason').val();
+  var remarks = $('textarea[name="remarks"]').val();
+  var remarks_length = misc_da_reason.length;
   var mid = '<?php echo $misc->mid; ?>';
 
   switch (remarks_length) {
@@ -132,19 +148,19 @@ $('.save').on('click', function(){
       $.ajax({
         url : "<?php echo base_url(); ?>disapprove/misc_expense",
         type: "POST",
-        data: {"mid": mid, "remarks": misc_da_remarks.val()},
+        data: {
+          "mid": mid,
+          "da_reason":  misc_da_reason,
+          "remarks": remarks
+        },
         dataType: "JSON",
         success: function(data)
         {
           // update info
           $('#da_group .control-label').text('Disapproved');
-          $('#da_group p').text('Reason: Test lang');
           $("#include_for_upload").prop("disabled", true);
           $("#exclude_for_upload").prop("disabled", true);
         },
-        error: function (jqXHR, textStatus, errorThrown)
-        {
-        }
       });
       break;
   }
