@@ -319,7 +319,7 @@ input[type='text'].numeric {
   padding: 5px 25px;
 }
 
-footer {
+.rms-footer {
   position:fixed;
   left:0px;
   bottom:0px;
@@ -327,7 +327,7 @@ footer {
   width:100%;
   font-size: 80%;
   color: #e7f0ff;
-  background: linear-gradient(to bottom, #47BF19, #348A13) repeat scroll 0% 0% transparent;
+  background: #47BF19;
 }
 
 /* IE 6 */

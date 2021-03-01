@@ -2,10 +2,10 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 
-            <footer>
+            <div class="rms-footer">
                 <p class="pull-left footer">Registration Monitoring System v<?php echo RMS_VERSION; ?></p>
                 <p class="pull-right footer">&copy; CMC <?php print date('Y'); ?> </p>
-            </footer>
+            </div>
         </div>
 
         <div class="ajax-loader hide" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; ">

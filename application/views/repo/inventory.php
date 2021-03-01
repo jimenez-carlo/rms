@@ -13,6 +13,7 @@
     <table class="table">
       <thead>
         <tr>
+          <td>Cust Code</td>
           <td>Customer</td>
           <td>Engine #</td>
           <td>MV File</td>
@@ -26,7 +27,8 @@
       <tbody>
         <?php foreach($repo_inventory AS $repo): ?>
         <tr>
-          <td><?php  echo $repo['last_name'].', '.$repo['first_name']; ?></td>
+          <td><?php echo $repo['cust_code']; ?></td>
+          <td><?php echo $repo['customer_name']; ?></td>
           <td><?php echo $repo['engine_no']; ?></td>
           <td><?php echo $repo['mvf_no']; ?></td>
           <td><?php echo $repo['repo_status']; ?></td>

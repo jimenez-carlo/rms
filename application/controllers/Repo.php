@@ -8,12 +8,12 @@ class Repo extends MY_Controller {
     $this->load->model('Sales_model', 'sales');
     $this->load->model('Repo_model', 'repo');
     $this->load->model('File_model', 'file');
+    $this->load->model('Validation_model', 'validate');
   }
 
   private $jsversion = 'v1.0.0';
 
   public function index() {
-
     $this->access(17);
     $this->header_data('title', 'Repo Inventory');
     $this->header_data('nav', 'repo-inventory');
@@ -40,33 +40,15 @@ class Repo extends MY_Controller {
 
   public function sale($repo_inventory_id) {
     $this->access(17);
-
     if ($this->input->post('save')) {
-      $validation = [
-        //REPO SALE
-        [ 'field' => 'repo_sale[rsf_num]', 'label' => 'RSF#', 'rules' => 'required' ],
-        [ 'field' => 'repo_sale[ar_num]', 'label' => 'AR Number', 'rules' => 'required' ],
-        [ 'field' => 'repo_sale[ar_amt]', 'label' => 'Amount Given', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_sale[date_sold]', 'label' => 'Date Sold', 'rules' => 'required' ],
-        //CUSTOMER
-        [ 'field' => 'customer[cust_code]', 'label' => 'Customer Code', 'rules' => 'required' ],
-        [ 'field' => 'customer[first_name]', 'label' => 'First Name', 'rules' => 'required' ],
-        [ 'field' => 'customer[last_name]', 'label' => 'Last Name', 'rules' => 'required' ],
-      ];
-      $this->form_validation->set_rules($validation);
-
-      if ($this->form_validation->run()) {
+      if ($this->validate->form('REPO_SALES')) {
         $this->db->trans_start();
         $sales = $this->input->post();
-        $repo_batch_id = $this->repo->generate_batch();
-
-        $sales['repo_sale']['repo_batch_id'] = $repo_batch_id;
+        //$repo_batch_id = $this->repo->generate_batch();
+        //$sales['repo_sale']['repo_batch_id'] = $repo_batch_id;
         $sales['repo_sale']['repo_inventory_id'] = $repo_inventory_id;
         $this->repo->save_sales($sales);
-        $this->repo->initialize_regn([
-          'repo_inventory_id' => $repo_inventory_id,
-          'repo_batch_id' => $repo_batch_id
-        ]);
+        //$this->repo->initialize_regn(['repo_inventory_id' => $repo_inventory_id, 'repo_batch_id' => $repo_batch_id]);
         $this->repo->update_inv_status($repo_inventory_id, 'SALES');
         $this->db->trans_complete();
 
@@ -80,7 +62,7 @@ class Repo extends MY_Controller {
     }
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'NEW');
-    $this->check_mc_branch($data['repo']['bcode']);
+    //$this->check_mc_branch($data['repo']['bcode']);
     $date = (!$this->input->post('save')) ? $data['repo']['date_registered'] : $this->input->post('repo_registration')['date_registered'];
     $expire = $this->repo->expiration($date);
 
@@ -100,36 +82,20 @@ class Repo extends MY_Controller {
     $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
-    if ($this->input->post('save')) {
-      $validation = [
-        //REGISTRATION
-        [ 'field' => 'repo_registration[registration_amt]', 'label' => 'Registration Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_registration[pnp_clearance_amt]', 'label' => 'PNP Clearance Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_registration[macro_etching_amt]', 'label' => 'Macro Etching', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_registration[insurance_amt]', 'label' => 'Insurance Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_registration[emission_amt]', 'label' => 'Emission Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
-        [ 'field' => 'repo_registration[date_registered]', 'label' => 'Registration Date', 'rules' => 'required' ],
-      ];
-
-      $tip = $this->repo->get_tip_matrix($_SESSION['rrt_region_id']);
-      if (isset($tip)) {
-        $validation[] =  [ 'field' => 'repo_registration[or_tip]', 'label' => 'OR Tip', 'rules' => 'required|numeric|less_than_equal_to['.$tip['repo_or'].']' ];
-        $validation[] =  [ 'field' => 'repo_registration[pnp_tip]', 'label' => 'PNP Tip', 'rules' => 'required|numeric|less_than_equal_to['.$tip['repo_or'].']' ];
-      }
-
-      $this->form_validation->set_rules($validation);
-      if ($this->form_validation->run()) {
-        $repo_registration_id = $this->repo->save_registration(
-          $repo_inventory_id,
-          $this->input->post('repo_registration')
-        );
-        $upload_attachments = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
+    $date_registered= false;
+    $data = $this->repo->get_branch_tip_matrix($_SESSION['branch_code']);
+    if ($save_registration = $this->input->post('save') && $repo_registration = $this->input->post('repo_registration')) {
+      echo '<pre>'; var_dump($_POST); echo '</pre>'; die();
+      $date_registered = $repo_registration['date_registered'];
+      if ($this->validate->form('REPO_REGISTRATION', $data)) {
+        $repo_registration_id = $this->repo->save_registration($repo_inventory_id, $repo_registration);
         redirect('repo/view/'.$repo_inventory_id);
       }
     }
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'SALES');
-    $date = (!$this->input->post('save')) ? $data['repo']['date_registered'] : $this->input->post('repo_registration')['date_registered'];
+    //echo '<pre>'; var_dump($data); echo '</pre>'; die();
+    $date = $date_registered ?? $data['repo']['date_registered'];
     $expire = $this->repo->expiration($date);
 
     $data['repo']['expire_status'] = $expire['status'];
@@ -309,12 +275,17 @@ HTML;
     }
   }
 
-  public function batch() {
+  public function create_ca() {
+    $data['table_sales'] = $this->repo->request_ca();
+    $this->template('repo/batch/create', $data);
+  }
+
+  public function ca_batch() {
     $this->access(17);
     $this->header_data('title', 'Repo Batch');
     $this->header_data('nav', 'repo-batch');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
-    $data['batches'] = $this->repo->batch_list();
+    $data['table_batches'] = $this->repo->batch_list();
     $this->template('repo/batch/list', $data);
   }
 

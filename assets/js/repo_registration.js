@@ -86,41 +86,12 @@ function get_engine(engine_number) {
   });
 }
 
-//$(document).on('focusout', '#get-cust', function(e) {
-//  console.log(e);
-//  var cust_code = $(this).val();
-//  if (check_length(cust_code)) {
-//    get_customer(cust_code);
-//  }
-//});
-
 $(document).on('click', '.btn-danger', function(e){
   e.preventDefault();
   $(this).closest('tr').remove();
   const index = engines.indexOf($(this).val());
   if (index > -1) {
     engines.splice(index, 1);
-  }
-});
-
-$(document).on('click', '.claim', function(e){
-  e.preventDefault();
-  var engine_id = $(this).val()
-  var td = $(this).parent();
-  var confirmed = confirm('Are you sure?');
-  if (confirmed) {
-    e.preventDefault();
-    $.ajax({
-      url: BASE_URL+'repo/claim_repo',
-      type: "POST",
-      data: { eid: engine_id },
-      dataType: 'json',
-      success: function(data) {
-        td.children().remove();
-        td.prepend('<span style="color:green">Success! <i class="icon-ok"></i><span>')
-        $('.bname-'+engine_id).empty().append(data.branch);
-      }
-    });
   }
 });
 
@@ -177,7 +148,8 @@ function repo_sales(bool) {
     #rsf, #date-sold, \
     #ar-num, #ar-amount, \
     #get-cust, #first-name, \
-    #last-name \
+    #last-name, #email, \
+    #phone \
   ')
   .prop('disabled', bool);
 }
@@ -205,4 +177,17 @@ $('#history').on('click', function(e){
       console.log(JSON.stringify(data, null, 2));
     }
   });
+});
+
+$('input[type="file"]').on('change', function(){
+  var that = $(this);
+  if (that.length === 1) {
+    var img_id = that.data('img_id');
+    var img_file = that[0].files[0];
+    var reader = new FileReader();
+    reader.readAsDataURL(img_file);
+    reader.onload = function(e) {
+      $(img_id).attr('src', e.target.result);
+    }
+  }
 });
