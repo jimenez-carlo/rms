@@ -61,6 +61,18 @@ class Validation_model extends CI_Model {
           ],
         ];
         break;
+
+      case 'REPO_BATCH_MISC_EXP':
+        $validation = [
+          [ 'field' => 'repo_batch_id', 'label' => 'Reference Number', 'rules' => 'required' ],
+          [ 'field' => 'expense_type', 'label' => 'Expense Type', 'rules' => 'required' ],
+          [ 'field' => 'amount', 'label' => 'Misc Expense Amount', 'rules' => 'required' ],
+        ];
+
+        if ($data['expense_type'] === 'Others') {
+          $validation[] = [ 'field' => 'others', 'label' => 'Others', 'rules' => 'required' ];
+        }
+        break;
     }
 
     $this->form_validation->set_rules($validation);

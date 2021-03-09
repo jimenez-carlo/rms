@@ -20,24 +20,26 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <th style="text-align:right;padding-right:10px;"><p>Amount</p></th>
                 <th><p>Region</p></th>
                 <th><p>Debit Memo #</p></th>
-                <th><p>Date Processed</p></th>
                 <th><p>Date Deposited</p></th>
               </tr>
             </thead>
             <tbody>
               <?php
-              foreach ($table as $i => $row)
+              foreach ($table as $row)
               {
                 print '<tr>';
-                print '<td>'.form_checkbox('deposit_funds['.$i.'][repo_batch_id]', $row->repo_batch_id).'</td>';
+                print '<td>'.form_checkbox('deposit_funds['.$row->repo_batch_id.'][repo_batch_id]', $row->repo_batch_id, set_value('deposit_funds['.$row->repo_batch_id.'][repo_batch_id]')).'</td>';
                 print '<td>'.$row->reference.'</td>';
                 print '<td>'.$row->doc_no.'</td>';
                 print '<td>'.$row->date_created.'</td>';
                 print '<td style="text-align:right;padding-right:10px;">'.number_format($row->amount,2,'.',',').'</td>';
                 print '<td>'.$row->region.'</td>';
-                print '<td>'.form_input('deposit_funds['.$i.'][debit_memo]', set_value('deposit_funds['.$i.'][debit_memo]'), array('disabled' => '')).'</td>';
-                print '<td>'.form_input('deposit_funds['.$i.'][date_processed]', set_value('deposit_funds['.$i.'][date_processed]'), array('class' => 'datepicker', 'disabled' => '', 'autocomplete' => 'off')).'</td>';
-                print '<td>'.form_input('deposit_funds['.$i.'][date_deposited]', set_value('deposit_funds['.$i.'][date_deposited]'), array('class' => 'datepicker', 'disabled' => '', 'autocomplete' => 'off')).'</td>';
+                $ea = (form_error('deposit_funds['.$row->repo_batch_id.'][debit_memo]')) ? 'error' : '';
+                print '<td class="control-group '.$ea.'">'.form_input('deposit_funds['.$row->repo_batch_id.'][debit_memo]', set_value('deposit_funds['.$row->repo_batch_id.'][debit_memo]'), array('disabled' => '', 'required' => true));
+                print '</td>';
+                $eb = (form_error('deposit_funds['.$row->repo_batch_id.'][date_deposited]')) ? 'error' : '';
+                print '<td class="control-group '.$eb.'">'.form_input('deposit_funds['.$row->repo_batch_id.'][date_deposited]', set_value('deposit_funds['.$row->repo_batch_id.'][date_deposited]'), array('class' => 'datepicker', 'disabled' => '', 'autocomplete' => 'off', 'required'=>true));
+                print '</td>';
                 print '</tr>';
               }
 
@@ -50,6 +52,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                   <td></td>
                   <td></td>
                   <td></td>
+                  <td></td>
+                  <td></td>
                   </tr>';
               }
               ?>
@@ -57,38 +61,20 @@ defined('BASEPATH') OR exit('No direct script access allowed');
           </table>
 
           <div class="form-actions">
-            <?php print form_submit('submit', 'Save changes', array('class' => 'btn btn-success', 'onclick' => 'return confirm("Please make sure all information are correct before proceeding. Continue?")', 'disabled' => '')); ?>
+            <?php print form_submit(
+              'submit', 'Save changes',
+              array(
+                'class' => 'btn btn-success',
+                'onclick' => "return confirm('Please make sure all information are correct before proceeding. Continue?');",
+                'disabled' => ''
+              )
+            ); ?>
           </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Bootstrap modal -->
-<div class="modal fade" id="modal_form" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title">Transfer Fund</h3>
-      </div>
-      <div class="modal-body form">
-        <div class="alert alert-error hide">
-          <button class="close" data-dismiss="alert">&times;</button>
-          <div class="error"></div>
-        </div>
-        <div class="form-body">
-          <!-- see process_transfer.php -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" id="btnSave" onclick="save_process()" class="btn btn-success">Save Transfer</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 <script type="text/javascript">
 $(function(){

@@ -69,51 +69,51 @@
     </style>
 </head>
 <body onload="window.print();">
-
-<p style="display: block; float: right; margin: 20px 10px;"><?php print date('F j, Y H:i:s'); ?></p>
-<h3>Registration Monitoring System</h3>
-<hr>
-<h3>Projected Funds for <?php echo $region_company; ?></h3>
-
-<table>
-  <thead>
-    <tr>
-      <th>Reference</th>
-      <th>Branch Code</th>
-      <th>Branch Name</th>
-      <th># of Units</th>
-      <th>Amount</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-    $total = 0;
-    $total_unit = 0;
-    foreach ($prints as $print)
-    {
-      $amount = 0;
-      print '<tr>';
-      print '<td>'.$print['reference'].'</td>';
-      print '<td>'.$print['bcode'].'</td>';
-      print '<td>'.$print['bname'].'</td>';
-      print '<td>'.$print['no_of_unit'].'</td>';
-      print '<td>'.number_format($print['amount'], 2, '.', ',').'</td>';
-      print '</tr>';
-      $total += $print['amount'];
-      $total_unit += $print['no_of_unit'];
-    }
-    ?>
-  </tbody>
-  <tfoot>
-    <tr>
-      <th>Total</th>
-      <th></th>
-      <th></th>
-      <th><?php echo $total_unit; ?></th>
-      <th style="text-align:left;">&#x20b1 <?php print number_format($total, 2, '.', ','); ?></th>
-    </tr>
-  </tfoot>
-</table>
-
+  <p style="display: block; float: right; margin: 20px 10px;"><?php print date('F j, Y H:i:s'); ?></p>
+  <h3>Registration Monitoring System</h3>
+  <hr>
+  <h3>Projected Funds for <?php echo $company_region; ?></h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Reference</th>
+        <th>Document #</th>
+        <th>Branch Code</th>
+        <th>Branch Name</th>
+        <th># of Units</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php
+      $total = 0;
+      $total_unit = 0;
+      foreach ($prints as $print)
+      {
+        $amount = 0;
+        print '<tr>';
+        print '<td>'.$print['reference'].'</td>';
+        print '<td>'.$print['doc_no'].'</td>';
+        print '<td>'.$print['bcode'].'</td>';
+        print '<td>'.$print['bname'].'</td>';
+        print '<td>'.$print['no_of_unit'].'</td>';
+        print '<td>'.number_format($print['amount'], 2, '.', ',').'</td>';
+        print '</tr>';
+        $total += $print['amount'];
+        $total_unit += $print['no_of_unit'];
+      }
+      ?>
+    </tbody>
+    <tfoot>
+      <tr>
+        <th>Total</th>
+        <th></th>
+        <th></th>
+        <th></th>
+        <th><?php echo $total_unit; ?></th>
+        <th style="text-align:left;">&#x20b1 <?php print number_format($total, 2, '.', ','); ?></th>
+      </tr>
+    </tfoot>
+  </table>
 </body>
 </html>

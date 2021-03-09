@@ -57,7 +57,7 @@
               <div class="control-group span2 <?php echo (form_error('repo_sale[date_sold]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
                 <label class="control-label" for="date-sold">Date Sold</label>
                 <div class="controls">
-                  <input id="date-sold" class="datepicker" type="text" placeholder="yyyy-mm-dd" name="repo_sale[date_sold]" value="<?php echo set_value('repo_sale[date_sold]', $repo['date_sold']); ?>" required>
+                  <input id="date-sold" class="datepicker" type="text" placeholder="yyyy-mm-dd" name="repo_sale[date_sold]" value="<?php echo set_value('repo_sale[date_sold]', $repo['date_sold']); ?>" autocomplete="off" required>
                 </div>
               </div>
             </div>
@@ -66,13 +66,13 @@
               <div class="control-group span2 offset4 <?php echo (form_error('customer[cust_code]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="get-cust">Customer Code</label>
                 <div class="controls">
-                  <input id="get-cust" type="text" name="customer[cust_code]" <?php echo 'value="'.set_value('customer[cust_code]', '').'"'; ?> required>
+                  <input id="get-cust" type="text" name="customer[cust_code]" <?php echo 'value="'.set_value('customer[cust_code]', '').'"'; ?> autocomplete="off" required>
                 </div>
               </div>
               <div class="control-group span2 <?php echo (form_error('customer[date_of_birth]')) ? 'error' : ''; ?>" style="margin-left:2rem;">
                 <label class="control-label" for="bday">Date of Birth</label>
                 <div class="controls">
-                  <input id="bday" class="datepicker" type="text" placeholder="yyyy-mm-dd" name="customer[date_of_birth]" <?php echo 'value="'.set_value('customer[date_of_birth]', '').'"'; ?> required>
+                  <input id="bday" class="datepicker" type="text" placeholder="yyyy-mm-dd" name="customer[date_of_birth]" <?php echo 'value="'.set_value('customer[date_of_birth]', '').'"'; ?> autocomplete="off" required>
                 </div>
               </div>
             </div>

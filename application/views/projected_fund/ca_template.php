@@ -1,4 +1,5 @@
 <?php
+
 $list = array(
   [
     "Debit/Credit line item", "Document Type", "Posting Date", "Document Type",
@@ -22,9 +23,8 @@ foreach ($data AS $key => $ca) {
   );
 }
 
-
 header('Content-Type: application/csv');
-header('Content-Disposition: attachment; filename="CA-'.$date.'.csv";');
+header('Content-Disposition: attachment; filename="'.$filename.'-'.$date.'.csv";');
 
 $file = fopen('php://output', 'w');
 

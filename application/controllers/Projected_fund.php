@@ -8,6 +8,7 @@ class Projected_fund extends MY_Controller {
     $this->load->helper('url');
     $this->load->model('Projected_fund_model', 'projected_fund');
     $this->load->model('Js_model', 'js');
+    $this->load->model('Form_model', 'form');
   }
 
   /**
@@ -61,8 +62,7 @@ class Projected_fund extends MY_Controller {
   /**
    * Accounting to view list of Voucher
    */
-  public function ca_list()
-  {
+  public function ca_list() {
     switch ($_SESSION['position']) {
       case 34: // TRSRY-ASST
         $nav = 'deposited_fund';
@@ -108,18 +108,7 @@ class Projected_fund extends MY_Controller {
     $param->date_to   = $this->input->post('date_to') ?? date('Y-m-d');
     $param->status    = $this->input->post('status');
     $param->region    = $this->input->post('region_id');
-    $data['region_dropdown'] = json_decode(
-      $this->db
-      ->select("
-        CONCAT('{',
-          '\"0\": \"- Any -\",',
-          GROUP_CONCAT('\"',rid,'\"', ':\"',region,'\"')
-        ,'}') AS regions
-      ")
-      ->get('tbl_region')
-      ->row_array()['regions'],
-      true
-    );
+    $data['region_dropdown'] = $this->form->region_dropdown();
 
     $data['table']  = $this->projected_fund->repo_ca_list($param);
     $this->template('projected_fund/repo_ca_list', $data);
@@ -196,6 +185,7 @@ class Projected_fund extends MY_Controller {
   public function ca_template() {
     $this->access(1);
     if ($ca_date = $this->input->post("date")) {
+      $data['filename'] = "CA";
       $data['date'] = $ca_date;
       $data['data'] = $this->db
         ->select("

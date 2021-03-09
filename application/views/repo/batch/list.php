@@ -45,7 +45,7 @@
             <div class="control-group">
               <div class="controls">
                 <?php echo form_button("search", "Search", ["class"=>"btn btn-success"]); ?>
-                <a class="btn btn-primary" href="<?php echo base_url('repo/create_ca'); ?>" target="_blank">Create CA</a>
+                <a class="btn btn-primary" href="<?php echo base_url('repo/create_ca'); ?>" target="_self">Create CA</a>
                 <?php // echo form_button("create", "Create CA", ["class"=>"btn btn-primary"]); ?>
               </div>
             </div>

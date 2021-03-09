@@ -3,31 +3,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Repo extends MY_Controller {
 
+  private $jsversion = 'v1.0.0';
+
   public function __construct() {
     parent::__construct();
     $this->load->model('Sales_model', 'sales');
     $this->load->model('Repo_model', 'repo');
     $this->load->model('File_model', 'file');
     $this->load->model('Validation_model', 'validate');
+    $this->load->model('Form_model', 'form');
   }
-
-  private $jsversion = 'v1.0.0';
 
   public function index() {
     $this->access(17);
     $this->header_data('title', 'Repo Inventory');
     $this->header_data('nav', 'repo-inventory');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
-
-    $repo_inventory = [];
     $inventory = $this->repo->inventory();
-    foreach ($inventory as $repo) {
-      $expiry = $this->repo->expiration($repo['date_registered']);
-      $repo['status'] = $expiry['status'];
-      $repo['message'] = $expiry['message'];
-      $repo_inventory[] = $repo;
-    }
-    $data['repo_inventory'] = $repo_inventory;
+    $data['inventory_table'] = $inventory;
     $this->template('repo/inventory', $data);
   }
 
@@ -44,11 +37,8 @@ class Repo extends MY_Controller {
       if ($this->validate->form('REPO_SALES')) {
         $this->db->trans_start();
         $sales = $this->input->post();
-        //$repo_batch_id = $this->repo->generate_batch();
-        //$sales['repo_sale']['repo_batch_id'] = $repo_batch_id;
         $sales['repo_sale']['repo_inventory_id'] = $repo_inventory_id;
         $this->repo->save_sales($sales);
-        //$this->repo->initialize_regn(['repo_inventory_id' => $repo_inventory_id, 'repo_batch_id' => $repo_batch_id]);
         $this->repo->update_inv_status($repo_inventory_id, 'SALES');
         $this->db->trans_complete();
 
@@ -76,26 +66,22 @@ class Repo extends MY_Controller {
     $this->template('repo/sales', $data);
   }
 
-  public function registration($repo_inventory_id) {
+  public function registration($repo_inventory_id, $repo_sales_id) {
     $this->access(17);
     $this->header_data('title', 'Repo Registration');
     $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
-    $date_registered= false;
     $data = $this->repo->get_branch_tip_matrix($_SESSION['branch_code']);
     if ($save_registration = $this->input->post('save') && $repo_registration = $this->input->post('repo_registration')) {
-      echo '<pre>'; var_dump($_POST); echo '</pre>'; die();
-      $date_registered = $repo_registration['date_registered'];
       if ($this->validate->form('REPO_REGISTRATION', $data)) {
-        $repo_registration_id = $this->repo->save_registration($repo_inventory_id, $repo_registration);
+        $repo_registration_id = $this->repo->save_registration($repo_inventory_id, $repo_sales_id, $repo_registration);
         redirect('repo/view/'.$repo_inventory_id);
       }
     }
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'SALES');
-    //echo '<pre>'; var_dump($data); echo '</pre>'; die();
-    $date = $date_registered ?? $data['repo']['date_registered'];
+    $date = $this->input->post('date_registered') ?? $data['repo']['date_registered'];
     $expire = $this->repo->expiration($date);
 
     $data['repo']['expire_status'] = $expire['status'];
@@ -112,7 +98,7 @@ class Repo extends MY_Controller {
     $this->access(17);
 
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, NULL);
-    $this->check_mc_branch($data['repo']['bcode']);
+    //$this->check_mc_branch($data['repo']['bcode']);
 
     $data['histories'] = $this->repo->get_history($repo_inventory_id);
     if (isset($data['repo']['attachment'])) {
@@ -130,7 +116,7 @@ class Repo extends MY_Controller {
 
     $this->header_data('title', 'Repo View');
     $this->header_data('nav', 'repo-view');
-    $this->template('repo/view.php', $data);
+    $this->template('repo/view', $data);
   }
 
   public function get_sales() {
@@ -277,6 +263,12 @@ HTML;
 
   public function create_ca() {
     $data['table_sales'] = $this->repo->request_ca();
+    if ($repo_sales_id = $this->input->post('repo_sales_id')) {
+      $success = $this->repo->generate_ca($repo_sales_id);
+      if ($success) {
+        redirect('repo/ca_batch');
+      }
+    }
     $this->template('repo/batch/create', $data);
   }
 
@@ -293,11 +285,7 @@ HTML;
     $this->access(17);
     $this->header_data('title', 'Repo Batch CA View');
     $this->header_data('nav', 'repo-batch-ca-view');
-    $data['batch'] = $this->repo->batch($repo_batch_id);
-    $data['reference'] = $data['batch'][0]['reference'];
-    $batch_misc = $data['batch'][0]['misc_expenses'];
-    $data['batch_misc'] = (isset($batch_misc)) ? json_decode($batch_misc, 1) : NULL;
-
+    $data = $this->repo->batch($repo_batch_id);
     $this->template('repo/batch/view', $data);
   }
 
@@ -305,48 +293,37 @@ HTML;
     $this->access(17);
     $this->header_data('title', 'Repo Registration Misc Expense');
     $this->header_data('nav', 'repo-registration-misc-expense');
-    $data['batches'] = $this->repo->batch_list();
+    $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
+
+    $data['batchref_dropdown'] = form_dropdown("repo_batch_id", $this->form->ca_dropdown('REPO'));
     $data['hidden'] = 'hidden';
     $data['disabled'] = 'disabled';
 
     if ($this->input->post('save')) {
+      $repo_batch_id = $this->input->post('repo_batch_id');
       $expense_type = $this->input->post('expense_type');
-      $validation = [
-        [ 'field' => 'repo_batch_id', 'label' => 'Reference Number', 'rules' => 'required' ],
-        [ 'field' => 'expense_type', 'label' => 'Expense Type', 'rules' => 'required' ],
-        [ 'field' => 'amount', 'label' => 'Misc Expense Amount', 'rules' => 'required' ],
-      ];
-
-      if ($expense_type === 'Others') {
-        $validation[] = [ 'field' => 'others', 'label' => 'Others', 'rules' => 'required' ];
-      }
-
-      $this->form_validation->set_rules($validation);
-      if ($this->form_validation->run()) {
-        $repo_batch_id = $this->input->post('repo_batch_id');
-        $expense_id = md5(date('Y-m-d H:m:s'));
-        $upload = $this->file->upload('misc', '/repo/batch/'.$repo_batch_id.'/', $expense_id.'.jpg');
-
-        if ($upload) {
-          $img_path = '/rms_dir/repo/batch/'.$repo_batch_id.'/'.$expense_id.'.jpg';
-          $misc_saved = $this->repo->save_expense([
-            "repo_batch_id" => $repo_batch_id,
-            "data" => [
-              $expense_id => [
-                "expense_type" => $expense_type,
-                "amount" => $this->input->post('amount'),
-                "image_path" => $img_path,
-                "status" => "For Checking",
-                "is_deleted" => "0"
-              ]
+      $expense_id = md5($_SESSION['branch_code'].date('Y-m-d H:m:s'));
+      $upload = $this->file->upload('misc', '/repo/batch/'.$repo_batch_id.'/', $expense_id.'.jpg');
+      $form_ok = $this->validate->form('REPO_BATCH_MISC_EXP', [ 'expense_type' => $expense_type ]);
+      if ($upload && $form_ok) {
+        $img_path = '/rms_dir/repo/batch/'.$repo_batch_id.'/'.$expense_id.'.jpg';
+        $misc_saved = $this->repo->save_expense([
+          "repo_batch_id" => $repo_batch_id,
+          "data" => [
+            $expense_id => [
+              "expense_type" => $expense_type,
+              "amount" => $this->input->post('amount'),
+              "image_path" => $img_path,
+              "status" => "For Checking",
+              "is_deleted" => "0"
             ]
-          ]);
+          ]
+        ]);
 
-          if ($misc_saved) {
-            $_SESSION['messages'][] = 'Misc expense uploaded successfully.';
-          } else {
-            $_SESSION['warning'][] = 'Something went wrong.';
-          }
+        if ($misc_saved) {
+          $_SESSION['messages'][] = 'Misc expense uploaded successfully.';
+        } else {
+          $_SESSION['warning'][] = 'Something went wrong.';
         }
       }
 
@@ -369,34 +346,66 @@ HTML;
 
   public function ca() {
     $this->access(1); // Todo add page access
-    if ($this->input->post()) {
-      $repo_batch_ids = array_keys($this->input->post('batches'));
-      $validation = [];
-      foreach ($repo_batch_ids as $repo_batch_id) {
-        $validation[] = [ 'field' => 'batches['.$repo_batch_id.']', 'label' => 'Document Number', 'rules' => 'required' ] ;
-      }
-      $this->form_validation->set_rules($validation);
-
+    if ($this->input->post("save_doc_no")) {
+      $this->form_validation->set_rules('doc_no', 'Document #', 'trim|required|min_length[4]');
       if ($this->form_validation->run()) {
-        $success = $this->repo->save_ca($this->input->post('batches'));
-        if ($success) {
-          $_SESSION['messages'][] = 'CA Reference added Document Number successfully.';
+        $ca['repo_batch_id'] = $this->input->post('repo_batch_id');
+        $ca['doc_no'] = $this->input->post('doc_no');
+        $ca['status'] = "FOR DEPOSIT";
+        $ca['date_doc_no_encoded'] = date('Y-m-d H:m:s');
+        $isSaved = $this->repo_save($ca,"INPUT_DOC_NUMBER");
+        if (!$isSaved) {
+          $this->output->set_status_header(500);
+          $status_msg = "Error in database.";
+        } else {
+          echo '{"message":"Document# '.$ca['doc_no'].' has been saved successfully!"}';
         }
+      } else {
+        $this->output->set_status_header(400);
+        echo validation_errors();
       }
+      exit;
     }
+
     $this->header_data('title', 'Repo CA');
     $this->header_data('nav', 'projected_fund');
-    $data['for_cas'] = $this->repo->get_for_ca();
+    $data['input_region'] = form_dropdown("region", $this->form->region_dropdown('WITH_OUT_ANY'), 0, ["class"=>"span12"]);
+    $data['for_ca'] = $this->repo->get_for_ca();
     $this->template('repo/acctg/ca', $data);
   }
 
-  public function print_ca() {
+  public function ca_template() {
+    if ($this->input->post("download")) {
+      $data = $this->repo->repo_ca_template();
+      $this->load->view("projected_fund/ca_template", $data);
+    }
+  }
+
+  public function print_ca_topsheet() {
     $this->access(1); // Todo add page access
-    if (!$this->input->post('batches')) {
+    if (!$this->input->post('print')) {
       show_404();
     }
-    $data['region_company'] = $this->input->post('region_company');
-    $data['prints'] = $this->repo->print_ca(array_keys($this->input->post('batches')));
-    $this->template('repo/acctg/print_ca', $data);
+    $data = $this->repo->print_ca($this->input->post());
+    $this->load->view('repo/acctg/print_ca', $data);
+  }
+
+  public function for_checking() {
+    $this->access(18); // For Checking
+    $this->header_data('title', 'Repo Checking');
+    $this->header_data('nav', 'repo-checking');
+    $data = [];
+    $this->template('repo/for_checking', $data);
+  }
+
+  private function repo_save(array $data, $type) {
+    $this->db->trans_start();
+    switch ($type) {
+      case 'INPUT_DOC_NUMBER':
+        $this->db->update('tbl_repo_batch', $data, "repo_batch_id=".$data['repo_batch_id']);
+        break;
+    }
+    $this->db->trans_complete();
+    return $this->db->trans_status();
   }
 }

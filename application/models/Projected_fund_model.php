@@ -157,18 +157,24 @@ SQL;
       $status = "AND rb.status = '{$param->status}'";
     }
 
-    return $this->db
+    $this->table->set_template(["table_open" => "<table class='table'>"]);
+    $result = $this->db
       ->select("
-        rb.reference, rb.doc_no, DATE_FORMAT(rb.date_created, '%Y-%m-%d') AS entry_date,
-        rb.debit_memo, rb.date_deposited, (rb.amount + rb.bank_amount) AS amount,
-        rb.status, r.rid, r.region
+        CONCAT(rb.bcode, ' ', rb.bname) AS 'Branch',
+        r.region AS 'Region',
+        DATE_FORMAT(rb.date_created, '%Y-%m-%d') AS 'Entry Date', rb.reference AS 'Reference #',
+        rb.doc_no AS 'Document #',
+        rb.debit_memo AS 'Debit Memo',
+        rb.date_deposited AS 'Date Deposited',
+        FORMAT(rb.amount, 2) AS 'Amount',
+        rb.status AS 'Status'
       ")
       ->from('tbl_repo_batch rb')
       ->join('tbl_region r', 'r.rid = rb.region_id', 'left')
       ->where("rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}")
       ->limit(1000)
-      ->get()
-      ->result_object();
+      ->get();
+    return $this->table->generate($result);
   }
 
 }

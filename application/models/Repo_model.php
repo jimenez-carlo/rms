@@ -7,33 +7,43 @@ class Repo_model extends CI_Model {
     parent::__construct();
   }
 
+  // TODO Get the seconds and convert to month and days or year(optional)
   public function inventory() {
+    $this->table->set_template(["table_open" => "<table class='table'>"]);
     $select = [
-      'ri.repo_inventory_id',
-      'ri.bcode', 'ri.bname',
-      'ri.status AS repo_status',
-      'e.*', 'c.cust_code',
-      'c.cid AS customer_id',
-      'IFNULL(c.first_name,"") AS first_name',
-      'IFNULL(c.last_name,"") AS last_name',
-      'TRIM(CONCAT(IF(c.last_name IS NULL, " " , CONCAT(c.last_name,",")), " ", IFNULL(c.first_name, " "), " ", IFNULL(c.middle_name, " "))) AS customer_name',
-      'IFNULL(DATE_FORMAT(rr.date_registered, "%Y-%m-%d"),"") AS date_registered',
-      'IFNULL(DATE_FORMAT(rs.date_sold, "%Y-%m-%d"),"") AS date_sold',
-      'CASE WHEN ri.status IN("New", "Registered")  THEN true END AS regn_disabled',
-      'CASE WHEN rs.is_active = 1 THEN true END AS sale_disabled'
+      'c.cust_code AS "Cust Code"',
+      'TRIM(CONCAT(IF(c.last_name IS NULL, " " , CONCAT(c.last_name,",")), " ", IFNULL(c.first_name, " "), " ", IFNULL(c.middle_name, " "))) AS Customer',
+      'e.engine_no AS "Engine #"',
+      'e.mvf_no AS "MV File"',
+      'ri.status AS Status',
+      'IFNULL(DATE_FORMAT(rs.date_sold, "%Y-%m-%d"),"") AS "Date Sold"',
+      'IFNULL(DATE_FORMAT(rr.date_registered, "%Y-%m-%d"),"") AS "Date Registered"',
+      //'IFNULL(
+      //  CONCAT(
+      //    "<span class=\'text-success\'>",
+      //    PERIOD_DIFF(DATE_FORMAT(DATE_ADD(rr.date_registered, INTERVAL 11 MONTH), "%Y%m"), DATE_FORMAT(NOW(), "%Y%m"))," month(s)",
+      //    "</span>"
+      //  ), "<span class=\'text-error\'>Not yet registered.</span>"
+      //) AS Expiration',
+      'CONCAT(
+        " <a class=\'btn btn-primary\'", " href=\''.base_url('repo/view/').'",ri.repo_inventory_id,"\'"," target=\'_blank\'>View</a> ",
+        " <a class=\'btn btn-warning\'",IF(ri.status = \'NEW\', CONCAT("href=\''.base_url('repo/sale/').'", ri.repo_inventory_id,"\'"), "disabled")," target=\'_blank\'>Sales</a> ",
+        " <a class=\'btn btn-success\'",IF(ri.status = \'SALES\' AND rb.debit_memo IS NOT NULL, CONCAT("href=\''.base_url('repo/registration/').'", ri.repo_inventory_id,"/",rs.repo_sales_id,"\'"), "disabled")," target=\'_blank\'>Register</a> "
+      ) AS ""',
     ];
 
-    return $this->db
+    $result =  $this->db
     ->distinct()
     ->select($select, false)
     ->from('tbl_repo_inventory ri')
     ->join('tbl_engine e', 'e.eid = ri.engine_id', 'inner')
-    ->join('tbl_repo_registration rr', 'rr.repo_inventory_id = ri.repo_inventory_id', 'left')
     ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
+    ->join('tbl_repo_batch rb', 'rb.repo_batch_id = rs.repo_batch_id', 'left')
+    ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id', 'left')
     ->join('tbl_customer c', 'c.cid = rs.customer_id', 'left')
     ->where([ 'ri.bcode' => $_SESSION['branch_code'] ])
-    ->order_by('date_sold DESC')
-    ->get()->result_array();
+    ->get();
+    return $this->table->generate($result);
   }
 
   public function get_repo_in($select, $where) {
@@ -42,8 +52,8 @@ class Repo_model extends CI_Model {
       ->join('tbl_sales s', 'e.eid = s.engine', 'left')
       ->join('tbl_customer sc', 'sc.cid = s.customer', 'left')
       ->join('tbl_repo_inventory ri', 'ri.engine_id = e.eid', 'left')
-      ->join('tbl_repo_registration rr', 'rr.repo_inventory_id = ri.repo_inventory_id', 'left')
       ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
+      ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id', 'left')
       ->join('tbl_customer rsc', 'rsc.cid = rs.customer_id', 'left')
       ->where($where)
       ->order_by('rr.repo_registration_id DESC')
@@ -62,14 +72,18 @@ class Repo_model extends CI_Model {
     }
 
     $engine_details = $this->db->select("
-      ri.*, e.*, rr.repo_registration_id, rr.repo_batch_id,
+      ri.*, e.*, rr.repo_registration_id, rb.repo_batch_id,
       DATE_FORMAT(
         IFNULL(rr.date_registered, s.cr_date),
         '%Y-%m-%d'
       ) AS date_registered,
-      rr.registration_type, rr.orcr_amt,
-      rr.hpg_pnp_clearance_amt, rr.emission_amt,
-      rr.insurance_amt, rr.macro_etching_amt,
+      rr.registration_type, IFNULL(rr.orcr_amt,0) AS orcr_amt,
+      IFNULL(rr.renewal_amt,0) AS renewal_amt, IFNULL(rr.transfer_amt,0) AS transfer_amt,
+      IFNULL(rr.hpg_pnp_clearance_amt,0) AS hpg_pnp_clearance_amt, IFNULL(rr.emission_amt,0) AS emission_amt,
+      IFNULL(rr.insurance_amt,0) AS insurance_amt, IFNULL(rr.macro_etching_amt,0) AS macro_etching_amt,
+      IFNULL(rr.renewal_tip,0) AS renewal_tip, IFNULL(rr.transfer_tip,0) AS transfer_tip,
+      IFNULL(rr.hpg_pnp_clearance_tip,0) AS hpg_pnp_clearance_tip,
+      IFNULL(rr.macro_etching_tip,0) AS macro_etching_tip, IFNULL(rr.plate_tip,0) AS plate_tip,
       rr.attachment, c.*,
       TRIM(
         CONCAT(
@@ -88,7 +102,7 @@ class Repo_model extends CI_Model {
     ->join('tbl_engine e', 'e.eid = ri.engine_id', 'left')
     ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
     ->join('tbl_repo_registration rr', 'rr.repo_registration_id= rs.repo_registration_id', 'left')
-    ->join('tbl_repo_batch rb', 'rb.repo_batch_id = rr.repo_batch_id', 'left')
+    ->join('tbl_repo_batch rb', 'rb.repo_batch_id = rs.repo_batch_id', 'left')
     ->join('tbl_customer c', 'c.cid = rs.customer_id', 'left')
     ->join('tbl_sales s', 's.engine = e.eid', 'left')
     ->where('ri.repo_inventory_id = '.$repo_inventory_id.' '.$status)->get()->row_array();
@@ -97,18 +111,12 @@ class Repo_model extends CI_Model {
 
   public function claim($engine_id) {
     $get_repo = <<<SQL
-      SELECT
-        *
-      FROM
-        tbl_repo_inventory ri
-      LEFT JOIN
-        tbl_repo_registration rr ON rr.repo_inventory_id = ri.repo_inventory_id
-      LEFT JOIN
-        tbl_repo_batch rb ON rb.repo_batch_id = rr.repo_batch_id
-      WHERE
-        ri.engine_id = {$engine_id}
-        AND ri.status != 'Registered'
-        AND rb.repo_batch_id IS NULL
+      SELECT *
+      FROM tbl_repo_inventory ri
+      LEFT JOIN tbl_repo_sales rs ON rs.repo_inventory_id = ri.repo_inventory_id
+      LEFT JOIN tbl_repo_registration rr ON rr.repo_registration_id = rs.repo_registration_id
+      LEFT JOIN tbl_repo_batch rb ON rb.repo_batch_id = rs.repo_batch_id
+      WHERE ri.engine_id = {$engine_id} AND ri.status != 'Registered' AND rb.repo_batch_id IS NULL
 SQL;
     $repo = $this->db->query($get_repo)->row_array();
 
@@ -211,80 +219,52 @@ SQL;
     $this->db->update('tbl_repo_inventory', ['status' => $status], ['repo_inventory_id' => $repo_inventory_id]);
   }
 
-  public function save_registration($repo_inventory_id, $registration) {
-    $this->db->trans_start(true);
-    echo '<pre>'; var_dump($registration); echo '</pre>'; die();
-    echo '<pre>'; var_dump($_FILES); echo '</pre>';
-    if ($this->db->insert('tbl_repo_registration', $registration)) {
-      $repo_registration_id = $this->db->last_query();
-    }
+  public function save_registration($repo_inventory_id, $repo_sales_id, $registration) {
+    $this->db->trans_begin();
 
-    // Attachments
-    $attachments = [];
-    foreach ($_FILES['attachments'] as $key => $files) {
-      $dir = '/rms_dir/repo/registration/'.$registration['repo_registration_id'].'/';
-      if ($key === 'name') {
-        foreach ($files as $key => $file) {
-          $attachments[$key] = $dir.$key.'_'.$file[0];
+    if ($this->db->insert('tbl_repo_registration', $registration)) {
+      $repo_registration_id = $this->db->insert_id();
+      // Attachment
+      $attachment = [];
+      foreach ($_FILES['attachments'] as $key => $files) {
+        $dir = '/rms_dir/repo/registration/'.$repo_registration_id.'/';
+        if ($key === 'name') {
+          foreach ($files as $key => $file) {
+            $attachment[$key] = $dir.$key.'_'.$file[0];
+          }
         }
       }
+      $attachments = json_encode($attachment);
+      $upload_status = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
+      $this->db->update('tbl_repo_registration', ['attachment'=>$attachments], 'repo_registration_id='.$repo_registration_id);
+
+      $this->db->query("
+        UPDATE tbl_repo_inventory ri, tbl_repo_sales rs
+        SET ri.status='REGISTERED', rs.repo_registration_id = {$repo_registration_id}
+        WHERE ri.repo_inventory_id = rs.repo_inventory_id AND rs.repo_sales_id = {$repo_sales_id}
+      ");
+
+      $this->insert_history(
+        $repo_inventory_id,
+        'REGISTERED',
+        $this->db
+          ->select()
+          ->join('tbl_repo_sales rs', 'rs.repo_registration_id = rr.repo_registration_id', 'left')
+          ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id', 'left')
+          ->get_where(
+            'tbl_repo_registration rr',
+            [
+              'rr.repo_registration_id' => $repo_registration_id
+            ]
+          )->row_array()
+      );
     }
-    //$upload_attachments = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
 
-    $registration['attachment'] = json_encode($attachments);
-    echo '<pre>'; var_dump($registration['attachment']); echo '</pre>'; die();
-
-    $update_qry = <<<SQL
-      UPDATE
-        tbl_repo_registration rr,
-        tbl_repo_inventory ri
-      SET
-        ri.status = 'REGISTERED',
-        rr.date_registered = '{$registration['date_registered']}',
-        rr.orcr_amt = {$registration['orcr_amt']},
-        rr.hpg_pnp_clearance_amt = {$registration['hpg_pnp_clearance_amt']},
-        rr.insurance_amt = {$registration['insurance_amt']},
-        rr.emission_amt = {$registration['emission_amt']},
-        rr.macro_etching_amt = {$registration['macro_etching_amt']},
-        rr.or_tip = {$registration['or_tip']},
-        rr.pnp_tip = {$registration['pnp_tip']},
-        rr.date_uploaded = NOW(),
-        rr.registration_type = 'RENEW & TRANSFER',
-        rr.attachment = '{$registration['attachment']}'
-      WHERE
-        ri.repo_inventory_id = rr.repo_inventory_id AND
-        rr.repo_registration_id = {$registration['repo_registration_id']} AND
-        ri.repo_inventory_id = {$repo_inventory_id}
-SQL;
-
-    $this->db->query($update_qry);
-
-    $this->insert_history(
-      $repo_inventory_id,
-      'REGISTERED',
-      $this
-        ->db
-        ->select("
-          ri.*, rr.repo_registration_id, rr.repo_batch_id,
-          rr.date_registered, rr.date_uploaded, rr.registration_type,
-          rr.orcr_amt, rr.hpg_pnp_clearance_amt, rr.emission_amt,
-          rr.insurance_amt, rr.macro_etching_amt, rr.attachment,
-          DATE_FORMAT(rr.date_created, '%Y-%m-%d') AS date_created
-        ")
-        ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rr.repo_inventory_id', 'left')
-        ->get_where(
-          'tbl_repo_registration rr',
-          [
-            'rr.repo_registration_id' => $registration['repo_registration_id']
-          ]
-        )->row_array()
-    );
-
-    $this->db->trans_complete();
-
-    if ($this->db->trans_status()) {
+    if ($this->db->trans_status() && $upload_status) {
+      $this->db->trans_commit();
       return $registration['repo_registration_id'];
     } else {
+      $this->db->trans_rollback();
       echo 'Error';
     }
   }
@@ -298,10 +278,11 @@ SQL;
     } else {
       $cid = $customer['cid'];
     }
+
     $sales['repo_sale']['bcode'] = $_SESSION['branch_code'];
     $sales['repo_sale']['bname'] = $_SESSION['branch_name'];
     $sales['repo_sale']['company_id'] = $_SESSION['company'];
-    $sales['repo_sale']['rrt_region_id'] = $_SESSION['rrt_region_id'];
+    $sales['repo_sale']['region_id'] = $_SESSION['rrt_region_id'];
     $sales['repo_sale']['customer_id'] = $cid;
 
     // REPO SALES
@@ -363,51 +344,65 @@ SQL;
     $this->table->set_template(["table_open" => "<table class='table'>"]);
 
     $result = $this->db
-      ->distinct()
       ->select("
-        rb.repo_batch_id,
+        DATE_FORMAT(rb.date_created, '%Y-%m-%d %r') AS 'Date Requested',
         CONCAT(rb.bcode,' ', rb.bname) AS Branch,
-        rb.reference AS 'Reference#', rb.amount AS 'Amount',
+        rb.reference AS 'Reference#', FORMAT(rb.amount, 2) AS 'Amount',
         rb.doc_no AS 'Document#', rb.debit_memo AS 'Debit Memo', rb.status AS 'Status',
-        CONCAT('<a>View</a> <a>Print</a>') AS ''
+        CONCAT('
+          <a class=\"btn btn-primary\" href=\"".base_url('repo/batch_view/')."',rb.repo_batch_id,'\" target=\"_blank\">View</a>
+          <a class=\"btn btn-success\" href=\"".base_url('repo/batch_print/')."',rb.repo_batch_id,'\" target=\"_blank\">Print</a>
+        ') AS ''
       ")
-      ->from('tbl_repo_inventory ri')
-      ->join('tbl_repo_sales rs', 'ri.repo_inventory_id = rs.repo_inventory_id', 'left')
-      ->join('tbl_repo_batch rb', 'rb.repo_batch_id = rs.repo_batch_id', 'left')
-      ->where('rb.status != "Liquidated" AND rs.bcode = '.$_SESSION["branch_code"].' AND (rs.is_active = 1)')
+      ->from('tbl_repo_batch rb')
+      ->where('rb.bcode = '.$_SESSION["branch_code"])
       ->order_by('rb.repo_batch_id', 'DESC')
       ->get();
     return $this->table->generate($result);
   }
 
   public function batch($repo_batch_id) {
-    return
-      $this->db
-      ->select('rb.*, rr.*, ri.*, rs.*, e.*, c.*')
+    $data = $this->db->select('reference, misc_expenses')->get_where('tbl_repo_batch', 'repo_batch_id='.$repo_batch_id)->row_array();
+    $this->table->set_template(["table_open" => "<table class='table'>"]);
+    $result = $this->db
+      ->select('
+        TRIM(CONCAT(IF(c.last_name IS NULL, " " , CONCAT(c.last_name,",")), " ", IFNULL(c.first_name, " "), " ", IFNULL(c.middle_name, " "))) AS "Customer Name",
+        c.cust_code AS "Customer Code",
+        e.engine_no AS "Engine #",
+        rs.ar_num AS "AR#",
+        FORMAT(rs.ar_amt,2) AS "AR Amt.",
+        FORMAT(IFNULL(rr.orcr_amt, 0),2) AS "OR/CR Amt.",
+        FORMAT(IFNULL(rr.renewal_amt, 0),2) AS "Renewal Amt.",
+        FORMAT(IFNULL(rr.transfer_amt, 0),2) AS "Transfer Amt.",
+        FORMAT(IFNULL(rr.hpg_pnp_clearance_amt, 0),2) AS "HPG/PNP Clearance Amt.",
+        FORMAT(IFNULL(rr.insurance_amt, 0),2) AS "Insurance Amt.",
+        FORMAT(IFNULL(rr.emission_amt, 0),2) AS "Emission Amt.",
+        FORMAT(IFNULL(rr.macro_etching_amt, 0),2) AS "Macro Etching Amt.",
+        FORMAT(IFNULL(rr.renewal_tip, 0),2) AS "Renewal Tip",
+        FORMAT(IFNULL(rr.transfer_tip, 0),2) AS "Transfer Tip",
+        FORMAT(IFNULL(rr.hpg_pnp_clearance_tip, 0),2) AS "HPG/PNP Clearance Tip",
+        FORMAT(IFNULL(rr.macro_etching_tip, 0),2) AS "Macro Etching Tip",
+        FORMAT(IFNULL(rr.plate_tip, 0),2) AS "Plate Tip"
+      ')
       ->from('tbl_repo_batch rb')
-      ->join('tbl_repo_registration rr', 'rb.repo_batch_id = rr.repo_batch_id', 'left')
-      ->join('tbl_repo_inventory ri', 'rr.repo_inventory_id = ri.repo_inventory_id', 'left')
-      ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
+      ->join('tbl_repo_sales rs', 'rs.repo_batch_id = rb.repo_batch_id', 'left')
+      ->join('tbl_repo_inventory ri', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
+      ->join('tbl_repo_registration rr', 'rs.repo_registration_id = rr.repo_registration_id', 'left')
       ->join('tbl_engine e', 'ri.engine_id = e.eid', 'left')
       ->join('tbl_customer c', 'rs.customer_id = c.cid', 'left')
-      ->where('rb.repo_batch_id = '.$repo_batch_id .' AND ri.bcode = '.$_SESSION['branch_code'])
-      ->get()->result_array();
+      ->where('rb.repo_batch_id = '.$repo_batch_id .' AND rs.bcode = '.$_SESSION['branch_code'])
+      ->get();
+    $data["batch"] = $this->table->generate($result);
+    return $data;
   }
 
   public function save_expense($data) {
     $data_json = json_encode($data['data']);
     $success = $this->db->query("
-      UPDATE
-        tbl_repo_batch
-      SET
-        misc_expenses = IF(misc_expenses IS NULL, '{$data_json}', JSON_MERGE_PATCH(misc_expenses, '{$data_json}'))
-      WHERE
-      repo_batch_id = {$data['repo_batch_id']}
+      UPDATE tbl_repo_batch
+      SET misc_expenses = IF(misc_expenses IS NULL, '{$data_json}', JSON_MERGE_PATCH(misc_expenses, '{$data_json}'))
+      WHERE repo_batch_id = {$data['repo_batch_id']}
     ");
-
-    if ($success) {
-      $_SESSION["message"][] = "Expense saved successfully.";
-    }
 
     return $success;
   }
@@ -434,8 +429,8 @@ SQL;
       ->join('tbl_engine e', 'e.eid = ri.engine_id','left')
       ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
       ->join('tbl_customer c', 'c.cid = rs.customer_id','left')
-      ->join('tbl_repo_registration rr', 'rr.repo_inventory_id = ri.repo_inventory_id','left')
-      ->where('rs.repo_batch_id = '.$repo_batch_id.' OR rr.repo_batch_id ='.$repo_batch_id)
+      ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id','left')
+      ->where('rs.repo_batch_id = '.$repo_batch_id.' OR rs.repo_batch_id ='.$repo_batch_id)
       ->get()
       ->result_array();
 
@@ -443,110 +438,136 @@ SQL;
   }
 
   public function request_ca() {
-    $this->table->set_template(["table_open" => "<table class='table'>"]);
+    $this->table->set_template(["table_open" => "<table class='table table-condensed'>"]);
 
     $result = $this->db
-      ->select()
+      ->select("
+        CONCAT('<input type=\"checkbox\" name=\"repo_sales_id[]\" value=\"',rs.repo_sales_id,'\" required>') AS '',
+        CONCAT(rs.bcode, ' ', rs.bname) AS 'Branch',
+        rs.date_sold AS 'Date Sold',
+        rs.rsf_num AS 'RSF#',
+        rs.ar_num AS 'AR#',
+        rs.ar_amt AS 'AR Amt.',
+        TRIM(
+          CONCAT(IF(c.last_name IS NULL, ' ' , CONCAT(c.last_name,',')), ' ',
+          IFNULL(c.first_name, ' '), ' ',
+          IFNULL(c.middle_name, ' '))
+        ) AS 'Customer Name',
+        e.mvf_no AS 'MVF No.',
+        e.engine_no AS 'Engine No',
+        IFNULL(p.plate_number, '') AS 'Plate Number'
+      ")
       ->from('tbl_repo_inventory ri')
       ->join('tbl_repo_sales rs', 'ri.repo_inventory_id = rs.repo_inventory_id', 'inner')
       ->join('tbl_engine e', 'e.eid = ri.engine_id', 'inner')
+      ->join('tbl_plate p', 'p.plate_id = e.plate_id', 'left')
       ->join('tbl_customer c', 'c.cid = rs.customer_id', 'inner')
-      ->where('rs.bcode = '.$_SESSION["branch_code"].' AND rs.repo_batch_id = 0')
-      ->order_by('rs.repo_sales_id', 'DESC')
-      ->get()->result_array();
-    echo '<pre>'; var_dump($result); echo '</pre>'; die();
+      ->where('rs.bcode = '.$_SESSION["branch_code"].' AND rs.repo_batch_id IS NULL')
+      ->order_by('rs.date_sold', 'DESC')
+      ->get();
+
     return $this->table->generate($result);
   }
 
   public function get_for_ca() {
-    $sql = <<<SQL
+    $this->table->set_template(["table_open" => "<table class='table table-condensed'>"]);
+    $sql = "
       SELECT
-        rrt_region,
-        company_code,
-        SUM(no_of_unit) total_no_of_unit,
-        FORMAT( SUM(no_of_unit) * 3600, 2) AS total_amount
-        ,CONCAT('[',
-          GROUP_CONCAT(DISTINCT '{
-            "repo_batch_id": ',repo_batch_id,',
-            "reference": "',reference,'",
-            "bcode":',bcode, ', "bname": "',bname,'",
-            "no_of_unit":',no_of_unit, ',
-            "amount":', (no_of_unit*3600),
-          '}'),
-        ']') AS batches
-      FROM (
-        SELECT
-          rb.*
-          ,c.*
-          ,r.rid, r.region AS rrt_region
-          ,COUNT(*) AS no_of_unit
-        FROM
-          tbl_repo_batch rb
-        LEFT JOIN
-          tbl_company c ON c.cid = rb.company_id
-        LEFT JOIN
-          tbl_region r ON r.rid = rb.region_id
-        LEFT JOIN
-          tbl_repo_sales rs ON rs.repo_batch_id = rb.repo_batch_id
-        LEFT JOIN
-          tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
-        WHERE
-          rb.status = 'FOR CA' AND DATE_FORMAT(rb.date_created, '%Y-%m-%d') <= DATE_FORMAT(NOW() - INTERVAL 1 DAY, '%Y-%m-%d')
-        GROUP BY rb.repo_batch_id
-      ) AS first_qry
-      GROUP BY company_code, rid, company_id
-      ORDER BY rid, company_id
-SQL;
-
-    $this->db->simple_query("SET SESSION group_concat_max_len = 18446744073709551615");
-    return $this->db->query($sql)->result_array();
+        r.region AS 'Region',
+        c.company_code AS 'Company',
+        CONCAT(IFNULL(rb.bcode,''), ' ', IFNULL(rb.bname,'')) AS 'Branch',
+        rb.date_created AS 'Date Requested',
+        rb.reference AS 'Reference',
+        IFNULL(rb.doc_no, CONCAT('<div class=\'control-group\'><input id=\'',rb.repo_batch_id,'\' class=\'doc-no\' type=\'text\'></div>')) AS 'Document #',
+        FORMAT(rb.amount, 2) AS 'Amount',
+        CONCAT('<button id=\'save-',rb.repo_batch_id,'\' type=\'button\' class=\'btn btn-success\' name=\'save\' value=\'',rb.repo_batch_id,'\' disabled>Save Doc#</button>') AS ''
+      FROM tbl_repo_batch rb
+      LEFT JOIN tbl_region r ON r.rid = rb.region_id
+      LEFT JOIN tbl_company c ON c.cid = rb.company_id
+      WHERE rb.doc_no IS NULL
+    ";
+    $result = $this->db->query($sql);
+    return $this->table->generate($result);
   }
 
-  public function print_ca(array $repo_batch_ids) {
-    return $this->db
-      ->select('rb.reference, rb.bcode, rb.bname, COUNT(*) AS no_of_unit, COUNT(*) * 3600 AS amount')
-      ->from('tbl_repo_batch rb')
-      ->join('tbl_repo_sales rs', 'rs.repo_batch_id = rb.repo_batch_id','left')
-      ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id','left')
-      ->where_in('rb.repo_batch_id', $repo_batch_ids)
-      ->group_by('rb.repo_batch_id')
-      ->get()->result_array();
+  public function print_ca(array $data) {
+    return [
+      'company_region' => $this->db
+         ->select('CONCAT(rb.bcode, " ", rb.bname," ", r.region) AS company_region' , true)
+         ->join('tbl_region r', 'r.rid = rb.region_id', 'inner')
+         ->get_where('tbl_repo_batch rb', 'rb.region_id='.$data['region'])
+         ->row_array()['company_region'],
+      'prints' => $this->db
+        ->select('rb.reference, rb.doc_no, rb.bcode, rb.bname, COUNT(*) AS no_of_unit, COUNT(*) * 3600 AS amount')
+        ->from('tbl_repo_batch rb')
+        ->join('tbl_repo_sales rs', 'rs.repo_batch_id = rb.repo_batch_id','left')
+        ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id','left')
+        ->where('rb.region_id', $data['region'])
+        ->where("rb.date_doc_no_encoded BETWEEN '{$data['date_doc_no_encoded']} 00:00:00' AND '{$data['date_doc_no_encoded']} 23:59:59'")
+        ->group_by('rb.repo_batch_id')
+        ->get()->result_array(),
+    ];
   }
 
-  public function save_ca(array $batches) {
+  public function generate_ca(array $repo_sales_id) {
     $this->db->trans_start();
-    foreach ($batches as $repo_batch_id => $doc_no) {
-      $this->db->query("
-        UPDATE
-          tbl_repo_batch rb
-        INNER JOIN
-          tbl_region_budget rbgt ON rbgt.region_id = rb.region_id
-        INNER JOIN (
-          SELECT
-            rb.repo_batch_id, COUNT(*) AS no_of_unit
-          FROM
-            tbl_repo_batch rb
-          LEFT JOIN
-            tbl_repo_sales rs ON rs.repo_batch_id = rb.repo_batch_id
-          LEFT JOIN
-            tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
-          WHERE
-            rb.repo_batch_id = {$repo_batch_id}
-          GROUP BY
-            rb.repo_batch_id
-        ) AS count ON count.repo_batch_id = rb.repo_batch_id
-        SET
-          rb.doc_no = '{$doc_no}',
-          rb.date_doc_no_encoded = NOW(),
-          rb.bank_amount = count.no_of_unit * rbgt.repo_bmi,
-          rb.amount = count.no_of_unit * rbgt.repo_cmc,
-          rb.status = 'FOR DEPOSIT'
-        WHERE
-          rb.repo_batch_id = {$repo_batch_id}
-      ");
-    }
+    $count = count($repo_sales_id);
+    $sql = <<<SQL
+    INSERT tbl_repo_batch(reference, amount, bcode, bname, type, status, date_created, region_id, company_id)
+    SELECT
+      CONCAT(
+        "REPOCA-{$_SESSION['branch_code']}-",
+        DATE_FORMAT(NOW(), "%y%m%d"),
+        IF(COUNT(*)>0, CONCAT("-", CAST(COUNT(*) AS CHAR)),"")
+      ) AS reference,
+      {$count} * 3600 AS amount,
+      {$_SESSION['branch_code']},
+      "{$_SESSION['branch_name']}",
+      "CASH ADVANCE", "NEW", NOW(),
+      {$_SESSION['rrt_region_id']},
+      {$_SESSION['company']}
+    FROM tbl_repo_batch rb
+    WHERE rb.reference LIKE CONCAT("%REPOCA-{$_SESSION['branch_code']}-",DATE_FORMAT(NOW(), "%y%m%d"),"%")
+SQL;
+    $this->db->query($sql);
+    $ca_batch_id = $this->db->insert_id();
+
+    $this->db->where_in('rs.repo_sales_id', $repo_sales_id);
+    $this->db->update('tbl_repo_sales rs', ['rs.repo_batch_id' => $ca_batch_id]);
     $this->db->trans_complete();
-    return $this->db->status();
+    return $this->db->trans_status();
+  }
+
+  public function repo_ca_template() {
+    return [
+      "filename" => "REPOCA",
+      "date" => date('Y-m-d'),
+      "data" => $this->db
+        ->select("
+          DATE_FORMAT(rb.date_created, '%Y-%m-%d') AS 'document_type',
+          DATE_FORMAT(rb.date_created, '%Y-%m-%d') AS 'posting_date',
+          'KR' AS 'kr', CONCAT(rb.company_id,'000') AS 'company_code',
+          'PHP' AS 'php', rb.reference, CONCAT('10', rb.bcode) AS vendor,
+          FORMAT(rb.amount, 0) AS amount, CONCAT(rb.company_id, '000000') AS profit_center,
+          CONCAT(
+            DATE_FORMAT(rb.date_created, '%d/%m/%Y'),
+            ' REPO CA - ', COUNT(*), 'UNIT -',
+            TRIM(BOTH 'MS' FROM
+              TRIM(BOTH 'MTI' FROM
+                TRIM(BOTH 'HPTI' FROM
+                  TRIM(BOTH 'MNC' FROM
+                    TRIM(BOTH 'MDI' FROM rb.bname)
+                  )
+                )
+              )
+            )
+          ) AS description
+        ")
+        ->join("tbl_repo_sales rs", "rb.repo_batch_id = rs.repo_batch_id", "left")
+        ->group_by("rb.reference")
+        ->get_where("tbl_repo_batch rb", "rb.doc_no IS NULL")
+        ->result_array()
+    ];
   }
 
   private function insert_history($repo_inventory_id, $action, array $logs) {
@@ -581,4 +602,5 @@ SQL;
       ])
       ->get_where('tbl_repo_branch_budget rbb', 'rbb.bcode = '. $branch_code)->row_array();
   }
+
 }

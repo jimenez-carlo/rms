@@ -9,7 +9,6 @@
       </div>
       <div class="block-content collapse in">
         <?php echo form_open_multipart('', ["class" => "form-inline", "onsubmit" => "return confirm('Are you sure?');"]);?>
-          <?php echo form_hidden('repo_registration[repo_registration_id]', $repo['repo_registration_id']); ?>
           <fieldset>
             <legend>
               CA Reference# <?php echo $repo['reference']; ?>
@@ -245,55 +244,55 @@
             </div>
 
             <div class="span6" style="height: 887px; overflow-y:auto;">
-              <div class="control-group <?php echo (form_error('attachments[orcr][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[registration_orcr_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="orcr">Registration OR / CR</label>
                 <div class="controls">
-                  <input type="file" id="orcr" name="attachments[orcr][]" data-img_id="#orcr-img" accept="image/jpeg" required>
+                  <input type="file" id="orcr" name="attachments[registration_orcr_img][]" data-img_id="#orcr-img" accept="image/jpeg" required>
                 </div>
                 <img id="orcr-img" class="img-polariod">
               </div>
-              <div class="control-group <?php echo (form_error('attachments[renewal][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[renewal_or_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="renewal-or">Renewal OR</label>
                 <div class="controls">
-                  <input type="file" id="renewal-or" name="attachments[renewal][]" data-img_id="#renewal-img" accept="image/jpeg" required>
+                  <input type="file" id="renewal-or" name="attachments[renewal_or_img][]" data-img_id="#renewal-img" accept="image/jpeg" required>
                 </div>
                 <img id="renewal-img" class="img-polariod">
               </div>
-              <div class="control-group <?php echo (form_error('attachments[transfer][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[transfer_or_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="transfer-or">Transfer OR</label>
                 <div class="controls">
-                  <input type="file" id="transfer-or" name="attachments[transfer][]" data-img_id="#transfer-img" accept="image/jpeg" required>
+                  <input type="file" id="transfer-or" name="attachments[transfer_or_img][]" data-img_id="#transfer-img" accept="image/jpeg" required>
                 </div>
                 <img id="transfer-img" class="img-polariod">
               </div>
-              <div class="control-group <?php echo (form_error('attachments[pnp_clearance][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[hpg_pnp_clearance_or_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="pnp-clearance">PNP Clearance OR</label>
                 <div class="controls">
-                  <input type="file" id="pnp-clearance" name="attachments[pnp_clearance][]" data-img_id="#hpg-pnp-img" accept="image/jpeg" required>
+                  <input type="file" id="pnp-clearance" name="attachments[hpg_pnp_clearance_or_img][]" data-img_id="#hpg-pnp-img" accept="image/jpeg" required>
                 </div>
                 <img id="hpg-pnp-img" class="img-polariod">
               </div>
 
-              <div class="control-group <?php echo (form_error('attachments[insurance_or][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[insurance_or_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="insurance-or">Insurance OR</label>
                 <div class="controls">
-                  <input type="file" id="insurance-or" name="attachments[insurance_or][]" data-img_id="#insurance-img" accept="image/jpeg" required>
+                  <input type="file" id="insurance-or" name="attachments[insurance_or_img][]" data-img_id="#insurance-img" accept="image/jpeg" required>
                 </div>
                 <img id="insurance-img" class="img-polariod">
               </div>
 
-              <div class="control-group <?php echo (form_error('attachments[emission_or][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[emission_or_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="emission-or">Emission OR</label>
                 <div class="controls">
-                  <input type="file" id="emission-or" name="attachments[emission_or][]" data-img_id="#emission-img" accept="image/jpeg" required>
+                  <input type="file" id="emission-or" name="attachments[emission_or_img][]" data-img_id="#emission-img" accept="image/jpeg" required>
                 </div>
                 <img id="emission-img" class="img-polariod">
               </div>
 
-              <div class="control-group <?php echo (form_error('attachments[macro_etching][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('attachments[macro_etching_or_img][]')) ? 'error' : ''; ?>">
                 <label class="control-label" for="macro-etching">Macro Etching OR</label>
                 <div class="controls">
-                  <input type="file" id="macro-etching" name="attachments[macro_etching][]" data-img_id="#macro-img" ccept="image/jpeg" required>
+                  <input type="file" id="macro-etching" name="attachments[macro_etching_or_img][]" data-img_id="#macro-img" accept="image/jpeg" required>
                 </div>
                 <img id="macro-img" class="img-polariod">
               </div>

@@ -119,8 +119,6 @@ class Fund_transfer extends MY_Controller {
     }
     $_SESSION['messages'][] = 'Changes saved succesfully.';
 
-    // $_SESSION['messages'][] = 'Deposited fund of Debit Memo # '.$voucher->dm_no.' for '.$voucher->region.'.';
-    // echo json_encode(array("status" => TRUE));
   }
 
   public function for_deposit_repo() {
@@ -128,11 +126,10 @@ class Fund_transfer extends MY_Controller {
     $this->header_data('title', 'Repo CA Deposit');
     $this->header_data('nav', 'fund_transfer');
     $this->header_data('dir', base_url());
-    if ($this->input->post('deposit_funds')) {
-      $keys = array_keys($this->input->post('deposit_funds'));
+    if ($for_deposit = $this->input->post('deposit_funds')) {
+      $keys = array_keys($for_deposit);
       foreach ($keys as $i) {
         $validation[] = [ 'field' => 'deposit_funds['.$i.'][debit_memo]', 'label' => 'Debit Memo', 'rules' => 'required' ] ;
-        $validation[] = [ 'field' => 'deposit_funds['.$i.'][date_processed]', 'label' => 'Process Date', 'rules' => 'required' ] ;
         $validation[] = [ 'field' => 'deposit_funds['.$i.'][date_deposited]', 'label' => 'Deposit Date', 'rules' => 'required' ] ;
       }
 
@@ -142,8 +139,11 @@ class Fund_transfer extends MY_Controller {
         foreach ($this->input->post('deposit_funds') as $deposit) {
           $deposit_funds[] = array_merge($deposit, ['status' => 'DEPOSITED', 'date_debit_memo_encoded' => date('Y-m-d H:m:s') ]);
         }
-        $this->db->update_batch('tbl_repo_batch', $deposit_funds, 'repo_batch_id');
-        $_SESSION['messages'][] = 'Success!! Document Number Applied!!';
+        if($this->db->update_batch('tbl_repo_batch', $deposit_funds, 'repo_batch_id')) {
+          foreach ($for_deposit as $batch) {
+            $_SESSION['messages'][] = 'Success!! Debit Memo #'.$batch['debit_memo'].' Saved!!';
+          }
+        }
       }
     }
     $data['table'] = $this->fund_transfer->get_repo_for_deposit();

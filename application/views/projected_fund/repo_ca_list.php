@@ -52,54 +52,22 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             </div>
           </fieldset>
         </form>
-
         <hr>
-        <table class="table">
-          <thead>
-            <tr>
-              <th><p>Reference #</p></th>
-              <th><p>Document #</p></th>
-              <th><p>Entry Date</p></th>
-              <th><p>Debit Memo #</p></th>
-              <th><p>Date Deposited</p></th>
-              <th><p>Amount</p></th>
-              <th><p>Region</p></th>
-              <th><p>Status</p></th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            foreach ($table as $row)
-            {
-              print '<tr>';
-              print '<td>'.$row->reference.'</td>';
-              print '<td>'.$row->doc_no.'</td>';
-              print '<td>'.$row->entry_date.'</td>';
-              print '<td>'.$row->debit_memo.'</td>';
-              print '<td>'.$row->date_deposited.'</td>';
-              print '<td>'.$row->amount.'</td>';
-              print '<td>'.$row->region.'</td>';
-              print '<td>'.$row->status.'</td>';
-              print '</tr>';
-            }
-
-            if (empty($table))
-            {
-              print '<tr>
-                <td>No result.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                </tr>';
-            }
-            ?>
-          </tbody>
-        </table>
+        <?php echo $table; ?>
       </div>
     </div>
   </div>
 </div>
+<?php echo form_open("repo/print_ca", ["id"=>"print", "class"=>"hide", "target"=>"_blank"]) ?>
+<script>
+  $('button[name="save"]').on('click', function() {
+    console.log($(this).val());;
+  });
+
+  $('button[name="print"]').on('click', function() {
+    var repo_batch_id = $(this).val();
+    var form_print = $("#print");
+    form_print.empty().append("<input name='repo_batch_id' value='"+repo_batch_id+"'>");
+    form_print.submit();
+  });
+</script>

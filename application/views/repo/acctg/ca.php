@@ -1,74 +1,54 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
-
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="block">
+      <div id="status"></div>
       <div class="navbar navbar-inner block-header">
         <div class="pull-left">Repo CA</div>
       </div>
+      <br>
+      <div class="container">
+          <div class="row">
+            <?php echo form_open('repo/ca_template', ["class"=>"span6", "target"=>"_blank"]); ?>
+              <div class="control-group">
+                <div class="control-label">CA Template</div>
+                <div class="controls">
+                  <?php echo form_button(["class" => "btn btn-warning", "name"=>"download", "value"=>"true", "content"=>"Download", "type"=>"submit"]); ?>
+                </div>
+                <div class="help-block" style="margin-top:10px; width:70%; position:relative;">
+                  <span class="label label-info">Download CA Template:</span> <br>
+                  Template will only generate REPOCA batch without Document #.
+                </div>
+              </div>
+            </form>
+            <?php echo form_open('repo/print_ca_topsheet', ["class"=>"span6", "target"=>"_blank"]); ?>
+              <div class="control-group">
+                <div class="control-label">Date Doc#</div>
+                <div class="controls">
+                  <?php echo form_input(["class"=>"datepicker", "name"=>"date_doc_no_encoded", "value"=>date('Y-m-d')]); ?>
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="control-label">Region</div>
+                <div class="controls">
+                  <?php echo $input_region; ?>
+                </div>
+                <div class="controls">
+                  <?php echo form_button(["class" => "btn btn-primary", "name"=>"print", "value"=>"true", "content"=>"Print", "type"=>"submit"]); ?>
+                </div>
+                <div class="help-block" style="margin-top:10px; width:70%; position:relative;">
+                  <span class="label label-info">Print Topsheet:</span> <br>
+                  You can print only based on the Doc# date encoded.
+                </div>
+              </div>
+            </form>
+          </div>
+      </div>
       <div class="block-content collapse in">
-        <?php foreach($for_cas AS $ca): ?>
-          <?php echo form_open(); ?>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>
-                <?php
-                  echo $ca['rrt_region'].' '.$ca['company_code'];
-                  echo form_hidden('region_company', $ca['rrt_region'].' '.$ca['company_code']);
-                ?>
-                </th>
-                <th>Reference</th>
-                <th>Branch Code</th>
-                <th>Branch Name</th>
-                <th># of Unit</th>
-                <th></th>
-                <th>Amount</th>
-                <th>Document Number</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php $batches = json_decode($ca['batches'], true); ?>
-              <?php foreach($batches AS $batch): ?>
-              <td>
-                <td><?php echo $batch['reference']; ?></td>
-                <td><?php echo $batch['bcode']; ?></td>
-                <td><?php echo $batch['bname']; ?></td>
-                <td><?php echo $batch['no_of_unit']; ?></td>
-                <td></td>
-                <td><?php echo number_format($batch['amount'], 2, '.', ','); ?></td>
-                <td>
-                  <input
-                    type="text"
-                    placeholder="Input Document Number"
-                    name="<?php echo 'batches'.'['.$batch['repo_batch_id'].']'; ?>"
-                    value="<?php echo set_value('batch'.'['.$batch['repo_batch_id'].']',''); ?>"
-                    required="true"
-                  >
-                </td>
-              </tr>
-              <?php endforeach; ?>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td style="text-align:right"><b>Total # of Unit</b></td>
-                <td><b><?php echo $ca['total_no_of_unit']; ?></b></td>
-                <td style="text-align:right"><b>Total Amount</b></td>
-                <td><b><?php echo $ca['total_amount']; ?></b></td>
-                <td>
-                  <button class="print btn btn-success">Print</button>
-                  <button class="save btn btn-warning" name="save" value="true">Save</button>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-          </form>
-        <?php endforeach; ?>
+        <?php echo form_open(); ?>
+          <?php echo $for_ca; ?>
       </div>
     </div>
   </div>
@@ -92,4 +72,38 @@ $('.save').on('click', function(e){
   form.removeAttr('target');
   form.attr('action', '<?php echo base_url('repo/ca'); ?>');
 });
+
+$('.doc-no').on('keyup', function() {
+  var id = $(this).attr('id');
+  var bool = true;
+  if($(this).val().length > 3) {
+    bool = false;
+  }
+  $('#save-'+id).prop('disabled', bool);
+});
+
+$('button[name="save"]').on('click', function() {
+  var id = $(this).val();
+  var doc_no = $('input#'+id).val();
+  $('input#'+id).parent().children('span').remove();
+
+  $.ajax({
+    url: '<?php echo base_url('repo/ca'); ?>',
+    type: 'POST',
+    dataType: 'json',
+    data: { "save_doc_no": true, "repo_batch_id": id, "doc_no": doc_no },
+    complete: function (jqXHR, textStatus) {
+    },
+    success: function (data, textStatus, jqXHR) {
+      $('input#'+id).parent().removeClass('error').addClass('success').append('<span class="help-inline">✔</span>');
+      $('#status').empty().append('<div class="alert alert-success"><p>'+data.message+'</p></div>');
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      if (jqXHR.status === 400) {
+        $('input#'+id).parent().removeClass('success').addClass('error').append('<span class="help-inline">✘</span>');
+        $('#status').empty().append('<div class="alert alert-error">'+jqXHR.responseText+'</div>');
+      }
+    }
+  });
+})
 </script>

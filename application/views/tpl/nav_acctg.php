@@ -34,11 +34,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <a tabindex="-1" href="<?php echo base_url('projected_fund'); ?>">Bnew Create CA</a>
                                 <a tabindex="-1" href="<?php echo base_url('projected_fund/ca_list'); ?>">Bnew CA List</a>
                             </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a tabindex="-1" href="<?php echo base_url('repo/ca'); ?>">Repo Create CA</a>
-                                <a tabindex="-1" href="<?php echo base_url('projected_fund/repo_ca_list'); ?>">Repo Ca List</a>
-                            </li>
                         </ul>
                     </li>
 
@@ -73,7 +68,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     ?>
                     <li class="<?php echo (isset($nav) && $nav === 'ric') ? 'active' : ''; ?>"><a href="<?php echo base_url('ric/monitoring'); ?>">RIC</a></li>
                     <li class="dropdown <?php echo (isset($nav) && $nav === 'disapprove') ? 'active' : ''; ?>">
-                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Disapprove<i class="caret"></i></a>
+                        <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">Disapprove <i class="caret"></i></a>
                         <ul class="dropdown-menu">
                           <li><a href="<?php echo base_url('disapprove/resolve'); ?>">View Resolve</a></li>
                           <li><a href="<?php echo base_url('disapprove'); ?>">View Disapprove</a></li>
@@ -81,6 +76,15 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </li>
                     <li class="<?php echo (isset($nav) && $nav === 'actual_docs') ? 'active' : ''; ?>"><a href="<?php echo base_url('actual_docs'); ?>">Actual Docs</a></li>
                     <li class="<?php echo (isset($nav) && $nav === 'acctg_report') ? 'active' : ''; ?>"><a href="<?php echo base_url('report'); ?>">Reports</a></li>
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown">Repo <i class="caret"></i></a>
+                      <ul class="dropdown-menu">
+                        <li><a href="<?php echo base_url('repo/ca'); ?>">Create CA</a></li>
+                        <li><a href="<?php echo base_url('projected_fund/repo_ca_list'); ?>">CA List</a></li>
+                        <li><a href="<?php echo base_url('repo/for_checking'); ?>">For Checking</a></li>
+                        <li><a href="<?php echo base_url('repo/sap_uploading'); ?>">SAP Uploading</a></li>
+                      </ul>
+                    </li>
                 </ul>
             </div>
             <!--/.nav-collapse -->

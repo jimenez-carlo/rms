@@ -10,11 +10,7 @@
             <div class="control-group">
               <label class="control-label">Batch#</label>
               <div class="controls">
-                <select name="repo_batch_id">
-                  <?php foreach($batches AS $batch): ?>
-                    <option value="<?php echo $batch['repo_batch_id']; ?>"><?php echo $batch['reference']; ?></option>
-                  <?php endforeach; ?>
-                </select>
+                <?php echo $batchref_dropdown; ?>
               </div>
             </div>
             <div class="control-group">
@@ -45,13 +41,13 @@
             </div>
           </div>
           <div class="span6">
-            <div class="span2"></div>
-            <div class="control-group" style="margin-top: 10px;">
+            <div class="control-group">
               <div class="control-label">Attachment</div>
               <div class="controls">
-                <input class="input-file uniform_on" type="file" name="misc[expense][]">
+                <input class="input-file uniform_on" type="file" name="misc[expense][]" data-img_id="#misc-exp-img" accept="image/jpeg" required>
                 <br><b>Required file format: jpeg, jpg</b>
                 <br><b>You can only upload upto 1MB</b>
+                <img id="misc-exp-img" class="img-polariod">
               </div>
             </div>
           </div>

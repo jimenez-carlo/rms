@@ -131,8 +131,8 @@
           print '<td>'.$batch_engine['engine_no'].'</td>';
           print '<td style="text-align: right">3,600.00</td>'; // TODO Should be query in database.
           print '<td style="text-align: right">'.number_format($batch_engine['ar_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($batch_engine['registration_amt'], 2, '.', ',').'</td>';
-          print '<td style="text-align: right">'.number_format($batch_engine['pnp_clearance_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['orcr_amt'], 2, '.', ',').'</td>';
+          print '<td style="text-align: right">'.number_format($batch_engine['hpg_pnp_clearance_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($batch_engine['macro_etching_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($batch_engine['emission_amt'], 2, '.', ',').'</td>';
           print '<td style="text-align: right">'.number_format($batch_engine['insurance_amt'], 2, '.', ',').'</td>';
@@ -140,8 +140,8 @@
 
           $tot_tgt  += 3600;
           $tot_ar   += $batch_engine['ar_amt'];
-          $tot_or   += $batch_engine['registration_amt'];
-          $tot_pnp  += $batch_engine['pnp_clearance_amt'];
+          $tot_or   += $batch_engine['orcr_amt'];
+          $tot_pnp  += $batch_engine['hpg_pnp_clearance_amt'];
           $tot_macr += $batch_engine['macro_etching_amt'];
           $tot_emi  += $batch_engine['emission_amt'];
           $tot_ins  += $batch_engine['insurance_amt'];

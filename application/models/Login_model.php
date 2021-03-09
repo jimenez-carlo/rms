@@ -87,7 +87,17 @@ SQL;
           $query  = <<<SQL
             SELECT
               u.username, u.password, b.bid, b.b_code
-              ,CONCAT(c.code, ' ', b.name) AS branch_name
+              ,TRIM(
+                TRIM(BOTH 'MS' FROM
+                  TRIM(BOTH 'MTI' FROM
+                    TRIM(BOTH 'HPTI' FROM
+                      TRIM(BOTH 'MNC' FROM
+                        TRIM(BOTH 'MDI' FROM TRIM(b.name))
+                      )
+                    )
+                  )
+                )
+              ) AS branch_name
               ,b.rm, b.am_ccod, b.am_csod, b.ch, b.hrbp, b.address,
               p.pid AS position_id, p.name AS position_name,
               ui.*, d.did AS dept_id, d.description AS dept_name,
