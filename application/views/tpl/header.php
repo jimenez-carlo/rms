@@ -10,7 +10,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <!-- Bootstrap -->
         <link href="<?php print base_url('bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet" media="screen">
         <link href="<?php print base_url('bootstrap/css/bootstrap-responsive.min.css') ?>" rel="stylesheet" media="screen">
-        <link href="<?php print base_url('bootstrap/font-awesome/css/font-awesome.css') ?>" rel="stylesheet" />
+        <link href="<?php print base_url('bootstrap/font-awesome/css/font-awesome.css') ?>" rel="stylesheet">
         <link href="<?php print base_url('bootstrap/css/custom.css') ?>" rel="stylesheet" media="screen">
         <link href="<?php print base_url('assets/styles.css') ?>" rel="stylesheet" media="screen">
         <link href="<?php print base_url('assets/DT_bootstrap.css') ?>" rel="stylesheet" media="screen">
@@ -21,7 +21,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
         <!-- JQUERY -->
         <script src="<?php print base_url('vendors/jquery-1.9.1.min.js') ?>"></script>
-
         <script src="<?php print base_url('bootstrap/js/bootstrap.min.js') ?>"></script>
         <script src="<?php print base_url('vendors/datatables/js/jquery.dataTables.min.js') ?>"></script>
         <script src="<?php print base_url('assets/DT_bootstrap.js') ?>"></script>

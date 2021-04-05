@@ -25,6 +25,11 @@ class Validation_model extends CI_Model {
         break;
 
       case 'REPO_REGISTRATION':
+        $unreceipted_renewal_tip = $data['unreceipted_renewal_tip'] ?? 0;
+        $unreceipted_transfer_tip = $data['unreceipted_transfer_tip'] ?? 0;
+        $unreceipted_hpg_pnp_clearance_tip = $data['unreceipted_hpg_pnp_clearance_tip'] ?? 0;
+        $unreceipted_macro_etching_tip = $data['unreceipted_macro_etching_tip'] ?? 0;
+        $unreceipted_plate_tip = $data['unreceipted_plate_tip'] ?? 0;
         $validation = [
           [ 'field' => 'repo_registration[date_registered]', 'label' => 'Registration Date', 'rules' => 'required' ],
           [ 'field' => 'repo_registration[orcr_amt]', 'label' => 'OR/CR Amount', 'rules' => 'required|numeric|greater_than_equal_to[0]' ],
@@ -37,27 +42,27 @@ class Validation_model extends CI_Model {
           [
             'field' => 'repo_registration[renewal_tip]',
             'label' => 'Renewal Tip',
-            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$data['unreceipted_renewal_tip'].']'
+            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$unreceipted_renewal_tip.']'
           ],
           [
             'field' => 'repo_registration[transfer_tip]',
             'label' => 'Transfer Tip',
-            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$data['unreceipted_transfer_tip'].']'
+            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$unreceipted_transfer_tip.']'
           ],
           [
             'field' => 'repo_registration[hpg_pnp_clearance_tip]',
             'label' => 'HPG / PNP Clearance Tip',
-            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$data['unreceipted_hpg_pnp_clearance_tip'].']'
+            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$unreceipted_hpg_pnp_clearance_tip.']'
           ],
           [
             'field' => 'repo_registration[macro_etching_tip]',
             'label' => 'Macro Etching Tip',
-            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$data['unreceipted_macro_etching_tip'].']'
+            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$unreceipted_macro_etching_tip.']'
           ],
           [
             'field' => 'repo_registration[plate_tip]',
             'label' => 'Plate Tip',
-            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$data['unreceipted_plate_tip'].']'
+            'rules' => 'required|numeric|greater_than_equal_to[0]|less_than_equal_to['.$unreceipted_plate_tip.']'
           ],
         ];
         break;
@@ -66,6 +71,8 @@ class Validation_model extends CI_Model {
         $validation = [
           [ 'field' => 'repo_batch_id', 'label' => 'Reference Number', 'rules' => 'required' ],
           [ 'field' => 'expense_type', 'label' => 'Expense Type', 'rules' => 'required' ],
+          [ 'field' => 'or_date', 'label' => 'OR Date', 'rules' => 'required' ],
+          [ 'field' => 'or_no', 'label' => 'OR No.', 'rules' => 'required' ],
           [ 'field' => 'amount', 'label' => 'Misc Expense Amount', 'rules' => 'required' ],
         ];
 

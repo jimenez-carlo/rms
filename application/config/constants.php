@@ -85,33 +85,30 @@ defined('EXIT__AUTO_MIN')      OR define('EXIT__AUTO_MIN', 9); // lowest automat
 defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
 switch(ENVIRONMENT):
+  case 'development':
+    defined('BASE_URL')      ? null : define('BASE_URL', 'http://localhost:8000/rms');
 
-  case 'production':
-    defined('BASE_URL')      ? null : define('BASE_URL', 'http://192.168.200.2/rms');
-
-    # RMS_DB
-    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '192.168.200.3');
-    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'appserver');
-    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'opulently tadpole mulberry ether overfeed drizzly');
+    defined('RMS_DB_HOST')      ? null : define('RMS_DB_HOST', '172.17.0.4');
+    defined('RMS_DB_USER')      ? null : define('RMS_DB_USER', 'root');
+    defined('RMS_DB_PASSWORD')  ? null : define('RMS_DB_PASSWORD', 'rootdev');
     defined('RMS_DB_NAME')      ? null : define('RMS_DB_NAME', 'rms_db');
 
-    # PORTAL GLOBAL DB
-    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '192.168.200.3');
-    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'appserver');
-    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'opulently tadpole mulberry ether overfeed drizzly');
+    defined('PORTAL_GLOBAL_DB_HOST')      ? null : define('PORTAL_GLOBAL_DB_HOST', '172.17.0.4');
+    defined('PORTAL_GLOBAL_DB_USER')      ? null : define('PORTAL_GLOBAL_DB_USER', 'root');
+    defined('PORTAL_GLOBAL_DB_PASSWORD')  ? null : define('PORTAL_GLOBAL_DB_PASSWORD', 'rootdev');
     defined('PORTAL_GLOBAL_DB_NAME')      ? null : define('PORTAL_GLOBAL_DB_NAME', 'portal_global_2');
 
     # MNC, MTI, HPTI DEV_CES2
-    defined('DEV_CES_DB_HOST')      ? null : define('DEV_CES_DB_HOST', '192.168.100.20');
-    defined('DEV_CES_DB_USER')      ? null : define('DEV_CES_DB_USER', 'admin');
-    defined('DEV_CES_DB_PASSWORD')  ? null : define('DEV_CES_DB_PASSWORD', 'admin');
+    defined('DEV_CES_DB_HOST')      ? null : define('DEV_CES_DB_HOST', '172.17.0.3');
+    defined('DEV_CES_DB_USER')      ? null : define('DEV_CES_DB_USER', 'root');
+    defined('DEV_CES_DB_PASSWORD')  ? null : define('DEV_CES_DB_PASSWORD', 'rootdev');
     defined('DEV_CES_DB_NAME')      ? null : define('DEV_CES_DB_NAME', 'dev_ces2');
 
     # MDI_DEV_CES2
-    # defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '192.168.100.40');
-    # defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'root');
-    # defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'RestricteD');
-    # defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'dev_ces2');
+    defined('MDI_DEV_CES_DB_HOST')      ? null : define('MDI_DEV_CES_DB_HOST', '172.17.0.3');
+    defined('MDI_DEV_CES_DB_USER')      ? null : define('MDI_DEV_CES_DB_USER', 'root');
+    defined('MDI_DEV_CES_DB_PASSWORD')  ? null : define('MDI_DEV_CES_DB_PASSWORD', 'rootdev');
+    defined('MDI_DEV_CES_DB_NAME')      ? null : define('MDI_DEV_CES_DB_NAME', 'mdi_dev_ces2');
 
     # DEV_RMS
     defined('DEV_RMS_DB_HOST')      ? null : define('DEV_RMS_DB_HOST', '192.168.100.20');
@@ -125,5 +122,4 @@ switch(ENVIRONMENT):
     defined('MDI_DEV_RMS_DB_PASSWORD')  ? null : define('MDI_DEV_RMS_DB_PASSWORD', 'admin');
     defined('MDI_DEV_RMS_DB_NAME')      ? null : define('MDI_DEV_RMS_DB_NAME', 'dev_rms');
   break;
-
 endswitch;

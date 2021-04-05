@@ -96,10 +96,7 @@ class Repo extends MY_Controller {
       show_404();
     }
     $this->access(17);
-
     $data['repo'] = $this->repo->engine_details($repo_inventory_id, NULL);
-    //$this->check_mc_branch($data['repo']['bcode']);
-
     $data['histories'] = $this->repo->get_history($repo_inventory_id);
     if (isset($data['repo']['attachment'])) {
       $data['attachment'] = true;
@@ -292,17 +289,20 @@ HTML;
   public function misc_exp() {
     $this->access(17);
     $this->header_data('title', 'Repo Registration Misc Expense');
-    $this->header_data('nav', 'repo-registration-misc-expense');
+    $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
-    $data['batchref_dropdown'] = form_dropdown("repo_batch_id", $this->form->ca_dropdown('REPO'));
+    $data['batchref_dropdown'] = form_dropdown("repo_batch_id", $this->form->ca_dropdown('REPO'), '', ["class"=>"span5"]);
     $data['hidden'] = 'hidden';
     $data['disabled'] = 'disabled';
 
     if ($this->input->post('save')) {
       $repo_batch_id = $this->input->post('repo_batch_id');
       $expense_type = $this->input->post('expense_type');
+      $or_no = $this->input->post('or_no');
+      $or_date = $this->input->post('or_date');
       $expense_id = md5($_SESSION['branch_code'].date('Y-m-d H:m:s'));
+
       $upload = $this->file->upload('misc', '/repo/batch/'.$repo_batch_id.'/', $expense_id.'.jpg');
       $form_ok = $this->validate->form('REPO_BATCH_MISC_EXP', [ 'expense_type' => $expense_type ]);
       if ($upload && $form_ok) {
@@ -311,11 +311,14 @@ HTML;
           "repo_batch_id" => $repo_batch_id,
           "data" => [
             $expense_id => [
+              "or_no" => $or_no,
               "expense_type" => $expense_type,
               "amount" => $this->input->post('amount'),
               "image_path" => $img_path,
-              "status" => "For Checking",
-              "is_deleted" => "0"
+              "status" => "FOR CHECKING",
+              "or_date" => $or_date,
+              "date_time_created" => date('Y-m-d H:m:s'),
+              "is_deleted" => "0",
             ]
           ]
         ]);
@@ -392,10 +395,26 @@ HTML;
 
   public function for_checking() {
     $this->access(18); // For Checking
-    $this->header_data('title', 'Repo Checking');
-    $this->header_data('nav', 'repo-checking');
-    $data = [];
-    $this->template('repo/for_checking', $data);
+    $repo_batch_id = $this->input->post('repo_batch_id');
+
+    if ($repo_batch_id) {
+      $reference_data =  $this->repo->check_registration($this->input->post('request_type'), ['repo_batch_id' => $repo_batch_id ]);
+      echo $reference_data;
+      exit;
+    }
+
+    if ($attachment = $this->input->post('attachment')) {
+      $data_attached =  $this->repo->check_registration($this->input->post('request_type'), $attachment);
+      echo $data_attached;
+      exit;
+    }
+
+    if (!$this->input->post()) {
+      $this->header_data('title', 'Repo Checking');
+      $this->header_data('nav', 'repo-registration');
+      $data['references'] = $this->repo->check_registration('GET_REFERENCE');
+      $this->template('repo/for_checking', $data);
+    }
   }
 
   private function repo_save(array $data, $type) {

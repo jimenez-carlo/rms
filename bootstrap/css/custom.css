@@ -362,7 +362,8 @@ input[type='text'].numeric {
   position:absolute;
 }
 
-.modal-center {
+/* Add this class to make the modal wider */
+.modal-wider {
   display: block;
   position: absolute;
   margin: auto;

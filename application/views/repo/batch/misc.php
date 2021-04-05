@@ -16,12 +16,24 @@
             <div class="control-group">
               <label class="control-label">Type</label>
               <div class="controls">
-                <select id="misc-type" name="expense_type">
+                <select id="misc-type" class="span5" name="expense_type">
                   <option value="Transportation" <?php echo set_select('expense_type', 'Transportation', true); ?> >Transportation</option>
                   <option value="Meals" <?php echo set_select('expense_type', 'Meals'); ?> >Meals</option>
                   <option value="Xerox" <?php echo set_select('expense_type', 'Xerox'); ?> >Xerox</option>
                   <option value="Others" <?php echo set_select('expense_type', 'Others'); ?> >Others</option>
                 </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">OR Date</label>
+              <div class="controls">
+                <input class="datepicker" type="text" name="or_date" value="<?php echo set_value('or_date',date('Y-m-d')); ?>">
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">OR No.</label>
+              <div class="controls">
+                <input name="or_no" type="text" value="<?php echo set_value('or_no',''); ?>">
               </div>
             </div>
             <div id="input-other" class="control-group <?php echo $hidden; ?>">

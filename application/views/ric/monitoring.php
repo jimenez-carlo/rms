@@ -127,7 +127,7 @@
   </tbody>
 </table>
 
-<div id="ric-list" class="modal modal-center hide fade">
+<div id="ric-list" class="modal modal-wider hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3 id="modal-title"></h3>

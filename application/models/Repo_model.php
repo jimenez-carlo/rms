@@ -595,12 +595,117 @@ SQL;
   public function get_branch_tip_matrix($branch_code) {
     return $this->db
       ->select([
-        'rbb.sop_renewal', 'rbb.sop_transfer', 'sop_hpg_pnp_clearance',
-        'rbb.insurance', 'rbb.emission', 'rbb.unreceipted_renewal_tip',
-        'rbb.unreceipted_transfer_tip', 'rbb.unreceipted_macro_etching_tip',
-        'rbb.unreceipted_hpg_pnp_clearance_tip', 'rbb.unreceipted_plate_tip',
+        'IFNULL(rbb.sop_renewal,0) AS sop_renewal', 'IFNULL(rbb.sop_transfer,0) AS sop_transfer',
+        'IFNULL(sop_hpg_pnp_clearance,0) AS sop_hpg_pnp_clrearance', 'IFNULL(rbb.insurance,0) AS insurance',
+        'IFNULL(rbb.emission,0) AS emission', 'IFNULL(rbb.unreceipted_renewal_tip,0) AS unreceipted_renewal_tip',
+        'IFNULL(rbb.unreceipted_transfer_tip,0) AS unreceipted_transfer_tip',
+        'IFNULL(rbb.unreceipted_macro_etching_tip,0) AS unreceipted_macro_etching_tip',
+        'IFNULL(rbb.unreceipted_hpg_pnp_clearance_tip,0) AS unreceipted_hpg_pnp_clearance_tip',
+        'IFNULL(rbb.unreceipted_plate_tip,0) AS unreceipted_plate_tip',
       ])
       ->get_where('tbl_repo_branch_budget rbb', 'rbb.bcode = '. $branch_code)->row_array();
   }
 
+  public function check_registration(string $type, array $data = []) {
+    switch ($type) {
+      case 'GET_REFERENCE':
+        return $this->db
+          ->select('rb.repo_batch_id, rb.reference')
+          ->get_where('tbl_repo_batch rb', 'rb.status = "DEPOSITED"')
+          ->result_array();
+        break;
+
+      case 'CA_REF_DATA':
+        $sql = <<<SQL
+          SELECT `rb`.*,
+            CONCAT('[',
+              GROUP_CONCAT('{
+                "repo_registration_id": "',`rr`.`repo_registration_id`,'",
+                "branch":"',CONCAT(ri.bcode, " ", ri.bname),'",
+                "date_sold":"',`rs`.`date_sold`,'", "engine_no":"',`e`.`engine_no`,'",
+                "ar_num":"',`rs`.`ar_num`,'", "ar_amt":"',rs.ar_amt,'", "status":"',`ri`.`status`,'"
+              }'),
+            ']') AS repo_registration
+            --  AS branch, , , `rs`.`ar_num`,`rs`.`ar_amt`, `ri`.`status`,
+          FROM `tbl_repo_batch` `rb`
+          INNER JOIN `tbl_repo_sales` `rs` ON `rs`.`repo_batch_id` = `rb`.`repo_batch_id`
+          LEFT JOIN `tbl_repo_registration` `rr` ON `rs`.`repo_registration_id` = `rr`.`repo_registration_id`
+          INNER JOIN `tbl_repo_inventory` `ri` ON `ri`.`repo_inventory_id` = `rs`.`repo_inventory_id`
+          INNER JOIN `tbl_engine` `e` ON `e`.`eid` = `ri`.`engine_id`
+          WHERE `rb`.`repo_batch_id` = {$data['repo_batch_id']}
+          GROUP BY `rb`.repo_batch_id
+SQL;
+        $repo_batch = $this->db->query($sql)->row_array();
+
+        $this->table->set_template(["table_open" => "<table class='table'>"]);
+        $this->table->set_heading('', '#', 'Branch', 'Date Sold', 'Engine #', 'AR #', 'AR Amt', 'Status', '');
+        foreach (json_decode($repo_batch['repo_registration'], 1) as $i => $repo_regn) {
+          $this->table->add_row(
+            "<input type='checkbox' id='cb-{$repo_regn['repo_registration_id']}' value='{$repo_regn['repo_registration_id']}'>", ++$i,
+            $repo_regn['branch'], $repo_regn['date_sold'], $repo_regn['engine_no'], $repo_regn['ar_num'], $repo_regn['ar_amt'], $repo_regn['status'],
+            "<button class='btn btn-primary view' style='float:right;' type='button' name='REPO_UNIT' value='{$repo_regn['repo_registration_id']}'>View</button>"
+          );
+        }
+        $repo_batch_table = $this->table->generate();
+
+        $this->table->clear();
+
+        $misc_exp_raw = json_decode($repo_batch['misc_expenses'], 1);
+        if (isset($misc_exp_raw)) {
+          $this->table->set_template(["table_open" => "<table class='table'>"]);
+          $this->table->set_heading('', '#', 'OR Date', 'OR No.', 'Expense Type', 'Amount', 'Status', '');
+          $misc_count = 0;
+          foreach ($misc_exp_raw as $id => $misc) {
+            if ($misc['is_deleted'] !== "1") {
+              $misc_count++;
+              $this->table->add_row(
+                form_checkbox("misc_exp_id", $id), $misc_count, $misc['or_date'], $misc['or_no'] ,
+                $misc['expense_type'], $misc['amount'], $misc['status'],
+                form_button(["class"=>"btn btn-primary view", "style"=>"float:right", "name"=>"MISC_EXP", "value"=>$id, "content"=>"View"])
+              );
+            }
+          }
+          $repo_batch_table .= $this->table->generate();
+        }
+
+        return json_encode([
+          "table" =>  $repo_batch_table
+        ]);
+        break;
+
+      case 'VIEW_ATTACHMENT':
+        switch ($data['type']) {
+          case 'MISC_EXP':
+            return $this->db->select('misc_expenses->>\'$."'.$data['misc_expense_id'].'"\' AS misc_expenses')
+            ->get_where('tbl_repo_batch rb', 'repo_batch_id='.$data['repo_batch_id'])
+            ->row_array()['misc_expenses'];
+            break;
+
+          case 'REPO_UNIT':
+            $repo_data = $this->db->select([
+              'CONCAT(ri.bcode, " ", ri.bname) AS branch',
+              'CONCAT(IFNULL(c.first_name,"")," ",IFNULL(c.middle_name, ""), " ", IFNULL(c.last_name, ""), " ", IFNULL(c.suffix,"")) AS customer_name',
+              'e.engine_no', 'rs.rsf_num', 'rs.ar_num', 'FORMAT(rs.ar_amt,2) AS ar_amt', 'FORMAT(rr.orcr_amt, 2) AS orcr_amt',
+              'FORMAT(rr.renewal_amt,2) AS renewal_amt', 'FORMAT(rr.transfer_amt,2) AS transfer_amt',
+              'FORMAT(rr.hpg_pnp_clearance_amt,2) AS hpg_pnp_clearance_amt', 'FORMAT(rr.insurance_amt,2) AS insurance_amt',
+              'FORMAT(rr.emission_amt,2) AS emission_amt', 'FORMAT(rr.macro_etching_amt,2) AS macro_etching_amt',
+              'FORMAT(rr.renewal_tip,2) AS renewal_tip', 'FORMAT(rr.transfer_tip,2) AS transfer_tip',
+              'FORMAT(rr.hpg_pnp_clearance_tip,2) AS hpg_pnp_clearance_tip', 'FORMAT(rr.macro_etching_tip,2) AS macro_etching_tip',
+              'FORMAT(rr.plate_tip,2) AS plate_tip', 'rr.attachment'
+            ])
+            ->from('tbl_repo_sales rs')
+            ->join('tbl_repo_registration rr', 'rs.repo_registration_id = rr.repo_registration_id', 'inner')
+            ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id', 'inner')
+            ->join('tbl_engine e', 'e.eid = ri.engine_id', 'inner')
+            ->join('tbl_customer c', 'c.cid = rs.customer_id', 'inner')
+            ->where('rr.repo_registration_id='.$data['repo_registration_id'])
+            ->get()->row_array();
+            $repo_data['attachment'] = json_decode($repo_data['attachment']);
+            return json_encode($repo_data);
+            break;
+
+        }
+        break;
+    }
+  }
 }

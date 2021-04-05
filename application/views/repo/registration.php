@@ -177,7 +177,7 @@
                   <div class="controls">
                     <?php echo form_input([
                       "id"=>"renewal-tip", "type"=>"number", "name"=>"repo_registration[renewal_tip]",
-                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_renewal_tip, "placeholder"=>"0.00",
+                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_renewal_tip ?? 0, "placeholder"=>"0.00",
                       "value"=>set_value('repo_registration[renewal_tip]', ''),
                       "required"=>true,
                     ]); ?>
@@ -191,7 +191,7 @@
                   <div class="controls">
                     <?php echo form_input([
                       "id"=>"transfer-tip", "type"=>"number", "name"=>"repo_registration[transfer_tip]",
-                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_transfer_tip, "placeholder"=>"0.00",
+                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_transfer_tip ?? 0, "placeholder"=>"0.00",
                       "value"=>set_value('repo_registration[transfer_tip]', ''),
                       "required"=>true,
                     ]); ?>
@@ -202,7 +202,7 @@
                   <div class="controls">
                     <?php echo form_input([
                       "id"=>"hpg-pnp-tip", "type"=>"number", "name"=>"repo_registration[hpg_pnp_clearance_tip]",
-                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_hpg_pnp_clearance_tip, "placeholder"=>"0.00",
+                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_hpg_pnp_clearance_tip ?? 0, "placeholder"=>"0.00",
                       "value"=>set_value('repo_registration[hpg_pnp_clearance_tip]', ''),
                       "required"=>true,
                     ]); ?>
@@ -216,7 +216,7 @@
                   <div class="controls">
                     <?php echo form_input([
                       "id"=>"macro-etching-tip", "type"=>"number", "name"=>"repo_registration[macro_etching_tip]",
-                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_macro_etching_tip, "placeholder"=>"0.00",
+                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_macro_etching_tip ?? 0, "placeholder"=>"0.00",
                       "value"=>set_value('repo_registration[macro_etching_tip]', ''),
                       "required"=>true,
                     ]); ?>
@@ -227,7 +227,7 @@
                   <div class="controls">
                     <?php echo form_input([
                       "id"=>"plate-tip", "type"=>"number", "name"=>"repo_registration[plate_tip]",
-                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_plate_tip, "placeholder"=>"0.00",
+                      "min"=>"0", "step"=>"0.01", "max"=>$unreceipted_plate_tip ?? 0, "placeholder"=>"0.00",
                       "value"=>set_value('repo_registration[plate_tip]', ''),
                       "required"=>true
                     ]); ?>

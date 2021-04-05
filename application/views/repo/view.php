@@ -226,7 +226,7 @@
               </div>
               <?php if($attachment): ?>
               <div class="span6" style="height: 887px; overflow-y:auto;">
-                <ul id="myTab" class="nav nav-tabs">
+                <ul id="imgTab" class="nav nav-tabs">
                   <?php if(isset($registration_orcr_img)): ?>
                   <li class="active"><a href="#orcr-img">OR/CR</a></li>
                   <?php endif; ?>
@@ -381,7 +381,7 @@
   </div>
 </div>
 <script>
-$('#myTab a').click(function (e) {
+$('#imgTab a').click(function (e) {
   e.preventDefault();
   $(this).tab('show');
 })

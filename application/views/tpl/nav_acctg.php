@@ -76,7 +76,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                     </li>
                     <li class="<?php echo (isset($nav) && $nav === 'actual_docs') ? 'active' : ''; ?>"><a href="<?php echo base_url('actual_docs'); ?>">Actual Docs</a></li>
                     <li class="<?php echo (isset($nav) && $nav === 'acctg_report') ? 'active' : ''; ?>"><a href="<?php echo base_url('report'); ?>">Reports</a></li>
-                    <li class="dropdown">
+                    <li class="dropdown <?php echo (isset($nav) && $nav === 'repo-registration') ? 'active' : ''; ?>">
                       <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown">Repo <i class="caret"></i></a>
                       <ul class="dropdown-menu">
                         <li><a href="<?php echo base_url('repo/ca'); ?>">Create CA</a></li>
