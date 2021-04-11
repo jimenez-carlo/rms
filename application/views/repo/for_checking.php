@@ -60,9 +60,11 @@ $("button.ca-ref").on("click", function() {
   var button = $(this)
   var repo_batch_id = button.val()
   var ajax = ajaxSend({ "repo_batch_id": repo_batch_id, "request_type": "CA_REF_DATA" })
+
   ajax.success(function(data, textStatus, jqXHR) {
     $("#table-landing").empty().append(data.table + '<button id="preview-summary" class="btn btn-success" disabled>Preview Summary</button>')
   })
+
   ajax.complete(function(jqXHR, textStatus) {
     $("li.ref-list").css("background-color", "#fff")
     $(".ca-ref").attr("disabled", false)
@@ -82,7 +84,7 @@ function includeForUpload(repo_registration_id) {
   console.log(for_sap_upload.repo_registration_ids);
 }
 
-function viewAttachment(id) {
+function viewAttachment(repo_batch_id) {
   $("button.view").on("click", function() {
     var button = $(this)
     var attach_type = button.attr("name")
@@ -170,11 +172,11 @@ function viewAttachment(id) {
                   <label class="control-label">Plate Tip</label> \
                   <div class="controls" style="padding-top:5px;">'+data.plate_tip+'</div> \
                 </div> \
-                <div style="height:100px;margin-top:100px;border:black solid 1px;border-radius:5px;padding:10px 10px 10px 10px;">  \
+                <div style="height:auto;margin-top:100px;border:black solid 1px;border-radius:5px;padding:10px 10px 10px 10px;">  \
                   <label for="da"><bold>Disapprove </bold><?php echo preg_replace("/\r|\n/", "", form_checkbox(["type"=>"checkbox","id"=>"da"])); ?></label> \
                   <div id="da-reason" class="hide"> \
-                    <label>Reason</label> \
-                    <div><?php echo preg_replace("/\r|\n/", "", form_dropdown('da_reason', ['foo'=>'test', 'baz'=>'tezz'])); ?></div> \
+                    <label>Reason:</label> \
+                    <div><?php echo preg_replace("/\r|\n/", "", form_dropdown('da_reason', ['Wrong Encode'=>'Wrong Encode', 'Invalid Format'=>'Invalid Format'])); ?></div> \
                   </div> \
                 </div> \
               </div> \
@@ -253,7 +255,7 @@ function viewAttachment(id) {
         break;
       case 'MISC_EXP':
         var misc_exp_id = button.val()
-        var ajax = ajaxSend({"request_type": "VIEW_ATTACHMENT" , "attachment": {  "repo_batch_id": id, "misc_expense_id": misc_exp_id, "type": attach_type}})
+        var ajax = ajaxSend({"request_type": "VIEW_ATTACHMENT" , "attachment": {  "repo_batch_id": repo_batch_id, "misc_expense_id": misc_exp_id, "type": attach_type}})
 
         ajax.success(function(data, textStatus, jqXHR) {
           $(".modal-body").empty().append(' \
@@ -331,5 +333,19 @@ $("#modal-view").on("show", function() {
     includeForUpload($(this).val())
     $("#cb-"+$(this).val()).prop("checked", true)
   })
+})
+
+$("#save-da").on("click", function(e) {
+  e.preventDefault()
+  var isConfirm = confirm("Are you sure?")
+  if (isConfirm) {
+    var x = $("select[name='da_reason']").val()
+    console.log(x)
+    console.log('Clicked!')
+    var ajax = ajaxSend({"disaprove"})
+    ajax.success(function() {
+
+    })
+  }
 })
 </script>
