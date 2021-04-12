@@ -340,9 +340,7 @@ $("#save-da").on("click", function(e) {
   var isConfirm = confirm("Are you sure?")
   if (isConfirm) {
     var x = $("select[name='da_reason']").val()
-    console.log(x)
-    console.log('Clicked!')
-    var ajax = ajaxSend({"disaprove"})
+    var ajax = ajaxSend({"disaprove":1})
     ajax.success(function() {
 
     })
