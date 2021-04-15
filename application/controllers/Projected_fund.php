@@ -102,6 +102,7 @@ class Projected_fund extends MY_Controller {
     $this->access(16);
     $this->header_data('title', 'Repo CA List');
     $this->header_data('dir', './../');
+    $this->header_data('nav', 'repo-registration');
 
     $param = new Stdclass;
     $param->date_from = $this->input->post('date_from') ?? date('Y-m-d', strtotime('-1 day'));

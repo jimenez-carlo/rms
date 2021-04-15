@@ -372,7 +372,7 @@ HTML;
     }
 
     $this->header_data('title', 'Repo CA');
-    $this->header_data('nav', 'projected_fund');
+    $this->header_data('nav', 'repo-registration');
     $data['input_region'] = form_dropdown("region", $this->form->region_dropdown('WITH_OUT_ANY'), 0, ["class"=>"span12"]);
     $data['for_ca'] = $this->repo->get_for_ca();
     $this->template('repo/acctg/ca', $data);
