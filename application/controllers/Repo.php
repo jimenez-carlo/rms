@@ -12,12 +12,12 @@ class Repo extends MY_Controller {
     $this->load->model('File_model', 'file');
     $this->load->model('Validation_model', 'validate');
     $this->load->model('Form_model', 'form');
+    $this->header_data('nav', 'repo-registration');
   }
 
   public function index() {
     $this->access(17);
     $this->header_data('title', 'Repo Inventory');
-    $this->header_data('nav', 'repo-inventory');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
     $inventory = $this->repo->inventory();
     $data['inventory_table'] = $inventory;
@@ -61,7 +61,6 @@ class Repo extends MY_Controller {
     $data['disable'] = 'disabled';
 
     $this->header_data('title', 'Repo Sales');
-    $this->header_data('nav', 'repo-sales');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
     $this->template('repo/sales', $data);
   }
@@ -69,7 +68,6 @@ class Repo extends MY_Controller {
   public function registration($repo_inventory_id, $repo_sales_id) {
     $this->access(17);
     $this->header_data('title', 'Repo Registration');
-    $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     $data = $this->repo->get_branch_tip_matrix($_SESSION['branch_code']);
@@ -112,7 +110,6 @@ class Repo extends MY_Controller {
     $data['repo']['expire_message'] = $expire['message'];
 
     $this->header_data('title', 'Repo View');
-    $this->header_data('nav', 'repo-view');
     $this->template('repo/view', $data);
   }
 
@@ -273,7 +270,6 @@ HTML;
   public function ca_batch() {
     $this->access(17);
     $this->header_data('title', 'Repo Batch');
-    $this->header_data('nav', 'repo-batch');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
     $data['table_batches'] = $this->repo->batch_list();
     $this->template('repo/batch/list', $data);
@@ -282,7 +278,6 @@ HTML;
   public function batch_view($repo_batch_id) {
     $this->access(17);
     $this->header_data('title', 'Repo Batch CA View');
-    $this->header_data('nav', 'repo-batch-ca-view');
     $data = $this->repo->batch($repo_batch_id);
     $this->template('repo/batch/view', $data);
   }
@@ -290,7 +285,6 @@ HTML;
   public function misc_exp() {
     $this->access(17);
     $this->header_data('title', 'Repo Registration Misc Expense');
-    $this->header_data('nav', 'repo-registration');
     $this->footer_data('script', '<script src="'.base_url().'assets/js/repo_registration.js?'.$this->jsversion.'"></script>');
 
     $data['batchref_dropdown'] = form_dropdown("repo_batch_id", $this->form->ca_dropdown('REPO'), '', ["class"=>"span5"]);
@@ -372,7 +366,6 @@ HTML;
     }
 
     $this->header_data('title', 'Repo CA');
-    $this->header_data('nav', 'repo-registration');
     $data['input_region'] = form_dropdown("region", $this->form->region_dropdown('WITH_OUT_ANY'), 0, ["class"=>"span12"]);
     $data['for_ca'] = $this->repo->get_for_ca();
     $this->template('repo/acctg/ca', $data);
@@ -412,7 +405,6 @@ HTML;
 
     if (!$this->input->post()) {
       $this->header_data('title', 'Repo Checking');
-      $this->header_data('nav', 'repo-registration');
       $data['references'] = $this->repo->check_registration('GET_REFERENCE');
       $this->template('repo/for_checking', $data);
     }
