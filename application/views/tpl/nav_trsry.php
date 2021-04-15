@@ -58,7 +58,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a tabindex="-1" href="<?php echo base_url('projected_fund/ca_list'); ?>">Brand New</a>
-                                        <a tabindex="-1" href="<?php echo base_url('projected_fund/repo_ca_list'); ?>">Repo</a>
+                                        <a tabindex="-1" href="<?php echo base_url('projected_fund/repo_ca_monitoring'); ?>">Repo</a>
                                     </li>
                                 </ul>
                             </li>
