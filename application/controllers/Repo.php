@@ -262,7 +262,8 @@ HTML;
     $data['table_sales'] = $this->repo->request_ca();
     if ($repo_sales_id = $this->input->post('repo_sales_id')) {
       $success = $this->repo->generate_ca($repo_sales_id);
-      if ($success) {
+      if ($success['status']) {
+        $_SESSION['messages'][] = $success['repo_ca_reference'].' created successfuly.';
         redirect('repo/ca_batch');
       }
     }

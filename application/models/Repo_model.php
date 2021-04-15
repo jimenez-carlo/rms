@@ -531,11 +531,12 @@ SQL;
 SQL;
     $this->db->query($sql);
     $ca_batch_id = $this->db->insert_id();
+    $repo_ca_reference = $this->db->query("SELECT reference FROM tbl_repo_batch WHERE repo_batch_id = {$ca_batch_id}")->row_array()['reference'];
 
     $this->db->where_in('rs.repo_sales_id', $repo_sales_id);
     $this->db->update('tbl_repo_sales rs', ['rs.repo_batch_id' => $ca_batch_id]);
     $this->db->trans_complete();
-    return $this->db->trans_status();
+    return [ 'status' => $this->db->trans_status(), 'repo_ca_reference' => $repo_ca_reference ];
   }
 
   public function repo_ca_template() {
