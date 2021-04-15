@@ -362,6 +362,7 @@ SQL;
   }
 
   public function batch($repo_batch_id) {
+    $branch = (!$_SESSION['dept_name'] === 'Accounting') ? ' AND rs.bcode = '.$_SESSION['branch_code'] : '';
     $data = $this->db->select('reference, misc_expenses')->get_where('tbl_repo_batch', 'repo_batch_id='.$repo_batch_id)->row_array();
     $this->table->set_template(["table_open" => "<table class='table'>"]);
     $result = $this->db
@@ -390,7 +391,7 @@ SQL;
       ->join('tbl_repo_registration rr', 'rs.repo_registration_id = rr.repo_registration_id', 'left')
       ->join('tbl_engine e', 'ri.engine_id = e.eid', 'left')
       ->join('tbl_customer c', 'rs.customer_id = c.cid', 'left')
-      ->where('rb.repo_batch_id = '.$repo_batch_id .' AND rs.bcode = '.$_SESSION['branch_code'])
+      ->where('rb.repo_batch_id = '.$repo_batch_id.' '.$branch)
       ->get();
     $data["batch"] = $this->table->generate($result);
     return $data;
@@ -597,7 +598,7 @@ SQL;
     return $this->db
       ->select([
         'IFNULL(rbb.sop_renewal,0) AS sop_renewal', 'IFNULL(rbb.sop_transfer,0) AS sop_transfer',
-        'IFNULL(sop_hpg_pnp_clearance,0) AS sop_hpg_pnp_clrearance', 'IFNULL(rbb.insurance,0) AS insurance',
+        'IFNULL(sop_hpg_pnp_clearance,0) AS sop_hpg_pnp_clearance', 'IFNULL(rbb.insurance,0) AS insurance',
         'IFNULL(rbb.emission,0) AS emission', 'IFNULL(rbb.unreceipted_renewal_tip,0) AS unreceipted_renewal_tip',
         'IFNULL(rbb.unreceipted_transfer_tip,0) AS unreceipted_transfer_tip',
         'IFNULL(rbb.unreceipted_macro_etching_tip,0) AS unreceipted_macro_etching_tip',

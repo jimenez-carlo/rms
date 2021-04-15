@@ -323,11 +323,6 @@
                   <?php endif; ?>
                 </div>
 
-<!--
-
-
-
--->
               </div>
               <?php endif; ?>
             </fieldset>

@@ -98,9 +98,9 @@ class Projected_fund extends MY_Controller {
     $this->template('projected_fund/list_voucher', $data);
   }
 
-  public function repo_ca_list() {
+  public function repo_ca_monitoring() {
     $this->access(16);
-    $this->header_data('title', 'Repo CA List');
+    $this->header_data('title', 'Repo CA Monitoring');
     $this->header_data('dir', './../');
     $this->header_data('nav', 'repo-registration');
 

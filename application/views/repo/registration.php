@@ -130,7 +130,7 @@
                 <div class="control-group span6 <?php echo (form_error('repo_registration[renewal_amt]')) ? 'error' : ''; ?>">
                   <label class="control-label" for="renewal-amount">Renewal Amt.</label>
                   <div class="controls">
-                    <input id="renewal-amount" type="number" name="repo_registration[renewal_amt]" min="0" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[renewal_amt]', ''); ?>" required>
+                    <input id="renewal-amount" type="number" name="repo_registration[renewal_amt]" min="0" max="<?php echo $sop_renewal; ?>" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[renewal_amt]', ''); ?>" required>
                   </div>
                 </div>
               </div>
@@ -139,13 +139,13 @@
                 <div class="control-group span6 <?php echo (form_error('repo_registration[transfer_amt]')) ? 'error' : ''; ?>">
                   <label class="control-label" for="transfer-amount">Transfer Amt.</label>
                   <div class="controls">
-                    <input id="transfer-amount" type="number" name="repo_registration[transfer_amt]" min="0" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[transfer_amt]', ''); ?>" required>
+                    <input id="transfer-amount" type="number" name="repo_registration[transfer_amt]" min="0" max="<?php echo $sop_renewal; ?>" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[transfer_amt]', ''); ?>" required>
                   </div>
                 </div>
                 <div class="control-group span6 <?php echo (form_error('repo_registration[hpg_pnp_clearance_amt]')) ? 'error' : ''; ?>">
                   <label class="control-label" for="pnp-amount">HPG / PNP Clearance Amt.</label>
                   <div class="controls">
-                    <input id="pnp-amount" type="number" name="repo_registration[hpg_pnp_clearance_amt]" min="0" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[hpg_pnp_clearance_amt]', ''); ?>" required>
+                    <input id="pnp-amount" type="number" name="repo_registration[hpg_pnp_clearance_amt]" min="0" max="<?php echo $sop_hpg_pnp_clearance; ?>" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[hpg_pnp_clearance_amt]', ''); ?>" required>
                   </div>
                 </div>
               </div>
@@ -154,13 +154,13 @@
                 <div class="control-group span6 <?php echo (form_error('repo_registration[insurance_amt]')) ? 'error' : ''; ?>">
                   <label class="control-label" for="insurance-amount">Insurance Amt.</label>
                   <div class="controls">
-                    <input id="insurance-amount" type="number" name="repo_registration[insurance_amt]" min="0" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[insurance_amt]', ''); ?>" required>
+                    <input id="insurance-amount" type="number" name="repo_registration[insurance_amt]" min="0" max="<?php echo $insurance; ?>" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[insurance_amt]', ''); ?>" required>
                   </div>
                 </div>
                 <div class="control-group span6 <?php echo (form_error('repo_registration[emission_amt]')) ? 'error' : ''; ?>">
                   <label class="control-label" for="emission-amount">Emission Amt.</label>
                   <div class="controls">
-                    <input id="emission-amount" type="number" name="repo_registration[emission_amt]" min="0" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[emission_amt]', ''); ?>" required>
+                    <input id="emission-amount" type="number" name="repo_registration[emission_amt]" min="0" max="<?php echo $emission; ?>" step="0.01" placeholder="0.00" value="<?php echo set_value('repo_registration[emission_amt]', ''); ?>" required>
                   </div>
                 </div>
               </div>

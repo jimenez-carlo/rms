@@ -158,20 +158,34 @@ SQL;
     }
 
     $this->table->set_template(["table_open" => "<table class='table'>"]);
+    $regn_exp_ttl  = "rr.orcr_amt+rr.renewal_amt+rr.transfer_amt+rr.hpg_pnp_clearance_amt";
+    $regn_exp_ttl .= "+rr.insurance_amt+rr.emission_amt+rr.macro_etching_amt+rr.renewal_tip";
+    $regn_exp_ttl .= "+rr.transfer_tip+rr.hpg_pnp_clearance_tip+rr.macro_etching_tip+rr.plate_tip";
+    $url_batch_view = base_url('repo/batch_view/');
+
     $result = $this->db
       ->select("
-        CONCAT(rb.bcode, ' ', rb.bname) AS 'Branch',
-        r.region AS 'Region',
-        DATE_FORMAT(rb.date_created, '%Y-%m-%d') AS 'Entry Date', rb.reference AS 'Reference #',
+        CONCAT('<a href=\"{$url_batch_view}',rb.repo_batch_id,'\" target=\"_blank\">',rb.reference,'</a>') AS 'Reference #',
         rb.doc_no AS 'Document #',
         rb.debit_memo AS 'Debit Memo',
-        rb.date_deposited AS 'Date Deposited',
+        CONCAT(DATE_FORMAT(rb.date_created, '%Y-%m-%d'), ' / ',rb.date_deposited) AS 'Entry Date / Date Deposited',
+        CONCAT(r.region, ' / ', rb.bcode, ' ', rb.bname) AS 'Region / Branch',
+        COUNT(*) AS '# of Units',
         FORMAT(rb.amount, 2) AS 'Amount',
+        IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
+        SUM(IF(ri.status = 'REGISTERED',({$regn_exp_ttl}),0)) AS 'For Checking',
+        SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
+        0 AS 'SAP Uploading',
+        SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)) AS 'Liquidated',
         rb.status AS 'Status'
       ")
       ->from('tbl_repo_batch rb')
+      ->join('tbl_repo_sales rs', 'rb.repo_batch_id = rs.repo_batch_id', 'inner')
+      ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id', 'inner')
+      ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id', 'left')
       ->join('tbl_region r', 'r.rid = rb.region_id', 'left')
       ->where("rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}")
+      ->group_by('rb.repo_batch_id')
       ->limit(1000)
       ->get();
     return $this->table->generate($result);

@@ -80,7 +80,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                       <a href="#" class="dropdown-toggle" role="button" data-toggle="dropdown">Repo <i class="caret"></i></a>
                       <ul class="dropdown-menu">
                         <li><a href="<?php echo base_url('repo/ca'); ?>">Create CA</a></li>
-                        <li><a href="<?php echo base_url('projected_fund/repo_ca_list'); ?>">CA List</a></li>
+                        <li><a href="<?php echo base_url('projected_fund/repo_ca_monitoring'); ?>">CA Monitoring</a></li>
                         <li><a href="<?php echo base_url('repo/for_checking'); ?>">For Checking</a></li>
                         <li><a href="<?php echo base_url('repo/sap_uploading'); ?>">SAP Uploading</a></li>
                       </ul>
