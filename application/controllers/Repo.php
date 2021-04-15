@@ -304,10 +304,10 @@ HTML;
       $or_date = $this->input->post('or_date');
       $expense_id = md5($_SESSION['branch_code'].date('Y-m-d H:m:s'));
 
-      $upload = $this->file->upload('misc', '/repo/batch/'.$repo_batch_id.'/', $expense_id.'.jpg');
+      $upload = $this->file->upload('misc', '/repo/batch/misc_exp/'.$repo_batch_id.'/', $expense_id.'.jpg');
       $form_ok = $this->validate->form('REPO_BATCH_MISC_EXP', [ 'expense_type' => $expense_type ]);
       if ($upload && $form_ok) {
-        $img_path = '/rms_dir/repo/batch/'.$repo_batch_id.'/'.$expense_id.'.jpg';
+        $img_path = '/rms_dir/repo/batch/misc_exp/'.$repo_batch_id.'/'.$expense_id.'.jpg';
         $misc_saved = $this->repo->save_expense([
           "repo_batch_id" => $repo_batch_id,
           "data" => [
