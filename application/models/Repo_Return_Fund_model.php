@@ -1,6 +1,7 @@
-<?php defined ('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined ('BASEPATH') OR exit('No direct script access allowed');
 
-class Return_Fund_model extends CI_Model{
+class Repo_Return_Fund_model extends CI_Model{
 
         public function __construct()
         {
@@ -120,13 +121,13 @@ class Return_Fund_model extends CI_Model{
                     DATE_FORMAT(rf.liq_date, '%Y-%m-%d') AS liq_date,
                     v.reference, st.status_name AS status
                   FROM
-                    tbl_return_fund rf
+                    tbl_repo_return_fund rf
                   INNER JOIN
-                    tbl_voucher v ON v.vid = rf.fund
+                    tbl_repo_batch v ON v.repo_batch_id = rf.fund
                   INNER JOIN
-                    tbl_return_fund_history rfh1 ON rf.rfid = rfh1.rfid
+                    tbl_repo_return_fund_history rfh1 ON rf.rfid = rfh1.rfid
                   LEFT JOIN
-                    tbl_return_fund_history rfh2 ON rfh1.rfid = rfh2.rfid AND rfh1.return_fund_history_id < rfh2.return_fund_history_id
+                    tbl_repo_return_fund_history rfh2 ON rfh1.rfid = rfh2.rfid AND rfh1.return_fund_history_id < rfh2.return_fund_history_id
                   INNER JOIN
                     tbl_status st ON st.status_id = rfh1.status_id AND status_type = 'RETURN_FUND'
                   WHERE

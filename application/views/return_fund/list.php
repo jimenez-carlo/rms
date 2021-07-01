@@ -88,7 +88,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<td>'.$row->reference.'</td>';
               print '<td>'.$row->companyname.'</td>';
               print '<td>'.$row->region.'</td>';
-              print '<td>'.$row->amount.'</td>';
+              print '<td style="text-align: right">'.number_format($row->amount,2).'</td>';
               print '<td><a href="'.base_url().'rms_dir/deposit_slip/'.$row->rfid.'/'.$row->slip.'" target="_blank">'.$row->slip.'</a></td>';
               print '<td>'.$row->status.'</td>';
               print (empty($row->liq_date)) ? '<td>-</td>' : '<td>'.$row->liq_date.'</td>';

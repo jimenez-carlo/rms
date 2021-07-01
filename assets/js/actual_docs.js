@@ -14,8 +14,6 @@ $('.save-actual-docs').on('click', function(e){
   var temp_id = $(this).val();
   save_transmittal_no(temp_id, actual_docs_id);
 });
-
-
 $('[name=deposit_slip]').on('change', function(e){
   var that = $(this);
   var actual_docs_id = $(this).closest('tr').prop('id');

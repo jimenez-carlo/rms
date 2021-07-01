@@ -9,9 +9,13 @@ class Repo extends MY_Controller {
     parent::__construct();
     $this->load->model('Sales_model', 'sales');
     $this->load->model('Repo_model', 'repo');
+    $this->load->model('Repo_Misc_model', 'repo_misc');
+    $this->load->model('Repo_Sales_model', 'repo_sales');
+    $this->load->model('Repo_Return_Fund_model', 'return_fund');
     $this->load->model('File_model', 'file');
     $this->load->model('Validation_model', 'validate');
     $this->load->model('Form_model', 'form');
+    $this->load->model('Request_model', 'request');
     $this->header_data('nav', 'repo-registration');
   }
 
@@ -31,15 +35,15 @@ class Repo extends MY_Controller {
     $this->template('repo/in', []);
   }
 
-  public function sale($repo_inventory_id) {
+  public function sale($sales_id) {
     $this->access(17);
     if ($this->input->post('save')) {
       if ($this->validate->form('REPO_SALES')) {
         $this->db->trans_start();
         $sales = $this->input->post();
-        $sales['repo_sale']['repo_inventory_id'] = $repo_inventory_id;
-        $this->repo->save_sales($sales);
-        $this->repo->update_inv_status($repo_inventory_id, 'SALES');
+        $sales['repo_sale']['repo_sales_id'] = $sales_id;
+        $this->repo->save_sales($sales,$sales_id);
+        $this->repo->update_inv_status($sales_id, 'SALES', 2);
         $this->db->trans_complete();
 
         if (!$this->db->trans_status()) {
@@ -51,7 +55,8 @@ class Repo extends MY_Controller {
       }
     }
 
-    $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'NEW');
+    $data['repo'] = $this->repo->engine_details($sales_id, 1);
+    $data['repo_type'] = $this->repo->repo_dropdown();
     //$this->check_mc_branch($data['repo']['bcode']);
     $date = (!$this->input->post('save')) ? $data['repo']['date_registered'] : $this->input->post('repo_registration')['date_registered'];
     $expire = $this->repo->expiration($date);
@@ -78,7 +83,7 @@ class Repo extends MY_Controller {
       }
     }
 
-    $data['repo'] = $this->repo->engine_details($repo_inventory_id, 'SALES');
+    $data['repo'] = $this->repo->engine_details($repo_inventory_id, 2);
     $date = $this->input->post('date_registered') ?? $data['repo']['date_registered'];
     $expire = $this->repo->expiration($date);
 
@@ -151,21 +156,26 @@ SQL;
             <input type="hidden" name="customer_id" value="{$sales['customer_id']}">
             <fieldset>
               <legend>Details</legend>
-                <div class="row">
-                  <div class="control-group offset1">
-                    <label>Branch</label>
-                    <input type="text" value="{$sales['bcode']} {$sales['bname']}" disabled>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="control-group offset1">
-                    <label for="get-cust">Customer Code</label>
-                    <input id="get-cust" type="text" value="{$sales['cust_code']}" disabled>
-                    <!-- <input id="customer-id" type="hidden" name="cid" type="text" value="{$sales['customer_id']}"> -->
-                  </div>
-                </div>
                 <div class="form-inline row">
                   <div class="control-group span4 offset1">
+
+                    <label class="control-label">Branch</label>
+                    <div class="controls">
+                    <input type="text" value="{$sales['bcode']} {$sales['bname']}" disabled>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label for="get-cust" class="control-label">Customer Code</label>
+                    <div class="controls">
+                    <input id="get-cust" type="text" value="{$sales['cust_code']}" disabled>
+                    <!-- <input id="customer-id" type="hidden" name="cid" type="text" value="{$sales['customer_id']}"> -->
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-inline row">
+                  <div class="control-group span4 offset1">
+
                     <label class="control-label">First Name</label>
                     <div class="controls">
                       <input id="first-name" type="text" value="{$sales['first_name']}" disabled>
@@ -302,6 +312,7 @@ HTML;
       $form_ok = $this->validate->form('REPO_BATCH_MISC_EXP', [ 'expense_type' => $expense_type ]);
       if ($upload && $form_ok) {
         $img_path = '/rms_dir/repo/batch/misc_exp/'.$repo_batch_id.'/'.$expense_id.'.jpg';
+        $this->repo->misc_insert();
         $misc_saved = $this->repo->save_expense([
           "repo_batch_id" => $repo_batch_id,
           "data" => [
@@ -397,17 +408,37 @@ HTML;
       exit;
     }
 
+    if ($repo_batch_id && isset($_POST['preview'])) {
+      $reference_data =  $this->repo->check_registration($this->input->post('request_type'), ['repo_batch_id' => $repo_batch_id ]);
+      echo $reference_data;
+      exit;
+    }
+
     if ($attachment = $this->input->post('attachment')) {
       $data_attached =  $this->repo->check_registration($this->input->post('request_type'), $attachment);
       echo $data_attached;
       exit;
     }
 
+    if ($attachment = $this->input->post('disaprove')) {
+      echo 'disaproved!';
+      exit;
+    }
+
     if (!$this->input->post()) {
       $this->header_data('title', 'Repo Checking');
-      $data['references'] = $this->repo->check_registration('GET_REFERENCE');
+      $data['repo_batch_id']    = $this->input->post('repo_batch_id');
+      $data['references']       = $this->repo->check_registration('GET_REFERENCE');
+      $data['misc_da_dropdown'] = $this->repo->misc_da_dropdown();
       $this->template('repo/for_checking', $data);
     }
+
+    // if (!empty($data['CA'])) {
+    //   $data['batch_ref'] = $this->orcr_checking->get_sales($data);
+    //   $data['reference_selected'] = $data['batch_ref']['reference'];
+    //   $view = (!empty($data['summary'])) ? 'orcr_checking/summary' : 'orcr_checking/ca_ref';
+    //   $data['view'] = $this->load->view($view, $data, TRUE);
+    // }
   }
 
   private function repo_save(array $data, $type) {
@@ -419,5 +450,120 @@ HTML;
     }
     $this->db->trans_complete();
     return $this->db->trans_status();
+  }
+
+  public function sap_uploading(){
+    $this->access(1);
+    $this->header_data('title', 'Repo For SAP Uploading');
+    $this->header_data('nav', '');
+    $this->header_data('dir', './');
+    $this->footer_data('script', '<script src="../assets/modal/sap_upload.js"></script>');
+
+    $save = $this->input->post('save');
+    if(!empty($save))
+    {
+      $subid = current(array_keys($save));
+      $this->liquidate($subid);
+    }
+
+    $data['table'] = $this->repo->list_for_upload();
+    $this->template('repo/sap_upload', $data);
+  }
+
+  public function liquidate($subid){
+    $this->form_validation->set_rules('doc_no', 'Document #', 'required');
+
+    if ($this->form_validation->run() == TRUE) {
+      $this->save_liquidated($subid);
+    }
+  }
+
+  private function save_liquidated($subid)
+  {
+    $misc_exp = $this->input->post('misc_exp');
+
+    $batch = new Stdclass();
+    $batch->subid = $subid;
+    $batch->doc_no = $this->input->post('doc_no');
+    $batch->download_date = date('Y-m-d H:i:s');
+    $batch->is_uploaded = 1;
+    $this->db->trans_start();
+    $batch = $this->repo->liquidate_batch($batch);
+
+    if ($misc_exp) {
+      $this->repo->liquidate_misc_exp($misc_exp);
+    }
+    $this->db->trans_complete();
+
+    if ($this->db->trans_status()) {
+      $_SESSION["messages"][] = 'Document Number '.$batch->doc_no.' for Transaction # '.$batch->trans_no.' was saved successfully.';
+    } else {
+      $_SESSION["warning"][] = 'Something went wrong.';
+    }
+  }
+  
+  public function sap($subid){
+    $data = $this->repo->sap_upload($subid);
+    $this->load->view('repo/sap', $data);
+  }
+
+  public function disapproved_misc()
+  {
+    $this->access(1);
+    $this->header_data('title', 'Disapprove Repo Miscellaneous List');
+    $this->header_data('nav', '');
+    $this->header_data('dir', './');
+
+    $param = new Stdclass();
+    $param->region = $this->session->region_id;
+    $param->branch = $this->input->post('branch');
+
+    $data['branch']    = $this->repo_misc->branch_list($param);
+    $data['table']     = $this->repo_misc->load_list($param);
+    // $data['da_reason'] = $this->disapprove->da_reason();
+    $this->template('repo/list/misc', $data);
+  }
+  
+  public function disapproved_sales()
+  {
+    $this->access(1);
+    $this->header_data('title', 'Disapprove Repo Sales List');
+    $this->header_data('nav', '');
+    $this->header_data('dir', './');
+
+    $param = new Stdclass();
+    $param->region = $this->session->region_id;
+    $param->branch = $this->input->post('branch');
+
+    $data['branch']    = $this->repo_sales->branch_list($param);
+    $data['table']     = $this->repo_sales->load_list($param);
+    // $data['da_reason'] = $this->disapprove->da_reason();
+    $this->template('repo/list/sales', $data);
+  }
+  
+  public function return_fund_view($rfid){
+    $this->access(1);
+    $this->header_data('title', 'Return Fund');
+    $this->header_data('nav', 'return_fund');
+    $this->header_data('dir', './../../');
+    $this->footer_data('return_fund_js', '<script src="'.base_url().'assets/js/return_fund.js?v1.0.0"></script>');
+    
+
+    $liquidate = $this->input->post('liquidate');
+    if (!empty($liquidate)) {
+      $this->return_fund->liquidate_return($rfid);
+    }
+
+    $amount = $this->input->post('amount');
+    if (!empty($amount)) {
+      $this->return_fund->correct_amount($rfid, $amount);
+    }
+
+    $data['return'] = $this->return_fund->load_return($rfid);
+    if (is_null($data['return']) || $data['return']->status === 'Deleted') {
+      show_404();
+    } else {
+      $this->template('repo/return_fund/view', $data);
+    }
   }
 }

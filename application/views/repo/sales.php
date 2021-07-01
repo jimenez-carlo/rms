@@ -18,6 +18,19 @@
             </legend>
 -->
             <div class="form-inline row">
+              <div class="control-group span4 offset4">
+                <label class="control-label">Repo Type</label>
+                <div class="controls">
+                  <select name="repo_sale[repo_reg_type]">
+                    <?php foreach ($repo_type as $res) { ?>
+                    <option value="<?php echo $res['status_id'] ?>"> <?php echo $res['status_name']; ?></option>
+                    <?php } ?>
+                  </select>
+                </div>
+              </div>
+              
+            </div>
+            <div class="form-inline row">
               <div class="control-group span2 offset4">
                 <label class="control-label">Engine#</label>
                 <div class="controls">

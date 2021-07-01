@@ -52,7 +52,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             print '<td>'.$row->si_no.'</td>';
             print '<td>'.$row->registration_type.'</td>';
             print '<td>'.$row->ar_no.'</td>';
-            print '<td>'.$row->registration.'</td>';
+            print '<td style="text-align: right">'.number_format($row->registration,2).'</td>';
             print '<td>'.$row->cr_no.'</td>';
             print '<td>'.$row->trans_no.'</td>';
             print '<td>'.$row->da_status.'</td>';

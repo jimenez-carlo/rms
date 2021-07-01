@@ -163,8 +163,34 @@ SQL;
     $regn_exp_ttl .= "+rr.transfer_tip+rr.hpg_pnp_clearance_tip+rr.macro_etching_tip+rr.plate_tip";
     $url_batch_view = base_url('repo/batch_view/');
 
-    $result = $this->db
-      ->select("
+
+    $additional = "";
+    if ($_SESSION['position'] != 34) {
+      // $additional = "IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
+      //                 SUM(IF(ri.status = 'REGISTERED',({$regn_exp_ttl}),0)) AS 'For Checking',
+      //                 SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
+      //                 0 AS 'SAP Uploading',
+      //                 SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)) AS 'Liquidated',";
+
+       // 'Registration: ', '<span style=float:right>', FORMAT(IFNULL({$regn_exp_ttl}, 0),2), '</span>',
+       //                '<br>Miscellaneous: ', '<span style=float:right>', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
+       //                '<br>Return Fund: ', '<span style=float:right>', FORMAT(IFNULL(return_fund_for_checking, 0),2), '</span>'
+
+      $additional = " 
+                      IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
+                     CONCAT(
+                      'Registration: ', '<span style=float:right>', FORMAT(IFNULL(SUM(rr.orcr_amt+rr.renewal_amt+rr.transfer_amt), 0),2), '</span>',
+                      '<br>Miscellaneous: ', '<span style=float:right>', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
+                      '<br>Return Fund: ', '<span style=float:right>', FORMAT(IFNULL(return_fund_for_checking, 0),2), '</span>'
+                    ) AS 'For Checking',
+                      SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
+                      0 AS 'SAP Uploading',
+                      SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)) AS 'Liquidated',
+";
+    }
+
+    $sql    = <<<SQL
+    SELECT
         CONCAT('<a href=\"{$url_batch_view}',rb.repo_batch_id,'\" target=\"_blank\">',rb.reference,'</a>') AS 'Reference #',
         rb.doc_no AS 'Document #',
         rb.debit_memo AS 'Debit Memo',
@@ -172,23 +198,73 @@ SQL;
         CONCAT(r.region, ' / ', rb.bcode, ' ', rb.bname) AS 'Region / Branch',
         COUNT(*) AS '# of Units',
         FORMAT(rb.amount, 2) AS 'Amount',
-        IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
-        SUM(IF(ri.status = 'REGISTERED',({$regn_exp_ttl}),0)) AS 'For Checking',
-        SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
-        0 AS 'SAP Uploading',
-        SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)) AS 'Liquidated',
+        $additional
         rb.status AS 'Status'
-      ")
-      ->from('tbl_repo_batch rb')
-      ->join('tbl_repo_sales rs', 'rb.repo_batch_id = rs.repo_batch_id', 'inner')
-      ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id', 'inner')
-      ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id', 'left')
-      ->join('tbl_region r', 'r.rid = rb.region_id', 'left')
-      ->where("rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}")
-      ->group_by('rb.repo_batch_id')
-      ->limit(1000)
-      ->get();
+        FROM tbl_repo_batch rb
+        INNER JOIN tbl_repo_sales rs ON rb.repo_batch_id = rs.repo_batch_id
+        INNER JOIN tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
+        LEFT JOIN tbl_repo_registration rr ON rr.repo_registration_id = rs.repo_registration_id
+        LEFT JOIN tbl_region r ON r.rid = rb.region_id
+        LEFT JOIN (
+                    SELECT
+                      m.ca_ref,
+                      IFNULL(SUM(IF(st.status_name = 'For Approval', m.amount ,0)), 0) AS misc_exp_for_checking,
+                      IFNULL(SUM(IF(st.status_name = 'For Liquidation', m.amount ,0)), 0) AS misc_exp_sap_upload,
+                      IFNULL(SUM(IF(st.status_name = 'Liquidated', m.amount ,0)), 0) AS misc_exp_liquidated,
+                      IFNULL(SUM(IF(st.status_name = 'Disapproved', m.amount ,0)), 0) AS misc_exp_da
+                    FROM tbl_repo_misc m
+                    INNER JOIN tbl_repo_misc_expense_history mxh1 ON m.mid = mxh1.mid
+                    INNER JOIN tbl_status st ON st.status_id = mxh1.status AND st.status_type = 'MISC_EXP'
+                    LEFT JOIN tbl_repo_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+                    WHERE mxh2.id IS NULL GROUP BY m.ca_ref
+                  ) AS misc ON misc.ca_ref = rb.repo_batch_id 
+        LEFT JOIN (
+                    SELECT
+                      rf.fund,
+                      IFNULL(SUM(IF(st.status_name = 'For Liquidation', rf.amount ,0)), 0) AS return_fund_for_checking,
+                      IFNULL(SUM(IF(st.status_name = 'Liquidated', rf.amount ,0)), 0) AS return_fund_liquidated,
+                      IFNULL(SUM(IF(st.status_name NOT IN('For Liquidation', 'Liquidated', 'Deleted'), rf.amount ,0)), 0) AS return_fund_da
+                    FROM tbl_repo_return_fund rf
+                    JOIN tbl_repo_return_fund_history rfh_1 USING(rfid)
+                    LEFT JOIN tbl_status st ON rfh_1.status_id = st.status_id AND status_type = 'RETURN_FUND'
+                    LEFT JOIN tbl_repo_return_fund_history rfh_2 ON rfh_2.rfid = rfh_1.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
+                    WHERE rfh_2.return_fund_history_id IS NULL
+                    GROUP BY rf.fund
+                  ) AS return_fund ON return_fund.fund = rb.repo_batch_id 
+
+        WHERE rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}
+        GROUP BY rb.repo_batch_id
+        LIMIT 1000 
+
+SQL;
+    $result = $this->db->query($sql);
+    // $result = $this->db
+    //   ->select("
+    //     CONCAT('<a href=\"{$url_batch_view}',rb.repo_batch_id,'\" target=\"_blank\">',rb.reference,'</a>') AS 'Reference #',
+    //     rb.doc_no AS 'Document #',
+    //     rb.debit_memo AS 'Debit Memo',
+    //     CONCAT(DATE_FORMAT(rb.date_created, '%Y-%m-%d'), ' / ',rb.date_deposited) AS 'Entry Date / Date Deposited',
+    //     CONCAT(r.region, ' / ', rb.bcode, ' ', rb.bname) AS 'Region / Branch',
+    //     COUNT(*) AS '# of Units',
+    //     FORMAT(rb.amount, 2) AS 'Amount',
+    //     IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
+    //     SUM(IF(ri.status = 'REGISTERED',({$regn_exp_ttl}),0)) AS 'For Checking',
+    //     SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
+    //     0 AS 'SAP Uploading',
+    //     SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)) AS 'Liquidated',
+    //     rb.status AS 'Status'
+    //   ")
+    //   ->from('tbl_repo_batch rb')
+    //   ->join('tbl_repo_sales rs', 'rb.repo_batch_id = rs.repo_batch_id', 'inner')
+    //   ->join('tbl_repo_inventory ri', 'ri.repo_inventory_id = rs.repo_inventory_id', 'inner')
+    //   ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id', 'left')
+    //   ->join('tbl_region r', 'r.rid = rb.region_id', 'left')
+    //   ->where("rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}")
+    //   ->group_by('rb.repo_batch_id')
+    //   ->limit(1000)
+    //   ->get();
     return $this->table->generate($result);
   }
+
 
 }

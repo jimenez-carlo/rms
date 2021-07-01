@@ -95,7 +95,7 @@
           </center>
         </td>
         <td><?php echo '<a class="view-ric-customer" href="#" data-value="'.$batch['ric_id'].'">'.$batch['reference_num'].'</a>'; ?></td>
-        <td><?php echo $batch['amount']; ?></td>
+        <td style="text-align: right"><?php echo number_format($batch['amount'],2); ?></td>
         <td><?php echo form_input($ap_id + ['name'=>'doc_num', 'value'=>$batch['doc_num']] + $disDN); ?></td>
         <td><?php echo form_input($tr_id + ['name'=>'debit_memo', 'value'=>$batch['debit_memo']] + $disDM); ?></td>
         <td><?php echo form_input(['id'=>'date-deposited-'.$batch['ric_id'], 'class'=>'datepicker', 'name'=>'date_deposited', 'value'=>$batch['date_deposited'], 'autocomplete'=>'off'] + $disDD); ?></td>

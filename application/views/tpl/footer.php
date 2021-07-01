@@ -12,7 +12,19 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <div style="background: linear-gradient(#000, #FFF, #FFF, #FFF, #FFF, #FFF, #FFF, #FFF, #000); opacity: .5; position: absolute; width: 100%; height: 100%;"></div>
             <img src="<?php echo base_url(); ?>images/loader.gif" style="position: absolute; top: 35%; left: 45%;">
         </div>
-
+<!-- Bootstrap modal -->
+<div class="modal fade" id="modal-container" role="dialog">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+		    <div class="modal-header">
+		      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+		      <h3 class="modal-title" id="modal-title"></h3>
+		    </div>
+				<div id="modal_body"></div>
+		   
+		    </div><!-- /.modal-content -->
+		  </div><!-- /.modal-dialog -->
+		</div><!-- /.modal -->
         <!--/.fluid-container-->
         <script type="text/javascript">
         BASE_URL = "<?php echo base_url(); ?>";
@@ -69,6 +81,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         </script>
         <?php if(isset($script)) echo $script; ?>
         <?php if(isset($return_fund_js)) echo $return_fund_js; ?>
+        
+        <script src="<?php print base_url('assets/js/xhr.js') ?>"></script>
     </body>
 
 </html>

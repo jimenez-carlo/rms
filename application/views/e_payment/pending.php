@@ -35,7 +35,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 								print '<td>'.$row->ref_date.'</td>';
 								print '<td><a href="view/'.$row->epid.'" target="_blank">'.$row->reference.'</a></td>';
 								print '<td>'.$region[$row->region].' '.$company[$row->company].'</td>';
-								print '<td>'.$row->amount.'</td>';
+								print '<td style="text-align: right">'.number_format($row->amount,2).'</td>';
 								print '<td>'.$row->addtl_amt.'</td>';
 								print '<td>'.form_input('doc_no['.$row->epid.']', set_value('doc_no['.$row->epid.']',$row->doc_no)).'</td>';
 								print '<td><a href="'.base_url().'electronic_payment/print_batch/'.$row->epid.'" target="_blank" class="btn btn-success">Print</a></td>';

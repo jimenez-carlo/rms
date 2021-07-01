@@ -103,7 +103,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               print '<td>'.$row->date.'</td>';
               print '<td>'.$row->dm_no.'</td>';
               print '<td>'.$row->transfer_date.'</td>';
-              print '<td>'.$row->amount.'</td>';
+              print '<td style="text-align: right">'.number_format($row->amount,2).'</td>';
               print '<td>'.$row->region.'</td>';
               // print '<td>'.$row->company.'</td>';
               print '<td>'.$row->status.'</td>';

@@ -13,6 +13,16 @@
             <legend>
               CA Reference# <?php echo $repo['reference']; ?>
             </legend>
+            <div class="span12">
+                    <div class="form-inline">
+                  <div class="control-group span12">
+                    <label class="control-label">Repo Type</label>
+                    <div class="controls">
+                      <input  type="text" value="<?php echo $repo['repo_reg_type']; ?>" disabled>
+                    </div>
+                  </div>
+                </div>
+              </div>
             <div class="span6">
               <div class="form-inline">
                 <div class="control-group span6">

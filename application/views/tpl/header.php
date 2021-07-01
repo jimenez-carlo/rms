@@ -17,6 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <link href="<?php print base_url('vendors/select2.css') ?>" rel="stylesheet" media="screen">
         <link href="<?php print base_url('vendors/datepicker.css') ?>" rel="stylesheet" media="screen">
         <link href="<?php print base_url('vendors/uniform.default.css') ?>" rel="stylesheet" media="screen">
+        <link href="<?php print base_url('bootstrap/css/alerty.css') ?>" rel="stylesheet" media="screen">
         <?php if(isset($link)) echo $link; ?>
 
         <!-- JQUERY -->
@@ -30,6 +31,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
         <script src="<?php print base_url('vendors/select2.min.js') ?>"></script>
         <script src="<?php print base_url('vendors/modernizr-2.6.2-respond-1.1.0.min.js') ?>"></script>
         <script src="<?php print base_url('assets/autocomma.js') ?>"></script>
+        <script src="<?php print base_url('assets/js/alerty.js') ?>"></script>
+        <script src="<?php print base_url('assets/js/custom_alert.js') ?>"></script>
 
         <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
         <!--[if lt IE 9]>

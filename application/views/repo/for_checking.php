@@ -1,5 +1,33 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
-
+<style type="text/css">
+  .bld{
+    font-weight: bold;
+    text-align: right!important;
+    font-size: 16px;
+  }
+  .brdrt{
+    border-top: dotted gray!important;;
+  }
+  .brdrb{
+    border-top: dotted gray!important;;
+  }
+  .clr-rd{
+    color: red;
+  }
+  .info{
+    background-color: #d9edf7!important;
+  }
+  .al{
+    text-align: left!important;
+  }
+  thead>tr{
+     border-top: double;
+  }
+  th:last-child,td:last-child{
+    width: 0.1%;
+    white-space: nowrap;
+  }
+</style>
 <div class="container-fluid">
   <div class="row-fluid">
     <!-- block -->
@@ -46,7 +74,7 @@
   <div class="modal-body row">
   </div>
   <div class="modal-footer">
-    <button id="include-for-upload" class="btn btn-success" data-dismiss="modal" aria-hidden="true">Include For Upload</button>
+    <button id="include-for-upload" class="btn btn-success" data-dismiss="modal" aria-hidden="true" data-type="0">Include For Upload</button>
     <button id="save-da" class="btn btn-warning" disabled>Disapprove</button>
   </div>
 </div>
@@ -62,7 +90,40 @@ $("button.ca-ref").on("click", function() {
   var ajax = ajaxSend({ "repo_batch_id": repo_batch_id, "request_type": "CA_REF_DATA" })
 
   ajax.success(function(data, textStatus, jqXHR) {
-    $("#table-landing").empty().append(data.table + '<button id="preview-summary" class="btn btn-success" disabled>Preview Summary</button>')
+    $("#table-landing").empty().append(data.table + '<button id="preview-summary" class="btn btn-success" name="preview" value="'+repo_batch_id+'"" disabled>Preview Summary</button>')
+  })
+
+  ajax.complete(function(jqXHR, textStatus) {
+    $("li.ref-list").css("background-color", "#fff")
+    $(".ca-ref").attr("disabled", false)
+    button.parent("li").css("background-color", "#66cdaa")
+    button.prop("disabled", true)
+    viewAttachment(repo_batch_id)
+  })
+})
+  var miscs = [];
+  var sales = [];
+$(document).on("click","#preview-summary",function() {
+  $('[data-selectable]').each(function( index ) {
+  if($( this ).is(':checked') ){
+    if (isNaN($(this).val())) {
+      miscs.push($(this).val());
+    }else{
+      sales.push($(this).val());
+    }
+  }
+  });
+  var misc_comma = miscs.join();
+  var sale_comma = sales.join();
+  console.table(misc_comma);
+  console.table(sale_comma);
+  var button = $(this)
+  var repo_batch_id = button.val()
+  var ajax = ajaxSend({ "repo_batch_id": repo_batch_id, "request_type": "CA_REF_DATA_PREV", })
+
+  ajax.success(function(data, textStatus, jqXHR) {
+    $("#table-landing").empty().append(data.table + '<input type="submit" name="submit_all" value="Submit" class="btn btn-success"> \
+          <input type="submit" name="back" value="Back" class="btn btn-success">')
   })
 
   ajax.complete(function(jqXHR, textStatus) {
@@ -80,8 +141,8 @@ function includeForUpload(repo_registration_id) {
   }
   bool = (for_sap_upload.repo_registration_ids.length < 0)
   $("#preview-summary").prop("disabled", bool)
-  console.log(bool);
-  console.log(for_sap_upload.repo_registration_ids);
+//   console.log(bool);
+//   console.log(for_sap_upload.repo_registration_ids);
 }
 
 function viewAttachment(repo_batch_id) {
@@ -94,6 +155,9 @@ function viewAttachment(repo_batch_id) {
         var repo_registration_id = button.val()
         var ajax = ajaxSend({"request_type": "VIEW_ATTACHMENT" , "attachment": {  "repo_registration_id": repo_registration_id, "type": attach_type }})
         $('#include-for-upload').val(repo_registration_id)
+        $('#include-for-upload').attr('data-type', 'sales');
+        $('#save-da').val(repo_registration_id)
+        $("#save-da").attr("disabled", true)
         ajax.success(function(data, textStatus, jqXHR) {
           $(".modal-body").empty().append(' \
             <div class="row form-horizontal"> \
@@ -256,7 +320,10 @@ function viewAttachment(repo_batch_id) {
       case 'MISC_EXP':
         var misc_exp_id = button.val()
         var ajax = ajaxSend({"request_type": "VIEW_ATTACHMENT" , "attachment": {  "repo_batch_id": repo_batch_id, "misc_expense_id": misc_exp_id, "type": attach_type}})
-
+        $("#save-da").attr("disabled", false)
+        $('#save-da').val(misc_exp_id);
+        $('#include-for-upload').attr('data-type', 'misc');
+        $('#include-for-upload').val(misc_exp_id)
         ajax.success(function(data, textStatus, jqXHR) {
           $(".modal-body").empty().append(' \
             <div class="span5 offset1 form-horizontal"> \
@@ -270,16 +337,38 @@ function viewAttachment(repo_batch_id) {
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Expense Type</label> \
-                <div class="controls" style="padding-top:5px">'+data.expense_type+'</div> \
+                <div class="controls" style="padding-top:5px">'+data.type+'</div> \
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Status</label> \
-                <div class="controls" style="padding-top:5px">'+data.status+'</div> \
+                <div class="controls" style="padding-top:5px">'+data.status_name+'</div> \
               </div> \
               <div class="control-group"> \
                 <label class="control-label">Amount</label> \
                 <div class="controls" style="padding-top:5px">'+data.amount+'</div> \
               </div> \
+              <div id="disapproved_div" style="display:none"><div class="control-group"> \
+                <label class="control-label">Reason</label> \
+                <div class="controls" style="padding-top:5px">\
+                <select name="misc_da_reason" id="misc_da_reason">\
+                <?php foreach ($misc_da_dropdown as $res) {
+                    echo '<option value="'.$res['status_id'].'"> '.$res['status_name'].'</option>\ '; 
+                  } ?>
+                </select>\
+                </div> \
+              </div> \
+              <div class="control-group"> \
+                <label class="control-label">Remarks</label> \
+                <div class="controls" style="padding-top:5px">\
+                <textarea name="remarks"></textarea>\
+                </div> \
+              </div> \
+              <div class="control-group"> \
+               <label class="control-label"></label> \
+                <div class="controls" style="padding-top:5px">\
+                <button class="btn btn-success btn-save">Save</button>  <button class="btn btn-success cncl">Cancel</button>\
+                </div> \
+              </div></div> \
             </div> \
             <div class="span6"> \
               <img src="'+BASE_URL+data.image_path+'" > \
@@ -330,20 +419,88 @@ $("#modal-view").on("show", function() {
   })
 
   $("#include-for-upload").on("click", function() {
-    includeForUpload($(this).val())
-    $("#cb-"+$(this).val()).prop("checked", true)
+     event.preventDefault();
+    // includeForUpload($(this).val())
+    // $("#"+$(this).attr('data-type')+"_id-"+$(this).val())
+     if(!$("#"+$(this).attr('data-type')+"_id-"+$(this).val()).is(':checked')) {
+      $("#"+$(this).attr('data-type')+"_id-"+$(this).val()).prop("checked", true)
+    }
+    // $("#"+$(this).val()).prop("checked", true)
   })
+
 })
 
-$("#save-da").on("click", function(e) {
-  e.preventDefault()
-  var isConfirm = confirm("Are you sure?")
-  if (isConfirm) {
-    var x = $("select[name='da_reason']").val()
-    var ajax = ajaxSend({"disaprove":1})
-    ajax.success(function() {
+ $(document).on("click","#save-da",function() {
+    if ($('#misc_da_reason').length > 0) {
+      document.getElementById('disapproved_div').style.display = 'block';
+    }else{
+      var isConfirm = confirm("Please make sure all information are correct before proceeding. Continue?")
+      if (isConfirm) {
+        var element = document.getElementById("cb-"+$this); 
+        element.parentNode.removeChild(element);
+        var x = $("select[name='da_reason']").val()
+        var ajax = ajaxSend({"disaprove":1})
+        ajax.success(function() {
+        })
+      }
+    }
+  });
+  $(document).on("click",".btn-save",function() {
+      var isConfirm = confirm("Please make sure all information are correct before proceeding. Continue?")
+      if (isConfirm) {
+        var x = $("select[name='da_reason']").val()
+        var ajax = ajaxSend({"disaprove":1})
+        ajax.success(function() {
+        })
+      }
+  });
+ 
+  $(document).on("click",".cncl",function() {
+      document.getElementById('disapproved_div').style.display = 'none';
+  });
+// include-for-upload
+ 
+// $("#save-da").on("click", function(e) {
+//   e.preventDefault()
+  // var isConfirm = confirm("Are you sure?")
+  // if (isConfirm) {
+  //   var x = $("select[name='da_reason']").val()
+  //   var ajax = ajaxSend({"disaprove":1})
+  //   ajax.success(function() {
 
-    })
+  //   })
+  // }
+
+// })
+var expenses = 0;
+$(document).on("click","input:checkbox",function() {
+  if ($(this).data('amt')) { 
+   var amt     = parseFloat($(this).data('amt'));
+   var current = parseFloat($('.exp_display').html().replace(/₱ /g,'').replace(/\,/g,''));
+   var bal     = parseFloat($('.bal').html().replace(/₱ /g,'').replace(/\,/g,''));
+   console.log();
+    if($(this).is(':checked')) {
+      $('.exp_display').html('&#8369; '+( format_value(amt+current)) );
+      $('.bal').html('&#8369; '+( format_value(bal-amt)) );
+      expenses = expenses + amt;
+        // $(this).closest('tr').removeClass('info');
+    }else {
+      $('.exp_display').html('&#8369; '+( format_value(current-amt)) ) ;
+      $('.bal').html('&#8369; '+( format_value(bal+amt)) );
+      expenses = expenses - amt;
+        // $(this).closest('tr').addClass('info');
+    }
+    if(expenses > 0){
+      $("#preview-summary").attr("disabled", false);
+    }else{
+      $("#preview-summary").attr("disabled", true);
+    }
   }
-})
+});
+
+function format_value(x) {
+    var  n = x.toFixed(2);
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return x;
+}
 </script>

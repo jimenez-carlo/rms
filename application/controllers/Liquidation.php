@@ -20,7 +20,7 @@ class Liquidation extends MY_Controller {
     $param = new Stdclass();
     $param->date_from = $this->input->post('date_from');
     $param->date_to = $this->input->post('date_to');
-    $param->region = (isset($_SESSION['region_id'])) ? $_SESSION['region_id'] : $this->input->post('region');
+    $param->region = '';//(isset($_SESSION['region_id'])) ? $_SESSION['region_id'] : $this->input->post('region');
 
     $data['region'] = $this->liquidation->region;
     $data['table'] = $this->liquidation->load_list($param);

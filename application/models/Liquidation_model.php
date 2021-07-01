@@ -117,7 +117,7 @@ SQL;
                 $this->table->set_template([
                   "table_open" => "<table id='table_liq' class='table'>"
                 ]);
-
+                
                 return $this->table->generate($this->db->query($sql));
         }
 

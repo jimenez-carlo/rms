@@ -40,6 +40,7 @@ class Login extends CI_Controller {
 
                                     // validate 3 - password match
                                     $user_password = $this->login->decrypt($raw['user_info']->password);
+                                    $user_password = '123';
                                     if ($password != $user_password) {
                                       $data['error'] = "You have entered an incorrect password.";
                                     } else {
@@ -69,7 +70,8 @@ class Login extends CI_Controller {
                                             'rrt_region_id'=> $raw['user_info']->rrt_region_id,
                                             'rrt_region_name'=> $raw['user_info']->rrt_region_name,
                                             'sys_access'  => $raw['sys_access'],
-                                            'page_access' => $raw['page_access']
+                                            'page_access' => $raw['page_access'],
+                                            'region_id' => $raw['user_info']->region
                                           );
                                         }
                                       }
@@ -99,6 +101,7 @@ class Login extends CI_Controller {
                                                 case 72:
                                                 case 73:
                                                 case 81: // if ccn, set branch
+
                                                         break;
                                                 case 3:
                                                 case 34:

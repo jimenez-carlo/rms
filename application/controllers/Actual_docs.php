@@ -19,7 +19,6 @@ class Actual_docs extends MY_Controller {
     foreach ($this->region as $rid => $region) {
       $regions[$rid] = $region;
     }
-
     $data['region'] = $regions;
     $rms_companies = $this->cmc->rms_companies();
     $company = array('any' => '- Any -');
