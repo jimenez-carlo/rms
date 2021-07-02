@@ -7,7 +7,6 @@
     <div class="row">
       <div class="span4">
         <label>Batch No#</label>
-        <input type="hidden" class="span4" value="update_misc" placeholder="Input here." name="action">
         <input required type="hidden" class="span4" value="<?php echo $record->mid; ?>" placeholder="Input here." name="edit_id">
         <select name="batch_no" style="width: 100%;">
           <?php foreach ($batch as $res) { ?>
@@ -32,7 +31,7 @@
 
       <div class="span4">
         <label>Attachment</label>
-        <img src="<?php echo !empty($record->image_path) ? BASE_URL . $record->image_path : BASE_URL . "img/NoImage.jpg"; ?>" alt="" style="width: 250px;height:250px" id="output">
+        <img src="<?php echo !empty($record->image_path) ? BASE_URL . $record->image_path : BASE_URL . "img/NoImage.jpg"; ?>" alt="" style="width:auto ;height:250px" id="output">
         <input type="file" class="span4" placeholder="Input here." name="file" id="file" onchange="document.getElementById('output').src = window.URL.createObjectURL(this.files[0])">
         <b>Required file format: jpeg, jpg You can only upload upto 1MB </b>
       </div>
@@ -40,7 +39,7 @@
 
   </div>
   <div class="modal-footer">
-    <input type="submit" class="btn btn-success" id="btn-submit" value="Save">
+    <input type="submit" class="btn btn-success" value="Save">
     <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
   </div>
 </form>

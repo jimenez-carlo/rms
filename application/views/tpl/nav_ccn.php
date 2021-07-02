@@ -59,6 +59,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                       <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved_misc'); ?>">Miscellaneous</a></li>
                                     </ul>
                                     </li>
+                                    <li>
+                                        <a tabindex="-1" href="<?php echo base_url('repo/return_fund'); ?>">Return Fund</a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="dropdown <?php if(isset($nav) && $nav=="plate") echo 'active'; ?>">

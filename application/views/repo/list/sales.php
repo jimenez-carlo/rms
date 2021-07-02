@@ -6,9 +6,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	position: fixed;
 width: 60%;
 top:10% !important;
-left: 25%;
+left: 20%;
 margin-top: auto; /* Negative half of height. */
 margin-left: auto; /* Negative half of width. */
+}
+.tab-pane{
+	border: 1px solid;
+  border-color: #ddd #ddd #ddd #ddd;
+	padding:20px;
+}
+.tabs-right>.nav-tabs {
+    float: right;
+    margin-left: 0px;
+}
+img{
+	width: auto;height:250px;
+}
+.tabbable{
+	/* margin-top: 25px; */
 }
 </style>
 <div class="container-fluid">
@@ -74,7 +89,7 @@ margin-left: auto; /* Negative half of width. */
 										$registration = ($row->orcr_amt + $row->renewal_amt + $row->transfer_amt);
 									break;
 							}
-	            print '<tr>';
+	            print '<tr id="tr_id_'.$row->repo_sales_id.'">';
 	            print '<td>'.substr($row->date_sold, 0, 10).'</td>';
 	            print '<td>'.$row->bcode.' '.$row->bname.'</td>';
 	            print '<td>'.strtoupper($row->last_name.', '.$row->first_name.' '.$row->middle_name).'</td>';
@@ -85,7 +100,7 @@ margin-left: auto; /* Negative half of width. */
 	            print '<td style="text-align:right">'.number_format($registration,2).'</td>';
 	            print '<td>'.$row->trans_no.'</td>';
 	            print '<td>'.$row->da.'</td>';
-							print '<td><button value="'.$row->repo_sales_id.'" type="button" class="btn btn-success btn-edit-sales" data-title="Resolve Repo Sale - '.$row->da.'">Resolve</button></td>';
+							print '<td><button value="'.$row->repo_sales_id.'" type="button" class="btn btn-success btn-edit-sales" data-title="Resolve Repo Sale - '.$row->da.'">Edit</button></td>';
               //       if (in_array($this->session->position, [108])) {
 	            // print '<td><a class="btn btn-success" onclick="resolve('.$row->sid.')">Resolve</a></td>';
               //       }

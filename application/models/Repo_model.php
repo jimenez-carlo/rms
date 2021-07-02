@@ -393,7 +393,7 @@ SQL;
         CONCAT('
           <a class=\"btn btn-primary\" href=\"".base_url('repo/batch_view/')."',rb.repo_batch_id,'\" target=\"_blank\">View</a>
           <a class=\"btn btn-success\" href=\"".base_url('repo/batch_print/')."',rb.repo_batch_id,'\" target=\"_blank\">Print</a>
-          <a class=\"btn btn-warning\" href=\"".base_url('repo/batch_print/')."',rb.repo_batch_id,'\" target=\"_blank\">Return Fund</a>
+          <button class=\"btn btn-warning btn-add-return-fund \" value=\"' ,rb.repo_batch_id,'\" data-title=\"Return Fund - ',rb.reference,'\">Return Fund</button>
         ') AS ''
       ")
       ->from('tbl_repo_batch rb')

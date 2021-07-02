@@ -88,6 +88,7 @@ class Repo_Sales_model extends CI_Model{
                     $branch = '';
                     break;
                 }
+                
                 $result = $this->db->query("
                   SELECT
                     s.repo_sales_id,reg.repo_registration_id,
