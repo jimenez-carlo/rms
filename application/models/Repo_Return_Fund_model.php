@@ -26,8 +26,7 @@ class Repo_Return_Fund_model extends CI_Model
       case 72:
       case 73:
       case 81: // if ccn, set branch
-        $condition = "";
-        // $condition = "AND rf.status_id in (3,4,5) AND v.bcode = " . $this->session->branch_code; // 2 wrong company
+        $condition = "AND rf.status_id in (3,4,5) AND v.bcode = " . $this->session->branch_code; // 2 wrong company
         // $region    = "AND v.region_id = " . $_SESSION['region_id'];
         $company   = "AND v.company_id = " . $_SESSION['company'];
         break;

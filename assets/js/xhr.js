@@ -206,6 +206,7 @@ try {
       xhr.onload = function () {
         docid('modal_body').innerHTML = xhr.response;
         $('select').select2();
+        $(".un-select").select2("destroy");
         try { $(".datepicker").datepicker({ format: 'yyyy-mm-dd' }); } catch (error) { }
         $('#modal-container').modal('toggle');
         //Update Return Fund
@@ -235,6 +236,9 @@ try {
                   } else {
                     error(res.message);
                   }
+                }else{
+                  $('#modal-container').modal('toggle');
+                  error("Administrator has been alerted Due To User Activity!");
                 }
               }
             };

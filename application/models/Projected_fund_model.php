@@ -185,7 +185,13 @@ SQL;
                     ) AS 'For Checking',
                       SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
                       0 AS 'SAP Uploading',
-                      SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)) AS 'Liquidated',
+                      CONCAT(
+                        'Registration: ', '<span style=float:right>', FORMAT(IFNULL(SUM(rr.orcr_amt+rr.renewal_amt+rr.transfer_amt), 0),2), '</span>',
+                        '<br>Miscellaneous: ', '<span style=float:right>', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
+                        '<br>Return Fund: ', '<span style=float:right>', SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)), '</span>'
+                      )
+                      AS 'Liquidated',
+                    
 ";
     }
 
@@ -220,23 +226,33 @@ SQL;
                   ) AS misc ON misc.ca_ref = rb.repo_batch_id 
         LEFT JOIN (
                     SELECT
-                      rf.fund,
-                      IFNULL(SUM(IF(st.status_name = 'For Liquidation', rf.amount ,0)), 0) AS return_fund_for_checking,
-                      IFNULL(SUM(IF(st.status_name = 'Liquidated', rf.amount ,0)), 0) AS return_fund_liquidated,
-                      IFNULL(SUM(IF(st.status_name NOT IN('For Liquidation', 'Liquidated', 'Deleted'), rf.amount ,0)), 0) AS return_fund_da
-                    FROM tbl_repo_return_fund rf
-                    JOIN tbl_repo_return_fund_history rfh_1 USING(rfid)
-                    LEFT JOIN tbl_status st ON rfh_1.status_id = st.status_id AND status_type = 'RETURN_FUND'
-                    LEFT JOIN tbl_repo_return_fund_history rfh_2 ON rfh_2.rfid = rfh_1.rfid AND rfh_1.return_fund_history_id < rfh_2.return_fund_history_id
-                    WHERE rfh_2.return_fund_history_id IS NULL
-                    GROUP BY rf.fund
-                  ) AS return_fund ON return_fund.fund = rb.repo_batch_id 
+                      x.repo_batch_id,
+                      IFNULL(SUM(IF(y.status_id = 1, x.amount ,0)), 0) AS return_fund_for_checking,
+                      IFNULL(SUM(IF(y.status_id = 30, x.amount ,0)), 0) AS return_fund_liquidated,
+                      IFNULL(SUM(IF(y.status_id NOT IN(1,30,90), x.amount ,0)), 0) AS return_fund_da
+                  FROM tbl_repo_return_fund x
+                  INNER JOIN tbl_status y ON x.status_id = y.status_id AND y.status_type = 'RETURN_FUND'
+                  GROUP BY x.repo_batch_id
+                  ) AS return_fund ON return_fund.repo_batch_id = rb.repo_batch_id 
 
         WHERE rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}
         GROUP BY rb.repo_batch_id
         LIMIT 1000 
 
 SQL;
+// -- is_deleted = 0
+// (
+//   SELECT
+//     rf.repo_batch_id,
+//     IFNULL(SUM(IF(st.status_name = 'For Liquidation', rf.amount ,0)), 0) AS return_fund_for_checking,
+//     IFNULL(SUM(IF(st.status_name = 'Liquidated', rf.amount ,0)), 0) AS return_fund_liquidated,
+//     IFNULL(SUM(IF(st.status_name NOT IN('For Liquidation', 'Liquidated', 'Deleted'), rf.amount ,0)), 0) AS return_fund_da
+//   FROM tbl_repo_return_fund rf
+//   LEFT JOIN tbl_status st ON rf.status_id = st.status_id AND status_type = 'RETURN_FUND'
+//   WHERE rfh_2.return_fund_history_id IS NULL
+//   GROUP BY rf.repo_batch_id
+// ) AS return_fund ON return_fund.repo_batch_id = rb.repo_batch_id 
+
     $result = $this->db->query($sql);
     // $result = $this->db
     //   ->select("

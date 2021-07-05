@@ -22,16 +22,13 @@ margin-left: auto; /* Negative half of width. */
 img{
 	width: auto;height:250px;
 }
-.tabbable{
-	/* margin-top: 25px; */
-}
 </style>
 <div class="container-fluid">
   <div class="row-fluid">
     <!-- block -->
     <div class="block">
       <div class="navbar navbar-inner block-header">
-          <div class="pull-left">Disapprove List</div>
+          <div class="pull-left">Disapproved Repo Sales List</div>
       </div>
       <div class="block-content collapse in">
         <?php if(!in_array($this->session->position_name, array('Branch Secretary', 'Branch Head1', 'Cash Custodian'))): ?>

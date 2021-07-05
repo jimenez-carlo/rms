@@ -6,17 +6,17 @@ class Request_model extends CI_Model
   function __construct()
   {
     parent::__construct();
+    $this->load->model('Message_model', 'message');
     if (!$this->session->has_userdata('username')) {
       show_404();
     }
   }
 
-  function get_batch(){
-    $id = $this->input->post('batch_id');
+  function get_batch($id){
     return $this->db->query("SELECT * FROM tbl_repo_batch where repo_batch_id = {$id} limit 1")->row();
   }
   function get_return_fund($id){
-    return $this->db->query("SELECT * FROM tbl_repo_return_fund  where id = '{$id}' limit 1")->row();
+    return $this->db->query("SELECT * FROM tbl_repo_return_fund x where x.id = '{$id}' limit 1")->row();
   }
   function view_repo_misc()
   {
@@ -30,10 +30,10 @@ class Request_model extends CI_Model
     return $this->db->query("SELECT z.reference,x.*,y.* FROM rms_db.tbl_repo_sales x left join tbl_repo_registration y on x.repo_registration_id = y.repo_registration_id inner join tbl_repo_batch z on x.repo_batch_id = z.repo_batch_id where  x.repo_sales_id = $id limit 1")->row();
   }
 
-  function view_repo_return_fund()
+
+  function repo_fund_change_status()
   {
-    $id = $this->input->post('return_fund_id');
-    return $this->db->query("SELECT * from tbl_repo_return_fund x where x.id = {$id} limit 1")->row();
+    return $this->db->query("SELECT status_id,UPPER(status_name) as status_name from tbl_status x where status_type = 'RETURN_FUND' and status_id NOT IN (1,2,90)")->result_array();
   }
 
   function expense_type()
@@ -60,7 +60,31 @@ class Request_model extends CI_Model
       return array();
     }
   }
-  
+  function change_status_repo_return_fund()
+  {
+    $post = $this->input->post();
+    $res  = $this->get_return_fund($post['return_fund_id']);
+    $this->db->trans_start();
+    $this->db->where('id', $post['return_fund_id']);
+    $this->db->update('tbl_repo_return_fund',  array("status_id" => $post['change_status']));
+    $data = array(
+      'status_id'       => $post['change_status'],
+      'return_fund_id'  => $post['return_fund_id'],
+      'repo_batch_id'   => $res->repo_batch_id,
+      'created_by'      => $_SESSION['uid']);
+    $this->db->insert('tbl_repo_return_fund_history', $data);
+    $this->db->trans_complete();
+    if ($this->db->trans_status() === FALSE)
+      {
+        $this->db->trans_rollback();
+        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+      }
+      else
+      {
+        $this->db->trans_commit();
+        return $this->message->success('Repo Return Fund Changed Status!');
+      }
+  }
   function update_repo_return_fund()
   {
     $post = $this->input->post();
@@ -93,12 +117,12 @@ class Request_model extends CI_Model
       if ($this->db->trans_status() === FALSE)
       {
         $this->db->trans_rollback();
-        return $this->error('Something Went Wrong Call Your Administrator For Assistance!');
+        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
       }
       else
       {
         $this->db->trans_commit();
-        return $this->success('Repo Return Fund Updated!');
+        return $this->message->success('Repo Return Fund Updated!');
       }
   }
 
@@ -148,17 +172,17 @@ class Request_model extends CI_Model
       if ($this->db->trans_status() === FALSE)
       {
         $this->db->trans_rollback();
-        return $this->error('Something Went Wrong Call Your Administrator For Assistance!');
+        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
       }
       else
       {
         $this->db->trans_commit();
         switch ($da_id) {
           case 1:
-            return $this->success('Repo Sales Wrong Amount Resolved!');
+            return $this->message->success('Repo Sales Wrong Amount Resolved!');
             break;
           case 2:
-            return $this->success('Repo Sales Missing/Unreadable Attachment Resolved!');
+            return $this->message->success('Repo Sales Missing/Unreadable Attachment Resolved!');
             break;
         }
       }
@@ -192,16 +216,15 @@ class Request_model extends CI_Model
       if ($this->db->trans_status() === FALSE)
       {
         $this->db->trans_rollback();
-        return $this->error('Something Went Wrong Call Your Administrator For Assistance!');
+        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
       }
       else
       {
         $this->db->trans_commit();
-        return $this->success('Miscellaneous Updated!');
+        return $this->message->success('Miscellaneous Updated!');
       }
     }
   }
-
 
   function insert_repo_return_fund(){
     $post = $this->input->post();
@@ -225,48 +248,13 @@ class Request_model extends CI_Model
       if ($this->db->trans_status() === FALSE)
       {
         $this->db->trans_rollback();
-        return $this->error('Something Went Wrong Call Your Administrator For Assistance!');
+        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
       }
       else
       {
         $this->db->trans_commit();
-        return $this->success('Return Fund Added!');
+        return $this->message->success('Return Fund Added!');
       }
   }
 
-  function error($message, $title = 'Error Occured!')
-  {
-    $obj = new stdClass();
-    $obj->message = $message;
-    $obj->title   = $title;
-    $obj->type    = 'error';
-    return json_encode($obj);
-  }
-
-  function success($message, $title = 'Successfull')
-  {
-    $obj = new stdClass();
-    $obj->message = $message;
-    $obj->title   = $title;
-    $obj->type    = 'success';
-    return json_encode($obj);
-  }
-
-  function warning($message, $title = 'Warning!')
-  {
-    $obj = new stdClass();
-    $obj->message = $message;
-    $obj->title   = $title;
-    $obj->type    = 'warning';
-    return json_encode($obj);
-  }
-
-  function info($message, $title = 'Alert!')
-  {
-    $obj = new stdClass();
-    $obj->message = $message;
-    $obj->title   = $title;
-    $obj->type    = 'info';
-    return json_encode($obj);
-  }
 }

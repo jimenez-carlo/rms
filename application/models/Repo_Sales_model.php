@@ -96,7 +96,7 @@ class Repo_Sales_model extends CI_Model{
                     type.status_name as reg_type,
                     s.ar_amt,s.ar_num,
                     reg.orcr_amt,reg.renewal_amt,transfer_amt,
-                    st.status_name as da
+                    UPPER(st.status_name) as da
                   FROM
                     tbl_repo_sales s
                   INNER JOIN

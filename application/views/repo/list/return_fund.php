@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
-?>
+$title = (in_array($this->session->position, array(72,73,83))) ? 'Edit Return Fund': 'View Return Fund';
+$btn   = (in_array($this->session->position, array(72,73,83))) ? 'Edit': 'View';
+ ?>
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="block">
@@ -10,6 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
       <div class="block-content collapse in">
         <form class="form-horizontal" method="post">
           <div class="row">
+
             <div class="control-group span5">
               <div class="control-label">Date</div>
               <div class="controls">
@@ -24,12 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               </div>
             </div>
             
-            <div class="control-group span5" <?php echo (in_array($this->session->position, array(72,73,83))) ? 'style="display:none"': '';?>>
-              <div class="control-label">Company</div>
-              <div class="controls">
-                <?php echo form_dropdown('company', array(0 => '- Any -') + $companies, set_value('company', 0)); ?>
-              </div>
-            </div>
+            
           </div>
           <div class="row">
             <div class="control-group span5">
@@ -38,6 +36,24 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 <input class="datepicker" type="text" name="date_to" value="<?php echo $date_to; ?>" autocomplete="off">
               </div>
             </div>
+            <div class="control-group span5" <?php echo (in_array($this->session->position, array(72,73,83))) ? 'style="display:none"': '';?>>
+              <div class="control-label">Company</div>
+              <div class="controls">
+                <?php echo form_dropdown('company', array(0 => '- Any -') + $companies, set_value('company', 0)); ?>
+              </div>
+            </div>
+
+           
+          </div>
+
+          <div class="row">
+            <div class="control-group span5">
+              <div class="control-label">Reference #</div>
+              <div class="controls">
+                <?php print form_input('reference', set_value('reference')); ?>
+              </div>
+            </div>
+            
             <div class="control-group span5" <?php echo (in_array($this->session->position, array(72,73,83))) ? 'style="display:none"': '';?>>
               <div class="control-label">Region</div>
               <div class="controls">
@@ -52,16 +68,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                 ?>
               </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="control-group span5">
-              <div class="control-label">Reference #</div>
-              <div class="controls">
-                <?php print form_input('reference', set_value('reference')); ?>
-              </div>
-            </div>
-            
-
 
           </div>
           <div class="row">
@@ -101,7 +107,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               }
               print '<td>'.strtoupper($row->status).'</td>';
               print (empty($row->liq_date)) ? '<td>-</td>' : '<td>'.$row->liq_date.'</td>';
-              print '<td><button type="button" class="btn btn-success btn-edit-repo-fund" value="'.$row->return_fund_id.'" data-title="Edit Return Fund">Edit</button></td>';
+              print '<td><button type="button" class="btn btn-success btn-edit-repo-fund" value="'.$row->return_fund_id.'" data-title="'.$title.'">'.$btn.'</button></td>';
               print '</tr>';
             }
 

@@ -19,11 +19,16 @@ class Request extends CI_Controller {
       $this->load->view('modal/repo/edit_repo_sales_amount', $data);
     }
     if (isset($_POST['action']) && $_POST['action'] == 'create_repo_return_fund') {
-      $data['record']  = $this->request->get_batch();
+      $id = $this->input->post('batch_id');
+      $data['record']  = $this->request->get_batch($id);
       $this->load->view('modal/repo/add_repo_return_fund', $data);
     }
     if (isset($_POST['action']) && $_POST['action'] == 'edit_repo_return_fund') {
-      $data['record']  = $this->request->view_repo_return_fund();
+      $id = $this->input->post('return_fund_id');
+      $record = $this->request->get_return_fund($id);
+      $data['record']  = $record;
+      $data['batch']   = $this->request->get_batch($record->repo_batch_id);
+      $data['dropdown']= $this->request->repo_fund_change_status();
       $this->load->view('modal/repo/edit_repo_return_fund', $data);
     }
     if (isset($_POST['action']) && $_POST['action'] == 'resolve_repo_sale') {
@@ -36,7 +41,11 @@ class Request extends CI_Controller {
       echo $this->request->insert_repo_return_fund();
     }
     if (isset($_POST['action']) && $_POST['action'] == 'update_repo_return_fund') {
-      echo $this->request->update_repo_return_fund();
+      if(isset($_POST['change_status'])){
+        echo $this->request->change_status_repo_return_fund();
+      }else{
+        echo $this->request->update_repo_return_fund();
+      }
     }
   }
 }

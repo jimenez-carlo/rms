@@ -84,8 +84,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     <a tabindex="-1" href="#">CA Monitoring</a>
                                     <ul class="dropdown-menu">
                                       <li><a href="<?php echo base_url('projected_fund/repo_ca_monitoring'); ?>">Liquidation</a></li>
-                                      <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved'); ?>">Misc Expense</a></li>
-                                      <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved'); ?>">Return Fund</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved_misc'); ?>">Misc Expense</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url('repo/return_fund'); ?>">Return Fund</a></li>
                                     </ul>
                         </li>
                         <li><a href="<?php echo base_url('repo/for_checking'); ?>">For Checking</a></li>
@@ -94,11 +94,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                         <li class="dropdown-submenu">
                                     <a tabindex="-1" href="#">Disapproved</a>
                                     <ul class="dropdown-menu">
-                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>">View Disapproved</a></li>
-                                      <li><a tabindex="-1" href="<?php echo base_url(); ?>">View Resolved</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url('repo/ac_sales'); ?>">View Disapproved</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url('repo/ac_sales'); ?>">View Resolved</a></li>
                                     </ul>
                         </li>
-                        <li><a href="<?php echo base_url(); ?>">Return Fund</a></li>
                       </ul>
                     </li>
                 </ul>

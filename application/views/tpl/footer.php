@@ -13,7 +13,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
             <img src="<?php echo base_url(); ?>images/loader.gif" style="position: absolute; top: 35%; left: 45%;">
         </div>
 <!-- Bootstrap modal -->
-<div class="modal fade" id="modal-container" role="dialog">
+<div class="modal fade-in" id="modal-container" role="dialog" style="display:none">
 		<div class="modal-dialog">
 		  <div class="modal-content">
 		    <div class="modal-header">

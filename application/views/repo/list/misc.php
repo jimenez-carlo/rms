@@ -16,30 +16,51 @@ margin-left: auto; /* Negative half of width. */
     <!-- block -->
     <div class="block">
       <div class="navbar navbar-inner block-header">
-          <div class="pull-left">Disapproved Miscellaneous List</div>
+          <div class="pull-left"><?php echo (in_array($this->session->position, array(72,73,83))) ? 'Disapproved': '';?> Miscellaneous List</div>
       </div>
       <div class="block-content collapse in">
         <?php if(!in_array($this->session->position_name, array('Branch Secretary', 'Branch Head1', 'Cash Custodian'))): ?>
       	<form class="form-horizontal" method="post">
-      		<div class="control-group span5">
-      			<div class="control-label">Branch</div>
-      			<div class="controls">
-      				<?php print form_dropdown('branch', array(0 => '- Please select a branch -') + $branch, set_value('branch')); ?>
-      			</div>
-      		</div>
+					
+					<div class="control-group span5">
+            <label class="control-label">Branch</label>
+            <div class="controls">
+						<?php print form_dropdown('branch', array(0 => '- Please select a branch -') + $branch, set_value('branch')); ?>
+            </div>
+          </div>
 
-      		<div class="form-actions">
-      			<input type="submit" name="search" value="Search" class="btn btn-success">
-      		</div>
+					<?php $type = array('all' => '- Any -') + $type; ?>
+					<div class="control-group span5">
+            <label class="control-label">Type</label>
+            <div class="controls">
+						<?php echo form_dropdown('type', $type, set_value('type')); ?>
+            </div>
+          </div>
+
+					<div class="control-group span5">
+            <label class="control-label"></label>
+            <div class="controls">
+						<input type="submit" name="search" value="Search" class="btn btn-success ">
+            </div>
+          </div>
+
+
+					<?php $status = array('all' => '- Any -') + $status; ?>
+					<div class="control-group span5">
+            <label class="control-label">Status</label>
+            <div class="controls">
+						<?php  echo form_dropdown('status', $status, set_value('status', $default_status)); ?>
+            </div>
+          </div>
+
       	</form>
         <?php endif; ?>
 
       	<hr>
 
-      	<form id="da_form" method="post" class="form-horizontal" action="return_fund_view" target="_blank">
 	        <input type="hidden" name="sid" value="0">
 
-	        <table id="da_table" class="table">
+	        <table id="tbl_exp" class="table">
 	          <thead>
 	            <tr>
                 <th><p>Batch</p></th>
@@ -49,8 +70,8 @@ margin-left: auto; /* Negative half of width. */
 	              <th><p>OR No#</p></th>
 	              <th><p>Amount</p></th>
 	              <th><p>Expense Type</p></th>
-                <th></th>
-                      <?php //if (in_array($this->session->position, [108])): ?>
+                <?php echo (in_array($this->session->position, array(72,73,83))) ? '<th></th>': '<th>Status</th>';?>
+                <?php //if (in_array($this->session->position, [108])): ?>
 	            </tr>
 	          </thead>
 	          <tbody>
@@ -66,8 +87,8 @@ margin-left: auto; /* Negative half of width. */
 	            print '<td>'.$row->date.'</td>';
 	            print '<td>'.$row->or_no.'</td>';
 	            print '<td style="text-align:right">'.number_format($row->amount,2).'</td>';
-	            print '<td>'.$row->type.'</td>';
-              print '<td><button value="'.$row->mid.'" type="button" class="btn btn-success btn-edit-misc" data-title="Edit Repo Miscellaneous">Edit</button></td>';
+	            print '<td>'.strtoupper($row->type).'</td>';
+							print (in_array($this->session->position, array(72,73,83))) ? '<td><button value="'.$row->mid.'" type="button" class="btn btn-success btn-edit-misc" data-title="Edit Repo Miscellaneous">Edit</button></td>': '<td>'.strtoupper($row->status_name).'</td>';
 	            print '</tr>';
 	          }
 	          if (empty($table))
@@ -79,9 +100,23 @@ margin-left: auto; /* Negative half of width. */
 	          ?>
 	          </tbody>
 	        </table>
-	      </form>
       </div>
     </div>
   </div>
 </div>
 	</div>
+	<script>
+	$(document).ready(function(){
+                $(".table").dataTable({
+                        "sDom": "<\'row\'<\'span6\'l><\'span6\'f>r>t<\'row\'<\'span6\'i><\'span6\'p>>",
+                        "sPaginationType": "bootstrap",
+                        "oLanguage": {
+                                "sLengthMenu": "_MENU_ records per page"
+                        },
+                        "bFilter": false,
+                        "bSort": false,
+                        "iDisplayLength": 5,
+                        "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+											});
+										});
+								</script>

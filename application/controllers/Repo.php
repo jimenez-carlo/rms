@@ -541,10 +541,13 @@ HTML;
     $param = new Stdclass();
     $param->region = $this->session->region_id;
     $param->branch = $this->input->post('branch');
-
+    $param->type = $this->input->post('type');
+    $param->status = (empty($this->input->post('status')) && !is_numeric($this->input->post('status'))) ? '' : $this->input->post('status');
+    $data['default_status'] = $param->status;
     $data['branch']    = $this->repo_misc->branch_list($param);
+    $data['type']      = $this->repo_misc->type;
+    $data['status']    = $this->repo_misc->status;
     $data['table']     = $this->repo_misc->load_list($param);
-    // $data['da_reason'] = $this->disapprove->da_reason();
     $this->template('repo/list/misc', $data);
   }
 
@@ -552,6 +555,23 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Disapprove Repo Sales List');
+    $this->header_data('nav', '');
+    $this->header_data('dir', './');
+
+    $param = new Stdclass();
+    $param->region = $this->session->region_id;
+    $param->branch = $this->input->post('branch');
+
+    $data['branch']    = $this->repo_sales->branch_list($param);
+    $data['table']     = $this->repo_sales->load_list($param);
+    // $data['da_reason'] = $this->disapprove->da_reason();
+    $this->template('repo/list/sales', $data);
+  }
+
+  public function ac_sales()
+  {
+    $this->access(1);
+    $this->header_data('title', 'Repo Sales List');
     $this->header_data('nav', '');
     $this->header_data('dir', './');
 
