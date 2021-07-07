@@ -12,10 +12,17 @@ class Request_model extends CI_Model
     }
   }
 
-  function get_batch($id){
+  function sales_disapprove_status()
+  {
+    return $this->db->query("SELECT status_id as `id`, UPPER(status_name) as `value` from tbl_status where status_type ='REPO_DA' and status_id in (1,2) ")->result_array();
+  }
+
+  function get_batch($id)
+  {
     return $this->db->query("SELECT * FROM tbl_repo_batch where repo_batch_id = {$id} limit 1")->row();
   }
-  function get_return_fund($id){
+  function get_return_fund($id)
+  {
     return $this->db->query("SELECT * FROM tbl_repo_return_fund x where x.id = '{$id}' limit 1")->row();
   }
   function view_repo_misc()
@@ -23,7 +30,7 @@ class Request_model extends CI_Model
     $id = $this->input->post('misc_id');
     return $this->db->query("SELECT x.*,DATE_FORMAT(x.date, '%Y-%m-%d') as dt from tbl_repo_misc x where x.mid = $id limit 1")->row();
   }
-  
+
   function view_repo_sale()
   {
     $id = $this->input->post('repo_sale_id');
@@ -46,17 +53,18 @@ class Request_model extends CI_Model
     return $this->db->query("SELECT repo_batch_id as `value`,reference as display from tbl_repo_batch where bcode = {$_SESSION['branch_code']}")->result_array();
   }
 
-  function upload_file($input_name, $dir, $column, $suffix=''){
+  function upload_file($input_name, $dir, $column, $suffix = '')
+  {
     if (!empty($_FILES[$input_name]['size'])) {
-    $post = $this->input->post();
-    $file = md5($_SESSION['branch_code'] . date('Y-m-d H:m:s')) .$suffix. '.jpg';
-    $location = $dir.'/';
-    if (!is_dir(FCPATH . $location)) {
-      mkdir(FCPATH . $location, 0775, true);
-    }
-    move_uploaded_file($_FILES[$input_name]['tmp_name'], FCPATH . $location . $file);
-    return array($column => $location . $file);
-    }else{
+      $post = $this->input->post();
+      $file = md5($_SESSION['branch_code'] . date('Y-m-d H:m:s')) . $suffix . '.jpg';
+      $location = $dir . '/';
+      if (!is_dir(FCPATH . $location)) {
+        mkdir(FCPATH . $location, 0775, true);
+      }
+      move_uploaded_file($_FILES[$input_name]['tmp_name'], FCPATH . $location . $file);
+      return array($column => $location . $file);
+    } else {
       return array();
     }
   }
@@ -71,19 +79,17 @@ class Request_model extends CI_Model
       'status_id'       => $post['change_status'],
       'return_fund_id'  => $post['return_fund_id'],
       'repo_batch_id'   => $res->repo_batch_id,
-      'created_by'      => $_SESSION['uid']);
+      'created_by'      => $_SESSION['uid']
+    );
     $this->db->insert('tbl_repo_return_fund_history', $data);
     $this->db->trans_complete();
-    if ($this->db->trans_status() === FALSE)
-      {
-        $this->db->trans_rollback();
-        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
-      }
-      else
-      {
-        $this->db->trans_commit();
-        return $this->message->success('Repo Return Fund Changed Status!');
-      }
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      return $this->message->success('Repo Return Fund Changed Status!');
+    }
   }
   function update_repo_return_fund()
   {
@@ -95,14 +101,14 @@ class Request_model extends CI_Model
     switch ($res->status_id) {
       case 3:
         $data += array("amount" => $post['amount']);
-      break;
+        break;
       case 4:
         $data += array("is_deleted" => 1);
         $new_status = 90;
-      break;
+        break;
       case 5:
-        $data += $this->upload_file('attachment'  ,'/rms_dir/repo/batch/return_fund/'.$res->repo_batch_id, 'image_path');
-      break;
+        $data += $this->upload_file('attachment', '/rms_dir/repo/batch/return_fund/' . $res->repo_batch_id, 'image_path');
+        break;
     }
     $data += array("status_id" => $new_status);
     $this->db->where('id', $post['return_fund_id']);
@@ -111,30 +117,76 @@ class Request_model extends CI_Model
       'status_id'       => $new_status,
       'return_fund_id'  => $post['return_fund_id'],
       'repo_batch_id'   => $res->repo_batch_id,
-      'created_by'      => $_SESSION['uid']);
+      'created_by'      => $_SESSION['uid']
+    );
     $this->db->insert('tbl_repo_return_fund_history', $data);
     $this->db->trans_complete();
-      if ($this->db->trans_status() === FALSE)
-      {
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      return $this->message->success('Repo Return Fund Updated!');
+    }
+  }
+  function submit_repo_sale()
+  {
+    $post = $this->input->post();
+    if (isset($_POST['ids'])) {
+      $this->db->trans_start();
+      foreach ($post['ids'] as $res) {
+        $this->db->where('repo_sales_id', $res);
+        $this->db->update('tbl_repo_sales', array("da_id" => 0));
+        $data = array(
+          'repo_sales_id' => $res,
+          'status_id'     => 0,
+          'uid'           => $_SESSION['uid']
+        );
+        $this->db->insert('tbl_repo_da_history', $data);
+      }
+      $this->db->trans_complete();
+      if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
         return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
-      }
-      else
-      {
+      } else {
         $this->db->trans_commit();
-        return $this->message->success('Repo Return Fund Updated!');
+        return $this->message->success('Repo Sales Submitted!');
       }
+    }else{
+      return $this->message->error('No Repo Sales Selected!');
+    }
   }
+  function reject_repo_sale()
+  {
+    $post = $this->input->post();
+    $this->db->trans_start();
+    $this->db->where('repo_registration_id', $post['edit_id']);
+    $this->db->update('tbl_repo_sales', array("da_id" => $post['new_status']));
 
+    $data = array(
+      'repo_sales_id' => $post['edit_id'],
+      'status_id'     => $post['new_status'],
+      'uid'           => $_SESSION['uid']
+    );
+    $this->db->insert('tbl_repo_da_history', $data);
+    $this->db->trans_complete();
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      return $this->message->success('Repo Sales Rejected!');
+    }
+  }
   function update_repo_sale()
   {
     $post = $this->input->post();
-    $da   = $this->db->query("SELECT da_id,repo_sales_id from tbl_repo_sales where repo_registration_id = '".$post['edit_id']."'  limit 1")->row();
-    $da_id = !empty($da->da_id) ? $da->da_id: '';
+    $da   = $this->db->query("SELECT da_id,repo_sales_id from tbl_repo_sales where repo_registration_id = '" . $post['edit_id'] . "'  limit 1")->row();
+    $da_id = !empty($da->da_id) ? $da->da_id : '';
     $this->db->trans_start();
     $data = array();
     #Wrong Amount
-    if($da_id == 1){
+    if ($da_id == 1) {
       $data += array(
         "orcr_amt"              => $post['orcr_amt'],
         "renewal_amt"           => $post['trans_amt'],
@@ -146,46 +198,43 @@ class Request_model extends CI_Model
       );
     }
     #Wrong Attachment
-    if($da_id == 2){
-      $data += $this->upload_file('reg_img'  ,'/rms_dir/repo/registration/'.$post['edit_id'], 'att_reg_orcr', 'registration');
-      $data += $this->upload_file('ren_img'  ,'/rms_dir/repo/registration/'.$post['edit_id'], 'att_renew_or', 'renewal');
-      $data += $this->upload_file('reg_trans','/rms_dir/repo/registration/'.$post['edit_id'], 'att_trans_or', 'transfer');
-      $data += $this->upload_file('reg_pnp'  ,'/rms_dir/repo/registration/'.$post['edit_id'], 'att_pnp_or', 'php');
-      $data += $this->upload_file('reg_ins'  ,'/rms_dir/repo/registration/'.$post['edit_id'], 'att_ins_or', 'insurance');
-      $data += $this->upload_file('reg_em'   ,'/rms_dir/repo/registration/'.$post['edit_id'], 'att_em_or', 'emission');
-      $data += $this->upload_file('reg_mac'  ,'/rms_dir/repo/registration/'.$post['edit_id'], 'att_macro_e_or', 'macro');
+    if ($da_id == 2) {
+      $data += $this->upload_file('reg_img', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_reg_orcr', 'registration');
+      $data += $this->upload_file('ren_img', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_renew_or', 'renewal');
+      $data += $this->upload_file('reg_trans', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_trans_or', 'transfer');
+      $data += $this->upload_file('reg_pnp', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_pnp_or', 'php');
+      $data += $this->upload_file('reg_ins', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_ins_or', 'insurance');
+      $data += $this->upload_file('reg_em', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_em_or', 'emission');
+      $data += $this->upload_file('reg_mac', '/rms_dir/repo/registration/' . $post['edit_id'], 'att_macro_e_or', 'macro');
     }
-      $this->db->where('repo_registration_id', $post['edit_id']);
-      $this->db->update('tbl_repo_registration', $data);
+    $this->db->where('repo_registration_id', $post['edit_id']);
+    $this->db->update('tbl_repo_registration', $data);
 
-      $data = array("da_id" => 3);
-      $this->db->where('repo_registration_id', $post['edit_id']);
-      $this->db->update('tbl_repo_sales', $data);
+    $data = array("da_id" => 3);
+    $this->db->where('repo_registration_id', $post['edit_id']);
+    $this->db->update('tbl_repo_sales', $data);
 
-      $data = array(
-        'repo_sales_id' => $da->repo_sales_id,
-        'status_id'     => 3,
-        'uid'           => $_SESSION['uid']
-      );
-      $this->db->insert('tbl_repo_da_history', $data);
-      $this->db->trans_complete();
-      if ($this->db->trans_status() === FALSE)
-      {
-        $this->db->trans_rollback();
-        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    $data = array(
+      'repo_sales_id' => $da->repo_sales_id,
+      'status_id'     => 3,
+      'uid'           => $_SESSION['uid']
+    );
+    $this->db->insert('tbl_repo_da_history', $data);
+    $this->db->trans_complete();
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      switch ($da_id) {
+        case 1:
+          return $this->message->success('Repo Sales Wrong Amount Resolved!');
+          break;
+        case 2:
+          return $this->message->success('Repo Sales Missing/Unreadable Attachment Resolved!');
+          break;
       }
-      else
-      {
-        $this->db->trans_commit();
-        switch ($da_id) {
-          case 1:
-            return $this->message->success('Repo Sales Wrong Amount Resolved!');
-            break;
-          case 2:
-            return $this->message->success('Repo Sales Missing/Unreadable Attachment Resolved!');
-            break;
-        }
-      }
+    }
   }
   function update_repo_misc()
   {
@@ -195,7 +244,7 @@ class Request_model extends CI_Model
       $data = array();
       $location = null;
       $this->db->trans_start();
-      $data += $this->upload_file('file'  ,'/rms_dir/repo/batch/misc_exp/'.$post['batch_no'], 'image_path');
+      $data += $this->upload_file('file', '/rms_dir/repo/batch/misc_exp/' . $post['batch_no'], 'image_path');
       $data += array(
         "ca_ref"    => $post['batch_no'],
         "date"      => $post['date'],
@@ -213,24 +262,22 @@ class Request_model extends CI_Model
       );
       $this->db->insert('tbl_repo_misc_expense_history', $data);
       $this->db->trans_complete();
-      if ($this->db->trans_status() === FALSE)
-      {
+      if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
         return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
-      }
-      else
-      {
+      } else {
         $this->db->trans_commit();
         return $this->message->success('Miscellaneous Updated!');
       }
     }
   }
 
-  function insert_repo_return_fund(){
+  function insert_repo_return_fund()
+  {
     $post = $this->input->post();
     $data = array();
     $this->db->trans_start();
-    $data += $this->upload_file('attachment'  ,'/rms_dir/repo/batch/return_fund/'.$post['batch_id'], 'image_path');
+    $data += $this->upload_file('attachment', '/rms_dir/repo/batch/return_fund/' . $post['batch_id'], 'image_path');
     $data += array(
       'repo_batch_id'  => $post['batch_id'],
       'amount'         => $post['amount'],
@@ -242,19 +289,16 @@ class Request_model extends CI_Model
       'status_id'       => 1,
       'return_fund_id'  => $id,
       'repo_batch_id'  => $post['batch_id'],
-      'created_by'      => $_SESSION['uid']);
+      'created_by'      => $_SESSION['uid']
+    );
     $this->db->insert('tbl_repo_return_fund_history', $data);
     $this->db->trans_complete();
-      if ($this->db->trans_status() === FALSE)
-      {
-        $this->db->trans_rollback();
-        return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
-      }
-      else
-      {
-        $this->db->trans_commit();
-        return $this->message->success('Return Fund Added!');
-      }
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      return $this->message->success('Return Fund Added!');
+    }
   }
-
 }

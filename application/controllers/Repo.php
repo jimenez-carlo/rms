@@ -563,12 +563,11 @@ HTML;
     $param->branch = $this->input->post('branch');
 
     $data['branch']    = $this->repo_sales->branch_list($param);
-    $data['table']     = $this->repo_sales->load_list($param);
-    // $data['da_reason'] = $this->disapprove->da_reason();
+    $data['table']     = $this->repo_sales->disapprove_list($param);
     $this->template('repo/list/sales', $data);
   }
 
-  public function ac_sales()
+  public function ac_sales($resolve = null)
   {
     $this->access(1);
     $this->header_data('title', 'Repo Sales List');
@@ -580,9 +579,16 @@ HTML;
     $param->branch = $this->input->post('branch');
 
     $data['branch']    = $this->repo_sales->branch_list($param);
-    $data['table']     = $this->repo_sales->load_list($param);
-    // $data['da_reason'] = $this->disapprove->da_reason();
-    $this->template('repo/list/sales', $data);
+    
+    if(!empty($resolve)){
+      $data['table']     = $this->repo_sales->resolve_list($param);
+      $this->template('repo/list/accounting/sales_resolved', $data);
+    }else{
+      $data['table']     = $this->repo_sales->disapprove_list($param);
+      $this->template('repo/list/accounting/sales_disapproved', $data);
+    }
+    
+    
   }
 
   public function return_fund_view($rfid)
@@ -611,6 +617,7 @@ HTML;
       $this->template('repo/return_fund/view', $data);
     }
   }
+  
   public function return_fund()
   {
 

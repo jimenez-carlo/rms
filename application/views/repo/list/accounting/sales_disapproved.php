@@ -31,6 +31,20 @@ img{
           <div class="pull-left">Disapproved Repo Sales List</div>
       </div>
       <div class="block-content collapse in">
+        <?php if(!in_array($this->session->position_name, array('Branch Secretary', 'Branch Head1', 'Cash Custodian'))): ?>
+      	<form class="form-horizontal" method="post">
+      		<div class="control-group span5">
+      			<div class="control-label">Branch</div>
+      			<div class="controls">
+      				<?php print form_dropdown('branch', array(0 => '- Please select a branch -') + $branch, set_value('branch')); ?>
+      			</div>
+      		</div>
+
+      		<div class="form-actions">
+      			<input type="submit" name="search" value="Search" class="btn btn-success">
+      		</div>
+      	</form>
+        <?php endif; ?>
 
       	<hr>
 
@@ -50,7 +64,7 @@ img{
 	              <th><p>Registration Expense</p></th>
 	              <th><p>Topsheet</p></th>
 	              <th><p>Reason for Disapprove</p></th>
-	              <th></th>
+
 	            </tr>
 	          </thead>
 	          <tbody>
@@ -59,7 +73,7 @@ img{
 	          // $post_sids = set_value('sid', array());
 	          foreach ($table as $row)
 	          {
-							switch ($row->reg_type) {
+              switch ($row->reg_type) {
 								case 'RENEWAL':
 										$registration = ($row->orcr_amt + $row->renewal_amt);
 										break;
@@ -81,10 +95,6 @@ img{
 	            print '<td style="text-align:right">'.number_format($registration,2).'</td>';
 	            print '<td>'.$row->trans_no.'</td>';
 	            print '<td>'.$row->da.'</td>';
-							print '<td><button value="'.$row->repo_sales_id.'" type="button" class="btn btn-success btn-edit-sales" data-title="Resolve Repo Sale - '.$row->da.'">Edit</button></td>';
-              //       if (in_array($this->session->position, [108])) {
-	            // print '<td><a class="btn btn-success" onclick="resolve('.$row->sid.')">Resolve</a></td>';
-              //       }
 	            print '</tr>';
 	          }
 
@@ -102,11 +112,3 @@ img{
     </div>
   </div>
 </div>
-
-<script type="text/javascript">
-  function resolve(sid) {
-    $('#da_form input[name=sid]').val(sid);
-    $('#da_form').submit();
-  }
-
-</script>

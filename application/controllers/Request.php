@@ -18,6 +18,11 @@ class Request extends CI_Controller {
       $data['record']  = $this->request->view_repo_sale();
       $this->load->view('modal/repo/edit_repo_sales_amount', $data);
     }
+    if (isset($_POST['action']) && $_POST['action'] == 'view_repo_sales') {
+      $data['record']  = $this->request->view_repo_sale();
+      $data['status']    = $this->request->sales_disapprove_status();
+      $this->load->view('modal/repo/view_repo_sales', $data);
+    }
     if (isset($_POST['action']) && $_POST['action'] == 'create_repo_return_fund') {
       $id = $this->input->post('batch_id');
       $data['record']  = $this->request->get_batch($id);
@@ -31,8 +36,14 @@ class Request extends CI_Controller {
       $data['dropdown']= $this->request->repo_fund_change_status();
       $this->load->view('modal/repo/edit_repo_return_fund', $data);
     }
+    if (isset($_POST['action']) && $_POST['action'] == 'submit_repo_sale') {
+      echo $this->request->submit_repo_sale();
+    }
     if (isset($_POST['action']) && $_POST['action'] == 'resolve_repo_sale') {
       echo $this->request->update_repo_sale();
+    }
+    if (isset($_POST['action']) && $_POST['action'] == 'reject_repo_sale') {
+      echo $this->request->reject_repo_sale();
     }
     if (isset($_POST['action']) && $_POST['action'] == 'resolve_repo_misc') {
       echo $this->request->update_repo_sale();

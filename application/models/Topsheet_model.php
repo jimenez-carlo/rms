@@ -404,7 +404,7 @@ SQL;
 	{
 		$topsheet = $this->db->query("select * from tbl_topsheet
 			where tid = ".$tid)->row();
-
+		// var_dump($topsheet->sales);die();
 		$topsheet->sales = $this->db->query("select count(*) as count from tbl_sales
 			where batch = 0 and topsheet = ".$tid)->row()->count;
 
