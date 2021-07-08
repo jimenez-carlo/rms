@@ -9,9 +9,9 @@ class Repo_model extends CI_Model {
     if ($_SESSION['company'] == 8) {
       $this->region     = $this->mdi_region;
       $this->company    = $this->mdi;
-      $this->companyQry = ' AND s.company = 8';
+      $this->companyQry = ' AND s.company_id = 8';
     } else {
-      $this->companyQry = ' AND s.company != 8';
+      $this->companyQry = ' AND s.company_id != 8';
     }
   }
 
@@ -237,30 +237,36 @@ SQL;
     $this->db->update('tbl_repo_inventory', ['status' => $status, 'status_id' => $status_id], ['repo_inventory_id' => $repo_inventory_id]);
   }
 
-  public function save_registration($repo_inventory_id, $repo_sales_id, $registration) {
+  public function save_registration($repo_inventory_id, $repo_sales_id, $registration) { 
     $this->db->trans_begin();
 
     if ($this->db->insert('tbl_repo_registration', $registration)) {
       $repo_registration_id = $this->db->insert_id();
       // Attachment
       $attachment = [];
-      foreach ($_FILES['attachments'] as $key => $files) {
-        $dir = '/rms_dir/repo/registration/'.$repo_registration_id.'/';
-        if ($key === 'name') {
-          foreach ($files as $key => $file) {
-            $attachment[$key] = $dir.$key.'_'.$file[0];
-          }
-        }
-      }
+      // foreach ($_FILES['attachments'] as $key => $files) {
+      //   $dir = '/rms_dir/repo/registration/'.$repo_registration_id.'/';
+      //   if ($key === 'name') {
+      //     foreach ($files as $key => $file) {
+      //       $attachment[$key] = $dir.$key.'_'.$file[0];
+      //     }
+      //   }
+      // }
       $attachments = json_encode($attachment);
-      $upload_status = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
+      // $upload_status = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
       $this->db->update('tbl_repo_registration', ['attachment'=>$attachments], 'repo_registration_id='.$repo_registration_id);
 
+      // $this->db->query("
+      //   UPDATE tbl_repo_inventory ri, tbl_repo_sales rs
+      //   SET ri.status='REGISTERED', rs.repo_registration_id = {$repo_registration_id},
+      //   ri.status_id = '3'
+      //   WHERE ri.repo_inventory_id = rs.repo_inventory_id AND rs.repo_sales_id = {$repo_sales_id}
+      // ");
       $this->db->query("
-        UPDATE tbl_repo_inventory ri, tbl_repo_sales rs
-        SET ri.status='REGISTERED', rs.repo_registration_id = {$repo_registration_id},
-        ri.status_id = '3'
-        WHERE ri.repo_inventory_id = rs.repo_inventory_id AND rs.repo_sales_id = {$repo_sales_id}
+        UPDATE tbl_repo_sales rs
+        SET  rs.repo_registration_id = {$repo_registration_id}
+        rs.status_id = 3
+        WHERE  rs.repo_sales_id = {$repo_sales_id}
       ");
 
       $this->insert_history(
@@ -279,7 +285,7 @@ SQL;
       );
     }
 
-    if ($this->db->trans_status() && $upload_status) {
+    if ($this->db->trans_status()) {
       $this->db->trans_commit();
       return $registration['repo_registration_id'];
     } else {
@@ -464,13 +470,13 @@ SQL;
     'amount'     =>  $post['amount'],
     'type'       =>  $post['expense_type'],
     'ca_ref'     =>  $post['repo_batch_id'],
-    'status_id'  =>  3,
+    'status_id'  =>  2,
     'image_path' => '/rms_dir/repo/batch/misc_exp/'.$post['repo_batch_id'].'/'.$expense_id.'.jpg');
     $this->db->insert('tbl_repo_misc', $misc);
     $id = $this->db->insert_id();
     $history = array(
     'mid'    => $id,
-    'status' => 3,
+    'status' => 2,
     'uid'    => $_SESSION['uid']);
     $this->db->insert('tbl_repo_misc_expense_history', $history);
     $this->db->trans_complete();
@@ -684,10 +690,31 @@ SQL;
   public function check_registration(string $type, array $data = []) {
     switch ($type) {
       case 'GET_REFERENCE':
-        return $this->db
-          ->select('rb.repo_batch_id, rb.reference')
-          ->get_where('tbl_repo_batch rb', 'rb.status = "DEPOSITED"')
-          ->result_array();
+        return $this->db->query(" SELECT
+              repo_batch_id, reference
+            FROM (
+              SELECT
+              s.region_id,v.repo_batch_id, v.reference
+              FROM
+                tbl_repo_batch v
+              INNER JOIN
+                tbl_repo_sales s ON v.repo_batch_id = s.repo_batch_id 
+              LEFT JOIN
+                tbl_repo_sap_upload_sales_batch susb ON susb.repo_sales_id = s.repo_sales_id
+              WHERE
+                s.status_id = 3 $this->companyQry AND s.da_id IN (0, 3) AND v.repo_batch_id IS NOT NULL AND susb.repo_sales_id IS NULL
+              GROUP BY
+                v.repo_batch_id, s.region_id
+              ORDER BY
+                v.reference DESC 
+             
+            ) AS result
+            ORDER BY region_id, reference")->result_array();
+            //AND v.repo_batch_id = s.repo_batch_id
+        // return $this->db
+        //   ->select('rb.repo_batch_id, rb.reference')
+        //   ->get_where('tbl_repo_batch rb', 'rb.status = "DEPOSITED"')
+        //   ->result_array();
         break;
 
       case 'CA_REF_DATA':
@@ -711,7 +738,11 @@ SQL;
           WHERE `rb`.`repo_batch_id` = {$data['repo_batch_id']} 
           GROUP BY `rb`.repo_batch_id
 SQL;
-$this->db->query("SELECT z.engine_no from tbl_repo_sales x inner join tbl_repo_inventory y on x.repo_inventory_id = y.repo_inventory_id inner join tbl_engine z on y.engine_id = z.eid inner join tbl_status a on y.status_id = a.status_id and a.status_type = 'REPO SALES' where x.repo_batch_id = '".$data['repo_batch_id']."'");
+$this->db->query("SELECT z.engine_no from 
+tbl_repo_sales x inner join 
+tbl_repo_inventory y on x.repo_inventory_id = y.repo_inventory_id inner join 
+tbl_engine z on y.engine_id = z.eid inner join 
+tbl_status a on y.status_id = a.status_id and a.status_type = 'REPO SALES' where x.repo_batch_id = '".$data['repo_batch_id']."'");
 // and rb.misc_expenses = {$data['misc_expenses']}
         $repo_batch = $this->db->query($sql)->row_array();
 
@@ -971,8 +1002,20 @@ SQL;
             END)
         END AS sap_code,
         CASE reg.registration_type
-          WHEN 'RENEW'  THEN SUM(reg.orcr_amt+reg.renewal_amt+reg.renewal_tip+reg.transfer_tip+reg.hpg_pnp_clearance_tip+reg.macro_etching_tip)
-          WHEN 'RENEW & TRANSFER'  THEN SUM(reg.orcr_amt+reg.transfer_amt+reg.renewal_tip+reg.transfer_tip+reg.hpg_pnp_clearance_tip+reg.macro_etching_tip)
+          WHEN 'RENEW'  THEN SUM(
+            IFNULL(reg.orcr_amt,0)+
+            IFNULL(reg.renewal_amt,0)+
+            IFNULL(reg.renewal_tip,0)+
+            IFNULL(reg.transfer_tip,0)+
+            IFNULL(reg.hpg_pnp_clearance_tip,0)+
+            IFNULL(reg.macro_etching_tip,0))
+          WHEN 'RENEW & TRANSFER'  THEN SUM(
+          IFNULL(reg.orcr_amt,0)+
+          IFNULL(reg.transfer_amt,0)+
+          IFNULL(reg.renewal_tip,0)+
+          IFNULL(reg.transfer_tip,0)+
+          IFNULL(reg.hpg_pnp_clearance_tip,0)+
+          IFNULL(reg.macro_etching_tip,0))
         END AS regn_expense,
          s.ar_num,s.ar_amt AS ar_amount,
         'Regular Regn. Paid' as registration_type, f.acct_number AS account_key,
@@ -982,27 +1025,28 @@ SQL;
         cust.cust_code, CONCAT(IFNULL(cust.last_name,''), ', ', IFNULL(cust.first_name,'')) AS customer_name
       FROM
         tbl_repo_sap_upload_batch sub
-      JOIN
-        tbl_repo_sap_upload_sales_batch USING (subid)
-      JOIN
-        tbl_repo_sales s USING (repo_sales_id)
+      LEFT JOIN
+        tbl_repo_sap_upload_sales_batch x ON sub.subid = x.subid
+      LEFT JOIN
+        tbl_repo_sales s ON x.repo_sales_id = s.repo_sales_id
       INNER JOIN
         tbl_customer cust ON s.customer_id = cust.cid
-      INNER JOIN 
+      LEFT JOIN 
         tbl_repo_registration reg ON s.repo_registration_id = reg.repo_registration_id
       INNER JOIN
         tbl_region r ON s.region_id = r.rid
-      INNER JOIN
+      LEFT JOIN
         tbl_repo_fund f ON r.rid = f.region
       INNER JOIN
         tbl_company c ON s.company_id = c.cid
       LEFT JOIN
         tbl_repo_batch v ON s.repo_batch_id = v.repo_batch_id
       WHERE
-        subid = $subid
+      sub.subid = $subid
       ORDER BY
         v.repo_batch_id ASC
 SQL;
+// inner join dapat tbl_repo_registration,tbl_repo_fund 
     $batch = $this->db->query($sql)->result_array();
 
     $misc_exp_qry = <<<SQL
@@ -1016,16 +1060,17 @@ SQL;
         LEFT JOIN tbl_repo_sales s ON s.repo_sales_id = susb.repo_sales_id
         LEFT JOIN tbl_repo_batch v ON v.repo_batch_id = s.repo_batch_id
         LEFT JOIN tbl_repo_misc m ON m.ca_ref = v.repo_batch_id
-        LEFT JOIN tbl_repo_misc_expense_history mxh1 ON m.mid = mxh1.mid
-        LEFT JOIN tbl_status st ON mxh1.status = st.status_id AND status_type = 'MISC_EXP'
-        LEFT JOIN tbl_repo_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
+        LEFT JOIN tbl_status st ON m.status_id = st.status_id AND status_type = 'MISC_EXP'
 
         WHERE
-          m.mid IS NOT NULL AND mxh2.id IS NULL AND susb.subid = {$subid} AND st.status_id = 3
+          m.mid IS NOT NULL AND susb.subid = {$subid} AND st.status_id = 3
       ) AS first_result
       GROUP BY repo_batch_id
       ORDER BY repo_batch_id ASC
 SQL;
+// AND mxh2.id IS NULL
+// LEFT JOIN tbl_repo_misc_expense_history mxh1 ON m.mid = mxh1.mid
+// LEFT JOIN tbl_repo_misc_expense_history mxh2 ON mxh2.mid = mxh1.mid AND mxh1.id < mxh2.id
     $misc_expenses = $this->db->query($misc_exp_qry)->result_array();
 
     $this->load->model('Login_model', 'login');
@@ -1047,7 +1092,7 @@ SQL;
                   INNER JOIN
                     tbl_repo_sap_upload_sales_batch susb  ON s.repo_sales_id = susb.repo_sales_id
                   SET
-                    status_id = 5, close_date = "{$date}"
+                    status_id = 4, close_date = "{$date}"
                   WHERE susb.subid = $batch->subid
 SQL;
     $this->db->query($update_qry);

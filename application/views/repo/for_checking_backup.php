@@ -39,7 +39,7 @@
         <ul style="list-style:none; margin:0; line-height:10px;">
           <?php foreach($references AS $x): ?>
           <li class="ref-list" style="line-height:28px; border-bottom:solid #ddd 1px;">
-            <?php echo "<button type='button' class='btn btn-success btn-mini ca-ref' onclick='view_for_checking({$x['repo_batch_id']},\"{$x['reference']}\")'><i class='icon-edit'></i></button> {$x['reference']}"; ?>
+            <?php echo "<button class='btn btn-success btn-mini ca-ref' value='{$x['repo_batch_id']}'><i class='icon-edit'></i></button> {$x['reference']}"; ?>
           </li>
           <?php endforeach; ?>
         </ul>
@@ -49,7 +49,7 @@
     <!-- block -->
     <div class="block span9" style="margin-left: 10px;">
       <div class="navbar navbar-inner block-header">
-        <div class="pull-left" id="transaction-title">TRANSACTION</div>
+        <div class="pull-left">Transaction <?php echo (isset($ca_ref)) ? '# '.$ca_ref['reference'] : ''; ?></div>
       </div>
       <div id="table-landing" class="block-content collapse in">
         <?php
@@ -66,7 +66,7 @@
 </div>
 
 <!-- Modal -->
-<div id="modal-view" class="modal modal-wider hide fade" tabindex="-1" role="dialog" aria-hidden="true" style="display:none">
+<div id="modal-view" class="modal modal-wider hide fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3>View attachment</h3>
@@ -83,7 +83,7 @@
 var for_sap_upload = {
   "repo_registration_ids":[]
 }
-/*
+
 $("button.ca-ref").on("click", function() {
   var button = $(this)
   var repo_batch_id = button.val()
@@ -101,7 +101,6 @@ $("button.ca-ref").on("click", function() {
     viewAttachment(repo_batch_id)
   })
 })
-*/
   var miscs = [];
   var sales = [];
 $(document).on("click","#preview-summary",function() {
@@ -504,194 +503,4 @@ function format_value(x) {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     return x;
 }
-
-// var btn_view_for_checking = document.querySelectorAll('.btn-view-for-checking')
-// // var btn_view_for_checking = document.getElementById('btn-view-for-checking');
-//   btn_view_for_checking.forEach(function(btn_view_for_checking) {
-//     btn_view_for_checking.addEventListener("click", function (event){
-//       event.preventDefault();
-//       var id = event.target.value;
-//       var params = "repo_batch_id=" + event.target.value + "&action=view_repo_for_checking";
-//       var xhr = new XMLHttpRequest();
-//       xhr.onload = function () {
-//         document.getElementById('table-landing').innerHTML = xhr.response;
-//       }
-//       xhr.open("POST", BASE_URL + "Request", true);
-//       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-//       xhr.send(params);
-//     });
-//   });
-
-  function view_for_checking(id, name){
-    event.preventDefault();
-      var params = "repo_batch_id=" + id + "&action=view_repo_for_checking";
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        document.getElementById('transaction-title').innerText = 'TRANSACTION '+name;
-        document.getElementById('table-landing').innerHTML = xhr.response;
-        // Update Sale
-        document.getElementById('FormSummary').addEventListener("submit", function (evt) {
-          evt.preventDefault();
-          confirmation('Please make sure all information are correct before proceeding.', 'Continue?', 'Ok', function () {
-            this.disabled = true;
-            this.innerText = 'Resolving...';
-            var form_submit = document.getElementById("FormSummary");
-            var elements = form_submit.elements;
-            var sub_params = new FormData(form_submit);
-            sub_params.append("action", 'view_repo_preview_summary');
-            for (var i = 0, len = elements.length; i < len; ++i) {
-              elements[i].disabled = true;
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-              xhr.onload = function () {
-                document.getElementById('table-landing').innerHTML = xhr.response;
-                document.getElementById('FormSummarySubmit').addEventListener("submit", function (evt) {
-                  evt.preventDefault();
-                  confirmation('Please make sure all information are correct before proceeding.', 'Continue?', 'Ok', function () {
-                    this.disabled = true;
-                    this.innerText = 'Resolving...';
-                    var sub_form_submit = document.getElementById("FormSummarySubmit");
-                    var elements = sub_form_submit.elements;
-                    var super_sub_params = new FormData(sub_form_submit);
-                    super_sub_params.append("action", 'save_for_checking');
-                    for (var i = 0, len = elements.length; i < len; ++i) {
-                      elements[i].disabled = true;
-                    }
-                    var xhr = new XMLHttpRequest();
-                    xhr.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                          if (res != '') {
-                            var res = JSON.parse(this.responseText);
-                            if (res.type == 'success') {
-                              success(res.message);
-                              document.getElementById('transaction-title').innerText = res.message;
-                              document.getElementById('table-landing').innerHTML = '';
-                            } else {
-                              error(res.message);
-                            }
-                          }
-                        }
-                      };
-                    xhr.open("POST", BASE_URL + 'Request', true);
-                    xhr.send(super_sub_params);
-                  });
-                } , function () {
-                  error('Something Went Wrong Call Your Administrator For Assistance!');
-                });
-              }
-            };
-            xhr.open("POST", BASE_URL + 'Request', true);
-            xhr.send(sub_params);
-          });
-        } , function () {
-          error('Something Went Wrong Call Your Administrator For Assistance!');
-        });
-      }
-      xhr.open("POST", BASE_URL + "Request", true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send(params);
-  }
-function view_sales(id, engine, batch){
-      document.querySelector('.modal-title').innerText = engine;
-      var params = "repo_sale_id=" + id + "&action=view_repo_sales";
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        document.getElementById('modal_body').innerHTML = xhr.response;
-        $('#modal-container').modal('toggle');
-        //Update Sale
-        document.getElementById('FormModal').addEventListener("submit", function (evt) {
-          evt.preventDefault();
-          confirmation('Please make sure all information are correct before proceeding.', 'Continue?', 'Ok', function () {
-            this.disabled = true;
-            this.innerText = 'Resolving...';
-            var form_submit = document.getElementById("FormModal");
-            var elements = form_submit.elements;
-            var sub_params = new FormData(form_submit);
-            sub_params.append("action", 'reject_repo_sale');
-            for (var i = 0, len = elements.length; i < len; ++i) {
-              elements[i].disabled = true;
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-              if (this.readyState == 4 && this.status == 200) {
-                var res = JSON.parse(this.responseText);
-                if (res != '') {
-                  if (res.type == 'success') {
-                    var row = document.getElementById("tr_sales_id_" + id);
-                    row.parentNode.removeChild(row);
-                    $('#modal-container').modal('toggle');
-                    view_for_checking(batch,'');
-                    success(res.message);
-                  } else {
-                    error(res.message);
-                  }
-                }
-
-              }
-            };
-            xhr.open("POST", BASE_URL + 'Request', true);
-            xhr.send(sub_params);
-          });
-        } , function () {
-          error('Something Went Wrong Call Your Administrator For Assistance!');
-        });
-
-      }
-      xhr.open("POST", BASE_URL + "Request", true);
-      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhr.send(params);
-}
-
-function view_misc(id, expense_title, batch){
-      document.querySelector('.modal-title').innerText = expense_title;
-      var params = "misc_id=" + id + "&action=view_repo_misc";
-      var xhr = new XMLHttpRequest();
-      xhr.onload = function () {
-        document.getElementById('modal_body').innerHTML = xhr.response;
-        $('#modal-container').modal('toggle');
-        //Update Misc
-        document.getElementById('FormModal-Misc').addEventListener("submit", function (evt) {
-          evt.preventDefault();
-          confirmation('Please make sure all information are correct before proceeding.', 'Continue?', 'Ok', function () {
-            this.disabled = true;
-            this.innerText = 'Updating...';
-            var form_submit = document.getElementById("FormModal-Misc");
-            var elements = form_submit.elements;
-            var sub_params = new FormData(form_submit);
-            sub_params.append("action", 'reject_repo_misc');
-            for (var i = 0, len = elements.length; i < len; ++i) {
-              elements[i].disabled = true;
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-              if (this.readyState == 4 && this.status == 200) {
-                var res = JSON.parse(this.responseText);
-                if (res != '') {
-                  if (res.type == 'success') {
-                    var row = document.getElementById("tr_misc_id_" + id);
-                    row.parentNode.removeChild(row);
-                    $('#modal-container').modal('toggle');
-                    view_for_checking(batch,'');
-                    success(res.message);
-                  } else {
-                    error(res.message);
-                  }
-                }
-
-              }
-            };
-            xhr.open("POST", BASE_URL + 'Request', true);
-            xhr.send(sub_params);
-          });
-        } , function () {
-          error('Something Went Wrong Call Your Administrator For Assistance!');
-        });
-
-      }
-      xhr.open("POST", BASE_URL + "Request", true);
-      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-      xhr.send(params);
-}
-
 </script>

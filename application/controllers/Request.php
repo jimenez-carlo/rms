@@ -36,6 +36,47 @@ class Request extends CI_Controller {
       $data['dropdown']= $this->request->repo_fund_change_status();
       $this->load->view('modal/repo/edit_repo_return_fund', $data);
     }
+    
+    if (isset($_POST['action']) && $_POST['action'] == 'view_repo_for_checking') {
+      $id = $this->input->post('repo_batch_id');
+      if (!empty($id)) {
+        $data['misc']  = $this->request->get_batch_misc($id);
+        $data['sales'] = $this->request->get_batch_sales($id);
+        $data['record'] = $this->request->get_batch($id);
+        $data['repo_batch'] = $id;
+        $data['checked_amount'] = $this->request->get_checked_misc($id)+$this->request->get_checked_sales($id);
+        $this->load->view('repo/acctg/view_for_checking', $data);
+      }
+    }
+
+    if (isset($_POST['action']) && $_POST['action'] == 'view_repo_preview_summary') {
+      $id = $this->input->post('repo_batch_id');
+      if (!empty($id)) {
+        $data['misc']   = $this->request->get_misc_array();
+        $data['sales']  = $this->request->get_sales_array();
+        $data['record'] = $this->request->get_batch($id);
+        $data['repo_batch'] = $id;
+        $data['sales_ids'] = $this->request->get_post_ids($_POST['sales'] ?? array());
+        $data['misc_ids'] = $this->request->get_post_ids($_POST['misc'] ?? array());
+        $data['checked_amount'] = $this->request->get_checked_misc($id)+$this->request->get_checked_sales($id);
+        $this->load->view('repo/acctg/view_summary', $data);
+      }
+    }
+
+
+    if (isset($_POST['action']) && $_POST['action'] == 'view_repo_misc') {
+      $data['record']       = $this->request->view_repo_misc();
+      $data['status']       = $this->request->repo_misc_change_status();
+      $data['expense_type'] = $this->request->expense_type();
+      $this->load->view('modal/repo/view_repo_misc', $data);
+    }
+    if (isset($_POST['action']) && $_POST['action'] == 'save_for_checking') {
+      echo $this->request->save_for_checking();
+    }
+
+    if (isset($_POST['action']) && $_POST['action'] == 'reject_repo_misc') {
+      echo $this->request->reject_repo_misc();
+    }
     if (isset($_POST['action']) && $_POST['action'] == 'submit_repo_sale') {
       echo $this->request->submit_repo_sale();
     }
@@ -46,7 +87,7 @@ class Request extends CI_Controller {
       echo $this->request->reject_repo_sale();
     }
     if (isset($_POST['action']) && $_POST['action'] == 'resolve_repo_misc') {
-      echo $this->request->update_repo_sale();
+      echo $this->request->update_repo_misc();
     }
     if (isset($_POST['action']) && $_POST['action'] == 'add_repo_return_fund') {
       echo $this->request->insert_repo_return_fund();

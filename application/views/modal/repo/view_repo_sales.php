@@ -1,3 +1,31 @@
+<style>
+	.modal {
+		position: fixed;
+		width: 60%;
+		top: 10% !important;
+		left: 20%;
+		margin-top: auto;
+		/* Negative half of height. */
+		margin-left: auto;
+		/* Negative half of width. */
+	}
+
+	.tab-pane {
+		border: 1px solid;
+		border-color: #ddd #ddd #ddd #ddd;
+		padding: 20px;
+	}
+
+	.tabs-right>.nav-tabs {
+		float: right;
+		margin-left: 0px;
+	}
+
+	img {
+		width: auto;
+		height: 250px;
+	}
+</style>
 <form id="FormModal" class="form-horizontal" style="margin:0px!important;" enctype="multipart/form-data" metho="POST">
   <div class="modal-body">
     <div class="alert alert-error hide">

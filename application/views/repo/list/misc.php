@@ -106,6 +106,7 @@ margin-left: auto; /* Negative half of width. */
 </div>
 	</div>
 	<script>
+	<?php   if (!empty($table)) { ?>
 	$(document).ready(function(){
                 $(".table").dataTable({
                         "sDom": "<\'row\'<\'span6\'l><\'span6\'f>r>t<\'row\'<\'span6\'i><\'span6\'p>>",
@@ -119,4 +120,6 @@ margin-left: auto; /* Negative half of width. */
                         "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
 											});
 										});
+
+										<?php } ?>
 								</script>
