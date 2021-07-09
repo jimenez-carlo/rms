@@ -110,7 +110,7 @@ class Projected_fund extends MY_Controller {
     $param->status    = $this->input->post('status');
     $param->region    = $this->input->post('region_id');
     $status_array = array();
-    $status_array[-1] = 'Any';
+    $status_array[-1] = '- Any -';
     $status_array  += $this->projected_fund->status;
     $data['status_dropdown'] = $status_array;
     $data['region_dropdown'] = $this->form->region_dropdown();
