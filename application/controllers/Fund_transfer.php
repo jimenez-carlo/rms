@@ -137,7 +137,7 @@ class Fund_transfer extends MY_Controller {
       if ($this->form_validation->run()) {
         $deposit_funds = [];
         foreach ($this->input->post('deposit_funds') as $deposit) {
-          $deposit_funds[] = array_merge($deposit, ['status' => 'DEPOSITED', 'date_debit_memo_encoded' => date('Y-m-d H:m:s') ]);
+          $deposit_funds[] = array_merge($deposit, ['status' => 'DEPOSITED','status_id'=> 1 , 'date_debit_memo_encoded' => date('Y-m-d H:m:s') ]);
         }
         if($this->db->update_batch('tbl_repo_batch', $deposit_funds, 'repo_batch_id')) {
           foreach ($for_deposit as $batch) {

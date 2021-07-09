@@ -9,6 +9,11 @@ class Projected_fund_model extends CI_Model{
     2 => 'Deposited',
     3 => 'Liquidated',
   );
+  public $status_2 = array(
+    0 => 'For Deposit',
+    1 => 'Deposited',
+    2 => 'Liquidated',
+  );
 
   public $sales_type = array(
     0 => 'Brand New (Cash)',
