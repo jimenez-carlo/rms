@@ -214,9 +214,9 @@
         </tr>
         <tr><th colspan="12"><br><br></th></tr>
         <tr>
-          <th colspan="2">Prepared By:<br><br><br>MA/LO/BS</th>
+          <th colspan="2">Prepared By CCN:<br><br><br>MA/LO/BS</th>
           <th colspan="3">Checked By:<br><br><br>Revolving Fund Custodian</th>
-          <th colspan="7">Approved By:<br><br><br>RS</th>
+          <th colspan="7">Approved By BCH:<br><br><br>RS</th>
         </tr>
       </tfoot>
     </table>

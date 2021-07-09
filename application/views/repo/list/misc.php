@@ -67,6 +67,7 @@ margin-left: auto; /* Negative half of width. */
 	              <th><p>Branch</p></th>
 	              <th><p>Region</p></th>
 	              <th><p>Date</p></th>
+								<th><p>Attachment</p></th>
 	              <th><p>OR No#</p></th>
 	              <th><p>Amount</p></th>
 	              <th><p>Expense Type</p></th>
@@ -85,6 +86,12 @@ margin-left: auto; /* Negative half of width. */
 	            print '<td>'.$row->branch.'</td>';
 	            print '<td>'.$row->region.'</td>';
 	            print '<td>'.$row->date.'</td>';
+							if (!empty($row->image_path)) {
+                print '<td><a href="'.base_url().$row->image_path.'" target="_blank">'.$row->reference.'</a></td>';
+              }else{
+                print '<td></td>';
+              }
+							// print '<td><a href="'.base_url().$row->image_path.'" target="_blank">'.$row->reference.'</a></td>';
 	            print '<td>'.$row->or_no.'</td>';
 	            print '<td style="text-align:right">'.number_format($row->amount,2).'</td>';
 	            print '<td>'.strtoupper($row->type).'</td>';

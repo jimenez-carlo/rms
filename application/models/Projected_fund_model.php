@@ -176,26 +176,81 @@ SQL;
        //                '<br>Miscellaneous: ', '<span style=float:right>', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
        //                '<br>Return Fund: ', '<span style=float:right>', FORMAT(IFNULL(return_fund_for_checking, 0),2), '</span>'
 
-      $additional = " 
+      //  'Registration: ', '<span style=float:right>', FORMAT(IFNULL(SUM(rr.orcr_amt+rr.renewal_amt+rr.transfer_amt), 0),2), '</span>',
+      $additional = " ,
                       IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
                      CONCAT(
-                      'Registration: ', '<span style=float:right>', FORMAT(IFNULL(SUM(rr.orcr_amt+rr.renewal_amt+rr.transfer_amt), 0),2), '</span>',
-                      '<br>Miscellaneous: ', '<span style=float:right>', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
-                      '<br>Return Fund: ', '<span style=float:right>', FORMAT(IFNULL(return_fund_for_checking, 0),2), '</span>'
+                      'Registration: ', '<span style=float:right>', IFNULL(for_checking_sales, 0.00), '</span>',
+                      '<br>Miscellaneous: ', '<span style=float:right>', IFNULL(for_checking_misc,0.00), '</span>',
+                      '<br>Return Fund: ', '<span style=float:right>', IFNULL(for_checking_return_fund, 0.00), '</span>'
                     ) AS 'For Checking',
-                      SUM(IF(ri.status = 'DISAPPROVED',({$regn_exp_ttl}),0)) AS 'Disapproved',
-                      0 AS 'SAP Uploading',
+                    CONCAT(
+                      'Registration: ', '<span style=float:right>', IFNULL(sap_upload_sales, 0.00), '</span>',
+                      '<br>Miscellaneous: ', '<span style=float:right>', IFNULL(sap_upload_misc,0.00), '</span>',
+                      '<br>Return Fund: ', '<span style=float:right>', IFNULL(sap_upload_return_fund, 0.00), '</span>'
+                    ) AS 'SAP Uploading',
                       CONCAT(
-                        'Registration: ', '<span style=float:right>', FORMAT(IFNULL(SUM(rr.orcr_amt+rr.renewal_amt+rr.transfer_amt), 0),2), '</span>',
-                        '<br>Miscellaneous: ', '<span style=float:right>', FORMAT(IFNULL(misc_exp_for_checking,0),2), '</span>',
-                        '<br>Return Fund: ', '<span style=float:right>', SUM(IF(ri.status = 'LIQUIDATED',({$regn_exp_ttl}),0)), '</span>'
+                        'Registration: ', '<span style=float:right>', IFNULL(liquidated_sales, 0.00), '</span>',
+                        '<br>Miscellaneous: ', '<span style=float:right>', IFNULL(liquidated_misc,0.00), '</span>',
+                        '<br>Return Fund: ', '<span style=float:right>', IFNULL(liquidated_return_fund, 0.00), '</span>'
                       )
-                      AS 'Liquidated',
+                      AS 'Liquidated'
                     
 ";
     }
 
-    $sql    = <<<SQL
+
+$sql = <<<SQL
+    SELECT
+        CONCAT('<a href=\"{$url_batch_view}',rb.repo_batch_id,'\" target=\"_blank\">',rb.reference,'</a>') AS 'Reference #',
+        rb.doc_no AS 'Document #',
+        rb.debit_memo AS 'Debit Memo',
+        CONCAT(DATE_FORMAT(rb.date_created, '%Y-%m-%d'), ' / ',rb.date_deposited) AS 'Entry Date / Date Deposited',
+        CONCAT(r.region, ' / ', rb.bcode, ' ', rb.bname) AS 'Region / Branch',
+        COUNT(*) AS '# of Units',
+        FORMAT(rb.amount, 2) AS 'Amount'
+        $additional
+        FROM tbl_repo_batch rb
+        INNER JOIN tbl_repo_sales rs ON rb.repo_batch_id = rs.repo_batch_id
+        LEFT JOIN tbl_repo_registration rr ON rr.repo_registration_id = rs.repo_registration_id
+        LEFT JOIN tbl_region r ON r.rid = rb.region_id
+        LEFT JOIN (
+          SELECT 
+          x.repo_batch_id,
+	        FORMAT(IF( x.status_id = 3 AND x.da_id IN (0,3), SUM(IFNULL(z.orcr_amt,0)+IFNULL(z.renewal_amt,0)+IFNULL(z.transfer_amt,0)+IFNULL(z.hpg_pnp_clearance_amt,0)+IFNULL(z.insurance_amt,0)+IFNULL(z.emission_amt,0)+IFNULL(z.macro_etching_amt,0)+IFNULL(z.renewal_tip,0)+IFNULL(z.transfer_tip,0)+IFNULL(z.hpg_pnp_clearance_tip,0)+IFNULL(z.macro_etching_tip,0)) ,0)  ,2) as for_checking_sales,
+	        FORMAT(IF( x.status_id = 3 AND y.repo_sales_id IS NOT NULL, SUM(IFNULL(z.orcr_amt,0)+IFNULL(z.renewal_amt,0)+IFNULL(z.transfer_amt,0)+IFNULL(z.hpg_pnp_clearance_amt,0)+IFNULL(z.insurance_amt,0)+IFNULL(z.emission_amt,0)+IFNULL(z.macro_etching_amt,0)+IFNULL(z.renewal_tip,0)+IFNULL(z.transfer_tip,0)+IFNULL(z.hpg_pnp_clearance_tip,0)+IFNULL(z.macro_etching_tip,0)) ,0)  ,2) as sap_upload_sales,
+          FORMAT(IF( x.status_id = 4 , SUM(IFNULL(z.orcr_amt,0)+IFNULL(z.renewal_amt,0)+IFNULL(z.transfer_amt,0)+IFNULL(z.hpg_pnp_clearance_amt,0)+IFNULL(z.insurance_amt,0)+IFNULL(z.emission_amt,0)+IFNULL(z.macro_etching_amt,0)+IFNULL(z.renewal_tip,0)+IFNULL(z.transfer_tip,0)+IFNULL(z.hpg_pnp_clearance_tip,0)+IFNULL(z.macro_etching_tip,0)) ,0)  ,2) as liquidated_sales
+          FROM
+          tbl_repo_sales x LEFT JOIN 
+          tbl_repo_sap_upload_sales_batch y ON x.repo_sales_id = y.repo_sales_id INNER JOIN
+          tbl_repo_registration z ON x.repo_registration_id = z.repo_registration_id 
+        
+          GROUP BY x.repo_batch_id) 
+          AS sales ON rb.repo_batch_id = sales.repo_batch_id 
+        LEFT JOIN (
+          SELECT 
+	        x.ca_ref,
+	        FORMAT(SUM( IF( x.status_id IN (2,3), IFNULL(amount,0) ,0)  ),2) as for_checking_misc,
+	        FORMAT(SUM( IF( x.status_id = 3 , IFNULL(amount,0) ,0)  ),2) as sap_upload_misc,
+          FORMAT(SUM( IF( x.status_id = 4 , IFNULL(amount,0) ,0)  ),2) as liquidated_misc
+          FROM 
+          tbl_repo_misc x GROUP BY x.ca_ref) 
+          AS misc ON rb.repo_batch_id =   misc.ca_ref
+        LEFT JOIN(
+          SELECT 
+	        x.repo_batch_id,
+	        FORMAT(SUM( IF( x.status_id = 1, IFNULL(amount,0) ,0)  ),2) as for_checking_return_fund,
+	        0 as sap_upload_return_fund,
+          FORMAT(SUM( IF( x.status_id = 30 , IFNULL(amount,0) ,0)  ),2) as liquidated_return_fund
+          FROM 
+          tbl_repo_return_fund x group by x.repo_batch_id
+        ) AS return_fund  ON rb.repo_batch_id = return_fund.repo_batch_id
+        WHERE rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}
+        GROUP BY rb.repo_batch_id
+        LIMIT 1000
+SQL;
+  /*  09/070/2021
+   $sql    = <<<SQL
     SELECT
         CONCAT('<a href=\"{$url_batch_view}',rb.repo_batch_id,'\" target=\"_blank\">',rb.reference,'</a>') AS 'Reference #',
         rb.doc_no AS 'Document #',
@@ -208,7 +263,6 @@ SQL;
         rb.status AS 'Status'
         FROM tbl_repo_batch rb
         INNER JOIN tbl_repo_sales rs ON rb.repo_batch_id = rs.repo_batch_id
-        INNER JOIN tbl_repo_inventory ri ON ri.repo_inventory_id = rs.repo_inventory_id
         LEFT JOIN tbl_repo_registration rr ON rr.repo_registration_id = rs.repo_registration_id
         LEFT JOIN tbl_region r ON r.rid = rb.region_id
         LEFT JOIN (
@@ -239,7 +293,7 @@ SQL;
         GROUP BY rb.repo_batch_id
         LIMIT 1000 
 
-SQL;
+SQL; */
 // -- is_deleted = 0
 // (
 //   SELECT

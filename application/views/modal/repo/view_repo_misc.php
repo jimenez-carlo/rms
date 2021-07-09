@@ -1,9 +1,9 @@
 <style>
 .modal{
 position: fixed;
-width: 50% !important;
+width: 60% !important;
 top:10% !important;
-left: 25%;
+left: 23%;
 margin-top: auto; /* Negative half of height. */
 margin-left: auto; /* Negative half of width. */
 }

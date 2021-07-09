@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 $title = (in_array($this->session->position, array(72,73,83))) ? 'Edit Return Fund': 'View Return Fund';
-$btn   = (in_array($this->session->position, array(72,73,83))) ? 'Edit': 'View';
+$btn   = (in_array($this->session->position, array(72,73,83))) ? 'View': 'View';
  ?>
 <div class="container-fluid">
   <div class="row-fluid">
@@ -84,7 +84,7 @@ $btn   = (in_array($this->session->position, array(72,73,83))) ? 'Edit': 'View';
                 <th>Company</th>
                 <th>Region</th>
                 <th>Amount</th>
-                <th>Attachment</th>
+                <!-- <th>Attachment</th> -->
                 <th>Status</th>
                 <th>Date Liquidated</th>
                 <th></th>
@@ -100,11 +100,11 @@ $btn   = (in_array($this->session->position, array(72,73,83))) ? 'Edit': 'View';
               print '<td>'.$row->companyname.'</td>';
               print '<td>'.$row->region.'</td>';
               print '<td style="text-align: right">'.number_format($row->amount,2).'</td>';
-              if (!empty($row->image_path)) {
-                print '<td><a href="'.base_url().$row->image_path.'" target="_blank">'.$row->reference.'</a></td>';
-              }else{
-                print '<td></td>';
-              }
+              // if (!empty($row->image_path)) {
+              //   print '<td><a href="'.base_url().$row->image_path.'" target="_blank">'.$row->reference.'</a></td>';
+              // }else{
+              //   print '<td></td>';
+              // }
               print '<td>'.strtoupper($row->status).'</td>';
               print (empty($row->liq_date)) ? '<td>-</td>' : '<td>'.$row->liq_date.'</td>';
               print '<td><button type="button" class="btn btn-success btn-edit-repo-fund" value="'.$row->return_fund_id.'" data-title="'.$title.'">'.$btn.'</button></td>';

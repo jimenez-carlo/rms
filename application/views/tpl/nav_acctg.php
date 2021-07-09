@@ -84,13 +84,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     <a tabindex="-1" href="#">CA Monitoring</a>
                                     <ul class="dropdown-menu">
                                       <li><a href="<?php echo base_url('projected_fund/repo_ca_monitoring'); ?>">Liquidation</a></li>
-                                      <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved_misc'); ?>">Misc Expense</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url('repo/expense'); ?>">Misc Expense</a></li>
                                       <li><a tabindex="-1" href="<?php echo base_url('repo/return_fund'); ?>">Return Fund</a></li>
                                     </ul>
                         </li>
                         <li><a href="<?php echo base_url('repo/for_checking'); ?>">For Checking</a></li>
                         <li><a href="<?php echo base_url('repo/sap_uploading'); ?>">SAP Uploading</a></li>
-                        <li><a href="<?php echo base_url(); ?>">Resolved</a></li>
                         <li class="dropdown-submenu">
                                     <a tabindex="-1" href="#">Disapproved</a>
                                     <ul class="dropdown-menu">

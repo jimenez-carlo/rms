@@ -102,7 +102,7 @@ class Repo_Misc_model extends CI_Model{
                         $where = "AND x.status_id = 5 AND y.bcode = '{$this->session->branch_code}'";
                                 break;
                 }
-                $result = $this->db->query(" SELECT x.mid,y.reference,UPPER(CONCAT(y.bcode,' ',y.bname)) as branch,UPPER(z.region) as region,x.date,x.or_no,x.amount,x.type,UPPER(st.status_name) as status_name from tbl_repo_misc x inner join tbl_repo_batch y on x.ca_ref = y.repo_batch_id inner join tbl_region z on x.region = z.rid inner join tbl_status st on x.status_id = st.status_id and st.status_type = 'MISC_EXP' where 1=1 {$branch} {$type} {$status} {$where}")->result_object();
+                $result = $this->db->query(" SELECT x.image_path,x.mid,y.reference,UPPER(CONCAT(y.bcode,' ',y.bname)) as branch,UPPER(z.region) as region,x.date,x.or_no,x.amount,x.type,UPPER(st.status_name) as status_name from tbl_repo_misc x inner join tbl_repo_batch y on x.ca_ref = y.repo_batch_id inner join tbl_region z on x.region = z.rid inner join tbl_status st on x.status_id = st.status_id and st.status_type = 'MISC_EXP' where 1=1 {$branch} {$type} {$status} {$where}")->result_object();
                 return $result;
         }
 

@@ -13,17 +13,22 @@
             <legend>
               CA Reference# <?php echo $repo['reference']; ?>
             </legend>
-            <div class="span12">
-                    <div class="form-inline">
-                  <div class="control-group span12">
+          
+            <div class="span6">
+            <div class="form-inline">
+            <div class="control-group span6">
                     <label class="control-label">Repo Type</label>
                     <div class="controls">
                       <input  type="text" value="<?php echo $repo['repo_reg_type']; ?>" disabled>
                     </div>
                   </div>
+                  <div class="control-group span6">
+                    <label class="control-label">Repo Date Registered</label>
+                    <div class="controls">
+                      <input  type="text" value="<?php echo date('Y-m-d') ?>" class="datepicker" name="repo_registration[repo_date_registered]">
+                    </div>
+                  </div>
                 </div>
-              </div>
-            <div class="span6">
               <div class="form-inline">
                 <div class="control-group span6">
                   <label class="control-label">Engine#</label>
@@ -124,7 +129,8 @@
                 <div id="regn-status" class="control-group span6 <?php echo $repo['expire_status']; ?>">
                   <label class="control-label" for="date-regn">Date Registered</label>
                   <div class="controls">
-                    <input id="date-regn" class="datepicker" type="text" name="repo_registration[date_registered]" value="<?php echo set_value('repo_registration[date_registered]', $repo['date_registered']); ?>" autocomplete="off">
+                  <input id="date-regn" class="datepicker" type="hidden" name="repo_registration[date_registered]" value="<?php echo set_value('repo_registration[date_registered]', $repo['date_registered']); ?>" autocomplete="off">
+                  <input id="date-regn" class="datepicker" type="text" disabled value="<?php echo set_value('repo_registration[date_registered]', $repo['date_registered']); ?>" autocomplete="off">
                     <small><span id="status-message" class="help-inline"><?php echo $repo['expire_message']; ?></span></small>
                   </div>
                 </div>
@@ -254,55 +260,55 @@
             </div>
 
             <div class="span6" style="height: 887px; overflow-y:auto;">
-              <div class="control-group <?php echo (form_error('attachments[registration_orcr_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('reg_img')) ? 'error' : ''; ?>">
                 <label class="control-label" for="orcr">Registration OR / CR</label>
                 <div class="controls">
-                  <input type="file" id="orcr" name="attachments[registration_orcr_img][]" data-img_id="#orcr-img" accept="image/jpeg" required>
+                  <input type="file" id="orcr" name="reg_img" data-img_id="#orcr-img" accept="image/jpeg" required>
                 </div>
                 <img id="orcr-img" class="img-polariod">
               </div>
-              <div class="control-group <?php echo (form_error('attachments[renewal_or_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('ren_img')) ? 'error' : ''; ?>">
                 <label class="control-label" for="renewal-or">Renewal OR</label>
                 <div class="controls">
-                  <input type="file" id="renewal-or" name="attachments[renewal_or_img][]" data-img_id="#renewal-img" accept="image/jpeg" required>
+                  <input type="file" id="renewal-or" name="ren_img" data-img_id="#renewal-img" accept="image/jpeg" required>
                 </div>
                 <img id="renewal-img" class="img-polariod">
               </div>
-              <div class="control-group <?php echo (form_error('attachments[transfer_or_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('reg_trans')) ? 'error' : ''; ?>">
                 <label class="control-label" for="transfer-or">Transfer OR</label>
                 <div class="controls">
-                  <input type="file" id="transfer-or" name="attachments[transfer_or_img][]" data-img_id="#transfer-img" accept="image/jpeg" required>
+                  <input type="file" id="transfer-or" name="reg_trans" data-img_id="#transfer-img" accept="image/jpeg" required>
                 </div>
                 <img id="transfer-img" class="img-polariod">
               </div>
-              <div class="control-group <?php echo (form_error('attachments[hpg_pnp_clearance_or_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('reg_pnp')) ? 'error' : ''; ?>">
                 <label class="control-label" for="pnp-clearance">PNP Clearance OR</label>
                 <div class="controls">
-                  <input type="file" id="pnp-clearance" name="attachments[hpg_pnp_clearance_or_img][]" data-img_id="#hpg-pnp-img" accept="image/jpeg" required>
+                  <input type="file" id="pnp-clearance" name="reg_pnp" data-img_id="#hpg-pnp-img" accept="image/jpeg" required>
                 </div>
                 <img id="hpg-pnp-img" class="img-polariod">
               </div>
 
-              <div class="control-group <?php echo (form_error('attachments[insurance_or_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('reg_ins')) ? 'error' : ''; ?>">
                 <label class="control-label" for="insurance-or">Insurance OR</label>
                 <div class="controls">
-                  <input type="file" id="insurance-or" name="attachments[insurance_or_img][]" data-img_id="#insurance-img" accept="image/jpeg" required>
+                  <input type="file" id="insurance-or" name="reg_ins" data-img_id="#insurance-img" accept="image/jpeg" required>
                 </div>
                 <img id="insurance-img" class="img-polariod">
               </div>
 
-              <div class="control-group <?php echo (form_error('attachments[emission_or_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('reg_em')) ? 'error' : ''; ?>">
                 <label class="control-label" for="emission-or">Emission OR</label>
                 <div class="controls">
-                  <input type="file" id="emission-or" name="attachments[emission_or_img][]" data-img_id="#emission-img" accept="image/jpeg" required>
+                  <input type="file" id="emission-or" name="reg_em" data-img_id="#emission-img" accept="image/jpeg" required>
                 </div>
                 <img id="emission-img" class="img-polariod">
               </div>
 
-              <div class="control-group <?php echo (form_error('attachments[macro_etching_or_img][]')) ? 'error' : ''; ?>">
+              <div class="control-group <?php echo (form_error('reg_mac')) ? 'error' : ''; ?>">
                 <label class="control-label" for="macro-etching">Macro Etching OR</label>
                 <div class="controls">
-                  <input type="file" id="macro-etching" name="attachments[macro_etching_or_img][]" data-img_id="#macro-img" accept="image/jpeg" required>
+                  <input type="file" id="macro-etching" name="reg_mac" data-img_id="#macro-img" accept="image/jpeg" required>
                 </div>
                 <img id="macro-img" class="img-polariod">
               </div>

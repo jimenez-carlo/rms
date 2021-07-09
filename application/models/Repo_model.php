@@ -28,6 +28,7 @@ class Repo_model extends CI_Model {
       'IFNULL(s.status_name, "NEW") AS Status',
       'IFNULL(DATE_FORMAT(rs.date_sold, "%Y-%m-%d"),"") AS "Date Sold"',
       'IFNULL(DATE_FORMAT(rr.date_registered, "%Y-%m-%d"),"") AS "Date Registered"',
+      'DATE_FORMAT(rs.date_created, "%Y-%m-%d %H:%i") as "Date Repo In"',
       //'IFNULL(
       //  CONCAT(
       //    "<span class=\'text-success\'>",
@@ -85,7 +86,7 @@ class Repo_model extends CI_Model {
     }
 
     $engine_details = $this->db->select("
-      rs.*, e.*, rr.repo_registration_id, rb.repo_batch_id,
+      rs.*, e.*, rr.repo_registration_id,rr.repo_date_registered, rb.repo_batch_id,
       DATE_FORMAT(
         IFNULL(rr.date_registered, s.cr_date),
         '%Y-%m-%d'
@@ -237,9 +238,26 @@ SQL;
     $this->db->update('tbl_repo_inventory', ['status' => $status, 'status_id' => $status_id], ['repo_inventory_id' => $repo_inventory_id]);
   }
 
+  
+  function upload_file($input_name, $dir, $column, $suffix = '')
+  {
+    if (!empty($_FILES[$input_name]['size'])) {
+      $post = $this->input->post();
+      $file = md5($_SESSION['branch_code'] . date('Y-m-d H:m:s')) . $suffix . '.jpg';
+      $location = $dir . '/';
+      if (!is_dir(FCPATH . $location)) {
+        mkdir(FCPATH . $location, 0775, true);
+      }
+      move_uploaded_file($_FILES[$input_name]['tmp_name'], FCPATH . $location . $file);
+      return array($column => $location . $file);
+    } else {
+      return array();
+    }
+  }
+
   public function save_registration($repo_inventory_id, $repo_sales_id, $registration) { 
     $this->db->trans_begin();
-
+    $post = $this->input->post();
     if ($this->db->insert('tbl_repo_registration', $registration)) {
       $repo_registration_id = $this->db->insert_id();
       // Attachment
@@ -254,8 +272,17 @@ SQL;
       // }
       $attachments = json_encode($attachment);
       // $upload_status = $this->file->upload('attachments', '/repo/registration/'.$repo_registration_id);
-      $this->db->update('tbl_repo_registration', ['attachment'=>$attachments], 'repo_registration_id='.$repo_registration_id);
-
+      // $this->db->update('tbl_repo_registration', ['attachment'=>$attachments], 'repo_registration_id='.$repo_registration_id);
+      $data = array();
+      $data += $this->upload_file('reg_img', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_reg_orcr', 'registration');
+      $data += $this->upload_file('ren_img', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_renew_or', 'renewal');
+      $data += $this->upload_file('reg_trans', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_trans_or', 'transfer');
+      $data += $this->upload_file('reg_pnp', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_pnp_or', 'php');
+      $data += $this->upload_file('reg_ins', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_ins_or', 'insurance');
+      $data += $this->upload_file('reg_em', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_em_or', 'emission');
+      $data += $this->upload_file('reg_mac', '/rms_dir/repo/registration/' . $repo_registration_id, 'att_macro_e_or', 'macro');
+      $this->db->where('repo_registration_id', $repo_registration_id);
+      $this->db->update('tbl_repo_registration', $data);
       // $this->db->query("
       //   UPDATE tbl_repo_inventory ri, tbl_repo_sales rs
       //   SET ri.status='REGISTERED', rs.repo_registration_id = {$repo_registration_id},
@@ -265,7 +292,7 @@ SQL;
       $this->db->query("
         UPDATE tbl_repo_sales rs
         SET  rs.repo_registration_id = {$repo_registration_id}
-        rs.status_id = 3
+        ,rs.status_id = 3
         WHERE  rs.repo_sales_id = {$repo_sales_id}
       ");
 
@@ -395,7 +422,8 @@ SQL;
         DATE_FORMAT(rb.date_created, '%Y-%m-%d %r') AS 'Date Requested',
         CONCAT(rb.bcode,' ', rb.bname) AS Branch,
         rb.reference AS 'Reference#', FORMAT(rb.amount, 2) AS 'Amount',
-        rb.doc_no AS 'Document#', rb.debit_memo AS 'Debit Memo', rb.status AS 'Status',
+        rb.doc_no AS 'Document#', rb.debit_memo AS 'Debit Memo',rb.date_deposited as 'Date Deposit', rb.status AS 'Status',
+        
         CONCAT('
           <a class=\"btn btn-primary\" href=\"".base_url('repo/batch_view/')."',rb.repo_batch_id,'\" target=\"_blank\">View</a>
           <a class=\"btn btn-success\" href=\"".base_url('repo/batch_print/')."',rb.repo_batch_id,'\" target=\"_blank\">Print</a>
@@ -560,8 +588,11 @@ SQL;
       FROM tbl_repo_batch rb
       LEFT JOIN tbl_region r ON r.rid = rb.region_id
       LEFT JOIN tbl_company c ON c.cid = rb.company_id
-      WHERE rb.doc_no IS NULL AND DATE(rb.date_created) >= (now()- INTERVAL 1 DAY)
+      WHERE rb.doc_no IS NULL AND DATE(rb.date_created) = DATE(NOW() - INTERVAL 1 DAY)
     ";
+    
+    // LEFT JOIN (SELECT x.repo_batch_id,MAX(DATE(y.date_created)) as registered_date,MAX(DATE(x.date_created)) as sales_date  FROM tbl_repo_sales x left join tbl_repo_registration y on x.repo_registration_id = y.repo_registration_id group by x.repo_batch_id ) sales ON rb.repo_batch_id = sales.repo_batch_id
+    //  OR DATE(sales.registered_date) >= (now()- INTERVAL 1 DAY) OR DATE(sales.sales_date) >= (now()- INTERVAL 1 DAY))
     $result = $this->db->query($sql);
     // var_dump( $this->db->last_query());die();
     return $this->table->generate($result);

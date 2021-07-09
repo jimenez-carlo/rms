@@ -13,9 +13,9 @@
 
   .modal {
     position: fixed;
-    width: 26%;
+    width: 35%;
     top: 5% !important;
-    left: 35%;
+    left: 30%;
     margin-top: auto;
     /* Negative half of height. */
     margin-left: auto;
@@ -50,7 +50,7 @@
 
 
 
-          <?php if ($record->status_id == 4) { ?>
+          <?php if ($record->status_id == 4 || $record->status_id == 30) { ?>
             <label>Attachment</label>
             <img src="<?php echo !empty($record->image_path) ? BASE_URL . $record->image_path : BASE_URL . "img/NoImage.jpg"; ?>" alt="">
             <label>Batch#</label>
@@ -62,7 +62,7 @@
 
           <?php if ($record->status_id == 5) { ?>
             <label>Attachment</label>
-            <img src="<?php echo !empty($record->image_path) ? BASE_URL . $record->image_path : BASE_URL . "img/NoImage.jpg"; ?>" alt="" id="output">
+            <img src="<?php echo !empty($record->image_path) ? BASE_URL . $record->image_path : BASE_URL . "img/NoImage.jpg"; ?>" alt="" id="output"><br>
             <input required type="file" class="" placeholder="Input here." name="attachment" id="attachment" onchange="document.getElementById('output').src = window.URL.createObjectURL(this.files[0])">
             <p><b>Required file format: jpeg, jpg You can only upload upto 1MB </b></p>
             <label>Batch#</label>
@@ -103,7 +103,7 @@
       <input type="submit" class="btn btn-success" value="<?php echo ($record->status_id == 4) ? "Delete" : "Save"; ?>">
       <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
     <?php } ?>
-    <?php if (in_array($this->session->position, array(72, 73, 83))) {  ?>
+    <?php if (in_array($this->session->position, array(72, 73, 83)) && $record->status_id != 30) {  ?>
       <input type="submit" class="btn btn-success" value="<?php echo ($record->status_id == 4) ? "Delete" : "Save"; ?>">
       <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
     <?php } ?>

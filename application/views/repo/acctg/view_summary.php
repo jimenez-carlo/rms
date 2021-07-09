@@ -17,7 +17,7 @@
   </thead>
   <tbody>
     <?php if(!empty($sales)){ ?>
-      <?php $ctr = 0; ?>
+      <?php $ctr = 0;  $amt = 0; ?>
     <?php foreach ($sales as $res) { ?>
       <tr id="tr_sales_id_<?php echo $res['repo_sales_id']; ?>">
         <td><?php echo $ctr = $ctr+1; ?></td>
@@ -25,7 +25,7 @@
         <td><?php echo $res['date_sold']; ?></td>
         <td><?php echo $res['engine_no']; ?></td>
         <td><?php echo $res['ar_num']; ?></td>
-        <td><?php echo number_format($res['ar_amt'],2); ?></td>
+        <td><?php echo number_format($res['ar_amt'], 2);  echo $amt = $amt + $res['sales_amt']; ?></td>
         <td><?php echo $res['status_name']; ?></td>   </tr>
       <?php } ?>
       <?php } ?>
@@ -52,7 +52,7 @@
       <td colspan="1"><?php echo $res['or_date']; ?></td>
       <td colspan="1"><?php echo $res['or_no'] ?></td>
       <td colspan="2"><?php echo $res['type'] ?></td>
-      <td colspan="2"><?php echo number_format($res['amount'],2); ?></td>
+      <td colspan="2"><?php echo number_format($res['amount'],2); $amt = $amt + $res['amount']; ?></td>
       <td colspan="2" <?php echo ($res['status_id'] == 5) ? 'style="color:red;font-weight:bold"': ""; ?>><?php echo $res['status_name']; ?></td>
     </tr>
     <?php } ?>
@@ -67,7 +67,7 @@
     </tr>
     <tr>
       <td class="bld" colspan="8">Liquidated</td>
-      <td class="bld" colspan="1">₱ 0.00</td>
+      <td class="bld" colspan="1">₱ <?php echo number_format(intval($liquidated_amount),2); ?></td>
     </tr>
     <tr>
       <td class="bld" colspan="8">Checked</td>
@@ -75,13 +75,13 @@
     </tr>
     <tr>
       <td class="bld" colspan="8">Balance</td>
-      <td class="bld bal" colspan="1">₱ <?php echo number_format(intval($record->amount),2); ?></td>
+      <td class="bld bal" colspan="1">₱ <?php echo number_format(intval($record->amount)-intval($liquidated_amount)-$amt,2); ?></td>
     </tr>
     <tr>
       <td class="bld clr-rd al" colspan="3">Balance for upload must not be negative.</td>
       <td colspan="4"></td>
       <td class="bld" colspan="1">Expense</td>
-      <td class="bld exp_display clr-rd" colspan="1">₱ 0.00</td>
+      <td class="bld exp_display clr-rd" colspan="1">₱ <?php echo number_format($amt,2); ?></td>
     </tr>
     <tr>
       <td class="brdrb bld" colspan="9"></td>

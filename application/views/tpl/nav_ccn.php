@@ -56,7 +56,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                     <a tabindex="-1" href="#">Disapproved</a>
                                     <ul class="dropdown-menu">
                                       <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved_sales'); ?>">Sales</a></li>
-                                      <li><a tabindex="-1" href="<?php echo base_url('repo/disapproved_misc'); ?>">Miscellaneous</a></li>
+                                      <li><a tabindex="-1" href="<?php echo base_url('repo/expense'); ?>">Miscellaneous</a></li>
                                     </ul>
                                     </li>
                                     <li>

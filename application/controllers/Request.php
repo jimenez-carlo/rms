@@ -44,7 +44,9 @@ class Request extends CI_Controller {
         $data['sales'] = $this->request->get_batch_sales($id);
         $data['record'] = $this->request->get_batch($id);
         $data['repo_batch'] = $id;
-        $data['checked_amount'] = $this->request->get_checked_misc($id)+$this->request->get_checked_sales($id);
+        $data['checked_amount'] = $this->request->get_checked($id);
+        $data['liquidated_amount'] = $this->request->get_liquidated($id);
+        
         $this->load->view('repo/acctg/view_for_checking', $data);
       }
     }
@@ -58,7 +60,8 @@ class Request extends CI_Controller {
         $data['repo_batch'] = $id;
         $data['sales_ids'] = $this->request->get_post_ids($_POST['sales'] ?? array());
         $data['misc_ids'] = $this->request->get_post_ids($_POST['misc'] ?? array());
-        $data['checked_amount'] = $this->request->get_checked_misc($id)+$this->request->get_checked_sales($id);
+        $data['checked_amount'] = $this->request->get_checked($id);
+        $data['liquidated_amount'] = $this->request->get_liquidated($id);
         $this->load->view('repo/acctg/view_summary', $data);
       }
     }

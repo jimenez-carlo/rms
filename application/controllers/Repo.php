@@ -531,7 +531,7 @@ HTML;
     $this->load->view('repo/sap', $data);
   }
 
-  public function disapproved_misc()
+  public function expense()
   {
     $this->access(1);
     $this->header_data('title', 'Disapprove Repo Miscellaneous List');

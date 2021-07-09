@@ -76,6 +76,30 @@ class Request_model extends CI_Model
         break;
     }
   }
+  function get_registration_sql($alias){
+    return "SUM(IFNULL(`$alias`.orcr_amt,0)+IFNULL(`$alias`.renewal_amt,0)+IFNULL(`$alias`.transfer_amt,0)+IFNULL(`$alias`.hpg_pnp_clearance_amt,0)+IFNULL(`$alias`.insurance_amt,0)+IFNULL(`$alias`.emission_amt,0)+IFNULL(`$alias`.macro_etching_amt,0)+IFNULL(`$alias`.renewal_tip,0)+IFNULL(`$alias`.transfer_tip,0)+IFNULL(`$alias`.hpg_pnp_clearance_tip,0)+IFNULL(`$alias`.macro_etching_tip,0))";
+  }
+  function get_liquidated($id){
+    return (intval($this->get_liquidated_misc($id)) + intval($this->get_liquidated_sales($id)));
+  }
+  function get_checked($id){
+    return (intval($this->get_checked_misc($id)) + intval($this->get_checked_sales($id)));
+  }
+  function get_liquidated_misc($id){
+    $res = $this->db->query("SELECT SUM(amount) as res from tbl_repo_misc where ca_ref = '{$id}' and status_id = 4 group by ca_ref")->row(); 
+    return !empty($res->res) ? intval($res->res) : 0;
+  }
+  function get_liquidated_sales($id){
+    if (!empty($id)){
+      $res = $this->db->query("SELECT group_concat(x.repo_registration_id) as ids from tbl_repo_sales x left join tbl_repo_sap_upload_sales_batch y on x.repo_sales_id = y.repo_sales_id where x.repo_batch_id ={$id} AND x.status_id = 4")->row();
+      if (!empty($res->ids)){
+        $subreturn = $this->db->query("SELECT SUM(orcr_amt+renewal_amt+transfer_amt+hpg_pnp_clearance_amt+insurance_amt+emission_amt+macro_etching_amt+renewal_tip+transfer_tip+hpg_pnp_clearance_tip+macro_etching_tip+plate_tip)  as res FROM `rms_db`.`tbl_repo_registration` where  repo_registration_id in ({$res->ids}) ")->row();
+        return !empty($subreturn->res) ? intval($subreturn->res) : 0;
+      }
+    }else{
+      return 0;
+    }
+  }
 
   function get_checked_misc($id){
     $res = $this->db->query("SELECT SUM(amount) as res from tbl_repo_misc where ca_ref = '{$id}' and status_id = 3 group by ca_ref")->row(); 
@@ -84,7 +108,7 @@ class Request_model extends CI_Model
 
   function get_checked_sales($id){
     if (!empty($id)){
-      $res = $this->db->query("SELECT group_concat(x.repo_registration_id) as ids from tbl_repo_sales x left join tbl_repo_sap_upload_sales_batch y on x.repo_sales_id = y.repo_sales_id where x.repo_batch_id ={$id}")->row();
+      $res = $this->db->query("SELECT group_concat(x.repo_registration_id) as ids from tbl_repo_sales x left join tbl_repo_sap_upload_sales_batch y on x.repo_sales_id = y.repo_sales_id where x.repo_batch_id ={$id} AND y.repo_sales_id IS NOT NULL AND x.status_id = 3")->row();
       if (!empty($res->ids)){
         $subreturn = $this->db->query("SELECT SUM(orcr_amt+renewal_amt+transfer_amt+hpg_pnp_clearance_amt+insurance_amt+emission_amt+macro_etching_amt+renewal_tip+transfer_tip+hpg_pnp_clearance_tip+macro_etching_tip+plate_tip)  as res FROM `rms_db`.`tbl_repo_registration` where  repo_registration_id in ({$res->ids})")->row();
         return !empty($subreturn->res) ? intval($subreturn->res) : 0;
@@ -102,39 +126,43 @@ class Request_model extends CI_Model
     $post = $this->input->post();
     if (isset($post['misc'])) {
       $ids = implode(',', $post['misc']);
-      return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0) AND a.mid in ({$ids})")->result_array();
+      return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0) AND a.mid in ({$ids}) group by a.mid ")->result_array();
     }else{
       return null;
     }
   }
   function get_sales_array(){
     $post = $this->input->post();
+    $id = $this->input->post('repo_batch_id');
     if (isset($post['sales'])) {
       $ids = implode(',', $post['sales']);
-      return $this->db->query("SELECT x.*,y.engine_no,z.status_name from 
+      return $this->db->query("SELECT x.*,y.engine_no,z.status_name,{$this->get_registration_sql("b")} as sales_amt  from 
       tbl_repo_sales x inner join 
       tbl_engine y on x.engine_id = y.eid inner join 
-      tbl_status z on x.status_id = z.status_id and z.status_type= 'REPO_SALES' where  x.status_id = 3 AND x.repo_sales_id in ({$ids})")->result_array();
+      tbl_status z on x.status_id = z.status_id and z.status_type= 'REPO_SALES' left join 
+      tbl_repo_registration b on x.repo_registration_id = b.repo_registration_id  left join 
+      tbl_repo_sap_upload_sales_batch susb ON x.repo_sales_id = susb.repo_sales_id
+                WHERE  susb.repo_sales_id IS NULL AND x.repo_batch_id = {$id} AND x.da_id IN (0,3) AND x.status_id = 3 AND x.repo_sales_id in ({$ids}) group by x.repo_sales_id")->result_array();
     }else{
       return null;
     }
   }
 
   function get_batch_misc($id){
-    return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0) AND a.ca_ref ='{$id}'")->result_array();
+    return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0) AND a.ca_ref ='{$id}' group by a.mid")->result_array();
   }
 
   function get_batch_sales($id){
-    return $this->db->query("SELECT x.*,y.engine_no,z.status_name from 
+    return $this->db->query("SELECT x.*,y.engine_no,z.status_name,{$this->get_registration_sql("b")} as sales_amt  from 
     tbl_repo_sales x inner join 
     tbl_engine y on x.engine_id = y.eid inner join 
     tbl_status z on x.status_id = z.status_id and z.status_type= 'REPO_SALES' left join 
-    tbl_status a on x.status_id = a.status_id and a.status_type= 'REPO_DA' 
-    
-    LEFT JOIN tbl_repo_sap_upload_sales_batch susb ON x.repo_sales_id = susb.repo_sales_id
-              WHERE  susb.repo_sales_id IS NULL AND x.repo_batch_id = {$id} AND x.da_id IN (0,3) AND x.status_id = 3")->result_array();
+    tbl_repo_registration b on x.repo_registration_id = b.repo_registration_id  left join 
+    tbl_repo_sap_upload_sales_batch susb ON x.repo_sales_id = susb.repo_sales_id
+              WHERE  susb.repo_sales_id IS NULL AND x.repo_batch_id = {$id} AND x.da_id IN (0,3) AND x.status_id = 3 group by x.repo_sales_id")->result_array();
     //I think kelagan tangalin yung status id = 3
   }
+
   function sales_disapprove_status()
   {
     return $this->db->query("SELECT status_id as `id`, UPPER(status_name) as `value` from tbl_status where status_type ='REPO_DA' and status_id in (1,2) ")->result_array();
@@ -223,9 +251,13 @@ class Request_model extends CI_Model
   {
     $post = $this->input->post();
     $res  = $this->get_return_fund($post['return_fund_id']);
+    $sub_data = array("status_id" => $post['change_status']);
+    if ($post['change_status'] == 30) {
+      $sub_data += array("liq_date" => date('Y-d-m H:i:s'));
+    }
     $this->db->trans_start();
     $this->db->where('id', $post['return_fund_id']);
-    $this->db->update('tbl_repo_return_fund',  array("status_id" => $post['change_status']));
+    $this->db->update('tbl_repo_return_fund',  $sub_data);
     $data = array(
       'status_id'       => $post['change_status'],
       'return_fund_id'  => $post['return_fund_id'],

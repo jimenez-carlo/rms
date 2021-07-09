@@ -19,7 +19,7 @@
   <?php $ctr = 0; ?>
     <?php foreach ($sales as $res) { ?>
       <tr id="tr_sales_id_<?php echo $res['repo_sales_id']; ?>">
-        <td><input type="checkbox" name="sales[]" id="sales_id-<?php echo $res['repo_sales_id']; ?>" value="<?php echo $res['repo_sales_id']; ?>" data-amt="<?php echo number_format($res['ar_amt'],2); ?>" data-selectable="true"></td>
+        <td><input type="checkbox" name="sales[]" id="sales_id-<?php echo $res['repo_sales_id']; ?>" value="<?php echo $res['repo_sales_id']; ?>" data-amt="<?php echo $res['sales_amt']; ?>" data-selectable="true"></td>
         <td><?php echo $ctr = $ctr+1; ?></td>
         <td><?php echo $res['bcode']." ".$res['bname'] ?></td>
         <td><?php echo $res['date_sold']; ?></td>
@@ -54,7 +54,7 @@
       <?php if ($res['status_id'] == 5) { ?>
         <td></td>
       <?php }else{ ?>
-      <td><input type="checkbox" name="misc[]" value="<?php echo $res['mid']; ?>" id="misc_id-<?php echo $res['mid']; ?>" data-selectable="true" data-amt="<?php echo number_format($res['amount'],2); ?>">
+      <td><input type="checkbox" name="misc[]" value="<?php echo $res['mid']; ?>" id="misc_id-<?php echo $res['mid']; ?>" data-selectable="true" data-amt="<?php echo $res['amount']; ?>">
       </td>
       <?php } ?>
       <td><?php echo $ctr = $ctr+1; ?></td>
@@ -78,7 +78,7 @@
     </tr>
     <tr>
       <td class="bld" colspan="8">Liquidated</td>
-      <td class="bld" colspan="1">₱ 0.00</td>
+      <td class="bld" colspan="1">₱ <?php echo number_format(intval($liquidated_amount),2); ?></td>
     </tr>
     <tr>
       <td class="bld" colspan="8">Checked</td>
@@ -86,7 +86,7 @@
     </tr>
     <tr>
       <td class="bld" colspan="8">Balance</td>
-      <td class="bld bal" colspan="1">₱ <?php echo number_format(intval($record->amount),2); ?></td>
+      <td class="bld bal" colspan="1">₱ <?php echo number_format(intval($record->amount)-intval($liquidated_amount),2); ?></td>
     </tr>
     <tr>
       <td class="bld clr-rd al" colspan="3">Balance for upload must not be negative.</td>

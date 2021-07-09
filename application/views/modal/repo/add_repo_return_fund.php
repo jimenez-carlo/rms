@@ -1,7 +1,7 @@
 <style>
 .modal{
 	position: fixed;
-/* width: 50%; */
+width: 35%;
 top:10% !important;
 left: 35%;
 margin-top: auto; /* Negative half of height. */

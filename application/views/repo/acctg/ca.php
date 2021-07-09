@@ -27,7 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               <div class="control-group">
                 <div class="control-label">Date Doc#</div>
                 <div class="controls">
-                  <?php echo form_input(["class"=>"datepicker", "name"=>"date_doc_no_encoded", "value"=>date('Y-m-d')]); ?>
+                  <?php echo form_input(["class"=>"datepicker", "name"=>"date_doc_no_encoded", "value"=> date('Y-m-d',strtotime( "yesterday" ))]); ?>
                 </div>
               </div>
               <div class="control-group">
