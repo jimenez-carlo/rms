@@ -210,7 +210,7 @@ $sql = <<<SQL
         CONCAT(DATE_FORMAT(rb.date_created, '%Y-%m-%d'), ' / ',rb.date_deposited) AS 'Entry Date / Date Deposited',
         CONCAT(r.region, ' / ', rb.bcode, ' ', rb.bname) AS 'Region / Branch',
         COUNT(*) AS '# of Units',
-        FORMAT(rb.amount, 2) AS 'Amount'
+        CONCAT('<p style="text-align:right">',FORMAT(rb.amount, 2),'<p>') AS 'Amount'
         $additional
         FROM tbl_repo_batch rb
         INNER JOIN tbl_repo_sales rs ON rb.repo_batch_id = rs.repo_batch_id
