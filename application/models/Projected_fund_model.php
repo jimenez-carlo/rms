@@ -153,10 +153,12 @@ SQL;
     if (!in_array($param->region,[NULL,"0"])) {
       $region = "AND r.rid = {$param->region}";
     }
-    if (!in_array($param->status,[NULL,"0"])) {
-      $status = "AND rb.status = '{$param->status}'";
+    // if (!in_array($param->status,[NULL,"0"])) {
+    //   $status = "AND rb.status = '{$param->status}'";
+    // }
+    if ($param->status != '-1') {
+      $status = "AND rb.status_id = '{$param->status}'";
     }
-
     $this->table->set_template(["table_open" => "<table class='table'>"]);
     $regn_exp_ttl  = "rr.orcr_amt+rr.renewal_amt+rr.transfer_amt+rr.hpg_pnp_clearance_amt";
     $regn_exp_ttl .= "+rr.insurance_amt+rr.emission_amt+rr.macro_etching_amt+rr.renewal_tip";
@@ -164,7 +166,7 @@ SQL;
     $url_batch_view = base_url('repo/batch_view/');
 
 
-    $additional = "";
+    $additional = ",UPPER(xzy.status_name) as Status";
     if ($_SESSION['position'] != 34) {
       // $additional = "IFNULL(rb.amount - SUM({$regn_exp_ttl}), rb.amount) AS 'LTO Pending',
       //                 SUM(IF(ri.status = 'REGISTERED',({$regn_exp_ttl}),0)) AS 'For Checking',
@@ -245,6 +247,7 @@ $sql = <<<SQL
           FROM 
           tbl_repo_return_fund x group by x.repo_batch_id
         ) AS return_fund  ON rb.repo_batch_id = return_fund.repo_batch_id
+        LEFT JOIN tbl_status xzy ON rb.status_id = xzy.status_id AND xzy.status_type = 'REPO_BATCH'
         WHERE rb.date_created BETWEEN '{$param->date_from} 00:00:00' AND '{$param->date_to} 23:59:59' {$region} {$status}
         GROUP BY rb.repo_batch_id
         LIMIT 1000

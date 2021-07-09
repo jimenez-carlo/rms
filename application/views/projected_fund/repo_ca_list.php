@@ -27,7 +27,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
               echo '<div class="control-group span5">';
               echo form_label('Status', 'status', array('class' => 'control-label'));
               echo '<div class="controls">';
-              echo form_dropdown('status', [ '0' => '- Any -', 'FOR CA' => 'For Ca', 'FOR DEPOSIT' => 'For Deposit', 'DEPOSITED' => 'Deposited'], set_value('status', '0'));
+              echo form_dropdown('status', $status_dropdown, set_value('status', '0'));
               echo '</div></div>';
 
               echo '<div class="control-group span5">';
