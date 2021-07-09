@@ -13,6 +13,7 @@ class Repo_model extends CI_Model {
     } else {
       $this->companyQry = ' AND s.company_id != 8';
     }
+    $this->load->model('Request_model', 'request');
   }
 
   // TODO Get the seconds and convert to month and days or year(optional)
@@ -427,7 +428,7 @@ SQL;
         CONCAT('
           <a class=\"btn btn-primary\" href=\"".base_url('repo/batch_view/')."',rb.repo_batch_id,'\" target=\"_blank\">View</a>
           <a class=\"btn btn-success\" href=\"".base_url('repo/batch_print/')."',rb.repo_batch_id,'\" target=\"_blank\">Print</a>
-          <button class=\"btn btn-warning btn-add-return-fund \" value=\"' ,rb.repo_batch_id,'\" data-title=\"Return Fund - ',rb.reference,'\">Return Fund</button>
+          <button class=\"btn btn-warning btn-add-return-fund \" value=\"' ,rb.repo_batch_id,'\" data-title=\"Return Fund - ',rb.reference,IF(rb.status = 'REGISTERED', 'disabled',''),'\",>Return Fund</button>
         ') AS ''
       ")
       ->from('tbl_repo_batch rb')
@@ -526,13 +527,14 @@ SQL;
         rs.ar_num, rs.ar_amt, rs.date_sold, rr.repo_registration_id,
         rr.date_registered, rr.registration_type, rr.orcr_amt,
         rr.hpg_pnp_clearance_amt, rr.emission_amt, rr.insurance_amt,
-        rr.macro_etching_amt, c.*
+        rr.macro_etching_amt, c.*,status_name,
       ")
       ->from('tbl_repo_inventory ri')
       ->join('tbl_engine e', 'e.eid = ri.engine_id','left')
       ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
       ->join('tbl_customer c', 'c.cid = rs.customer_id','left')
       ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id','left')
+      ->join('tbl_status st', 'st.status_id = rs.repo_reg_type','inner')
       ->where('rs.repo_batch_id = '.$repo_batch_id.' OR rs.repo_batch_id ='.$repo_batch_id)
       ->get()
       ->result_array();

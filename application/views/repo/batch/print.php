@@ -122,7 +122,7 @@
         foreach ($batch_engines as $batch_engine)
         {
           print '<tr>';
-          print '<td>'.$batch_engine['registration_type'].'</td>';
+          print '<td>'.$batch_engine['status_name'].'</td>';
           print '<td>'.$batch_engine['ar_num'].'</td>';
           print '<td>Repo</td>';
           print '<td>'.$batch_engine['date_sold'].'</td>';
@@ -214,9 +214,9 @@
         </tr>
         <tr><th colspan="12"><br><br></th></tr>
         <tr>
-          <th colspan="2">Prepared By CCN:<br><br><br>MA/LO/BS</th>
+          <th colspan="2">Prepared By:<br><br><br> CCN</th>
           <th colspan="3">Checked By:<br><br><br>Revolving Fund Custodian</th>
-          <th colspan="7">Approved By BCH:<br><br><br>RS</th>
+          <th colspan="7">Approved By:<br><br><br>BCH</th>
         </tr>
       </tfoot>
     </table>

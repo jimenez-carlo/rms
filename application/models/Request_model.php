@@ -527,8 +527,9 @@ class Request_model extends CI_Model
           VALUES
             (NULL, ".$misc.", NULL, 3, ".$_SESSION['uid'].")"
         );
+        $this->db->where('mid', $misc);
+        $this->db->update('tbl_repo_misc',array( "status_id" => 3 ));
       }
-    
     }
     $this->db->trans_complete();
     if ($this->db->trans_status() === FALSE) {
