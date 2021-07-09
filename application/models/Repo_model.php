@@ -428,7 +428,7 @@ SQL;
         CONCAT('
           <a class=\"btn btn-primary\" href=\"".base_url('repo/batch_view/')."',rb.repo_batch_id,'\" target=\"_blank\">View</a>
           <a class=\"btn btn-success\" href=\"".base_url('repo/batch_print/')."',rb.repo_batch_id,'\" target=\"_blank\">Print</a>
-          <button class=\"btn btn-warning btn-add-return-fund \" value=\"' ,rb.repo_batch_id,'\" data-title=\"Return Fund - ',rb.reference,IF(rb.status = 'REGISTERED', 'disabled',''),'\",>Return Fund</button>
+          <button class=\"btn btn-warning btn-add-return-fund \" value=\"' ,rb.repo_batch_id,'\" data-title=\"Return Fund - ',rb.reference,'\"',IF(rb.status = 'REGISTERED', '','disabled'),'>Return Fund</button>
         ') AS ''
       ")
       ->from('tbl_repo_batch rb')
@@ -534,7 +534,7 @@ SQL;
       ->join('tbl_repo_sales rs', 'rs.repo_inventory_id = ri.repo_inventory_id', 'left')
       ->join('tbl_customer c', 'c.cid = rs.customer_id','left')
       ->join('tbl_repo_registration rr', 'rr.repo_registration_id = rs.repo_registration_id','left')
-      ->join('tbl_status st', 'st.status_id = rs.repo_reg_type','inner')
+      ->join('tbl_status st', 'st.status_id = rs.repo_reg_type and st.status_type = "REPO_REG_STATUS"','left')
       ->where('rs.repo_batch_id = '.$repo_batch_id.' OR rs.repo_batch_id ='.$repo_batch_id)
       ->get()
       ->result_array();

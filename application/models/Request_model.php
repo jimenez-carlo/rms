@@ -126,7 +126,7 @@ class Request_model extends CI_Model
     $post = $this->input->post();
     if (isset($post['misc'])) {
       $ids = implode(',', $post['misc']);
-      return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0) AND a.mid in ({$ids}) group by a.mid ")->result_array();
+      return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0,3) AND a.mid in ({$ids}) group by a.mid ")->result_array();
     }else{
       return null;
     }
@@ -149,7 +149,7 @@ class Request_model extends CI_Model
   }
 
   function get_batch_misc($id){
-    return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0) AND a.ca_ref ='{$id}' group by a.mid")->result_array();
+    return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0,3) AND a.ca_ref ='{$id}' group by a.mid")->result_array();
   }
 
   function get_batch_sales($id){
