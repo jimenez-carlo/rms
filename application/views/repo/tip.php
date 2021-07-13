@@ -19,6 +19,7 @@
 </div>
 
 <script>
+  var BASE_URL = "<?php echo BASE_URL; ?>";
   var docid = function (id) { return document.getElementById(id); }
 var docqa = function (id) { return document.querySelectorAll(id); }
 var doca  = function (id) { return document.querySelector(id); }
@@ -76,7 +77,6 @@ var doca  = function (id) { return document.querySelector(id); }
   });
 
   function load_tip_table() {
-    var BASE_URL = "<?php echo BASE_URL; ?>";
     var form_submit = document.getElementById("tip_form");
     var elements = form_submit.elements;
     var params = new FormData(form_submit);

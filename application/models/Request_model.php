@@ -11,7 +11,8 @@ class Request_model extends CI_Model
       show_404();
     }
   }
-  function get_slug($company_id){
+  function get_slug($company_id)
+  {
     switch ($company_id) {
       case 1:
         return 'B1';
@@ -27,7 +28,8 @@ class Request_model extends CI_Model
         break;
     }
   }
-  function get_region_slug($id){
+  function get_region_slug($id)
+  {
     switch ($id) {
       case 1:
         return 'NCR';
@@ -76,13 +78,15 @@ class Request_model extends CI_Model
         break;
     }
   }
-  function get_repo_branch_tip($branch = null){
+  function get_repo_branch_tip($branch = null)
+  {
     if (empty($branch)) {
       return false;
     }
     return $this->db->query("SELECT x.*,concat(y.b_code,' ',y.name) as display from tbl_repo_branch_budget x inner join portal_global_2.tbl_branches y on x.bcode = y.b_code where x.bcode ={$branch} limit 1 ")->row();
   }
-  function update_branch_tip(){
+  function update_branch_tip()
+  {
     $post = $this->input->post();
     $branch = $post['branch'];
     if (empty($branch)) {
@@ -112,12 +116,13 @@ class Request_model extends CI_Model
       return $this->message->success("Branch Code {$branch} Updated!");
     }
   }
-  function save_repo_branch_tip(){
+  function save_repo_branch_tip()
+  {
     $post = $this->input->post();
     $branch = $post['branch'];
     $branchExists = $this->db->query("SELECT * from tbl_repo_branch_budget where bcode = {$branch}")->num_rows();
     if (!empty($branchExists)) {
-      return $this->message->error('Branch Code '.$branch.', Already Exists');
+      return $this->message->error('Branch Code ' . $branch . ', Already Exists');
     }
     $this->db->trans_start();
     $data = array(
@@ -143,79 +148,89 @@ class Request_model extends CI_Model
       $this->db->trans_commit();
       return $this->message->success("Branch Code {$branch} Registered!");
     }
-    
   }
-  function get_repo_branch_tip_not_exists(){
+  function get_repo_branch_tip_not_exists()
+  {
     $region = $_SESSION['region_id'];
-    $res = $this->db->query("SELECT group_concat(bcode) as 'bcodes' from tbl_repo_branch_budget where region_id = {$region}");
-    if (!empty($res->num_rows())) {// y.code
-      return $this->db->query("SELECT x.b_code as value,concat(x.b_code,' ',x.name) as display from  portal_global_2.tbl_branches x inner join portal_global_2.tbl_companies y on y.cid = x.company where x.b_code not in (".$res->row()->bcodes.") AND rrt_region_id = {$region}")->result_array();    
-    }else{
-      return $this->db->query("SELECT x.b_code as value,concat(x.b_code,' ',x.name) as display from portal_global_2.tbl_branches  x inner join portal_global_2.tbl_companies y on y.cid = x.company where x.rrt_region_id = {$region}")->result_array();    
+    $res = $this->db->query("SELECT IFNULL(group_concat(bcode),0) as 'bcodes' from tbl_repo_branch_budget where region_id = {$region}")->row();
+    if (!empty($res->bcodes)) { // y.code
+      return $this->db->query("SELECT x.b_code as value,concat(x.b_code,' ',x.name) as display from  portal_global_2.tbl_branches x inner join portal_global_2.tbl_companies y on y.cid = x.company where x.b_code not in (" . $res->bcodes . ") AND rrt_region_id = {$region}")->result_array();
     }
+    return $this->db->query("SELECT x.b_code as value,concat(x.b_code,' ',x.name) as display from portal_global_2.tbl_branches  x inner join portal_global_2.tbl_companies y on y.cid = x.company where x.rrt_region_id = {$region}")->result_array();
   }
 
-  function view_repo_matrix_table(){
+  function view_repo_matrix_table()
+  {
     $region = $_SESSION['region_id'];
     // where x.region_id = {$region}
     return $this->db->query("SELECT x.*,y.name from tbl_repo_branch_budget x inner join portal_global_2.tbl_branches y on x.bcode = y.b_code where x.region_id = {$region}")->result_array();
   }
-  function get_registration_sql($alias){
+  function get_registration_sql($alias)
+  {
     return "SUM(IFNULL(`$alias`.orcr_amt,0)+IFNULL(`$alias`.renewal_amt,0)+IFNULL(`$alias`.transfer_amt,0)+IFNULL(`$alias`.hpg_pnp_clearance_amt,0)+IFNULL(`$alias`.insurance_amt,0)+IFNULL(`$alias`.emission_amt,0)+IFNULL(`$alias`.macro_etching_amt,0)+IFNULL(`$alias`.renewal_tip,0)+IFNULL(`$alias`.transfer_tip,0)+IFNULL(`$alias`.hpg_pnp_clearance_tip,0)+IFNULL(`$alias`.macro_etching_tip,0))";
   }
-  function get_liquidated($id){
+  function get_liquidated($id)
+  {
     return (intval($this->get_liquidated_misc($id)) + intval($this->get_liquidated_sales($id)));
   }
-  function get_checked($id){
+  function get_checked($id)
+  {
     return (intval($this->get_checked_misc($id)) + intval($this->get_checked_sales($id)));
   }
-  function get_liquidated_misc($id){
-    $res = $this->db->query("SELECT SUM(amount) as res from tbl_repo_misc where ca_ref = '{$id}' and status_id = 4 group by ca_ref")->row(); 
+  function get_liquidated_misc($id)
+  {
+    $res = $this->db->query("SELECT SUM(amount) as res from tbl_repo_misc where ca_ref = '{$id}' and status_id = 4 group by ca_ref")->row();
     return !empty($res->res) ? intval($res->res) : 0;
   }
-  function get_liquidated_sales($id){
-    if (!empty($id)){
+  function get_liquidated_sales($id)
+  {
+    if (!empty($id)) {
       $res = $this->db->query("SELECT group_concat(x.repo_registration_id) as ids from tbl_repo_sales x left join tbl_repo_sap_upload_sales_batch y on x.repo_sales_id = y.repo_sales_id where x.repo_batch_id ={$id} AND x.status_id = 4")->row();
-      if (!empty($res->ids)){
+      if (!empty($res->ids)) {
         $subreturn = $this->db->query("SELECT SUM(orcr_amt+renewal_amt+transfer_amt+hpg_pnp_clearance_amt+insurance_amt+emission_amt+macro_etching_amt+renewal_tip+transfer_tip+hpg_pnp_clearance_tip+macro_etching_tip+plate_tip)  as res FROM `rms_db`.`tbl_repo_registration` where  repo_registration_id in ({$res->ids}) ")->row();
         return !empty($subreturn->res) ? intval($subreturn->res) : 0;
       }
-    }else{
+    } else {
       return 0;
     }
   }
 
-  function get_checked_misc($id){
-    $res = $this->db->query("SELECT SUM(amount) as res from tbl_repo_misc where ca_ref = '{$id}' and status_id = 3 group by ca_ref")->row(); 
+  function get_checked_misc($id)
+  {
+    $res = $this->db->query("SELECT SUM(amount) as res from tbl_repo_misc where ca_ref = '{$id}' and status_id = 3 group by ca_ref")->row();
     return !empty($res->res) ? intval($res->res) : 0;
   }
 
-  function get_checked_sales($id){
-    if (!empty($id)){
+  function get_checked_sales($id)
+  {
+    if (!empty($id)) {
       $res = $this->db->query("SELECT group_concat(x.repo_registration_id) as ids from tbl_repo_sales x left join tbl_repo_sap_upload_sales_batch y on x.repo_sales_id = y.repo_sales_id where x.repo_batch_id ={$id} AND y.repo_sales_id IS NOT NULL AND x.status_id = 3")->row();
-      if (!empty($res->ids)){
+      if (!empty($res->ids)) {
         $subreturn = $this->db->query("SELECT SUM(orcr_amt+renewal_amt+transfer_amt+hpg_pnp_clearance_amt+insurance_amt+emission_amt+macro_etching_amt+renewal_tip+transfer_tip+hpg_pnp_clearance_tip+macro_etching_tip+plate_tip)  as res FROM `rms_db`.`tbl_repo_registration` where  repo_registration_id in ({$res->ids})")->row();
         return !empty($subreturn->res) ? intval($subreturn->res) : 0;
       }
-    }else{
+    } else {
       return 0;
     }
   }
 
-  function get_post_ids($array = array()){
+  function get_post_ids($array = array())
+  {
     return $ids = implode(',', $array);
   }
 
-  function get_misc_array(){
+  function get_misc_array()
+  {
     $post = $this->input->post();
     if (isset($post['misc'])) {
       $ids = implode(',', $post['misc']);
       return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0,3) AND a.mid in ({$ids}) group by a.mid ")->result_array();
-    }else{
+    } else {
       return null;
     }
   }
-  function get_sales_array(){
+  function get_sales_array()
+  {
     $post = $this->input->post();
     $id = $this->input->post('repo_batch_id');
     if (isset($post['sales'])) {
@@ -227,16 +242,18 @@ class Request_model extends CI_Model
       tbl_repo_registration b on x.repo_registration_id = b.repo_registration_id  left join 
       tbl_repo_sap_upload_sales_batch susb ON x.repo_sales_id = susb.repo_sales_id
                 WHERE  susb.repo_sales_id IS NULL AND x.repo_batch_id = {$id} AND x.da_id IN (0,3) AND x.status_id = 3 AND x.repo_sales_id in ({$ids}) group by x.repo_sales_id")->result_array();
-    }else{
+    } else {
       return null;
     }
   }
 
-  function get_batch_misc($id){
+  function get_batch_misc($id)
+  {
     return $this->db->query("SELECT a.*,DATE(a.or_date) as or_date,b.status_name from tbl_repo_misc a inner join tbl_status b on a.status_id = b.status_id and b.status_type= 'MISC_EXP' where b.status_id NOT IN(90,1,0,3) AND a.ca_ref ='{$id}' group by a.mid")->result_array();
   }
 
-  function get_batch_sales($id){
+  function get_batch_sales($id)
+  {
     return $this->db->query("SELECT x.*,y.engine_no,z.status_name,{$this->get_registration_sql("b")} as sales_amt  from 
     tbl_repo_sales x inner join 
     tbl_engine y on x.engine_id = y.eid inner join 
@@ -419,7 +436,7 @@ class Request_model extends CI_Model
         $this->db->trans_commit();
         return $this->message->success('Repo Sales Submitted!');
       }
-    }else{
+    } else {
       return $this->message->error('No Repo Sales Selected!');
     }
   }
@@ -568,14 +585,15 @@ class Request_model extends CI_Model
       return $this->message->success('Return Fund Added!');
     }
   }
-  function save_for_checking(){
+  function save_for_checking()
+  {
     $post = $this->input->post();
     $repo_batch = $this->get_batch($post['repo_batch_id']);
     $slug  = $this->get_slug($repo_batch->company_id);
     $rslug = $this->get_region_slug($repo_batch->region_id);
     $this->db->trans_start();
-    $batch_name = 'T-'.$rslug.'-'.date('ymd').'-'.$slug;
-    $batch = $this->db->query("SELECT a.*, b.batch_count FROM tbl_repo_sap_upload_batch a INNER JOIN ( SELECT  MAX(subid) AS subid, COUNT(*) AS batch_count FROM tbl_repo_sap_upload_batch WHERE trans_no LIKE '".$batch_name."%'
+    $batch_name = 'T-' . $rslug . '-' . date('ymd') . '-' . $slug;
+    $batch = $this->db->query("SELECT a.*, b.batch_count FROM tbl_repo_sap_upload_batch a INNER JOIN ( SELECT  MAX(subid) AS subid, COUNT(*) AS batch_count FROM tbl_repo_sap_upload_batch WHERE trans_no LIKE '" . $batch_name . "%'
       ) b ON a.subid = b.subid")->row_array();
 
     if ($batch['is_uploaded'] === "0") {
@@ -584,17 +602,17 @@ class Request_model extends CI_Model
       $data['subid'] = NULL;
 
       if ($batch === NULL) {
-        $data['trans_no'] =  $batch_name.'-1';
-      } elseif($batch['is_uploaded'] === "1") {
-        $new_batch_count = $batch['batch_count']+1;
-        $data['trans_no'] = $batch_name.'-'.$new_batch_count;
+        $data['trans_no'] =  $batch_name . '-1';
+      } elseif ($batch['is_uploaded'] === "1") {
+        $new_batch_count = $batch['batch_count'] + 1;
+        $data['trans_no'] = $batch_name . '-' . $new_batch_count;
       }
       $this->db->insert('tbl_repo_sap_upload_batch', $data);
       $subid = $this->db->insert_id();
     }
     # INSERT SALE
     if (!empty($post['sales'])) {
-      foreach (explode(',',$post['sales']) as $sale) {
+      foreach (explode(',', $post['sales']) as $sale) {
         $sales_batch = array(
           'subid' => $subid,
           'repo_sales_id' => $sale
@@ -604,15 +622,16 @@ class Request_model extends CI_Model
     }
     # INSERT MISC
     if (!empty($post['misc'])) {
-      foreach (explode(',',$post['misc']) as $misc) {
-        $this->db->query("
+      foreach (explode(',', $post['misc']) as $misc) {
+        $this->db->query(
+          "
           INSERT INTO
             tbl_repo_misc_expense_history(id, mid, remarks, status, uid)
           VALUES
-            (NULL, ".$misc.", NULL, 3, ".$_SESSION['uid'].")"
+            (NULL, " . $misc . ", NULL, 3, " . $_SESSION['uid'] . ")"
         );
         $this->db->where('mid', $misc);
-        $this->db->update('tbl_repo_misc',array( "status_id" => 3 ));
+        $this->db->update('tbl_repo_misc', array("status_id" => 3));
       }
     }
     $this->db->trans_complete();
@@ -621,8 +640,7 @@ class Request_model extends CI_Model
       return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
     } else {
       $this->db->trans_commit();
-      return $this->message->success('Created '.$batch_name.'!');
+      return $this->message->success('Created ' . $batch_name . '!');
     }
-
   }
 }
