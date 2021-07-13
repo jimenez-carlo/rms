@@ -76,6 +76,90 @@ class Request_model extends CI_Model
         break;
     }
   }
+  function get_repo_branch_tip($branch = null){
+    if (empty($branch)) {
+      return false;
+    }
+    return $this->db->query("SELECT x.*,concat(y.b_code,' ',y.name) as display from tbl_repo_branch_budget x inner join portal_global_2.tbl_branches y on x.bcode = y.b_code where x.bcode ={$branch} limit 1 ")->row();
+  }
+  function update_branch_tip(){
+    $post = $this->input->post();
+    $branch = $post['branch'];
+    if (empty($branch)) {
+      return $this->message->error('No Branch Code Selected!');
+    }
+    $this->db->trans_start();
+    $data = array(
+      'sop_renewal'                       => $post['renewal'],
+      'sop_transfer'                      => $post['transfer'],
+      'sop_hpg_pnp_clearance'             => $post['hpg_pnp_clearance'],
+      'insurance'                         => $post['insurance'],
+      'emission'                          => $post['emission'],
+      'unreceipted_renewal_tip'           => $post['un_renewal'],
+      'unreceipted_transfer_tip'          => $post['un_transfer'],
+      'unreceipted_macro_etching_tip'     => $post['un_macro'],
+      'unreceipted_hpg_pnp_clearance_tip' => $post['un_hpg_pnp_clearance'],
+      'unreceipted_plate_tip'             => $post['un_plate']
+    );
+    $this->db->where('bcode', $branch);
+    $this->db->update('tbl_repo_branch_budget', $data);
+    $this->db->trans_complete();
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      return $this->message->success("Branch Code {$branch} Updated!");
+    }
+  }
+  function save_repo_branch_tip(){
+    $post = $this->input->post();
+    $branch = $post['branch'];
+    $branchExists = $this->db->query("SELECT * from tbl_repo_branch_budget where bcode = {$branch}")->num_rows();
+    if (!empty($branchExists)) {
+      return $this->message->error('Branch Code '.$branch.', Already Exists');
+    }
+    $this->db->trans_start();
+    $data = array(
+      'bcode'                             => $post['branch'],
+      'sop_renewal'                       => $post['renewal'],
+      'sop_transfer'                      => $post['transfer'],
+      'sop_hpg_pnp_clearance'             => $post['hpg_pnp_clearance'],
+      'insurance'                         => $post['insurance'],
+      'emission'                          => $post['emission'],
+      'unreceipted_renewal_tip'           => $post['un_renewal'],
+      'unreceipted_transfer_tip'          => $post['un_transfer'],
+      'unreceipted_macro_etching_tip'     => $post['un_macro'],
+      'unreceipted_hpg_pnp_clearance_tip' => $post['un_hpg_pnp_clearance'],
+      'unreceipted_plate_tip'             => $post['un_plate'],
+      'region_id'                         => $_SESSION['region_id']
+    );
+    $this->db->insert('tbl_repo_branch_budget', $data);
+    $this->db->trans_complete();
+    if ($this->db->trans_status() === FALSE) {
+      $this->db->trans_rollback();
+      return $this->message->error('Something Went Wrong Call Your Administrator For Assistance!');
+    } else {
+      $this->db->trans_commit();
+      return $this->message->success("Branch Code {$branch} Registered!");
+    }
+    
+  }
+  function get_repo_branch_tip_not_exists(){
+    $region = $_SESSION['region_id'];
+    $res = $this->db->query("SELECT group_concat(bcode) as 'bcodes' from tbl_repo_branch_budget where region_id = {$region}");
+    if (!empty($res->num_rows())) {// y.code
+      return $this->db->query("SELECT x.b_code as value,concat(x.b_code,' ',x.name) as display from  portal_global_2.tbl_branches x inner join portal_global_2.tbl_companies y on y.cid = x.company where x.b_code not in (".$res->row()->bcodes.") AND rrt_region_id = {$region}")->result_array();    
+    }else{
+      return $this->db->query("SELECT x.b_code as value,concat(x.b_code,' ',x.name) as display from portal_global_2.tbl_branches  x inner join portal_global_2.tbl_companies y on y.cid = x.company where x.rrt_region_id = {$region}")->result_array();    
+    }
+  }
+
+  function view_repo_matrix_table(){
+    $region = $_SESSION['region_id'];
+    // where x.region_id = {$region}
+    return $this->db->query("SELECT x.*,y.name from tbl_repo_branch_budget x inner join portal_global_2.tbl_branches y on x.bcode = y.b_code where x.region_id = {$region}")->result_array();
+  }
   function get_registration_sql($alias){
     return "SUM(IFNULL(`$alias`.orcr_amt,0)+IFNULL(`$alias`.renewal_amt,0)+IFNULL(`$alias`.transfer_amt,0)+IFNULL(`$alias`.hpg_pnp_clearance_amt,0)+IFNULL(`$alias`.insurance_amt,0)+IFNULL(`$alias`.emission_amt,0)+IFNULL(`$alias`.macro_etching_amt,0)+IFNULL(`$alias`.renewal_tip,0)+IFNULL(`$alias`.transfer_tip,0)+IFNULL(`$alias`.hpg_pnp_clearance_tip,0)+IFNULL(`$alias`.macro_etching_tip,0))";
   }

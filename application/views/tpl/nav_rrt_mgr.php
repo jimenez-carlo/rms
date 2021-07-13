@@ -66,6 +66,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="disapprove") echo 'class="active"'; ?>>
                               <a href="<?php echo base_url(); ?>disapprove">Disapprove</a>
                             </li>
+                            <li <?php if(isset($nav) && $nav=="matrix") echo 'class="active"'; ?>>
+                                <a href="<?php echo base_url(); ?>repo/matrix">Tip Matrix</a>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->

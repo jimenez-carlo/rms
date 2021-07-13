@@ -11,18 +11,26 @@ class Repo extends MY_Controller
     parent::__construct();
     $this->load->model('Sales_model', 'sales');
     $this->load->model('Repo_model', 'repo');
-    $this->load->model('Repo_Misc_model', 'repo_misc');
-    $this->load->model('Repo_Sales_model', 'repo_sales');
-    $this->load->model('Repo_Return_Fund_model', 'return_fund');
     $this->load->model('File_model', 'file');
     $this->load->model('Validation_model', 'validate');
     $this->load->model('Form_model', 'form');
     $this->load->model('Request_model', 'request');
     $this->load->model('Rms_model', 'rms');
+    $this->load->model('Repo_Misc_model', 'repo_misc');
+    $this->load->model('Repo_Sales_model', 'repo_sales');
+    $this->load->model('Repo_Return_Fund_model', 'return_fund');
     $this->header_data('nav', 'repo-registration');
   }
 
-  public function index()
+  public function in()
+  {
+    $this->access(17);
+    $this->header_data('title', 'Repo In');
+    $this->footer_data('script', '<script src="' . base_url() . 'assets/js/repo_registration.js?' . $this->jsversion . '"></script>');
+    $this->template('repo/in', []);
+  }
+
+  public function inventory()
   {
     $this->access(17);
     $this->header_data('title', 'Repo Inventory');
@@ -32,12 +40,66 @@ class Repo extends MY_Controller
     $this->template('repo/inventory', $data);
   }
 
-  public function in()
+  public function ca_batch()
   {
     $this->access(17);
-    $this->header_data('title', 'Repo In');
+    $this->header_data('title', 'Repo Batch');
     $this->footer_data('script', '<script src="' . base_url() . 'assets/js/repo_registration.js?' . $this->jsversion . '"></script>');
-    $this->template('repo/in', []);
+    $data['table_batches'] = $this->repo->batch_list();
+    $this->template('repo/batch/list', $data);
+  }
+
+  public function misc_exp()
+  {
+    $this->access(17);
+    $this->header_data('title', 'Repo Registration Misc Expense');
+    $this->footer_data('script', '<script src="' . base_url() . 'assets/js/repo_registration.js?' . $this->jsversion . '"></script>');
+
+    $data['batchref_dropdown'] = form_dropdown("repo_batch_id", $this->form->ca_dropdown('REPO'), '', ["class" => "span5"]);
+    $data['hidden'] = 'hidden';
+    $data['disabled'] = 'disabled';
+
+    if ($this->input->post('save')) {
+      $repo_batch_id = $this->input->post('repo_batch_id');
+      $expense_type = $this->input->post('expense_type');
+      $or_no = $this->input->post('or_no');
+      $or_date = $this->input->post('or_date');
+      $expense_id = md5($_SESSION['branch_code'] . date('Y-m-d H:m:s'));
+
+      $upload = $this->file->upload('misc', '/repo/batch/misc_exp/' . $repo_batch_id . '/', $expense_id . '.jpg');
+      $form_ok = $this->validate->form('REPO_BATCH_MISC_EXP', ['expense_type' => $expense_type]);
+      if ($upload && $form_ok) {
+        $img_path = '/rms_dir/repo/batch/misc_exp/' . $repo_batch_id . '/' . $expense_id . '.jpg';
+        $this->repo->misc_insert();
+        $misc_saved = $this->repo->save_expense([
+          "repo_batch_id" => $repo_batch_id,
+          "data" => [
+            $expense_id => [
+              "or_no" => $or_no,
+              "expense_type" => $expense_type,
+              "amount" => $this->input->post('amount'),
+              "image_path" => $img_path,
+              "status" => "FOR CHECKING",
+              "or_date" => $or_date,
+              "date_time_created" => date('Y-m-d H:m:s'),
+              "is_deleted" => "0",
+            ]
+          ]
+        ]);
+
+        if ($misc_saved) {
+          $_SESSION['messages'][] = 'Misc expense uploaded successfully.';
+        } else {
+          $_SESSION['warning'][] = 'Something went wrong.';
+        }
+      }
+
+      if (strlen(set_select('expense_type', 'Others')) > 0) {
+        $data['hidden'] = '';
+        $data['disabled'] = '';
+      }
+    }
+    $this->template('repo/batch/misc', $data);
   }
 
   public function sale($sales_id)
@@ -263,7 +325,6 @@ HTML;
     if ($this->input->post('repo-in')) {
       $this->repo->claim($this->input->post('engine_id'));
     }
-
     redirect('./repo/in');
   }
 
@@ -289,14 +350,6 @@ HTML;
     $this->template('repo/batch/create', $data);
   }
 
-  public function ca_batch()
-  {
-    $this->access(17);
-    $this->header_data('title', 'Repo Batch');
-    $this->footer_data('script', '<script src="' . base_url() . 'assets/js/repo_registration.js?' . $this->jsversion . '"></script>');
-    $data['table_batches'] = $this->repo->batch_list();
-    $this->template('repo/batch/list', $data);
-  }
 
   public function batch_view($repo_batch_id)
   {
@@ -306,58 +359,6 @@ HTML;
     $this->template('repo/batch/view', $data);
   }
 
-  public function misc_exp()
-  {
-    $this->access(17);
-    $this->header_data('title', 'Repo Registration Misc Expense');
-    $this->footer_data('script', '<script src="' . base_url() . 'assets/js/repo_registration.js?' . $this->jsversion . '"></script>');
-
-    $data['batchref_dropdown'] = form_dropdown("repo_batch_id", $this->form->ca_dropdown('REPO'), '', ["class" => "span5"]);
-    $data['hidden'] = 'hidden';
-    $data['disabled'] = 'disabled';
-
-    if ($this->input->post('save')) {
-      $repo_batch_id = $this->input->post('repo_batch_id');
-      $expense_type = $this->input->post('expense_type');
-      $or_no = $this->input->post('or_no');
-      $or_date = $this->input->post('or_date');
-      $expense_id = md5($_SESSION['branch_code'] . date('Y-m-d H:m:s'));
-
-      $upload = $this->file->upload('misc', '/repo/batch/misc_exp/' . $repo_batch_id . '/', $expense_id . '.jpg');
-      $form_ok = $this->validate->form('REPO_BATCH_MISC_EXP', ['expense_type' => $expense_type]);
-      if ($upload && $form_ok) {
-        $img_path = '/rms_dir/repo/batch/misc_exp/' . $repo_batch_id . '/' . $expense_id . '.jpg';
-        $this->repo->misc_insert();
-        $misc_saved = $this->repo->save_expense([
-          "repo_batch_id" => $repo_batch_id,
-          "data" => [
-            $expense_id => [
-              "or_no" => $or_no,
-              "expense_type" => $expense_type,
-              "amount" => $this->input->post('amount'),
-              "image_path" => $img_path,
-              "status" => "FOR CHECKING",
-              "or_date" => $or_date,
-              "date_time_created" => date('Y-m-d H:m:s'),
-              "is_deleted" => "0",
-            ]
-          ]
-        ]);
-
-        if ($misc_saved) {
-          $_SESSION['messages'][] = 'Misc expense uploaded successfully.';
-        } else {
-          $_SESSION['warning'][] = 'Something went wrong.';
-        }
-      }
-
-      if (strlen(set_select('expense_type', 'Others')) > 0) {
-        $data['hidden'] = '';
-        $data['disabled'] = '';
-      }
-    }
-    $this->template('repo/batch/misc', $data);
-  }
 
   public function batch_print($repo_batch_id)
   {
@@ -531,6 +532,16 @@ HTML;
     $this->load->view('repo/sap', $data);
   }
 
+  public function matrix()
+  {
+    $this->access(1);
+    $this->header_data('title', 'Disapprove Repo Miscellaneous List');
+    $this->header_data('nav', '');
+    $this->header_data('dir', './');
+
+    $this->template('repo/tip');
+  }
+
   public function expense()
   {
     $this->access(1);
@@ -586,41 +597,11 @@ HTML;
     }else{
       $data['table']     = $this->repo_sales->disapprove_list($param);
       $this->template('repo/list/accounting/sales_disapproved', $data);
-    }
-    
-    
-  }
-
-  public function return_fund_view($rfid)
-  {
-    $this->access(1);
-    $this->header_data('title', 'Return Fund');
-    $this->header_data('nav', 'return_fund');
-    $this->header_data('dir', './../../');
-    $this->footer_data('return_fund_js', '<script src="' . base_url() . 'assets/js/return_fund.js?v1.0.0"></script>');
-
-
-    $liquidate = $this->input->post('liquidate');
-    if (!empty($liquidate)) {
-      $this->return_fund->liquidate_return($rfid);
-    }
-
-    $amount = $this->input->post('amount');
-    if (!empty($amount)) {
-      $this->return_fund->correct_amount($rfid, $amount);
-    }
-
-    $data['return'] = $this->return_fund->load_return($rfid);
-    if (is_null($data['return']) || $data['return']->status === 'Deleted') {
-      show_404();
-    } else {
-      $this->template('repo/return_fund/view', $data);
-    }
+    } 
   }
   
   public function return_fund()
   {
-
     $this->access(1);
     $this->header_data('title', 'Return Fund');
     $this->header_data('nav', 'return_fund');

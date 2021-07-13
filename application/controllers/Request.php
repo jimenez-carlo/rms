@@ -28,6 +28,15 @@ class Request extends CI_Controller {
       $data['record']  = $this->request->get_batch($id);
       $this->load->view('modal/repo/add_repo_return_fund', $data);
     }
+    if (isset($_POST['action']) && $_POST['action'] == 'create_repo_branch_tip') {
+      $data['dropdown']  = $this->request->get_repo_branch_tip_not_exists();
+      $this->load->view('modal/repo/add_repo_branch_tip',$data);
+    }
+    if (isset($_POST['action']) && $_POST['action'] == 'edit_repo_branch_tip') {
+      $data['record']    = $this->request->get_repo_branch_tip($_POST['branch']);
+      $data['dropdown']  = $this->request->get_repo_branch_tip_not_exists();
+      $this->load->view('modal/repo/edit_repo_branch_tip',$data);
+    }
     if (isset($_POST['action']) && $_POST['action'] == 'edit_repo_return_fund') {
       $id = $this->input->post('return_fund_id');
       $record = $this->request->get_return_fund($id);
@@ -66,13 +75,24 @@ class Request extends CI_Controller {
       }
     }
 
-
     if (isset($_POST['action']) && $_POST['action'] == 'view_repo_misc') {
       $data['record']       = $this->request->view_repo_misc();
       $data['status']       = $this->request->repo_misc_change_status();
       $data['expense_type'] = $this->request->expense_type();
       $this->load->view('modal/repo/view_repo_misc', $data);
     }
+
+    if (isset($_POST['action']) && $_POST['action'] == 'view_repo_matrix_table') {
+      $data['table'] = $this->request->view_repo_matrix_table();
+      $this->load->view('repo/list/tip', $data);
+    }
+    if (isset($_POST['action']) && $_POST['action'] == 'update_branch_tip') {
+      echo $this->request->update_branch_tip();
+    }
+    if (isset($_POST['action']) && $_POST['action'] == 'save_repo_branch_tip') {
+      echo $this->request->save_repo_branch_tip();
+    }
+
     if (isset($_POST['action']) && $_POST['action'] == 'save_for_checking') {
       echo $this->request->save_for_checking();
     }

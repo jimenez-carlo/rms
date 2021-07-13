@@ -114,6 +114,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                             <li <?php if(isset($nav) && $nav=="transmittal") echo 'class="active"'; ?>>
                                 <a href="<?php echo base_url('transmittal'); ?>">Transmittal</a>
                             </li>
+                            <li <?php if(isset($nav) && $nav=="matrix") echo 'class="active"'; ?>>
+                                <a href="<?php echo base_url(); ?>repo/matrix">Tip Matrix</a>
+                            </li>
                         </ul>
                     </div>
                     <!--/.nav-collapse -->
