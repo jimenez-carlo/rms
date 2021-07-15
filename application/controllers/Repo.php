@@ -479,7 +479,7 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Repo For SAP Uploading');
-    $this->header_data('nav', '');
+    $this->header_data('nav', 'repo-registration');
     $this->header_data('dir', './');
     $this->footer_data('script', '<script src="../assets/modal/sap_upload.js"></script>');
 
@@ -536,7 +536,7 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Disapprove Repo Miscellaneous List');
-    $this->header_data('nav', '');
+    $this->header_data('nav', 'repo-registration');
     $this->header_data('dir', './');
 
     $this->template('repo/tip');
@@ -546,7 +546,7 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Disapprove Repo Miscellaneous List');
-    $this->header_data('nav', '');
+    $this->header_data('nav', 'repo-registration');
     $this->header_data('dir', './');
 
     $param = new Stdclass();
@@ -566,7 +566,7 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Disapprove Repo Sales List');
-    $this->header_data('nav', '');
+    $this->header_data('nav', 'repo-registration');
     $this->header_data('dir', './');
 
     $param = new Stdclass();
@@ -582,7 +582,7 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Repo Sales List');
-    $this->header_data('nav', '');
+    $this->header_data('nav', 'repo-registration');
     $this->header_data('dir', './');
 
     $param = new Stdclass();
@@ -604,7 +604,7 @@ HTML;
   {
     $this->access(1);
     $this->header_data('title', 'Return Fund');
-    $this->header_data('nav', 'return_fund');
+    $this->header_data('nav', 'repo-registration');
     $this->header_data('dir', './');
     $this->footer_data('script', '<script src="'.base_url().'vendors/datatables/js/jquery.dataTables.min.js"></script>');
     $this->footer_data('return_fund_js', '<script src="'.base_url().'assets/js/return_fund.js?v1.0.0"></script>');

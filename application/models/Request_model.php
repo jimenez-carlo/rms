@@ -120,9 +120,9 @@ class Request_model extends CI_Model
   {
     $post = $this->input->post();
     $branch = $post['branch'];
-    $branchExists = $this->db->query("SELECT * from tbl_repo_branch_budget where bcode = {$branch}")->num_rows();
-    if (!empty($branchExists)) {
-      return $this->message->error('Branch Code ' . $branch . ', Already Exists');
+    $branchExists = $this->db->query("SELECT IFNULL(bcode,0) as result from tbl_repo_branch_budget where bcode = {$branch}");
+    if (!empty($branchExists->row()->result)) {
+      return $this->message->error('Branch Code ' . $branch . ', Already Exists!');
     }
     $this->db->trans_start();
     $data = array(
