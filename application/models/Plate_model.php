@@ -413,5 +413,10 @@ class Plate_model extends CI_Model{
             ORDER BY b.bname;")->result_object();
           return $result;
         }
-
+        public function list(){
+          return $this->db->query("SELECT x.*,UPPER(CONCAT(y.bcode,' ',y.bname)) as branch,y.company,x.plate_id,z.status_name,a.company_name from 
+          tbl_plate x right join
+           tbl_sales y on x.sid = y.sid
+                    inner join tbl_status z on z.status_type= 'PLATE' AND x.status_id = z.status_id inner join tbl_company a on y.company = a.cid limit 100")->result_array();
+        }
 }

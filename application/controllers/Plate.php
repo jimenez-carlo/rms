@@ -281,5 +281,12 @@ class Plate extends MY_Controller {
                         }
                 }
         }
+        public function list(){
+          $this->header_data('title', 'Plate List');
+          $this->footer_data('script', '<script src="' .base_url() . 'assets/js/barcode.js"></script>');
+          $data['table'] = $this->plate->list();
+          $this->template("plate/plate_list", $data);
+        }
+         
 
 }

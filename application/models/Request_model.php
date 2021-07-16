@@ -78,6 +78,59 @@ class Request_model extends CI_Model
         break;
     }
   }
+  function test_table(){
+    $obj = new stdClass();
+    $limit = $where = "";
+    
+    if (!empty($_POST['search'])) {
+      $where = " WHERE CONCAT_WS(sid,bname,registration_type,payment_method,si_no) LIKE '%{$_POST['search']}%'";
+    }
+
+    $obj->count = $this->db->query("SELECT COUNT(IFNULL(sid,0)) as 'count' from tbl_sales {$where} limit 1")->row()->count;
+    $obj->page = isset($_POST['page']) && is_numeric($_POST['page']) ? $_POST['page'] : 1;
+    
+    $obj->num_results_on_page = isset($_POST['pagination']) && is_numeric($_POST['pagination']) ? $_POST['pagination'] : 5;
+    $obj->calc_page = ($obj->page - 1) * $obj->num_results_on_page;
+    $limit = "LIMIT {$obj->calc_page},{$obj->num_results_on_page}";
+    
+    if (isset($_POST['pagination']) && $_POST['pagination'] == 0) {
+      $obj->num_results_on_page = $obj->count;
+      $obj->calc_page           = $obj->count;
+  
+    }
+
+    $sort = (isset($_POST['sort']) && !empty($_POST['sort'])) ? "ORDER BY ".$_POST['sort'] : "";
+    
+
+    if (empty($_POST['is_init'])) {
+      $_SESSION['ids'] = array();
+    }
+
+    if (isset($_POST['ids'])) {
+      $_SESSION['ids'] =  array_unique (array_merge ($_SESSION['ids'], $_POST['ids'])); 
+    }
+    $obj->table = $this->db->query("SELECT * from tbl_sales {$where} {$sort} {$limit}")->result_array();
+    return $obj;
+  }
+  function get_plate($id){
+    return $this->db->query("SELECT 
+    x.plate_number,
+    x.date_encoded,
+    x.received_dt,
+    x.received_cust,
+    x.plate_trans_no,
+    UPPER(CONCAT(y.bcode,y.bname)) as branch,
+    y.si_no,
+    y.ar_no,
+    UPPER(CONCAT(IFNULL(cus.last_name, ''),', ', IFNULL(cus.first_name, ''), LEFT(IFNULL(cus.middle_name,''),1))) as customer_name,
+    s.status_name,
+    cmp.company_code
+     FROM tbl_plate x 
+    inner join tbl_sales y on x.sid = y.sid
+    inner join tbl_status s on s.status_id = x.status_id and s.status_type='PLATE'
+    left join tbl_customer cus on  y.customer = cus.cid
+    inner join tbl_company cmp on y.company = cmp.cid where x.plate_number = '{$id}' limit 1")->row();
+  }
   function get_repo_branch_tip($branch = null)
   {
     if (empty($branch)) {

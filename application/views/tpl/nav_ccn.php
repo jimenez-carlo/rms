@@ -69,6 +69,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a tabindex="-1" href="<?php echo base_url('plate/transmittal'); ?>">Plate Transmittal</a>
+                                        <a tabindex="-1" href="<?php echo base_url('plate/list'); ?>">Plate List</a>
                                     </li>
                                 </ul>
                             </li>

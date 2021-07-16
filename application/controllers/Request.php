@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Request extends CI_Controller {
+class Request extends MY_Controller { //CI  Controller MY_Controller
   function __construct() {
     parent::__construct();
     $this->load->model('Request_model', 'request');
@@ -8,6 +8,10 @@ class Request extends CI_Controller {
 
   function index() {
 
+    if (isset($_POST['action']) && $_POST['action'] == 'view_plate') {
+      $data['record']    = $this->request->get_plate($_POST['plate_no']);
+      $this->load->view('modal/repo/view_plate', $data);
+    }
     if (isset($_POST['action']) && $_POST['action'] == 'edit_repo_misc') {
       $data['record']       = $this->request->view_repo_misc();
       $data['expense_type'] = $this->request->expense_type();
@@ -45,7 +49,7 @@ class Request extends CI_Controller {
       $data['dropdown']= $this->request->repo_fund_change_status();
       $this->load->view('modal/repo/edit_repo_return_fund', $data);
     }
-    
+
     if (isset($_POST['action']) && $_POST['action'] == 'view_repo_for_checking') {
       $id = $this->input->post('repo_batch_id');
       if (!empty($id)) {
@@ -122,5 +126,10 @@ class Request extends CI_Controller {
         echo $this->request->update_repo_return_fund();
       }
     }
+  }
+  function table(){
+      $data['table']   = $this->request->test_table();
+      $this->template('test', $data);
+      // $this->load->view('test', $data);
   }
 }

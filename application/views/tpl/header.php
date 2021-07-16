@@ -2,8 +2,8 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 ?>
 <!DOCTYPE html>
-<html class="no-js">
-
+<html>
+<!-- class="no-js" -->
     <head>
         <title><?php echo 'RMS'; if(isset($title)) echo ' | '.$title; ?></title>
         <link rel="shortcut icon" href="<?php print base_url('images/favicon.ico') ?>">
