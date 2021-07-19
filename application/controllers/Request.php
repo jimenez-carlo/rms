@@ -128,8 +128,14 @@ class Request extends MY_Controller { //CI  Controller MY_Controller
     }
   }
   function table(){
-      $data['table']   = $this->request->test_table();
-      $this->template('test', $data);
-      // $this->load->view('test', $data);
-  }
+    $data['table']   = $this->request->test_table();
+    $this->template('test', $data);
+}
+function super_table(){
+  $this->template('super_test');
+}
+function table_api(){
+  $data['table']   = $this->request->test_table();
+  $this->load->view('test', $data);
+}
 }
